@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     const breakdownThisWeek: File[] = []
     const breakdownLastWeek: File[] = []
     
-    for (const [key, value] of formData.entries()) {
+    for (const [key, value] of Array.from(formData.entries())) {
       if (key.startsWith('breakdownThisWeek_') && value instanceof File) {
         breakdownThisWeek.push(value)
       }

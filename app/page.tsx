@@ -387,7 +387,7 @@ export default function Home() {
                   color: '#333',
                   fontSize: '1rem'
                 }}>
-                  Klik "Analyze CSV"
+                  Klik &quot;Analyze CSV&quot;
                 </h3>
                 <p style={{
                   color: '#666',
@@ -395,7 +395,7 @@ export default function Home() {
                   lineHeight: '1.6',
                   margin: 0
                 }}>
-                  Setelah semua file ter-upload, klik tombol <strong>"1. Analyze CSV"</strong> untuk memproses data. 
+                  Setelah semua file ter-upload, klik tombol <strong>&quot;1. Analyze CSV&quot;</strong> untuk memproses data. 
                   Sistem akan menganalisis semua file dan menampilkan summary hasil analisis.
                 </p>
               </div>
@@ -441,7 +441,7 @@ export default function Home() {
                   lineHeight: '1.6',
                   margin: 0
                 }}>
-                  Setelah analisis selesai, klik tombol <strong>"2. Generate HTML Report"</strong>. 
+                  Setelah analisis selesai, klik tombol <strong>&quot;2. Generate HTML Report&quot;</strong>. 
                   Sistem akan menggenerate report dengan 13 slide lengkap. 
                   Tunggu sampai proses selesai dan preview report akan muncul.
                 </p>
@@ -488,9 +488,9 @@ export default function Home() {
                   lineHeight: '1.6',
                   margin: 0
                 }}>
-                  Setelah report ter-generate, klik tombol <strong>"📥 Download PDF"</strong>. 
-                  Print dialog akan muncul - pilih <strong>"Save as PDF"</strong> sebagai destination, 
-                  pastikan <strong>"Background graphics"</strong> diaktifkan, lalu klik <strong>"Save"</strong>.
+                  Setelah report ter-generate, klik tombol <strong>&quot;📥 Download PDF&quot;</strong>. 
+                  Print dialog akan muncul - pilih <strong>&quot;Save as PDF&quot;</strong> sebagai destination, 
+                  pastikan <strong>&quot;Background graphics&quot;</strong> diaktifkan, lalu klik <strong>&quot;Save&quot;</strong>.
                 </p>
               </div>
             </div>

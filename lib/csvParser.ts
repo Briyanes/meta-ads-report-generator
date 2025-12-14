@@ -44,7 +44,7 @@ export async function parseCSV(file: File | string): Promise<ParsedData> {
           }
         })
       },
-      error: (error) => {
+      error: (error: any) => {
         reject(new Error(`Failed to parse CSV: ${error.message}`))
       }
     })
