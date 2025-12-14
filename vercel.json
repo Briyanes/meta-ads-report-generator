@@ -1,0 +1,15 @@
+{
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "regions": ["sin1"],
+  "env": {
+    "NEXT_PUBLIC_SUPABASE_URL": "https://dhxvwbbdztjcwozesmxy.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "@supabase_anon_key",
+    "SUPABASE_SERVICE_ROLE_KEY": "@supabase_service_role_key",
+    "Z_AI_API_KEY": "@z_ai_api_key",
+    "Z_AI_API_URL": "https://api.z.ai/api/paas/v4/chat/completions"
+  }
+}
+
