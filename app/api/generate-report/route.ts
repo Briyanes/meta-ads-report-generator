@@ -1,11 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateHTMLReportWithZAI } from '@/lib/zai'
 import { supabaseAdmin } from '@/lib/supabase'
-import { generateReactTailwindReport } from '@/lib/reportTemplate'
 
 export async function POST(request: NextRequest) {
   try {
-    const { analysisData, reportName } = await request.json()
+    // Parse request body with error handling
+    let body
+    try {
+      body = await request.json()
+    } catch (parseError: any) {
+      console.error('Error parsing request body:', parseError)
+      return NextResponse.json(
+        { error: 'Invalid JSON in request body' },
+        { status: 400 }
+      )
+    }
+    
+    const { analysisData, reportName, retentionType = 'wow', objectiveType = 'ctwa' } = body
 
     if (!analysisData) {
       return NextResponse.json(
@@ -14,14 +25,56 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generate HTML report with Z AI
+    // Import template based on objective type
+    let generateReport: (analysisData: any, reportName?: string, retentionType?: string, objectiveType?: string) => string
+    
+    try {
+      if (objectiveType === 'ctwa') {
+        const { generateReactTailwindReport: generateCTWA } = await import('@/lib/reportTemplate-ctwa')
+        generateReport = generateCTWA
+      } else if (objectiveType === 'cpas') {
+        const { generateReactTailwindReport: generateCPAS } = await import('@/lib/reportTemplate-cpas')
+        generateReport = generateCPAS
+      } else if (objectiveType === 'ctlptowa') {
+        const { generateReactTailwindReport: generateCTLP } = await import('@/lib/reportTemplate-ctlptowa')
+        generateReport = generateCTLP
+      } else {
+        // Fallback to CTWA
+        const { generateReactTailwindReport: generateCTWA } = await import('@/lib/reportTemplate-ctwa')
+        generateReport = generateCTWA
+      }
+    } catch (importError) {
+      // If specific template doesn't exist, use default CTWA template
+      console.warn('Template import failed, using default CTWA template:', importError)
+      const { generateReactTailwindReport: generateCTWA } = await import('@/lib/reportTemplate-ctwa')
+      generateReport = generateCTWA
+    }
+
+    // Generate HTML report directly using React + Tailwind template based on objective type
+    // This ensures each objective type has its own isolated template and doesn't affect others
     let htmlReport: string
     try {
-      htmlReport = await generateHTMLReportWithZAI(analysisData)
-    } catch (zaiError: any) {
-      // If Z AI fails, use React + Tailwind template
-      console.warn('Z AI API failed, using React+Tailwind template:', zaiError.message)
-      htmlReport = generateReactTailwindReport(analysisData, reportName)
+      console.log(`Generating HTML report for objective type: ${objectiveType}, retention: ${retentionType}`)
+      htmlReport = generateReport(analysisData, reportName, retentionType, objectiveType)
+      console.log(`Generated HTML report length: ${htmlReport?.length || 0} characters`)
+      
+      if (!htmlReport || htmlReport.length < 100) {
+        throw new Error('Generated HTML report is too short or empty')
+      }
+      
+      // Validate HTML structure
+      if (!htmlReport.includes('<!DOCTYPE html>') && !htmlReport.includes('<html')) {
+        throw new Error('Generated HTML report is missing required HTML structure')
+      }
+      
+      if (!htmlReport.includes('<div id="root">')) {
+        throw new Error('Generated HTML report is missing root element')
+      }
+      
+      console.log('HTML report generated successfully')
+    } catch (templateError: any) {
+      console.error('Template generation error:', templateError)
+      throw new Error(`Failed to generate report template: ${templateError.message}`)
     }
 
     // Save to Supabase

@@ -7,6 +7,8 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData()
     const fileThisWeek = formData.get('fileThisWeek') as File
     const fileLastWeek = formData.get('fileLastWeek') as File
+    const retentionType = (formData.get('retentionType') as string) || 'wow'
+    const objectiveType = (formData.get('objectiveType') as string) || 'ctwa'
 
     if (!fileThisWeek || !fileLastWeek) {
       return NextResponse.json(
@@ -163,13 +165,29 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         return isNaN(num) ? 0 : num
       }
       
-      // Calculate CPR (Cost Per Result)
+      // Calculate base metrics
       const thisWeekSpend = parseNum(thisWeekData['Amount spent (IDR)'])
-      const thisWeekResults = parseNum(thisWeekData['Messaging conversations started'])
-      const thisWeekCPR = thisWeekResults > 0 ? thisWeekSpend / thisWeekResults : 0
-      
       const lastWeekSpend = parseNum(lastWeekData['Amount spent (IDR)'])
-      const lastWeekResults = parseNum(lastWeekData['Messaging conversations started'])
+      
+      // Extract results based on objective type
+      let thisWeekResults = 0
+      let lastWeekResults = 0
+      
+      if (objectiveType === 'cpas') {
+        // CPAS: Use purchases
+        thisWeekResults = parseNum(thisWeekData['Purchases'] || thisWeekData['Purchases with shared items'] || 0)
+        lastWeekResults = parseNum(lastWeekData['Purchases'] || lastWeekData['Purchases with shared items'] || 0)
+      } else if (objectiveType === 'ctlptowa') {
+        // CTLP to WA: Use checkouts initiated
+        thisWeekResults = parseNum(thisWeekData['Checkouts initiated'] || 0)
+        lastWeekResults = parseNum(lastWeekData['Checkouts initiated'] || 0)
+      } else {
+        // CTWA: Use messaging conversations
+        thisWeekResults = parseNum(thisWeekData['Messaging conversations started'] || 0)
+        lastWeekResults = parseNum(lastWeekData['Messaging conversations started'] || 0)
+      }
+      
+      const thisWeekCPR = thisWeekResults > 0 ? thisWeekSpend / thisWeekResults : 0
       const lastWeekCPR = lastWeekResults > 0 ? lastWeekSpend / lastWeekResults : 0
       
       // Calculate growth
@@ -184,36 +202,74 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         ...breakdownLastWeek.map(f => f.name)
       ]
       
+      // Build performance summary with all fields
+      const buildPerformanceData = (data: any, results: number, cpr: number) => {
+        const base = {
+          amountSpent: parseNum(data['Amount spent (IDR)']),
+          impressions: parseNum(data['Impressions']),
+          linkClicks: parseNum(data['Link clicks']),
+          ctr: parseNum(data['CTR (link click-through rate)']),
+          cpc: parseNum(data['CPC (cost per link click)']),
+          cpm: parseNum(data['CPM (cost per 1,000 impressions)']),
+          outboundClicks: parseNum(data['Outbound clicks']),
+          frequency: parseNum(data['Frequency']),
+          reach: parseNum(data['Reach']),
+          cpr: cpr
+        }
+        
+        // CTWA fields
+        if (objectiveType === 'ctwa') {
+          return {
+            ...base,
+            messagingConversations: results,
+            costPerWA: parseNum(data['Cost per messaging conversation started'])
+          }
+        }
+        
+        // CTLP to WA fields
+        if (objectiveType === 'ctlptowa') {
+          // Extract ratio fields (they're already calculated in CSV)
+          const ocToLPV = parseNum(data['* OC to LPV'] || 0)
+          const lcToLPV = parseNum(data['* LC to LPV'] || 0)
+          const lpvToIC = parseNum(data['* LPV to IC'] || 0)
+          
+          return {
+            ...base,
+            checkoutsInitiated: results,
+            landingPageViews: parseNum(data['Website landing page views'] || data['Landing page views'] || 0),
+            contentViews: parseNum(data['Content views'] || 0),
+            clicksAll: parseNum(data['Clicks (all)'] || 0),
+            ctrAll: parseNum(data['CTR (all)'] || 0),
+            ocToLPV: ocToLPV, // Ratio from CSV (0-1 format)
+            lcToLPV: lcToLPV, // Ratio from CSV (0-1 format)
+            lpvToIC: lpvToIC  // Ratio from CSV (0-1 format)
+          }
+        }
+        
+        // CPAS fields
+        if (objectiveType === 'cpas') {
+          return {
+            ...base,
+            purchases: results,
+            addsToCart: parseNum(data['Adds to cart'] || data['Adds to cart with shared items']),
+            contentViews: parseNum(data['Content views'] || data['Content views with shared items']),
+            atcConversionValue: parseNum(data['ATC conversion value'] || data['ATC conversion value (shared only)']),
+            purchasesConversionValue: parseNum(data['Purchases conversion value'] || data['Purchases conversion value for shared items only'])
+          }
+        }
+        
+        // Default (CTWA)
+        return {
+          ...base,
+          messagingConversations: results,
+          costPerWA: parseNum(data['Cost per messaging conversation started'])
+        }
+      }
+      
       analysis = JSON.stringify({
         performanceSummary: {
-          thisWeek: {
-            amountSpent: thisWeekSpend,
-            impressions: parseNum(thisWeekData['Impressions']),
-            linkClicks: parseNum(thisWeekData['Link clicks']),
-            ctr: parseNum(thisWeekData['CTR (link click-through rate)']),
-            cpc: parseNum(thisWeekData['CPC (cost per link click)']),
-            cpm: parseNum(thisWeekData['CPM (cost per 1,000 impressions)']),
-            outboundClicks: parseNum(thisWeekData['Outbound clicks']),
-            messagingConversations: thisWeekResults,
-            costPerWA: parseNum(thisWeekData['Cost per messaging conversation started']),
-            frequency: parseNum(thisWeekData['Frequency']),
-            reach: parseNum(thisWeekData['Reach']),
-            cpr: thisWeekCPR
-          },
-          lastWeek: {
-            amountSpent: lastWeekSpend,
-            impressions: parseNum(lastWeekData['Impressions']),
-            linkClicks: parseNum(lastWeekData['Link clicks']),
-            ctr: parseNum(lastWeekData['CTR (link click-through rate)']),
-            cpc: parseNum(lastWeekData['CPC (cost per link click)']),
-            cpm: parseNum(lastWeekData['CPM (cost per 1,000 impressions)']),
-            outboundClicks: parseNum(lastWeekData['Outbound clicks']),
-            messagingConversations: lastWeekResults,
-            costPerWA: parseNum(lastWeekData['Cost per messaging conversation started']),
-            frequency: parseNum(lastWeekData['Frequency']),
-            reach: parseNum(lastWeekData['Reach']),
-            cpr: lastWeekCPR
-          },
+          thisWeek: buildPerformanceData(thisWeekData, thisWeekResults, thisWeekCPR),
+          lastWeek: buildPerformanceData(lastWeekData, lastWeekResults, lastWeekCPR),
           growth: {
             spend: spendGrowth,
             results: resultsGrowth,
@@ -225,6 +281,8 @@ Return the analysis as structured JSON data that can be used to generate the HTM
           lastWeek: breakdownDataLastWeek
         },
         fileNames: allFileNames,
+        retentionType: retentionType,
+        objectiveType: objectiveType,
         note: 'Data extracted from CSV. Configure Z AI API for full AI analysis.'
       }, null, 2)
     }

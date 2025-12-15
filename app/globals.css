@@ -29,6 +29,7 @@ a {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
+  min-height: 100vh;
 }
 
 .card {
@@ -37,6 +38,17 @@ a {
   padding: 2rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   margin-bottom: 2rem;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .card {
+    padding: 1.5rem;
+  }
 }
 
 .btn {
@@ -84,12 +96,29 @@ a {
 }
 
 .input-group input,
-.input-group textarea {
+.input-group textarea,
+.input-group select {
   width: 100%;
   padding: 0.75rem;
   border: 1px solid #ddd;
   border-radius: 6px;
   font-size: 1rem;
+  font-family: inherit;
+}
+
+.input-group select {
+  background-color: white;
+  cursor: pointer;
+}
+
+.input-group select:hover {
+  border-color: #2B46BB;
+}
+
+.input-group select:focus {
+  outline: none;
+  border-color: #2B46BB;
+  box-shadow: 0 0 0 3px rgba(43, 70, 187, 0.1);
 }
 
 .file-upload {
@@ -149,4 +178,5 @@ a {
   color: #0c5460;
   border: 1px solid #bee5eb;
 }
+
 

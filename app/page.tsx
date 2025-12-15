@@ -15,6 +15,8 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null)
   const [reportName, setReportName] = useState('')
   const [generationProgress, setGenerationProgress] = useState<string>('')
+  const [retentionType, setRetentionType] = useState<'wow' | 'mom'>('wow')
+  const [objectiveType, setObjectiveType] = useState<'ctwa' | 'cpas' | 'ctlptowa'>('ctwa')
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'thisWeek' | 'lastWeek') => {
     const selectedFiles = Array.from(e.target.files || [])
@@ -93,7 +95,8 @@ export default function Home() {
     ) || filesLastWeek[0]
 
     if (!mainFileThisWeek || !mainFileLastWeek) {
-      setError('Please upload at least main CSV file for both weeks (Minggu Ini & Minggu Lalu)')
+      const periodLabel = retentionType === 'wow' ? 'weeks (Minggu Ini & Minggu Lalu)' : 'months (Bulan Ini & Bulan Lalu)'
+      setError(`Please upload at least main CSV file for both ${periodLabel}`)
       return
     }
 
@@ -106,6 +109,10 @@ export default function Home() {
       // Append main files
       formData.append('fileThisWeek', mainFileThisWeek)
       formData.append('fileLastWeek', mainFileLastWeek)
+      
+      // Append retention and objective type
+      formData.append('retentionType', retentionType)
+      formData.append('objectiveType', objectiveType)
       
       // Append breakdown files for this week
       filesThisWeek.forEach((file, index) => {
@@ -195,9 +202,24 @@ export default function Home() {
             ...analysisData,
             breakdown: breakdown
           },
-          reportName: reportName || `Report ${new Date().toLocaleDateString('id-ID')}`
+          reportName: reportName || `Report ${new Date().toLocaleDateString('id-ID')}`,
+          retentionType: retentionType,
+          objectiveType: objectiveType
         })
       })
+
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type')
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text()
+        console.error('Non-JSON response received:', {
+          status: response.status,
+          statusText: response.statusText,
+          contentType: contentType,
+          preview: text.substring(0, 200)
+        })
+        throw new Error(`Server error: Received HTML instead of JSON. Status: ${response.status}`)
+      }
 
       const data = await response.json()
 
@@ -207,8 +229,18 @@ export default function Home() {
 
       // Validate HTML report is generated
       if (!data.html || data.html.length < 100) {
+        console.error('Invalid HTML report:', {
+          hasHtml: !!data.html,
+          htmlLength: data.html?.length || 0,
+          dataKeys: Object.keys(data)
+        })
         throw new Error('Report tidak lengkap. Silakan coba lagi.')
       }
+      
+      console.log('HTML report received:', {
+        length: data.html.length,
+        preview: data.html.substring(0, 200)
+      })
 
       setGenerationProgress('✓ Report berhasil di-generate! Memuat preview...')
       await new Promise(resolve => setTimeout(resolve, 1000))
@@ -273,8 +305,8 @@ export default function Home() {
   }
 
   return (
-    <main className="container">
-      <div className="card">
+    <main className="container" style={{ minHeight: '100vh' }}>
+      <div className="card" style={{ width: '100%', maxWidth: '100%' }}>
         <h1 style={{ 
           color: '#2B46BB', 
           marginBottom: '0.5rem',
@@ -348,7 +380,7 @@ export default function Home() {
                   lineHeight: '1.6',
                   margin: 0
                 }}>
-                  Upload file utama dan file breakdown untuk <strong>Minggu Ini</strong> dan <strong>Minggu Lalu</strong>. 
+                  Upload file utama dan file breakdown untuk periode yang dipilih. 
                   File breakdown bisa berupa: age, gender, region, platform, placement, objective, ad-creative.
                   Bisa upload multiple files sekaligus dengan drag & drop atau klik area upload.
                 </p>
@@ -506,7 +538,7 @@ export default function Home() {
             color: '#856404'
           }}>
             <strong>💡 Tips:</strong> Pastikan semua file CSV sudah lengkap untuk hasil analisis yang maksimal. 
-            File utama harus ada untuk kedua periode (Minggu Ini & Minggu Lalu).
+            File utama harus ada untuk kedua periode yang dipilih.
           </div>
         </div>
 
@@ -528,14 +560,99 @@ export default function Home() {
         </div>
 
         <div className="input-group">
-          <label>Upload CSV Files untuk Week-on-Week Analysis</label>
+          <label htmlFor="retentionType">Pemilihan Retensi</label>
+          <select
+            id="retentionType"
+            value={retentionType}
+            onChange={(e) => {
+              setRetentionType(e.target.value as 'wow' | 'mom')
+              // Reset files when changing retention type
+              setFilesThisWeek([])
+              setFilesLastWeek([])
+              setAnalysis(null)
+              setHtmlReport(null)
+            }}
+            style={{
+              width: '100%',
+              padding: '0.75rem',
+              border: '1px solid #ddd',
+              borderRadius: '6px',
+              fontSize: '1rem',
+              backgroundColor: 'white',
+              cursor: 'pointer',
+              transition: 'border-color 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#2B46BB'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = '#ddd'
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = '#2B46BB'
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(43, 70, 187, 0.1)'
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = '#ddd'
+              e.currentTarget.style.boxShadow = 'none'
+            }}
+          >
+            <option value="wow">WoW (Week-on-Week)</option>
+            <option value="mom">MoM (Month-on-Month)</option>
+          </select>
+        </div>
+
+        <div className="input-group">
+          <label htmlFor="objectiveType">Pemilihan Iklan Objective</label>
+          <select
+            id="objectiveType"
+            value={objectiveType}
+            onChange={(e) => {
+              setObjectiveType(e.target.value as 'ctwa' | 'cpas' | 'ctlptowa')
+              // Reset analysis and report when changing objective
+              setAnalysis(null)
+              setHtmlReport(null)
+            }}
+            style={{
+              width: '100%',
+              padding: '0.75rem',
+              border: '1px solid #ddd',
+              borderRadius: '6px',
+              fontSize: '1rem',
+              backgroundColor: 'white',
+              cursor: 'pointer',
+              transition: 'border-color 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#2B46BB'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = '#ddd'
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = '#2B46BB'
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(43, 70, 187, 0.1)'
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = '#ddd'
+              e.currentTarget.style.boxShadow = 'none'
+            }}
+          >
+            <option value="ctwa">CTWA</option>
+            <option value="cpas">CPAS</option>
+            <option value="ctlptowa">CTLP to WA</option>
+          </select>
+        </div>
+
+        <div className="input-group">
+          <label>Upload CSV Files untuk {retentionType === 'wow' ? 'Week-on-Week' : 'Month-on-Month'} Analysis</label>
           <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '1rem' }}>
             Upload file utama + file breakdown (age, gender, region, platform, placement, objective, ad-creative)
           </p>
           
           <div style={{ marginBottom: '1.5rem' }}>
             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
-              📅 Minggu Ini (This Week) - {filesThisWeek.length} file(s)
+              📅 {retentionType === 'wow' ? 'Minggu Ini (This Week)' : 'Bulan Ini (This Month)'} - {filesThisWeek.length} file(s)
             </label>
             <div
               className="file-upload"
@@ -606,7 +723,7 @@ export default function Home() {
 
           <div>
             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
-              📅 Minggu Lalu (Last Week) - {filesLastWeek.length} file(s)
+              📅 {retentionType === 'wow' ? 'Minggu Lalu (Last Week)' : 'Bulan Lalu (Last Month)'} - {filesLastWeek.length} file(s)
             </label>
             <div
               className="file-upload"
@@ -733,7 +850,7 @@ export default function Home() {
               <strong>✓ Analysis Complete!</strong>
               <div style={{ marginTop: '0.75rem', fontSize: '0.9rem', lineHeight: '1.8' }}>
                 <div style={{ marginBottom: '0.5rem' }}>
-                  <strong>📊 Minggu Ini (This Week):</strong><br/>
+                  <strong>📊 {retentionType === 'wow' ? 'Minggu Ini (This Week)' : 'Bulan Ini (This Month)'}:</strong><br/>
                   • Main CSV: {analysis.summary?.thisWeek?.totalRows || 'N/A'} rows<br/>
                   • Breakdown Files: {analysis.summary?.thisWeek?.breakdownFiles || 0} files ({analysis.summary?.thisWeek?.breakdownRows || 0} rows)<br/>
                   {analysis.summary?.thisWeek?.breakdownTypes && analysis.summary.thisWeek.breakdownTypes.length > 0 && (
@@ -743,7 +860,7 @@ export default function Home() {
                   )}
                 </div>
                 <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(0,0,0,0.1)' }}>
-                  <strong>📊 Minggu Lalu (Last Week):</strong><br/>
+                  <strong>📊 {retentionType === 'wow' ? 'Minggu Lalu (Last Week)' : 'Bulan Lalu (Last Month)'}:</strong><br/>
                   • Main CSV: {analysis.summary?.lastWeek?.totalRows || 'N/A'} rows<br/>
                   • Breakdown Files: {analysis.summary?.lastWeek?.breakdownFiles || 0} files ({analysis.summary?.lastWeek?.breakdownRows || 0} rows)<br/>
                   {analysis.summary?.lastWeek?.breakdownTypes && analysis.summary.lastWeek.breakdownTypes.length > 0 && (
@@ -853,7 +970,7 @@ export default function Home() {
                 📊 Preview Report - Meta Ads Performance Report
               </div>
               <iframe
-                srcDoc={htmlReport}
+                srcDoc={htmlReport || ''}
                 style={{
                   width: '100%',
                   height: '800px',
@@ -863,6 +980,23 @@ export default function Home() {
                 title="Report Preview"
                 onLoad={() => {
                   console.log('Report loaded successfully')
+                  const iframe = document.querySelector('iframe[title="Report Preview"]') as HTMLIFrameElement
+                  if (iframe && iframe.contentWindow) {
+                    try {
+                      const iframeDoc = iframe.contentDocument || iframe.contentWindow.document
+                      const root = iframeDoc?.getElementById('root')
+                      if (!root || root.innerHTML.trim() === '') {
+                        console.error('Report iframe is empty or root element not found')
+                        setError('Report tidak ter-render dengan benar. Silakan coba lagi.')
+                      }
+                    } catch (e) {
+                      console.error('Error checking iframe content:', e)
+                    }
+                  }
+                }}
+                onError={(e) => {
+                  console.error('Iframe error:', e)
+                  setError('Error loading report preview. Silakan coba lagi.')
                 }}
               />
             </div>
