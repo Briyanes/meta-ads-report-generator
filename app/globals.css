@@ -122,12 +122,15 @@ a {
 }
 
 .file-upload {
+  cursor: pointer;
   border: 2px dashed #2B46BB;
   border-radius: 8px;
   padding: 3rem;
   text-align: center;
-  cursor: pointer;
   transition: all 0.2s;
+  display: block;
+  position: relative;
+  min-height: 150px;
 }
 
 .file-upload:hover {

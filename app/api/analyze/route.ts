@@ -266,6 +266,12 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         }
       }
       
+      // Extract event data if CSV has date column (for CPAS only)
+      let eventAnalysis: any = {}
+      if (objectiveType === 'cpas') {
+        eventAnalysis = extractEventData(parsedDataThisWeek.data, parsedDataLastWeek.data, retentionType)
+      }
+      
       analysis = JSON.stringify({
         performanceSummary: {
           thisWeek: buildPerformanceData(thisWeekData, thisWeekResults, thisWeekCPR),
@@ -280,6 +286,7 @@ Return the analysis as structured JSON data that can be used to generate the HTM
           thisWeek: breakdownDataThisWeek,
           lastWeek: breakdownDataLastWeek
         },
+        eventAnalysis: eventAnalysis,
         fileNames: allFileNames,
         retentionType: retentionType,
         objectiveType: objectiveType,
@@ -334,5 +341,167 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       { status: 500 }
     )
   }
+}
+
+// Helper function to extract event data from CSV based on dates
+function extractEventData(thisWeekData: any[], lastWeekData: any[], retentionType: string): any {
+  const eventAnalysis: any = {
+    twindateThis: {},
+    twindateLast: {},
+    paydayThis: {},
+    paydayLast: {}
+  }
+  
+  // Check if CSV has date column
+  const dateColumnNames = ['Date', 'Day', 'Day (YYYY-MM-DD)', 'Day (YYYY/MM/DD)', 'Reporting starts', 'Day name']
+  let dateColumn: string | null = null
+  
+  if (thisWeekData.length > 0) {
+    const firstRow = thisWeekData[0]
+    dateColumn = Object.keys(firstRow).find(key => 
+      dateColumnNames.some(name => key.toLowerCase().includes(name.toLowerCase()))
+    ) || null
+  }
+  
+  // If no date column found, return empty event analysis
+  if (!dateColumn) {
+    return eventAnalysis
+  }
+  
+  // Helper function to parse date
+  const parseDate = (dateStr: string): Date | null => {
+    if (!dateStr) return null
+    // Try different date formats
+    const date = new Date(dateStr)
+    if (isNaN(date.getTime())) return null
+    return date
+  }
+  
+  // Helper function to check if date is Twindate (tanggal kembar: 11.11, 12.12, dll)
+  const isTwindate = (date: Date): boolean => {
+    const day = date.getDate()
+    const month = date.getMonth() + 1
+    // Check if day and month are the same (e.g., 11/11, 12/12)
+    return day === month
+  }
+  
+  // Helper function to check if date is Payday (tanggal 21-5: dari tanggal 21 bulan ini sampai tanggal 5 bulan berikutnya)
+  const isPayday = (date: Date): boolean => {
+    const day = date.getDate()
+    // Payday: tanggal 21-31 (akhir bulan) atau tanggal 1-5 (awal bulan)
+    return day >= 21 || day <= 5
+  }
+  
+  // Helper function to aggregate data for event
+  const aggregateEventData = (data: any[]): any => {
+    if (data.length === 0) return {}
+    
+    const parseNum = (val: any) => {
+      if (typeof val === 'string') {
+        const cleaned = val.replace(/[^\d.-]/g, '')
+        return parseFloat(cleaned) || 0
+      }
+      return Number(val) || 0
+    }
+    
+    // Sum all numeric values
+    const aggregated: any = {}
+    const firstRow = data[0]
+    
+    for (const key of Object.keys(firstRow)) {
+      if (key === dateColumn) continue
+      const values = data.map(row => parseNum(row[key])).filter(v => !isNaN(v))
+      if (values.length > 0) {
+        aggregated[key] = values.reduce((sum, val) => sum + val, 0)
+      }
+    }
+    
+    // Build performance data similar to buildPerformanceData
+    const amountSpent = parseNum(aggregated['Amount spent (IDR)'])
+    const purchases = parseNum(aggregated['Purchases with shared items'])
+    const addsToCart = parseNum(aggregated['Adds to cart with shared items'])
+    const contentViews = parseNum(aggregated['Content views with shared items'])
+    const atcConversionValue = parseNum(aggregated['ATC conversion value (shared only)'])
+    const purchasesConversionValue = parseNum(aggregated['Purchases conversion value for shared items only'])
+    const linkClicks = parseNum(aggregated['Link clicks'])
+    const impressions = parseNum(aggregated['Impressions'])
+    const ctr = linkClicks > 0 && impressions > 0 ? linkClicks / impressions : 0
+    const cpc = linkClicks > 0 ? parseNum(aggregated['CPC (cost per link click)']) : 0
+    const cpm = parseNum(aggregated['CPM (cost per 1,000 impressions)'])
+    const frequency = parseNum(aggregated['Frequency'])
+    const purchaseROAS = amountSpent > 0 ? purchasesConversionValue / amountSpent : 0
+    const costPerPurchase = purchases > 0 ? amountSpent / purchases : 0
+    const costPerATC = addsToCart > 0 ? amountSpent / addsToCart : 0
+    const conversionRate = linkClicks > 0 ? purchases / linkClicks : 0
+    const avgPurchaseValue = purchases > 0 ? purchasesConversionValue / purchases : 0
+    
+    return {
+      amountSpent,
+      purchases,
+      addsToCart,
+      contentViews,
+      atcConversionValue,
+      purchasesConversionValue,
+      linkClicks,
+      impressions,
+      ctr,
+      cpc,
+      cpm,
+      frequency,
+      purchaseROAS,
+      costPerPurchase,
+      costPerATC,
+      conversionRate,
+      avgPurchaseValue
+    }
+  }
+  
+  // Filter and aggregate Twindate data for this period
+  const twindateThisData = thisWeekData.filter(row => {
+    const dateStr = row[dateColumn!]
+    if (!dateStr) return false
+    const date = parseDate(dateStr)
+    return date ? isTwindate(date) : false
+  })
+  
+  // Filter and aggregate Twindate data for last period
+  const twindateLastData = lastWeekData.filter(row => {
+    const dateStr = row[dateColumn!]
+    if (!dateStr) return false
+    const date = parseDate(dateStr)
+    return date ? isTwindate(date) : false
+  })
+  
+  // Filter and aggregate Payday data for this period
+  const paydayThisData = thisWeekData.filter(row => {
+    const dateStr = row[dateColumn!]
+    if (!dateStr) return false
+    const date = parseDate(dateStr)
+    return date ? isPayday(date) : false
+  })
+  
+  // Filter and aggregate Payday data for last period
+  const paydayLastData = lastWeekData.filter(row => {
+    const dateStr = row[dateColumn!]
+    if (!dateStr) return false
+    const date = parseDate(dateStr)
+    return date ? isPayday(date) : false
+  })
+  
+  // Aggregate event data
+  if (twindateThisData.length > 0) {
+    eventAnalysis.twindateThis = aggregateEventData(twindateThisData)
+  }
+  if (twindateLastData.length > 0) {
+    eventAnalysis.twindateLast = aggregateEventData(twindateLastData)
+  }
+  if (paydayThisData.length > 0) {
+    eventAnalysis.paydayThis = aggregateEventData(paydayThisData)
+  }
+  if (paydayLastData.length > 0) {
+    eventAnalysis.paydayLast = aggregateEventData(paydayLastData)
+  }
+  
+  return eventAnalysis
 }
 

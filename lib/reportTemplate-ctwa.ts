@@ -392,6 +392,12 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             const resultsGrowth = ${resultsGrowth.toFixed(2)};
             const cprGrowth = ${cprGrowth.toFixed(2)};
             const clientName = ${JSON.stringify(clientName)};
+            const periodLabel = ${JSON.stringify(periodLabel)};
+            const periodLabelId = ${JSON.stringify(periodLabelId)};
+            const periodLabelEn = ${JSON.stringify(periodLabelEn)};
+            const thisPeriodLabel = ${JSON.stringify(thisPeriodLabel)};
+            const lastPeriodLabel = ${JSON.stringify(lastPeriodLabel)};
+            const comparisonLabel = ${JSON.stringify(comparisonLabel)};
             const objectiveLabel = ${JSON.stringify(objectiveLabel)};
             
             function calculateGrowth(current, previous) {

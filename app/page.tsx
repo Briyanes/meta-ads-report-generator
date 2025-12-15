@@ -654,23 +654,33 @@ export default function Home() {
             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
               📅 {retentionType === 'wow' ? 'Minggu Ini (This Week)' : 'Bulan Ini (This Month)'} - {filesThisWeek.length} file(s)
             </label>
-            <div
+            <label
+              htmlFor="fileInputThisWeek"
               className="file-upload"
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, 'thisWeek')}
-              onClick={() => document.getElementById('fileInputThisWeek')?.click()}
+              style={{ cursor: 'pointer', display: 'block', position: 'relative' }}
             >
               <input
                 id="fileInputThisWeek"
                 type="file"
-                accept=".csv"
+                accept=".csv,text/csv"
                 multiple
                 onChange={(e) => handleFileChange(e, 'thisWeek')}
-                style={{ display: 'none' }}
+                style={{ 
+                  position: 'absolute',
+                  width: '100%',
+                  height: '100%',
+                  top: 0,
+                  left: 0,
+                  opacity: 0,
+                  cursor: 'pointer',
+                  zIndex: 1
+                }}
               />
               {filesThisWeek.length > 0 ? (
-                <div style={{ width: '100%' }}>
+                <div style={{ width: '100%', position: 'relative', zIndex: 2 }}>
                   {filesThisWeek.map((file, index) => (
                     <div key={index} style={{ 
                       display: 'flex', 
@@ -679,7 +689,9 @@ export default function Home() {
                       padding: '0.5rem',
                       marginBottom: '0.5rem',
                       backgroundColor: '#f5f5f5',
-                      borderRadius: '4px'
+                      borderRadius: '4px',
+                      position: 'relative',
+                      zIndex: 2
                     }}>
                       <span style={{ fontWeight: '600', color: '#2B46BB', fontSize: '0.9rem' }}>
                         ✓ {file.name}
@@ -688,6 +700,7 @@ export default function Home() {
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation()
+                          e.preventDefault()
                           removeFile(index, 'thisWeek')
                         }}
                         style={{
@@ -697,19 +710,25 @@ export default function Home() {
                           borderRadius: '4px',
                           padding: '0.25rem 0.5rem',
                           cursor: 'pointer',
-                          fontSize: '0.8rem'
+                          fontSize: '0.8rem',
+                          position: 'relative',
+                          zIndex: 3
                         }}
                       >
                         ✕
                       </button>
                     </div>
                   ))}
-                  <p style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem', textAlign: 'center' }}>
+                  <label
+                    htmlFor="fileInputThisWeek"
+                    style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem', textAlign: 'center', cursor: 'pointer', position: 'relative', zIndex: 2, display: 'block' }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     Click untuk menambah file lagi
-                  </p>
+                  </label>
                 </div>
               ) : (
-                <div>
+                <div style={{ position: 'relative', zIndex: 2 }}>
                   <p style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>
                     📄 Drag & Drop atau click untuk upload CSV files (bisa multiple)
                   </p>
@@ -718,30 +737,40 @@ export default function Home() {
                   </p>
                 </div>
               )}
-            </div>
+            </label>
           </div>
 
           <div>
             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
               📅 {retentionType === 'wow' ? 'Minggu Lalu (Last Week)' : 'Bulan Lalu (Last Month)'} - {filesLastWeek.length} file(s)
             </label>
-            <div
+            <label
+              htmlFor="fileInputLastWeek"
               className="file-upload"
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, 'lastWeek')}
-              onClick={() => document.getElementById('fileInputLastWeek')?.click()}
+              style={{ cursor: 'pointer', display: 'block', position: 'relative' }}
             >
               <input
                 id="fileInputLastWeek"
                 type="file"
-                accept=".csv"
+                accept=".csv,text/csv"
                 multiple
                 onChange={(e) => handleFileChange(e, 'lastWeek')}
-                style={{ display: 'none' }}
+                style={{ 
+                  position: 'absolute',
+                  width: '100%',
+                  height: '100%',
+                  top: 0,
+                  left: 0,
+                  opacity: 0,
+                  cursor: 'pointer',
+                  zIndex: 1
+                }}
               />
               {filesLastWeek.length > 0 ? (
-                <div style={{ width: '100%' }}>
+                <div style={{ width: '100%', position: 'relative', zIndex: 2 }}>
                   {filesLastWeek.map((file, index) => (
                     <div key={index} style={{ 
                       display: 'flex', 
@@ -750,7 +779,9 @@ export default function Home() {
                       padding: '0.5rem',
                       marginBottom: '0.5rem',
                       backgroundColor: '#f5f5f5',
-                      borderRadius: '4px'
+                      borderRadius: '4px',
+                      position: 'relative',
+                      zIndex: 2
                     }}>
                       <span style={{ fontWeight: '600', color: '#2B46BB', fontSize: '0.9rem' }}>
                         ✓ {file.name}
@@ -759,6 +790,7 @@ export default function Home() {
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation()
+                          e.preventDefault()
                           removeFile(index, 'lastWeek')
                         }}
                         style={{
@@ -768,19 +800,25 @@ export default function Home() {
                           borderRadius: '4px',
                           padding: '0.25rem 0.5rem',
                           cursor: 'pointer',
-                          fontSize: '0.8rem'
+                          fontSize: '0.8rem',
+                          position: 'relative',
+                          zIndex: 3
                         }}
                       >
                         ✕
                       </button>
                     </div>
                   ))}
-                  <p style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem', textAlign: 'center' }}>
+                  <label
+                    htmlFor="fileInputLastWeek"
+                    style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem', textAlign: 'center', cursor: 'pointer', position: 'relative', zIndex: 2, display: 'block' }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     Click untuk menambah file lagi
-                  </p>
+                  </label>
                 </div>
               ) : (
-                <div>
+                <div style={{ position: 'relative', zIndex: 2 }}>
                   <p style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>
                     📄 Drag & Drop atau click untuk upload CSV files (bisa multiple)
                   </p>
@@ -789,7 +827,7 @@ export default function Home() {
                   </p>
                 </div>
               )}
-            </div>
+            </label>
           </div>
         </div>
 
