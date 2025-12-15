@@ -2,24 +2,26 @@
 
 ## Credentials
 
-**Project URL:** `https://dhxvwbbdztjcwozesmxy.supabase.co`
+**⚠️ Security Note:** Jangan commit credentials ke repository public!
 
-**Anon Public Key:**
-```
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRoeHZ3YmJkenRqY3dvemVzbXh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3MTkxMjgsImV4cCI6MjA4MTI5NTEyOH0.VsnbLQIe0bUPlkLxN3XxoWNCNoaa4an98TIWFpq8O68
-```
+Dapatkan credentials dari:
+- **Supabase Dashboard** → Settings → API
+  - Project URL
+  - Anon Public Key (anon/public key)
+  - Service Role Key (service_role key - **JANGAN expose di public!**)
 
-**Service Role Key:**
-```
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRoeHZ3YmJkenRqY3dvemVzbXh5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NTcxOTEyOCwiZXhwIjoyMDgxMjk1MTI4fQ.COwKwB7VLLW0UTJY-Gdu4u7eLuuLObOpr19nUduhBe8
-```
+**Project URL:** `https://your-project-id.supabase.co`
+
+**Anon Public Key:** (dapatkan dari Supabase Dashboard)
+
+**Service Role Key:** (dapatkan dari Supabase Dashboard - **RAHASIA!**)
 
 ## Setup Database Schema
 
 ### Method 1: Via Supabase Dashboard (Recommended)
 
 1. Buka [Supabase Dashboard](https://supabase.com/dashboard)
-2. Login dan pilih project: **dhxvwbbdztjcwozesmxy**
+2. Login dan pilih project Anda
 3. Klik **SQL Editor** di sidebar kiri
 4. Klik **New Query**
 5. Copy semua isi dari file `supabase/schema.sql`
@@ -35,8 +37,8 @@ npm install -g supabase
 # Login ke Supabase
 supabase login
 
-# Link ke project
-supabase link --project-ref dhxvwbbdztjcwozesmxy
+# Link ke project (ganti dengan project-ref Anda)
+supabase link --project-ref your-project-ref
 
 # Run migration
 supabase db push

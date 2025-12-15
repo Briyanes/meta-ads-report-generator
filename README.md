@@ -38,14 +38,18 @@ Buat file `.env.local` di root project dengan isi:
 
 ```env
 # Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL=https://dhxvwbbdztjcwozesmxy.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRoeHZ3YmJkenRqY3dvemVzbXh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3MTkxMjgsImV4cCI6MjA4MTI5NTEyOH0.VsnbLQIe0bUPlkLxN3XxoWNCNoaa4an98TIWFpq8O68
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRoeHZ3YmJkenRqY3dvemVzbXh5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NTcxOTEyOCwiZXhwIjoyMDgxMjk1MTI4fQ.COwKwB7VLLW0UTJY-Gdu4u7eLuuLObOpr19nUduhBe8
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
 # Z AI Configuration
-Z_AI_API_KEY=9870b50ecf5f41a5b9d97d908aaeefa5.CrmIbZGCMZOD6QGk
-Z_AI_API_URL=https://api.z.ai/api/paas/v4
+Z_AI_API_KEY=your_z_ai_api_key
+Z_AI_API_URL=https://api.z.ai/api/paas/v4/chat/completions
 ```
+
+**Note:** Dapatkan credentials dari:
+- Supabase Dashboard → Settings → API
+- Z AI Dashboard → API Keys
 
 ### 4. Setup Supabase Database
 
@@ -95,11 +99,11 @@ git push -u origin main
 4. Tambahkan environment variables berikut:
 
 ```
-NEXT_PUBLIC_SUPABASE_URL = https://dhxvwbbdztjcwozesmxy.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRoeHZ3YmJkenRqY3dvemVzbXh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3MTkxMjgsImV4cCI6MjA4MTI5NTEyOH0.VsnbLQIe0bUPlkLxN3XxoWNCNoaa4an98TIWFpq8O68
-SUPABASE_SERVICE_ROLE_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRoeHZ3YmJkenRqY3dvemVzbXh5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NTcxOTEyOCwiZXhwIjoyMDgxMjk1MTI4fQ.COwKwB7VLLW0UTJY-Gdu4u7eLuuLObOpr19nUduhBe8
-Z_AI_API_KEY = 9870b50ecf5f41a5b9d97d908aaeefa5.CrmIbZGCMZOD6QGk
-Z_AI_API_URL = https://api.z.ai/v1/chat/completions
+NEXT_PUBLIC_SUPABASE_URL = your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY = your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY = your_supabase_service_role_key
+Z_AI_API_KEY = your_z_ai_api_key
+Z_AI_API_URL = https://api.z.ai/api/paas/v4/chat/completions
 ```
 
 ### 4. Auto Deploy
