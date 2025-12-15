@@ -14,6 +14,10 @@ CREATE INDEX IF NOT EXISTS idx_reports_created_at ON reports(created_at DESC);
 -- Enable Row Level Security
 ALTER TABLE reports ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies if they exist, then create new ones
+DROP POLICY IF EXISTS "Allow public read access" ON reports;
+DROP POLICY IF EXISTS "Allow public insert" ON reports;
+
 -- Create policy for authenticated users (adjust based on your auth setup)
 CREATE POLICY "Allow public read access" ON reports
   FOR SELECT USING (true);
@@ -29,6 +33,9 @@ BEGIN
   RETURN NEW;
 END;
 $$ language 'plpgsql';
+
+-- Drop existing trigger if exists, then create new one
+DROP TRIGGER IF EXISTS update_reports_updated_at ON reports;
 
 -- Trigger to auto-update updated_at
 CREATE TRIGGER update_reports_updated_at BEFORE UPDATE ON reports
