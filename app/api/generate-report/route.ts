@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generateHTMLReportWithZAI } from '@/lib/zai'
-import { supabaseAdmin } from '@/lib/supabase'
+// import { generateHTMLReportWithZAI } from '@/lib/zai'
+// Supabase import commented out - not needed for now
+// import { supabaseAdmin } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
   try {
@@ -77,27 +78,27 @@ export async function POST(request: NextRequest) {
       throw new Error(`Failed to generate report template: ${templateError.message}`)
     }
 
-    // Save to Supabase
-    const { data, error } = await supabaseAdmin
-      .from('reports')
-      .insert({
-        name: reportName || `Report ${new Date().toISOString()}`,
-        html_content: htmlReport,
-        analysis_data: analysisData,
-        created_at: new Date().toISOString()
-      })
-      .select()
-      .single()
+    // Save to Supabase (optional - commented out for now)
+    // const { data, error } = await supabaseAdmin
+    //   .from('reports')
+    //   .insert({
+    //     name: reportName || `Report ${new Date().toISOString()}`,
+    //     html_content: htmlReport,
+    //     analysis_data: analysisData,
+    //     created_at: new Date().toISOString()
+    //   })
+    //   .select()
+    //   .single()
 
-    if (error) {
-      console.error('Supabase error:', error)
-      // Continue even if Supabase fails
-    }
+    // if (error) {
+    //   console.error('Supabase error:', error)
+    //   // Continue even if Supabase fails
+    // }
 
     return NextResponse.json({
       success: true,
       html: htmlReport,
-      reportId: data?.id
+      // reportId: data?.id
     })
   } catch (error: any) {
     console.error('Report generation error:', error)

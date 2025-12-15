@@ -745,10 +745,13 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                         <div className="max-w-6xl mx-auto w-full text-center">
                             <img src="https://hadona.id/wp-content/uploads/2024/12/cropped-Hadona-Logo-1-300x300.png" alt="Hadona Logo" className="mx-auto mb-6" style={{width: '100px', height: '100px'}} />
                             <h2 className="text-4xl font-bold text-hadona-blue mb-6">Terima Kasih</h2>
-                            <div className="space-y-3">
+                            <div className="space-y-3 mb-6">
                                 <p className="text-xl"><i className="fab fa-instagram text-purple-500 mr-2"></i> Instagram: @hadona.id</p>
                                 <p className="text-xl"><i className="fab fa-tiktok text-black mr-2"></i> TikTok: @hadona.id</p>
                                 <p className="text-xl"><i className="fas fa-globe text-blue-500 mr-2"></i> Website: www.hadona.id</p>
+                            </div>
+                            <div className="mt-8 pt-6 border-t border-gray-300">
+                                <p className="text-sm text-gray-500">Powered by <span className="font-semibold text-gray-700">Z AI GLM 4.6</span></p>
                             </div>
                         </div>
                     </div>
