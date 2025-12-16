@@ -1894,7 +1894,7 @@ export default function HomePage() {
                     maxHeight: isOpen ? '500px' : '0',
                     overflow: 'hidden',
                     transition: 'max-height 0.3s ease, padding 0.3s ease, opacity 0.3s ease',
-                    padding: isOpen ? '0 24px 20px 72px' : '0 24px',
+                    padding: isOpen ? '20px 24px 20px 72px' : '0 24px',
                     opacity: isOpen ? 1 : 0
                   }}>
                     <p style={{
