@@ -86,7 +86,7 @@ export default function GoogleAdsPage() {
                 color: '#6b7280',
                 margin: 0
               }}>
-                Powered by Hadona Digital Media
+                Powered by <span style={{ fontWeight: '600' }}>Hadona Digital Media</span>
               </p>
             </div>
           </div>
@@ -234,6 +234,37 @@ export default function GoogleAdsPage() {
           </button>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer style={{
+        backgroundColor: '#ffffff',
+        borderTop: '1px solid #e5e7eb',
+        marginTop: '12px'
+      }}>
+        <div className="responsive-footer" style={{
+          maxWidth: '1400px',
+          margin: '0 auto',
+          padding: '24px 48px',
+          textAlign: 'center'
+        }}>
+          <p className="footer-line-1" style={{
+            fontSize: '14px',
+            color: '#6b7280',
+            margin: 0,
+            marginBottom: '8px'
+          }}>
+            <span className="footer-text-1">© 2025 Ads Report Generator. Powered by</span>
+            <span className="footer-hadona" style={{ fontWeight: '600', color: '#2563eb', marginLeft: '4px' }}>Hadona Digital Media</span>
+          </p>
+          <p style={{
+            fontSize: '12px',
+            color: '#9ca3af',
+            margin: 0
+          }}>
+            Designed & Developed by <span style={{ fontWeight: '600', color: '#6b7280' }}>Briyanes</span>
+          </p>
+        </div>
+      </footer>
     </div>
   )
 }

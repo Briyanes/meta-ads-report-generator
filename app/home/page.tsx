@@ -114,7 +114,7 @@ export default function HomePage() {
               color: '#6b7280',
               margin: 0
             }}>
-              Powered by Hadona Digital Media
+              Powered by <span style={{ fontWeight: '600' }}>Hadona Digital Media</span>
             </p>
           </div>
           <div style={{
@@ -2000,7 +2000,7 @@ export default function HomePage() {
                     marginBottom: '4px',
                     fontSize: '14px'
                   }}>
-                    Powered by Hadona Digital Media
+                    Powered by <span style={{ fontWeight: '600' }}>Hadona Digital Media</span>
                   </div>
                   <div style={{
                     fontSize: '12px',

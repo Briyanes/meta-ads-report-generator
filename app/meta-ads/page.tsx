@@ -320,7 +320,7 @@ export default function MetaAdsPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #2B46BB 0%, #1e35a0 100%)',
+      background: 'linear-gradient(to bottom right, #f9fafb, #ffffff, #f3f4f6)',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     }}>
       {/* Header */}
@@ -372,7 +372,7 @@ export default function MetaAdsPage() {
               margin: 0,
               lineHeight: '1.3'
             }}>
-              Powered by Hadona Digital Media
+              Powered by <span style={{ fontWeight: '600' }}>Hadona Digital Media</span>
             </p>
           </div>
           <div className="responsive-header-logo-container" style={{
@@ -1375,7 +1375,7 @@ export default function MetaAdsPage() {
             marginBottom: '8px'
           }}>
             <span className="footer-text-1">© 2025 Ads Report Generator. Powered by</span>
-            <span className="footer-hadona" style={{ fontWeight: '600', color: '#2563eb', marginLeft: '4px' }}> Hadona Digital Media</span>
+            <span className="footer-hadona" style={{ fontWeight: '600', color: '#2563eb', marginLeft: '4px' }}>Hadona Digital Media</span>
           </p>
           <p style={{
             fontSize: '12px',
