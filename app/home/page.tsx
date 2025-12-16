@@ -1333,27 +1333,32 @@ export default function HomePage() {
                 </p>
               </div>
               <div style={{
-                height: '400px',
+                height: '450px',
                 overflow: 'hidden',
-                position: 'relative'
+                position: 'relative',
+                backgroundColor: '#f3f4f6',
+                borderRadius: '0 0 12px 12px'
               }}>
                 <iframe
-                  src="/demo/report-ctwa.pdf#view=FitH"
+                  src="/demo/report-ctwa.pdf#view=FitH&toolbar=0&navpanes=0&scrollbar=0"
                   style={{
                     width: '100%',
                     height: '100%',
-                    border: 'none'
+                    border: 'none',
+                    borderRadius: '0 0 12px 12px'
                   }}
                   title="CTWA Report Preview"
+                  loading="lazy"
                 />
                 <div style={{
                   position: 'absolute',
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  height: '60px',
-                  background: 'linear-gradient(to top, rgba(249, 250, 251, 0.95), transparent)',
-                  pointerEvents: 'none'
+                  height: '80px',
+                  background: 'linear-gradient(to top, rgba(249, 250, 251, 0.98), rgba(249, 250, 251, 0.5), transparent)',
+                  pointerEvents: 'none',
+                  borderRadius: '0 0 12px 12px'
                 }}></div>
               </div>
               <div className="demo-button-container" style={{
@@ -1430,27 +1435,32 @@ export default function HomePage() {
                 </p>
               </div>
               <div style={{
-                height: '400px',
+                height: '450px',
                 overflow: 'hidden',
-                position: 'relative'
+                position: 'relative',
+                backgroundColor: '#f3f4f6',
+                borderRadius: '0 0 12px 12px'
               }}>
                 <iframe
-                  src="/demo/report-ctlptowa.pdf#view=FitH"
+                  src="/demo/report-ctlptowa.pdf#view=FitH&toolbar=0&navpanes=0&scrollbar=0"
                   style={{
                     width: '100%',
                     height: '100%',
-                    border: 'none'
+                    border: 'none',
+                    borderRadius: '0 0 12px 12px'
                   }}
                   title="CTLP to WA Report Preview"
+                  loading="lazy"
                 />
                 <div style={{
                   position: 'absolute',
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  height: '60px',
-                  background: 'linear-gradient(to top, rgba(249, 250, 251, 0.95), transparent)',
-                  pointerEvents: 'none'
+                  height: '80px',
+                  background: 'linear-gradient(to top, rgba(249, 250, 251, 0.98), rgba(249, 250, 251, 0.5), transparent)',
+                  pointerEvents: 'none',
+                  borderRadius: '0 0 12px 12px'
                 }}></div>
               </div>
               <div className="demo-button-container" style={{
@@ -1527,27 +1537,32 @@ export default function HomePage() {
                 </p>
               </div>
               <div style={{
-                height: '400px',
+                height: '450px',
                 overflow: 'hidden',
-                position: 'relative'
+                position: 'relative',
+                backgroundColor: '#f3f4f6',
+                borderRadius: '0 0 12px 12px'
               }}>
                 <iframe
-                  src="/demo/report-cpas.pdf#view=FitH"
+                  src="/demo/report-cpas.pdf#view=FitH&toolbar=0&navpanes=0&scrollbar=0"
                   style={{
                     width: '100%',
                     height: '100%',
-                    border: 'none'
+                    border: 'none',
+                    borderRadius: '0 0 12px 12px'
                   }}
                   title="CPAS Report Preview"
+                  loading="lazy"
                 />
                 <div style={{
                   position: 'absolute',
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  height: '60px',
-                  background: 'linear-gradient(to top, rgba(249, 250, 251, 0.95), transparent)',
-                  pointerEvents: 'none'
+                  height: '80px',
+                  background: 'linear-gradient(to top, rgba(249, 250, 251, 0.98), rgba(249, 250, 251, 0.5), transparent)',
+                  pointerEvents: 'none',
+                  borderRadius: '0 0 12px 12px'
                 }}></div>
               </div>
               <div className="demo-button-container" style={{
