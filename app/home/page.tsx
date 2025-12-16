@@ -136,7 +136,7 @@ export default function HomePage() {
       </header>
 
       {/* Spacer for fixed header */}
-      <div style={{ height: '120px' }}></div>
+      <div className="header-spacer" style={{ height: '120px' }}></div>
 
       {/* Main Content */}
       <main className="responsive-container" style={{
