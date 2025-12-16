@@ -186,4 +186,675 @@ a {
   border: 1px solid #bee5eb;
 }
 
+/* Responsive Styles */
+@media (max-width: 1024px) {
+  .responsive-container {
+    padding: 32px 24px !important;
+  }
+  
+  .responsive-header {
+    padding: 16px 24px !important;
+  }
+  
+  .responsive-header h1 {
+    font-size: 24px !important;
+  }
+  
+  .responsive-hero {
+    padding: 48px 24px !important;
+  }
+  
+  .responsive-hero h1 {
+    font-size: 40px !important;
+  }
+  
+  .responsive-hero p {
+    font-size: 18px !important;
+  }
+  
+  .responsive-grid-3 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .responsive-grid-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .responsive-use-cases {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .responsive-benefits {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .responsive-workflow {
+    flex-wrap: wrap !important;
+  }
+  
+  .responsive-workflow > div {
+    flex: 1 1 calc(50% - 8px) !important;
+    min-width: 200px !important;
+  }
+  
+  .responsive-workflow .arrow {
+    display: none !important;
+  }
+  
+  .responsive-faq {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .responsive-demo {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 20px !important;
+  }
+}
 
+@media (max-width: 768px) {
+  .responsive-container {
+    padding: 24px 16px !important;
+  }
+  
+  .responsive-header {
+    padding: 12px 16px !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    flex-wrap: nowrap !important;
+    width: 100% !important;
+    display: flex !important;
+  }
+  
+  .responsive-header > div:first-child {
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    max-width: calc(100% - 80px) !important;
+    padding-right: 8px !important;
+    overflow: hidden !important;
+  }
+  
+  .responsive-header-title {
+    font-size: 20px !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    margin-bottom: 3px !important;
+  }
+  
+  .responsive-header-subtitle {
+    font-size: 12px !important;
+    margin-top: 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  
+  .responsive-header-logo-container {
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    align-self: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    width: auto !important;
+    margin-left: auto !important;
+  }
+  
+  .responsive-header-logo {
+    height: 40px !important;
+    width: auto !important;
+    max-width: 100px !important;
+    display: block !important;
+    object-fit: contain !important;
+  }
+  
+  .responsive-badge {
+    font-size: 10px !important;
+    padding: 4px 8px !important;
+  }
+  
+  .responsive-hero {
+    padding: 32px 16px !important;
+    margin-bottom: 32px !important;
+  }
+  
+  .responsive-hero h1 {
+    font-size: 28px !important;
+    line-height: 1.3 !important;
+    word-spacing: 0.15em !important;
+    letter-spacing: 0.02em !important;
+  }
+  
+  .responsive-hero h1 br {
+    display: none !important;
+  }
+  
+  .responsive-hero h1 span {
+    margin-left: 0.25em !important;
+  }
+  
+  .responsive-hero p {
+    font-size: 16px !important;
+    margin-bottom: 24px !important;
+  }
+  
+  .responsive-platform-title {
+    font-size: 24px !important;
+    line-height: 1.3 !important;
+  }
+  
+  .responsive-section h3 {
+    font-size: 22px !important;
+  }
+  
+  .responsive-hero-buttons {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+  
+  .responsive-hero-buttons button {
+    width: 100% !important;
+    padding: 14px 24px !important;
+    font-size: 16px !important;
+  }
+  
+  .responsive-grid-3 {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  .responsive-grid-4 {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  .responsive-grid-2 {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  .responsive-statistics {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 8px !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  .responsive-statistics > div {
+    padding: 12px 8px !important;
+    min-width: 0 !important;
+    flex-shrink: 0 !important;
+  }
+  
+  .responsive-statistics > div > div:first-child {
+    font-size: 24px !important;
+  }
+  
+  .responsive-statistics > div > div:first-child i {
+    font-size: 20px !important;
+  }
+  
+  .responsive-statistics > div > div:last-child {
+    font-size: 11px !important;
+    line-height: 1.3 !important;
+  }
+  
+  .responsive-workflow {
+    flex-direction: column !important;
+    gap: 24px !important;
+  }
+  
+  .responsive-workflow > div {
+    flex: 1 1 100% !important;
+    min-width: 100% !important;
+  }
+  
+  .responsive-workflow .arrow {
+    display: none !important;
+  }
+  
+  .responsive-section {
+    padding: 32px 16px !important;
+    margin-bottom: 32px !important;
+  }
+  
+  .responsive-section h3 {
+    font-size: 24px !important;
+    margin-bottom: 24px !important;
+  }
+  
+  .responsive-section p {
+    font-size: 14px !important;
+    margin-bottom: 24px !important;
+  }
+  
+  .responsive-benefits {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  .responsive-benefits > div {
+    padding: 20px !important;
+  }
+  
+  .responsive-use-cases {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  .responsive-use-cases > div {
+    padding: 24px !important;
+  }
+  
+  .responsive-features {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+  
+  .responsive-benefits > div {
+    flex-direction: column !important;
+    text-align: center !important;
+  }
+  
+  .responsive-benefits > div > div:first-child {
+    margin: 0 auto 12px auto !important;
+  }
+  
+  .responsive-faq {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  
+  .responsive-demo {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  .responsive-demo > div {
+    margin-bottom: 24px;
+  }
+  
+  .responsive-demo iframe {
+    height: 350px !important;
+  }
+  
+  .demo-button-container {
+    padding: 8px 12px !important;
+    margin-top: -8px !important;
+  }
+  
+  .responsive-faq > div {
+    border-radius: 8px !important;
+  }
+  
+  .responsive-faq > div button {
+    padding: 16px !important;
+    gap: 12px !important;
+  }
+  
+  .responsive-faq > div button > div:first-child {
+    gap: 12px !important;
+  }
+  
+  .responsive-faq > div button > div:first-child > div:first-child {
+    width: 28px !important;
+    height: 28px !important;
+  }
+  
+  .responsive-faq > div button > div:first-child > div:first-child i {
+    font-size: 16px !important;
+  }
+  
+  .responsive-faq > div button h4 {
+    font-size: 15px !important;
+  }
+  
+  .responsive-faq > div button > div:last-child {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  
+  .responsive-faq > div button > div:last-child i {
+    font-size: 16px !important;
+  }
+  
+  .responsive-faq > div > div:last-child {
+    padding-left: 60px !important;
+    padding-right: 16px !important;
+  }
+  
+  .responsive-faq > div > div:last-child p {
+    font-size: 13px !important;
+  }
+  
+  .responsive-trust {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  .responsive-footer {
+    padding: 20px 16px !important;
+  }
+  
+  .responsive-footer p {
+    font-size: 12px !important;
+  }
+  
+  .footer-line-1 {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 4px !important;
+  }
+  
+  .footer-text-1 {
+    display: block !important;
+  }
+  
+  .footer-hadona {
+    display: block !important;
+  }
+}
+
+/* Desktop view - add space between "Powered by" and "Hadona Digital Media" */
+@media (min-width: 769px) {
+  .footer-hadona {
+    margin-left: 0 !important;
+  }
+}
+
+.social-link {
+  transition: all 0.2s ease;
+  display: block;
+}
+
+.social-link:hover {
+  opacity: 0.8;
+  transform: translateX(4px);
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.1);
+}
+
+.feature-card:hover > div:first-child {
+  transform: scale(1.1);
+}
+
+.floating-header {
+  transition: all 0.3s ease;
+  will-change: box-shadow, background-color;
+}
+
+.floating-header:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+@media (max-width: 768px) {
+  .floating-header {
+    position: fixed !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .responsive-container {
+    padding: 16px 12px !important;
+  }
+  
+  .responsive-header {
+    padding: 10px 12px !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    flex-wrap: nowrap !important;
+    width: 100% !important;
+    display: flex !important;
+  }
+  
+  .responsive-header > div:first-child {
+    padding-right: 6px !important;
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    max-width: calc(100% - 60px) !important;
+    overflow: hidden !important;
+  }
+  
+  .responsive-header-title {
+    font-size: 18px !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    margin-bottom: 2px !important;
+  }
+  
+  .responsive-header-subtitle {
+    font-size: 11px !important;
+    margin-top: 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  
+  .responsive-header-logo-container {
+    align-self: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    width: auto !important;
+    margin-left: auto !important;
+  }
+  
+  .responsive-header-logo {
+    height: 35px !important;
+    width: auto !important;
+    max-width: 80px !important;
+    display: block !important;
+    object-fit: contain !important;
+  }
+  
+  .responsive-statistics {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 6px !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  .responsive-statistics > div {
+    padding: 10px 6px !important;
+    min-width: 0 !important;
+    flex-shrink: 0 !important;
+  }
+  
+  .responsive-statistics > div > div:first-child {
+    font-size: 20px !important;
+  }
+  
+  .responsive-statistics > div > div:first-child i {
+    font-size: 18px !important;
+  }
+  
+  .responsive-statistics > div > div:last-child {
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+  }
+  
+  .responsive-hero {
+    padding: 24px 12px !important;
+  }
+  
+  .responsive-hero h1 {
+    font-size: 24px !important;
+    word-spacing: 0.2em !important;
+    letter-spacing: 0.03em !important;
+  }
+  
+  .responsive-hero h1 span {
+    margin-left: 0.35em !important;
+  }
+  
+  .responsive-hero p {
+    font-size: 14px !important;
+  }
+  
+  .responsive-platform-title {
+    font-size: 20px !important;
+    line-height: 1.3 !important;
+  }
+  
+  .responsive-section {
+    padding: 24px 16px !important;
+  }
+  
+  .responsive-section h3 {
+    font-size: 18px !important;
+  }
+  
+  .responsive-section p {
+    font-size: 13px !important;
+  }
+  
+  .responsive-use-cases > div {
+    padding: 20px !important;
+  }
+  
+  .responsive-benefits > div {
+    padding: 16px !important;
+  }
+  
+  .responsive-features > div {
+    padding: 16px !important;
+  }
+}
+
+/* Meta Ads Page Responsive Styles */
+@media (max-width: 1024px) {
+  .responsive-card {
+    padding: 20px !important;
+  }
+  
+  .responsive-grid-3 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .responsive-card {
+    padding: 16px !important;
+  }
+  
+  .responsive-grid-3 {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  
+  .responsive-grid-2 {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  .responsive-header button {
+    font-size: 12px !important;
+    padding: 6px 12px !important;
+  }
+  
+  .responsive-header h1 {
+    font-size: 20px !important;
+  }
+  
+  .responsive-header p {
+    font-size: 12px !important;
+  }
+  
+  .responsive-header img {
+    height: 50px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .responsive-card {
+    padding: 12px !important;
+  }
+  
+  .responsive-grid-3 {
+    gap: 10px !important;
+  }
+  
+  .responsive-grid-2 {
+    gap: 12px !important;
+  }
+  
+  .responsive-header {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+  }
+  
+  .responsive-header-right {
+    width: auto !important;
+    justify-content: flex-end !important;
+  }
+  
+  .responsive-header-button {
+    font-size: 12px !important;
+    padding: 6px 12px !important;
+  }
+  
+  .responsive-button-text {
+    display: none !important;
+  }
+  
+  .responsive-header-logo {
+    height: 50px !important;
+  }
+  
+  .responsive-card iframe {
+    height: 400px !important;
+  }
+  
+  .responsive-header-button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  
+  /* Action buttons responsive */
+  .responsive-container > div:has(button) {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+  
+  .responsive-container > div:has(button) > div:last-child {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  
+  .responsive-container > div:has(button) > button:first-child {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .responsive-container > div:has(button) {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+  
+  .responsive-container > div:has(button) > div:last-child {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  
+  .responsive-container > div:has(button) > button:first-child {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}

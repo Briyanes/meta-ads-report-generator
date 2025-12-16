@@ -21,7 +21,10 @@ export async function POST(request: NextRequest) {
     const breakdownThisWeek: File[] = []
     const breakdownLastWeek: File[] = []
     
-    for (const [key, value] of Array.from(formData.entries())) {
+    // Get all form data entries
+    const entries = Array.from(formData.entries())
+    
+    for (const [key, value] of entries) {
       if (key.startsWith('breakdownThisWeek_') && value instanceof File) {
         breakdownThisWeek.push(value)
       }
@@ -29,6 +32,16 @@ export async function POST(request: NextRequest) {
         breakdownLastWeek.push(value)
       }
     }
+    
+    // Debug log (remove in production)
+    console.log('Main files:', {
+      thisWeek: fileThisWeek?.name,
+      lastWeek: fileLastWeek?.name
+    })
+    console.log('Breakdown files:', {
+      thisWeek: breakdownThisWeek.map(f => f.name),
+      lastWeek: breakdownLastWeek.map(f => f.name)
+    })
 
     // Parse main CSV files
     const parsedDataThisWeek = await parseCSV(fileThisWeek)
@@ -272,7 +285,7 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       eventAnalysis = extractEventData(parsedDataThisWeek.data, parsedDataLastWeek.data, retentionType)
     }
     
-    const analysis = JSON.stringify({
+    const analysis = {
         performanceSummary: {
           thisWeek: buildPerformanceData(thisWeekData, thisWeekResults, thisWeekCPR),
           lastWeek: buildPerformanceData(lastWeekData, lastWeekResults, lastWeekCPR),
@@ -291,7 +304,7 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         retentionType: retentionType,
         objectiveType: objectiveType,
         note: 'Data extracted from CSV. Configure Z AI API for full AI analysis.'
-      }, null, 2)
+      }
 
     // Calculate breakdown summary
     const breakdownSummaryThisWeek = {

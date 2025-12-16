@@ -100,6 +100,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     <script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -421,7 +422,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                         <div className="max-w-6xl mx-auto w-full text-center">
                             <img src="https://hadona.id/wp-content/uploads/2024/12/cropped-Hadona-Logo-1-300x300.png" alt="Hadona Logo" className="mx-auto mb-6" style={{width: '80px', height: '80px'}} />
                             <h1 className="text-4xl font-bold text-hadona-blue mb-3">{comparisonLabel} Reporting</h1>
-                            <p className="text-2xl font-semibold text-hadona-blue mb-2">Iklan Objective: {objectiveLabel}</p>
+                            <p className="text-2xl font-semibold text-hadona-blue mb-2">{objectiveLabel}</p>
                             {reportName && reportName !== 'Weekly Report' && (
                                 <p className="text-xl font-semibold text-hadona-blue mb-4">{reportName}</p>
                             )}
@@ -753,7 +754,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                 <p className="text-xl"><i className="fas fa-globe text-blue-500 mr-2"></i> Website: www.hadona.id</p>
                             </div>
                             <div className="mt-8 pt-6 border-t border-gray-300">
-                                <p className="text-sm text-gray-500">Powered by <span className="font-semibold text-gray-700">Z AI GLM 4.6</span></p>
+                                <p className="text-sm text-gray-500">Powered by <span className="font-semibold text-gray-700">Hadona Digital Media</span></p>
                             </div>
                         </div>
                     </div>
@@ -762,7 +763,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         };
 
         try {
-            ReactDOM.render(<App />, document.getElementById('root'));
+        ReactDOM.render(<App />, document.getElementById('root'));
         } catch (error) {
             console.error('Error rendering React app:', error);
             const root = document.getElementById('root');

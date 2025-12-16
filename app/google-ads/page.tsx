@@ -1,67 +1,235 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
 
 export default function GoogleAdsPage() {
   const router = useRouter()
+  const [isScrolled, setIsScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY
+      setIsScrolled(scrollPosition > 10)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(to bottom right, #f9fafb, #ffffff, #f3f4f6)',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    }}>
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => router.push('/home')}
-                className="text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                ← Back to Home
-              </button>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Google Ads Report Generator</h1>
-                <p className="text-xs text-gray-500">Powered by Z AI GLM 4.6</p>
-              </div>
+      <header className="floating-header" style={{
+        backgroundColor: isScrolled ? 'rgba(255, 255, 255, 0.98)' : 'rgba(255, 255, 255, 0.95)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        boxShadow: isScrolled 
+          ? '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' 
+          : '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+        borderBottom: '1px solid #e5e7eb',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        width: '100%',
+        zIndex: 1000,
+        transition: 'all 0.3s ease'
+      }}>
+        <div className="responsive-header" style={{
+          maxWidth: '1400px',
+          margin: '0 auto',
+          padding: '24px 48px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px'
+          }}>
+            <button
+              onClick={() => router.push('/home')}
+              style={{
+                color: '#4b5563',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '16px',
+                padding: '8px',
+                borderRadius: '4px',
+                transition: 'background-color 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            >
+              <i className="bi bi-arrow-left" style={{ marginRight: '4px' }}></i>
+              Back to Home
+            </button>
+            <div>
+              <h1 style={{
+                fontSize: '28px',
+                fontWeight: 'bold',
+                color: '#111827',
+                margin: 0,
+                marginBottom: '4px'
+              }}>
+                Google Ads Report Generator
+              </h1>
+              <p style={{
+                fontSize: '14px',
+                color: '#6b7280',
+                margin: 0
+              }}>
+                Powered by Hadona Digital Media
+              </p>
             </div>
           </div>
         </div>
       </header>
 
+      {/* Spacer for fixed header */}
+      <div style={{ height: '100px' }}></div>
+
       {/* Coming Soon Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center">
-          <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 text-5xl">
-            🔍
+      <main className="responsive-container" style={{
+        maxWidth: '1400px',
+        margin: '0 auto',
+        padding: '48px'
+      }}>
+        <div style={{
+          backgroundColor: '#ffffff',
+          borderRadius: '12px',
+          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+          border: '1px solid #e5e7eb',
+          padding: '64px 48px',
+          textAlign: 'center'
+        }}>
+          <div style={{
+            width: '96px',
+            height: '96px',
+            backgroundColor: '#f0fdf4',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 24px auto',
+            border: '3px solid #10b981',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+          }}>
+            <i className="bi bi-google" style={{ fontSize: '48px', color: '#10b981' }}></i>
           </div>
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">Coming Soon</h2>
-          <p className="text-xl text-gray-600 mb-8">
-            Google Ads reporting dashboard is currently under development.
+          <h2 style={{
+            fontSize: '36px',
+            fontWeight: 'bold',
+            color: '#111827',
+            marginBottom: '16px',
+            margin: '0 0 16px 0'
+          }}>
+            Coming Soon
+          </h2>
+          <p style={{
+            fontSize: '18px',
+            color: '#6b7280',
+            marginBottom: '32px',
+            margin: '0 0 32px 0',
+            maxWidth: '600px',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            lineHeight: '1.6'
+          }}>
+            We&apos;re working hard to bring you Google Ads reporting capabilities. Stay tuned for updates!
           </p>
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
-            <h3 className="text-2xl font-semibold text-gray-900 mb-4">What to Expect</h3>
-            <ul className="text-left space-y-3 text-gray-600">
-              <li className="flex items-start">
-                <span className="text-green-500 mr-3">✓</span>
-                <span>Comprehensive Google Ads performance analytics</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-green-500 mr-3">✓</span>
-                <span>AI-powered insights and recommendations</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-green-500 mr-3">✓</span>
-                <span>Detailed campaign breakdowns and metrics</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-green-500 mr-3">✓</span>
-                <span>Export to PDF functionality</span>
-              </li>
+          <div style={{
+            display: 'inline-block',
+            padding: '8px 16px',
+            backgroundColor: '#f3f4f6',
+            color: '#6b7280',
+            borderRadius: '9999px',
+            fontSize: '14px',
+            fontWeight: '600',
+            marginBottom: '32px'
+          }}>
+            <i className="bi bi-clock" style={{ marginRight: '6px' }}></i>
+            Under Development
+          </div>
+          <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '12px',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+            border: '1px solid #e5e7eb',
+            padding: '32px',
+            marginBottom: '32px',
+            textAlign: 'left',
+            maxWidth: '600px',
+            margin: '0 auto 32px auto'
+          }}>
+            <h3 style={{
+              fontSize: '24px',
+              fontWeight: '600',
+              color: '#111827',
+              marginBottom: '16px',
+              margin: '0 0 16px 0'
+            }}>
+              What to Expect
+            </h3>
+            <ul style={{
+              listStyle: 'none',
+              padding: 0,
+              margin: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px'
+            }}>
+              {[
+                'Comprehensive Google Ads performance analytics',
+                'AI-powered insights and recommendations',
+                'Detailed campaign breakdowns and metrics',
+                'Export to PDF functionality'
+              ].map((item, idx) => (
+                <li key={idx} style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '12px'
+                }}>
+                  <i className="bi bi-check-circle" style={{ color: '#10b981', fontSize: '18px' }}></i>
+                  <span style={{ color: '#4b5563', lineHeight: '1.6' }}>{item}</span>
+                </li>
+              ))}
             </ul>
           </div>
           <button
             onClick={() => router.push('/home')}
-            className="mt-8 px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors"
+            style={{
+              padding: '12px 24px',
+              backgroundColor: '#2563eb',
+              color: '#ffffff',
+              borderRadius: '8px',
+              fontWeight: '600',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '16px',
+              transition: 'all 0.2s ease',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#1e40af'
+              e.currentTarget.style.transform = 'translateY(-2px)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#2563eb'
+              e.currentTarget.style.transform = 'translateY(0)'
+            }}
           >
+            <i className="bi bi-arrow-left"></i>
             Back to Home
           </button>
         </div>
@@ -69,4 +237,3 @@ export default function GoogleAdsPage() {
     </div>
   )
 }
-

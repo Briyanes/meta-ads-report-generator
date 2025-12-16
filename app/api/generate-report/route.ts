@@ -56,6 +56,13 @@ export async function POST(request: NextRequest) {
     let htmlReport: string
     try {
       console.log(`Generating HTML report for objective type: ${objectiveType}, retention: ${retentionType}`)
+      console.log('Analysis data structure:', {
+        hasPerformanceSummary: !!analysisData?.performanceSummary,
+        hasBreakdown: !!analysisData?.breakdown,
+        performanceSummaryKeys: analysisData?.performanceSummary ? Object.keys(analysisData.performanceSummary) : [],
+        thisWeekData: analysisData?.performanceSummary?.thisWeek ? Object.keys(analysisData.performanceSummary.thisWeek) : [],
+        lastWeekData: analysisData?.performanceSummary?.lastWeek ? Object.keys(analysisData.performanceSummary.lastWeek) : []
+      })
       htmlReport = generateReport(analysisData, reportName, retentionType, objectiveType)
       console.log(`Generated HTML report length: ${htmlReport?.length || 0} characters`)
       
