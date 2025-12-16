@@ -347,6 +347,25 @@ a {
     height: 80px !important;
   }
   
+  .responsive-cta-section {
+    padding: 32px 24px !important;
+  }
+  
+  .responsive-cta-heading {
+    font-size: 24px !important;
+    line-height: 1.3 !important;
+  }
+  
+  .responsive-cta-section .cta-description-single-line {
+    font-size: 14px !important;
+    white-space: normal !important;
+  }
+  
+  .responsive-cta-button {
+    padding: 14px 28px !important;
+    font-size: 16px !important;
+  }
+  
   .responsive-platform-title {
     font-size: 24px !important;
     line-height: 1.3 !important;
@@ -719,6 +738,25 @@ a {
   
   .header-spacer {
     height: 70px !important;
+  }
+  
+  .responsive-cta-section {
+    padding: 24px 16px !important;
+  }
+  
+  .responsive-cta-heading {
+    font-size: 20px !important;
+    line-height: 1.3 !important;
+  }
+  
+  .responsive-cta-section .cta-description-single-line {
+    font-size: 13px !important;
+    white-space: normal !important;
+  }
+  
+  .responsive-cta-button {
+    padding: 12px 24px !important;
+    font-size: 14px !important;
   }
   
   .responsive-platform-title {

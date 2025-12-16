@@ -2215,7 +2215,7 @@ export default function HomePage() {
         </div>
 
         {/* Final CTA Section */}
-        <div style={{
+        <div className="responsive-cta-section" style={{
           backgroundColor: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
           background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
           borderRadius: '16px',
@@ -2224,7 +2224,7 @@ export default function HomePage() {
           textAlign: 'center',
           boxShadow: '0 20px 25px -5px rgba(37, 99, 235, 0.3)'
         }}>
-          <h2 style={{
+          <h2 className="responsive-cta-heading" style={{
             fontSize: '40px',
             fontWeight: 'bold',
             color: '#ffffff',
@@ -2243,6 +2243,7 @@ export default function HomePage() {
             Start creating professional advertising reports in minutes. No credit card required.
           </p>
           <button
+            className="responsive-cta-button"
             onClick={() => router.push('/meta-ads')}
             style={{
               padding: '18px 40px',
