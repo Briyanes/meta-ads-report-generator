@@ -352,7 +352,7 @@ export default function HomePage() {
           }}>
             Choose Your Advertising Platform
           </h2>
-          <p style={{
+          <p className="cta-description-single-line" style={{
             fontSize: '18px',
             color: '#4b5563',
             maxWidth: '800px',
@@ -2233,7 +2233,7 @@ export default function HomePage() {
           }}>
             Ready to Generate Your First Report?
           </h2>
-          <p style={{
+          <p className="cta-description-single-line" style={{
             fontSize: '18px',
             color: 'rgba(255, 255, 255, 0.9)',
             maxWidth: '600px',
@@ -2290,7 +2290,7 @@ export default function HomePage() {
             marginBottom: '8px'
           }}>
             <span className="footer-text-1">© 2025 Ads Report Generator. Powered by</span>
-            <span className="footer-hadona" style={{ fontWeight: '600', color: '#2563eb' }}>Hadona Digital Media</span>
+            <span className="footer-hadona" style={{ fontWeight: '600', color: '#2563eb', marginLeft: '4px' }}>Hadona Digital Media</span>
           </p>
           <p style={{
             fontSize: '12px',

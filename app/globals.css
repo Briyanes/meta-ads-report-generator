@@ -565,10 +565,15 @@ a {
   }
 }
 
-/* Desktop view - add space between "Powered by" and "Hadona Digital Media" */
+/* Desktop view - make description text single line and add space in footer */
 @media (min-width: 769px) {
+  .cta-description-single-line {
+    white-space: nowrap !important;
+    max-width: 100% !important;
+  }
+  
   .footer-hadona {
-    margin-left: 0 !important;
+    margin-left: 4px !important;
   }
 }
 
