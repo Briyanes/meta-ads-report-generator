@@ -300,16 +300,112 @@ export default function MetaAdsPage() {
   const getExportRequirements = () => {
     const requirements: Record<string, any> = {
       ctwa: {
-        main: ['Amount spent', 'Messaging conversations started', 'Outbound clicks', 'Impressions', 'CTR (link click-through rate)', 'Cost per messaging conversation started'],
-        breakdown: ['Age', 'Gender', 'Region', 'Platform', 'Placement', 'Campaign objective', 'Ad creative/Ad name']
+        main: [
+          'Amount spent (IDR)',
+          'Messaging conversations started',
+          'Cost per messaging conversation started',
+          'Link clicks',
+          'CPC (cost per link click)',
+          'CTR (link click-through rate)',
+          'Outbound clicks',
+          '* OC→WA landing ratio',
+          'Impressions',
+          'CPM (cost per 1,000 impressions)',
+          'Reach',
+          'Cost per 1,000 Accounts Center accounts reached',
+          'Frequency',
+          'Clicks (all)',
+          'CTR (all)',
+          'CPC (all)',
+          'Instagram follows'
+        ],
+        breakdown: [
+          'Age (age.csv)',
+          'Gender (gender.csv)',
+          'Region (region.csv)',
+          'Platform (platform.csv)',
+          'Placement (placement.csv)',
+          'Campaign objective (objective.csv)',
+          'Ad creative/Ad name (ad-creative.csv)'
+        ]
       },
       cpas: {
-        main: ['Amount spent', 'Purchases', 'Purchases with shared items', 'Cost per purchase', 'Link clicks', 'CTR (all)', 'Purchases conversion value'],
-        breakdown: ['Age', 'Gender', 'Region', 'Platform', 'Placement', 'Campaign objective', 'Ad creative/Ad name']
+        main: [
+          'Amount spent (IDR)',
+          'Purchases with shared items',
+          'Cost /Purchase (IDR)',
+          'Purchase ROAS for shared items only',
+          'Purchases conversion value for shared items only',
+          'Adds to cart with shared items',
+          'Cost /ATC (IDR)',
+          'Content views with shared items',
+          'Cost /CV (IDR)',
+          '* LC to CV',
+          'VC to ATC',
+          'ATC → Purchases',
+          'Link clicks',
+          'CPC (cost per link click)',
+          'CTR (link click-through rate)',
+          'Outbound clicks',
+          'Impressions',
+          'CPM (cost per 1,000 impressions)',
+          'Reach',
+          'Cost per 1,000 Accounts Center accounts reached',
+          'Frequency',
+          'Clicks (all)',
+          'CTR (all)',
+          'CPC (all)',
+          'AOV (IDR)',
+          'Instagram profile visits',
+          'Instagram follows',
+          '* COST /Follow (IDR)'
+        ],
+        breakdown: [
+          'Age (age.csv)',
+          'Gender (gender.csv)',
+          'Region (region.csv)',
+          'Platform (platform.csv)',
+          'Placement (placement.csv)',
+          'Campaign objective (objective.csv)',
+          'Ad creative/Ad name (ad-creative.csv)'
+        ]
       },
       ctlptowa: {
-        main: ['Amount spent', 'Checkouts initiated', 'Landing page views', 'Clicks (all)', 'CTR (all)', 'Cost per checkout initiated', 'Outbound clicks'],
-        breakdown: ['Age', 'Gender', 'Region', 'Platform', 'Placement', 'Campaign objective', 'Ad creative/Ad name']
+        main: [
+          'Amount spent (IDR)',
+          'Website landing page views',
+          'Cost per landing page view',
+          'Checkouts initiated',
+          'Cost per checkout initiated',
+          'Link clicks',
+          'CPC (cost per link click)',
+          'CTR (link click-through rate)',
+          'Outbound clicks',
+          '* OC to LPV',
+          '* LC to LPV',
+          '* LPV to IC',
+          'Content views',
+          'Impressions',
+          'CPM (cost per 1,000 impressions)',
+          'Reach',
+          'Cost per 1,000 Accounts Center accounts reached',
+          'Frequency',
+          'Clicks (all)',
+          'CTR (all)',
+          'CPC (all)',
+          'Instagram profile visits',
+          'Instagram follows',
+          '* COST / Follow (IDR)'
+        ],
+        breakdown: [
+          'Age (age.csv)',
+          'Gender (gender.csv)',
+          'Region (region.csv)',
+          'Platform (platform.csv)',
+          'Placement (placement.csv)',
+          'Campaign objective (objective.csv)',
+          'Ad creative/Ad name (ad-creative.csv)'
+        ]
       }
     }
     return requirements[objectiveType] || requirements.ctwa
