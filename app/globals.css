@@ -502,8 +502,21 @@ a {
     margin-bottom: 24px;
   }
   
+  .demo-preview-container {
+    overflow: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: contain !important;
+  }
+  
   .responsive-demo iframe {
     height: 350px !important;
+    pointer-events: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  .demo-gradient-overlay {
+    display: none !important;
   }
   
   .demo-button-container {
@@ -757,6 +770,22 @@ a {
   .responsive-cta-button {
     padding: 12px 24px !important;
     font-size: 14px !important;
+  }
+  
+  .demo-preview-container {
+    overflow: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: contain !important;
+  }
+  
+  .responsive-demo iframe {
+    pointer-events: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  .demo-gradient-overlay {
+    display: none !important;
   }
   
   .responsive-platform-title {

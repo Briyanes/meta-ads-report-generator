@@ -1332,7 +1332,7 @@ export default function HomePage() {
                   Click to WhatsApp, Visit Profile
                 </p>
               </div>
-              <div style={{
+              <div className="demo-preview-container" style={{
                 height: '450px',
                 overflow: 'hidden',
                 position: 'relative',
@@ -1350,7 +1350,7 @@ export default function HomePage() {
                   title="CTWA Report Preview"
                   loading="lazy"
                 />
-                <div style={{
+                <div className="demo-gradient-overlay" style={{
                   position: 'absolute',
                   bottom: 0,
                   left: 0,
@@ -1358,7 +1358,8 @@ export default function HomePage() {
                   height: '80px',
                   background: 'linear-gradient(to top, rgba(249, 250, 251, 0.98), rgba(249, 250, 251, 0.5), transparent)',
                   pointerEvents: 'none',
-                  borderRadius: '0 0 12px 12px'
+                  borderRadius: '0 0 12px 12px',
+                  zIndex: 1
                 }}></div>
               </div>
               <div className="demo-button-container" style={{
@@ -1434,7 +1435,7 @@ export default function HomePage() {
                   Click to Landing Page to WhatsApp Button
                 </p>
               </div>
-              <div style={{
+              <div className="demo-preview-container" style={{
                 height: '450px',
                 overflow: 'hidden',
                 position: 'relative',
@@ -1452,7 +1453,7 @@ export default function HomePage() {
                   title="CTLP to WA Report Preview"
                   loading="lazy"
                 />
-                <div style={{
+                <div className="demo-gradient-overlay" style={{
                   position: 'absolute',
                   bottom: 0,
                   left: 0,
@@ -1460,7 +1461,8 @@ export default function HomePage() {
                   height: '80px',
                   background: 'linear-gradient(to top, rgba(249, 250, 251, 0.98), rgba(249, 250, 251, 0.5), transparent)',
                   pointerEvents: 'none',
-                  borderRadius: '0 0 12px 12px'
+                  borderRadius: '0 0 12px 12px',
+                  zIndex: 1
                 }}></div>
               </div>
               <div className="demo-button-container" style={{
@@ -1536,7 +1538,7 @@ export default function HomePage() {
                   Collaborative Performance Advertising Solution
                 </p>
               </div>
-              <div style={{
+              <div className="demo-preview-container" style={{
                 height: '450px',
                 overflow: 'hidden',
                 position: 'relative',
@@ -1554,7 +1556,7 @@ export default function HomePage() {
                   title="CPAS Report Preview"
                   loading="lazy"
                 />
-                <div style={{
+                <div className="demo-gradient-overlay" style={{
                   position: 'absolute',
                   bottom: 0,
                   left: 0,
@@ -1562,7 +1564,8 @@ export default function HomePage() {
                   height: '80px',
                   background: 'linear-gradient(to top, rgba(249, 250, 251, 0.98), rgba(249, 250, 251, 0.5), transparent)',
                   pointerEvents: 'none',
-                  borderRadius: '0 0 12px 12px'
+                  borderRadius: '0 0 12px 12px',
+                  zIndex: 1
                 }}></div>
               </div>
               <div className="demo-button-container" style={{
