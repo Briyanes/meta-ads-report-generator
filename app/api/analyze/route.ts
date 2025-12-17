@@ -859,11 +859,16 @@ function extractEventData(thisWeekData: any[], lastWeekData: any[], retentionTyp
   }
   
   // Filter and aggregate Twindate data for this period
+  // Twindate: tanggal kembar seperti 1.1, 2.2, 3.3, ..., 11.11, 12.12
+  // Note: Data akan muncul jika ada tanggal kembar dalam periode report
+  // Contoh: Periode 26 Okt - 25 Nov tidak akan memiliki twindate karena tidak ada tanggal kembar di range tersebut
   const twindateThisData = thisWeekData.filter(row => {
     const dateStr = row[dateColumn!]
     if (!dateStr) return false
     const date = parseDate(dateStr)
-    return date ? isTwindate(date) : false
+    if (!date) return false
+    const isTwindateDate = isTwindate(date)
+    return isTwindateDate
   })
   
   // Filter and aggregate Twindate data for last period
@@ -871,15 +876,21 @@ function extractEventData(thisWeekData: any[], lastWeekData: any[], retentionTyp
     const dateStr = row[dateColumn!]
     if (!dateStr) return false
     const date = parseDate(dateStr)
-    return date ? isTwindate(date) : false
+    if (!date) return false
+    const isTwindateDate = isTwindate(date)
+    return isTwindateDate
   })
   
   // Filter and aggregate Payday data for this period
+  // Payday: tanggal 21-31 (akhir bulan) atau tanggal 1-5 (awal bulan)
+  // Note: Payday akan selalu muncul karena periode report (26-25) selalu mencakup tanggal 21-31 atau 1-5
   const paydayThisData = thisWeekData.filter(row => {
     const dateStr = row[dateColumn!]
     if (!dateStr) return false
     const date = parseDate(dateStr)
-    return date ? isPayday(date) : false
+    if (!date) return false
+    const isPaydayDate = isPayday(date)
+    return isPaydayDate
   })
   
   // Filter and aggregate Payday data for last period
@@ -887,7 +898,9 @@ function extractEventData(thisWeekData: any[], lastWeekData: any[], retentionTyp
     const dateStr = row[dateColumn!]
     if (!dateStr) return false
     const date = parseDate(dateStr)
-    return date ? isPayday(date) : false
+    if (!date) return false
+    const isPaydayDate = isPayday(date)
+    return isPaydayDate
   })
   
   // Aggregate event data - always aggregate even if empty to ensure consistent structure
