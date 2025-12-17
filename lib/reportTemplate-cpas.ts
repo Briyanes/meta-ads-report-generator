@@ -408,6 +408,13 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             const lastWeek = perf.lastWeek || {};
             const breakdown = reportData.breakdown || {};
             
+            // Debug: Log data structure
+            console.log('DEBUG reportData:', reportData);
+            console.log('DEBUG perf:', perf);
+            console.log('DEBUG thisWeek:', thisWeek);
+            console.log('DEBUG thisWeek.reach:', thisWeek.reach);
+            console.log('DEBUG lastWeek.reach:', lastWeek.reach);
+            
             const spendGrowth = ${spendGrowth.toFixed(2)};
             const resultsGrowth = ${resultsGrowth.toFixed(2)};
             const cpaGrowth = ${cpaGrowth.toFixed(2)};
