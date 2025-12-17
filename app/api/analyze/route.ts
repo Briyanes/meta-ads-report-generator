@@ -338,19 +338,32 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       
       // Recalculate CTR, CPC, CPM after aggregation
       // Find the exact field names (case-insensitive, exact match preferred)
-      const linkClicksKey = keys.find(k => k.toLowerCase() === 'link clicks') || 
+      // Note: Papa.parse removes quotes from field names, so 'Link clicks' not '"Link clicks"'
+      const linkClicksKey = keys.find(k => k === 'Link clicks') || 
+                           keys.find(k => k.toLowerCase() === 'link clicks') ||
                            keys.find(k => k.toLowerCase().includes('link clicks') && !k.toLowerCase().includes('cost'))
-      const impressionsKey = keys.find(k => k.toLowerCase() === 'impressions')
-      const reachKey = keys.find(k => k.toLowerCase() === 'reach')
-      const amountSpentKey = keys.find(k => k.toLowerCase().includes('amount spent'))
-      const contentViewsKey = keys.find(k => k.toLowerCase().includes('content views with shared items'))
-      const addsToCartKey = keys.find(k => k.toLowerCase().includes('adds to cart with shared items'))
-      const purchasesKey = keys.find(k => k.toLowerCase().includes('purchases with shared items'))
-      const purchasesCVKey = keys.find(k => k.toLowerCase().includes('purchases conversion value for shared items only'))
-      const ctrKey = keys.find(k => k.toLowerCase().includes('ctr (link click-through rate)'))
-      const cpcKey = keys.find(k => k.toLowerCase().includes('cpc (cost per link click)'))
-      const cpmKey = keys.find(k => k.toLowerCase().includes('cpm (cost per 1,000 impressions)'))
-      const frequencyKey = keys.find(k => k.toLowerCase() === 'frequency')
+      const impressionsKey = keys.find(k => k === 'Impressions') || 
+                            keys.find(k => k.toLowerCase() === 'impressions')
+      const reachKey = keys.find(k => k === 'Reach') || 
+                      keys.find(k => k.toLowerCase() === 'reach')
+      const amountSpentKey = keys.find(k => k === 'Amount spent (IDR)') ||
+                            keys.find(k => k.toLowerCase().includes('amount spent'))
+      const contentViewsKey = keys.find(k => k === 'Content views with shared items') ||
+                             keys.find(k => k.toLowerCase().includes('content views with shared items'))
+      const addsToCartKey = keys.find(k => k === 'Adds to cart with shared items') ||
+                           keys.find(k => k.toLowerCase().includes('adds to cart with shared items'))
+      const purchasesKey = keys.find(k => k === 'Purchases with shared items') ||
+                          keys.find(k => k.toLowerCase().includes('purchases with shared items'))
+      const purchasesCVKey = keys.find(k => k === 'Purchases conversion value for shared items only') ||
+                            keys.find(k => k.toLowerCase().includes('purchases conversion value for shared items only'))
+      const ctrKey = keys.find(k => k === 'CTR (link click-through rate)') ||
+                    keys.find(k => k.toLowerCase().includes('ctr (link click-through rate)'))
+      const cpcKey = keys.find(k => k === 'CPC (cost per link click)') ||
+                    keys.find(k => k.toLowerCase().includes('cpc (cost per link click)'))
+      const cpmKey = keys.find(k => k === 'CPM (cost per 1,000 impressions)') ||
+                    keys.find(k => k.toLowerCase().includes('cpm (cost per 1,000 impressions)'))
+      const frequencyKey = keys.find(k => k === 'Frequency') ||
+                          keys.find(k => k.toLowerCase() === 'frequency')
       
       // Recalculate CTR (CSV format is already percentage, so we calculate from aggregated values)
       if (linkClicksKey && impressionsKey && ctrKey) {
@@ -450,6 +463,20 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     // Aggregate data from CSV (in case CSV has multiple rows/days)
     const thisWeekData = aggregateCSVData(parsedDataThisWeek.data)
     const lastWeekData = aggregateCSVData(parsedDataLastWeek.data)
+    
+    // Debug: Log aggregated data to verify
+    console.log('=== AGGREGATION DEBUG ===')
+    console.log('This Week Data Keys:', Object.keys(thisWeekData))
+    console.log('This Week Sample Values:', {
+      'Reach': thisWeekData['Reach'],
+      'Link clicks': thisWeekData['Link clicks'],
+      'Frequency': thisWeekData['Frequency'],
+      'CTR (link click-through rate)': thisWeekData['CTR (link click-through rate)'],
+      'CPC (cost per link click)': thisWeekData['CPC (cost per link click)'],
+      'CPM (cost per 1,000 impressions)': thisWeekData['CPM (cost per 1,000 impressions)'],
+      'Amount spent (IDR)': thisWeekData['Amount spent (IDR)'],
+      'Impressions': thisWeekData['Impressions']
+    })
     
     // Calculate base metrics
     const thisWeekSpend = parseNum(thisWeekData['Amount spent (IDR)'])
