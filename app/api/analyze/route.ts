@@ -337,8 +337,9 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       }
       
       // Recalculate CTR, CPC, CPM after aggregation
-      // Find the exact field names (case-insensitive)
-      const linkClicksKey = keys.find(k => k.toLowerCase().includes('link clicks') && !k.toLowerCase().includes('cost'))
+      // Find the exact field names (case-insensitive, exact match preferred)
+      const linkClicksKey = keys.find(k => k.toLowerCase() === 'link clicks') || 
+                           keys.find(k => k.toLowerCase().includes('link clicks') && !k.toLowerCase().includes('cost'))
       const impressionsKey = keys.find(k => k.toLowerCase() === 'impressions')
       const reachKey = keys.find(k => k.toLowerCase() === 'reach')
       const amountSpentKey = keys.find(k => k.toLowerCase().includes('amount spent'))
@@ -351,41 +352,80 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       const cpmKey = keys.find(k => k.toLowerCase().includes('cpm (cost per 1,000 impressions)'))
       const frequencyKey = keys.find(k => k.toLowerCase() === 'frequency')
       
+      // Recalculate CTR (CSV format is already percentage, so we calculate from aggregated values)
       if (linkClicksKey && impressionsKey && aggregated[linkClicksKey] > 0 && aggregated[impressionsKey] > 0) {
-        if (ctrKey) aggregated[ctrKey] = (aggregated[linkClicksKey] / aggregated[impressionsKey]) * 100
+        if (ctrKey) {
+          aggregated[ctrKey] = (aggregated[linkClicksKey] / aggregated[impressionsKey]) * 100
+        }
       }
+      
+      // Recalculate CPC
       if (linkClicksKey && amountSpentKey && aggregated[linkClicksKey] > 0 && aggregated[amountSpentKey] > 0) {
-        if (cpcKey) aggregated[cpcKey] = aggregated[amountSpentKey] / aggregated[linkClicksKey]
+        if (cpcKey) {
+          aggregated[cpcKey] = aggregated[amountSpentKey] / aggregated[linkClicksKey]
+        }
       }
+      
+      // Recalculate CPM
       if (impressionsKey && amountSpentKey && aggregated[impressionsKey] > 0 && aggregated[amountSpentKey] > 0) {
-        if (cpmKey) aggregated[cpmKey] = (aggregated[amountSpentKey] / aggregated[impressionsKey]) * 1000
+        if (cpmKey) {
+          aggregated[cpmKey] = (aggregated[amountSpentKey] / aggregated[impressionsKey]) * 1000
+        }
       }
+      
+      // Recalculate Frequency
+      if (impressionsKey && reachKey && aggregated[impressionsKey] > 0 && aggregated[reachKey] > 0) {
+        if (frequencyKey) {
+          aggregated[frequencyKey] = aggregated[impressionsKey] / aggregated[reachKey]
+        }
+      }
+      
+      // Recalculate Cost per Reach
       if (reachKey && amountSpentKey && aggregated[reachKey] > 0 && aggregated[amountSpentKey] > 0) {
         const costPerReachKey = keys.find(k => k.toLowerCase().includes('cost per 1,000 accounts center accounts reached'))
-        if (costPerReachKey) aggregated[costPerReachKey] = (aggregated[amountSpentKey] / aggregated[reachKey]) * 1000
+        if (costPerReachKey) {
+          aggregated[costPerReachKey] = (aggregated[amountSpentKey] / aggregated[reachKey]) * 1000
+        }
       }
+      
+      // Recalculate Cost per Content View
       if (contentViewsKey && amountSpentKey && aggregated[contentViewsKey] > 0 && aggregated[amountSpentKey] > 0) {
         const costPerCVKey = keys.find(k => k.toLowerCase().includes('cost /cv'))
-        if (costPerCVKey) aggregated[costPerCVKey] = aggregated[amountSpentKey] / aggregated[contentViewsKey]
+        if (costPerCVKey) {
+          aggregated[costPerCVKey] = aggregated[amountSpentKey] / aggregated[contentViewsKey]
+        }
       }
+      
+      // Recalculate Cost per ATC
       if (addsToCartKey && amountSpentKey && aggregated[addsToCartKey] > 0 && aggregated[amountSpentKey] > 0) {
         const costPerATCKey = keys.find(k => k.toLowerCase().includes('cost /atc'))
-        if (costPerATCKey) aggregated[costPerATCKey] = aggregated[amountSpentKey] / aggregated[addsToCartKey]
+        if (costPerATCKey) {
+          aggregated[costPerATCKey] = aggregated[amountSpentKey] / aggregated[addsToCartKey]
+        }
       }
+      
+      // Recalculate Cost per Purchase
       if (purchasesKey && amountSpentKey && aggregated[purchasesKey] > 0 && aggregated[amountSpentKey] > 0) {
         const costPerPurchaseKey = keys.find(k => k.toLowerCase().includes('cost /purchase'))
-        if (costPerPurchaseKey) aggregated[costPerPurchaseKey] = aggregated[amountSpentKey] / aggregated[purchasesKey]
+        if (costPerPurchaseKey) {
+          aggregated[costPerPurchaseKey] = aggregated[amountSpentKey] / aggregated[purchasesKey]
+        }
       }
-      if (impressionsKey && reachKey && aggregated[impressionsKey] > 0 && aggregated[reachKey] > 0) {
-        if (frequencyKey) aggregated[frequencyKey] = aggregated[impressionsKey] / aggregated[reachKey]
-      }
+      
+      // Recalculate ROAS
       if (purchasesCVKey && amountSpentKey && aggregated[purchasesCVKey] > 0 && aggregated[amountSpentKey] > 0) {
         const roasKey = keys.find(k => k.toLowerCase().includes('purchase roas for shared items only'))
-        if (roasKey) aggregated[roasKey] = aggregated[purchasesCVKey] / aggregated[amountSpentKey]
+        if (roasKey) {
+          aggregated[roasKey] = aggregated[purchasesCVKey] / aggregated[amountSpentKey]
+        }
       }
+      
+      // Recalculate AOV
       if (purchasesKey && purchasesCVKey && aggregated[purchasesKey] > 0 && aggregated[purchasesCVKey] > 0) {
         const aovKey = keys.find(k => k.toLowerCase().includes('aov'))
-        if (aovKey) aggregated[aovKey] = aggregated[purchasesCVKey] / aggregated[purchasesKey]
+        if (aovKey) {
+          aggregated[aovKey] = aggregated[purchasesCVKey] / aggregated[purchasesKey]
+        }
       }
       
       return aggregated
@@ -432,18 +472,52 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       ...breakdownLastWeek.map(f => f.name)
     ]
     
+    // Helper to get field value with case-insensitive matching
+    const getFieldValue = (data: any, fieldName: string, alternatives: string[] = []): any => {
+      if (!data || typeof data !== 'object') return undefined
+      
+      const allFields = [fieldName, ...alternatives]
+      const dataKeys = Object.keys(data)
+      
+      for (const field of allFields) {
+        // Try exact match first
+        if (data[field] !== undefined && data[field] !== null && data[field] !== '') {
+          return data[field]
+        }
+        // Try case-insensitive exact match
+        const exactMatch = dataKeys.find(key => key.toLowerCase() === field.toLowerCase())
+        if (exactMatch && data[exactMatch] !== undefined && data[exactMatch] !== null && data[exactMatch] !== '') {
+          return data[exactMatch]
+        }
+        // Try partial match (for fields with variations)
+        const partialMatch = dataKeys.find(key => {
+          const keyLower = key.toLowerCase()
+          const fieldLower = field.toLowerCase()
+          return keyLower.includes(fieldLower) || fieldLower.includes(keyLower)
+        })
+        if (partialMatch && data[partialMatch] !== undefined && data[partialMatch] !== null && data[partialMatch] !== '') {
+          return data[partialMatch]
+        }
+      }
+      return undefined
+    }
+    
     // Build performance summary with all fields
     const buildPerformanceData = (data: any, results: number, cpr: number) => {
       const base = {
-        amountSpent: parseNum(data['Amount spent (IDR)']),
-        impressions: parseNum(data['Impressions']),
-        linkClicks: parseNum(data['Link clicks']),
-        ctr: parseNum(data['CTR (link click-through rate)']),
-        cpc: parseNum(data['CPC (cost per link click)']),
-        cpm: parseNum(data['CPM (cost per 1,000 impressions)']),
-        outboundClicks: parseNum(data['Outbound clicks']),
-        frequency: parseNum(data['Frequency']),
-        reach: parseNum(data['Reach']),
+        amountSpent: parseNum(getFieldValue(data, 'Amount spent (IDR)')),
+        impressions: parseNum(getFieldValue(data, 'Impressions')),
+        linkClicks: parseNum(getFieldValue(data, 'Link clicks')),
+        ctr: (() => {
+          const ctrValue = parseNum(getFieldValue(data, 'CTR (link click-through rate)'))
+          // CTR in CSV is already in percentage format (e.g., 1.3 means 1.3%), convert to decimal (0.013)
+          return ctrValue > 1 ? ctrValue / 100 : ctrValue
+        })(),
+        cpc: parseNum(getFieldValue(data, 'CPC (cost per link click)')),
+        cpm: parseNum(getFieldValue(data, 'CPM (cost per 1,000 impressions)')),
+        outboundClicks: parseNum(getFieldValue(data, 'Outbound clicks')),
+        frequency: parseNum(getFieldValue(data, 'Frequency')),
+        reach: parseNum(getFieldValue(data, 'Reach')),
         cpr: cpr
       }
       
