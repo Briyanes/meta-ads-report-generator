@@ -1783,26 +1783,15 @@ function generateEventAnalysisSlides(data: any, thisWeek: any, lastWeek: any, th
   }
   
   // Generate Twindate slides if data exists
-  // Only show if we have data in BOTH periods, or at least meaningful data in this period
-  const hasTwindateThisData = twindateThis.amountSpent !== undefined && twindateThis.amountSpent > 0
-  const hasTwindateLastData = twindateLast.amountSpent !== undefined && twindateLast.amountSpent > 0
-  const shouldShowTwindate = hasTwindateData && (hasTwindateThisData || hasTwindateLastData)
-  
-  if (shouldShowTwindate) {
+  if (hasTwindateData) {
     // Get highlights and lowlights for Twindate
-    // Only show lowlights if we have data in this period (to avoid misleading 100% decreases)
     const twindateHighlights = Object.entries(twindateMetrics)
       .filter(([_, metric]: [string, any]) => metric.isPositive && Math.abs(metric.percentage) >= 1)
       .sort(([_, a]: [string, any], [__, b]: [string, any]) => Math.abs(b.percentage) - Math.abs(a.percentage))
       .slice(0, 10)
     
     const twindateLowlights = Object.entries(twindateMetrics)
-      .filter(([_, metric]: [string, any]) => {
-        // Only show lowlights if we have meaningful data in this period
-        // This prevents showing misleading 100% decreases when this period has no data
-        if (!hasTwindateThisData) return false
-        return !metric.isPositive && Math.abs(metric.percentage) >= 1
-      })
+      .filter(([_, metric]: [string, any]) => !metric.isPositive && Math.abs(metric.percentage) >= 1)
       .sort(([_, a]: [string, any], [__, b]: [string, any]) => Math.abs(b.percentage) - Math.abs(a.percentage))
       .slice(0, 5)
     
@@ -1848,13 +1837,13 @@ function generateEventAnalysisSlides(data: any, thisWeek: any, lastWeek: any, th
                         </div>
                     </div>`
     
-    // Slide: Twindate Lowlight
-    if (twindateLowlights.length > 0) {
-      slides += `
+    // Slide: Twindate Lowlight (always show after Highlight)
+    slides += `
                     {/* EVENT ANALYSIS - TWINDATE LOWLIGHT */}
                     <div className="bg-white p-8 border-t-4 border-hadona-blue">
                         <div className="max-w-6xl mx-auto">
                             <h2 className="text-2xl font-bold text-hadona-blue mb-4">Lowlight (Event MoM) — Twindate</h2>
+                            ${twindateLowlights.length > 0 ? `
                             <ul className="space-y-2 text-sm">
                                 ${twindateLowlights.map(([key, metric]: [string, any]) => {
         const label = metricLabels[key] || key
@@ -1869,9 +1858,11 @@ function generateEventAnalysisSlides(data: any, thisWeek: any, lastWeek: any, th
                                             </li>`
       }).join('')}
                             </ul>
+                            ` : `
+                            <p className="text-sm text-gray-500 italic">Tidak ada lowlight untuk periode ini.</p>
+                            `}
                         </div>
                     </div>`
-    }
     
     // Slide: Twindate Table
     slides += `
