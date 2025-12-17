@@ -22,8 +22,6 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const thisWeek = perf.thisWeek || {}
   const lastWeek = perf.lastWeek || {}
   const breakdown = data?.breakdown || {}
-  const eventAnalysis = data?.eventAnalysis || {}
-  const hasTwindate = eventAnalysis?.twindateThis?.amountSpent !== undefined || eventAnalysis?.twindateLast?.amountSpent !== undefined
   
   // Debug logging
   console.log('Report template - Extracted data:', {
@@ -540,8 +538,8 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr className={\`${hasTwindate ? 'bg-yellow-100 border-2 border-yellow-400' : ''}\`}>
-                                            <td className="border border-gray-300 p-2 text-xs">Amount spent${hasTwindate ? ' <span className="text-yellow-600 font-bold">(Twindate)</span>' : ''}</td>
+                                        <tr>
+                                            <td className="border border-gray-300 p-2 text-xs">Amount spent</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(lastWeek.amountSpent || 0)}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(thisWeek.amountSpent || 0)}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((thisWeek.amountSpent || 0) - (lastWeek.amountSpent || 0))}</td>

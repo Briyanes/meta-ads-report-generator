@@ -273,25 +273,35 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       const keys = Object.keys(data[0])
       const aggregated: any = {}
       
-      // Fields that should be summed
-      const sumFields = [
-        'Amount spent (IDR)', 'Impressions', 'Link clicks', 'Outbound clicks', 'Clicks (all)',
-        'Reach', 'Content views', 'Content views with shared items',
-        'Adds to cart', 'Adds to cart with shared items',
-        'Purchases', 'Purchases with shared items',
-        'Messaging conversations started', 'Checkouts initiated',
-        'ATC conversion value', 'ATC conversion value (shared only)',
-        'Purchases conversion value', 'Purchases conversion value for shared items only',
-        'Adds to cart conversion value for shared items only',
-        'Results'
-      ]
+      // Helper to check if field should be summed (case-insensitive, partial match)
+      const shouldSumField = (key: string): boolean => {
+        const keyLower = key.toLowerCase()
+        const sumFieldPatterns = [
+          'amount spent', 'impressions', 'link clicks', 'outbound clicks', 'clicks (all)',
+          'reach', 'content views', 'content views with shared items',
+          'adds to cart', 'adds to cart with shared items',
+          'purchases', 'purchases with shared items',
+          'messaging conversations started', 'checkouts initiated',
+          'atc conversion value', 'atc conversion value (shared only)',
+          'purchases conversion value', 'purchases conversion value for shared items only',
+          'adds to cart conversion value for shared items only',
+          'results'
+        ]
+        return sumFieldPatterns.some(pattern => keyLower.includes(pattern.toLowerCase()))
+      }
       
-      // Fields that should be recalculated (not summed)
-      const recalcFields = ['CTR (link click-through rate)', 'CTR (all)', 'CPC (cost per link click)', 
-        'CPM (cost per 1,000 impressions)', 'Cost per 1,000 Accounts Center accounts reached',
-        'Cost /CV (IDR)', 'Cost /ATC (IDR)', 'Cost /Purchase (IDR)', 'Cost per result',
-        'Frequency', 'Purchase ROAS for shared items only', 'AOV (IDR)',
-        '* LC to CV', '* CV to ATC', 'ATC to Purchase', 'Conversion rate ranking']
+      // Helper to check if field should be recalculated (case-insensitive, partial match)
+      const shouldRecalcField = (key: string): boolean => {
+        const keyLower = key.toLowerCase()
+        const recalcFieldPatterns = [
+          'ctr (link click-through rate)', 'ctr (all)', 'cpc (cost per link click)', 
+          'cpm (cost per 1,000 impressions)', 'cost per 1,000 accounts center accounts reached',
+          'cost /cv', 'cost /atc', 'cost /purchase', 'cost per result',
+          'frequency', 'purchase roas for shared items only', 'aov',
+          '* lc to cv', '* cv to atc', 'atc to purchase', 'conversion rate ranking'
+        ]
+        return recalcFieldPatterns.some(pattern => keyLower.includes(pattern.toLowerCase()))
+      }
       
       // For each key, sum all values if numeric, otherwise keep first value
       for (const key of keys) {
@@ -303,7 +313,7 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         }
         
         // For fields that should be recalculated, skip summing
-        if (recalcFields.some(f => key.includes(f))) {
+        if (shouldRecalcField(key)) {
           aggregated[key] = '' // Will be recalculated later if needed
           continue
         }
@@ -312,58 +322,70 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         const numericValues = values.map(v => parseNum(v)).filter(v => !isNaN(v))
         
         if (numericValues.length > 0) {
-          // Sum numeric values for sumFields, otherwise keep first value
-          if (sumFields.some(f => key.includes(f))) {
+          // Sum numeric values for sumFields
+          if (shouldSumField(key)) {
             aggregated[key] = numericValues.reduce((sum, val) => sum + val, 0)
           } else {
             // For other numeric fields, try to sum, but if all values are same, keep first
-            const allSame = numericValues.every(v => v === numericValues[0])
+            const allSame = numericValues.length > 0 && numericValues.every(v => v === numericValues[0])
             aggregated[key] = allSame ? numericValues[0] : numericValues.reduce((sum, val) => sum + val, 0)
           }
         } else {
-          // Keep first non-numeric value
-          aggregated[key] = values[0] || ''
+          // Keep first non-numeric value, or 0 if empty
+          aggregated[key] = values[0] || 0
         }
       }
       
       // Recalculate CTR, CPC, CPM after aggregation
-      if (aggregated['Link clicks'] && aggregated['Impressions'] && aggregated['Impressions'] > 0) {
-        aggregated['CTR (link click-through rate)'] = (aggregated['Link clicks'] / aggregated['Impressions']) * 100
-      } else {
-        aggregated['CTR (link click-through rate)'] = 0
+      // Find the exact field names (case-insensitive)
+      const linkClicksKey = keys.find(k => k.toLowerCase().includes('link clicks') && !k.toLowerCase().includes('cost'))
+      const impressionsKey = keys.find(k => k.toLowerCase() === 'impressions')
+      const reachKey = keys.find(k => k.toLowerCase() === 'reach')
+      const amountSpentKey = keys.find(k => k.toLowerCase().includes('amount spent'))
+      const contentViewsKey = keys.find(k => k.toLowerCase().includes('content views with shared items'))
+      const addsToCartKey = keys.find(k => k.toLowerCase().includes('adds to cart with shared items'))
+      const purchasesKey = keys.find(k => k.toLowerCase().includes('purchases with shared items'))
+      const purchasesCVKey = keys.find(k => k.toLowerCase().includes('purchases conversion value for shared items only'))
+      const ctrKey = keys.find(k => k.toLowerCase().includes('ctr (link click-through rate)'))
+      const cpcKey = keys.find(k => k.toLowerCase().includes('cpc (cost per link click)'))
+      const cpmKey = keys.find(k => k.toLowerCase().includes('cpm (cost per 1,000 impressions)'))
+      const frequencyKey = keys.find(k => k.toLowerCase() === 'frequency')
+      
+      if (linkClicksKey && impressionsKey && aggregated[linkClicksKey] > 0 && aggregated[impressionsKey] > 0) {
+        if (ctrKey) aggregated[ctrKey] = (aggregated[linkClicksKey] / aggregated[impressionsKey]) * 100
       }
-      if (aggregated['Link clicks'] && aggregated['Amount spent (IDR)'] && aggregated['Link clicks'] > 0) {
-        aggregated['CPC (cost per link click)'] = aggregated['Amount spent (IDR)'] / aggregated['Link clicks']
-      } else {
-        aggregated['CPC (cost per link click)'] = 0
+      if (linkClicksKey && amountSpentKey && aggregated[linkClicksKey] > 0 && aggregated[amountSpentKey] > 0) {
+        if (cpcKey) aggregated[cpcKey] = aggregated[amountSpentKey] / aggregated[linkClicksKey]
       }
-      if (aggregated['Impressions'] && aggregated['Amount spent (IDR)'] && aggregated['Impressions'] > 0) {
-        aggregated['CPM (cost per 1,000 impressions)'] = (aggregated['Amount spent (IDR)'] / aggregated['Impressions']) * 1000
-      } else {
-        aggregated['CPM (cost per 1,000 impressions)'] = 0
+      if (impressionsKey && amountSpentKey && aggregated[impressionsKey] > 0 && aggregated[amountSpentKey] > 0) {
+        if (cpmKey) aggregated[cpmKey] = (aggregated[amountSpentKey] / aggregated[impressionsKey]) * 1000
       }
-      if (aggregated['Reach'] && aggregated['Amount spent (IDR)']) {
-        aggregated['Cost per 1,000 Accounts Center accounts reached'] = (aggregated['Amount spent (IDR)'] / aggregated['Reach']) * 1000
+      if (reachKey && amountSpentKey && aggregated[reachKey] > 0 && aggregated[amountSpentKey] > 0) {
+        const costPerReachKey = keys.find(k => k.toLowerCase().includes('cost per 1,000 accounts center accounts reached'))
+        if (costPerReachKey) aggregated[costPerReachKey] = (aggregated[amountSpentKey] / aggregated[reachKey]) * 1000
       }
-      if (aggregated['Content views with shared items'] && aggregated['Amount spent (IDR)']) {
-        aggregated['Cost /CV (IDR)'] = aggregated['Amount spent (IDR)'] / aggregated['Content views with shared items']
+      if (contentViewsKey && amountSpentKey && aggregated[contentViewsKey] > 0 && aggregated[amountSpentKey] > 0) {
+        const costPerCVKey = keys.find(k => k.toLowerCase().includes('cost /cv'))
+        if (costPerCVKey) aggregated[costPerCVKey] = aggregated[amountSpentKey] / aggregated[contentViewsKey]
       }
-      if (aggregated['Adds to cart with shared items'] && aggregated['Amount spent (IDR)']) {
-        aggregated['Cost /ATC (IDR)'] = aggregated['Amount spent (IDR)'] / aggregated['Adds to cart with shared items']
+      if (addsToCartKey && amountSpentKey && aggregated[addsToCartKey] > 0 && aggregated[amountSpentKey] > 0) {
+        const costPerATCKey = keys.find(k => k.toLowerCase().includes('cost /atc'))
+        if (costPerATCKey) aggregated[costPerATCKey] = aggregated[amountSpentKey] / aggregated[addsToCartKey]
       }
-      if (aggregated['Purchases with shared items'] && aggregated['Amount spent (IDR)']) {
-        aggregated['Cost /Purchase (IDR)'] = aggregated['Amount spent (IDR)'] / aggregated['Purchases with shared items']
+      if (purchasesKey && amountSpentKey && aggregated[purchasesKey] > 0 && aggregated[amountSpentKey] > 0) {
+        const costPerPurchaseKey = keys.find(k => k.toLowerCase().includes('cost /purchase'))
+        if (costPerPurchaseKey) aggregated[costPerPurchaseKey] = aggregated[amountSpentKey] / aggregated[purchasesKey]
       }
-      if (aggregated['Impressions'] && aggregated['Reach'] && aggregated['Reach'] > 0) {
-        aggregated['Frequency'] = aggregated['Impressions'] / aggregated['Reach']
-      } else {
-        aggregated['Frequency'] = 0
+      if (impressionsKey && reachKey && aggregated[impressionsKey] > 0 && aggregated[reachKey] > 0) {
+        if (frequencyKey) aggregated[frequencyKey] = aggregated[impressionsKey] / aggregated[reachKey]
       }
-      if (aggregated['Purchases conversion value for shared items only'] && aggregated['Amount spent (IDR)']) {
-        aggregated['Purchase ROAS for shared items only'] = aggregated['Purchases conversion value for shared items only'] / aggregated['Amount spent (IDR)']
+      if (purchasesCVKey && amountSpentKey && aggregated[purchasesCVKey] > 0 && aggregated[amountSpentKey] > 0) {
+        const roasKey = keys.find(k => k.toLowerCase().includes('purchase roas for shared items only'))
+        if (roasKey) aggregated[roasKey] = aggregated[purchasesCVKey] / aggregated[amountSpentKey]
       }
-      if (aggregated['Purchases with shared items'] && aggregated['Purchases conversion value for shared items only']) {
-        aggregated['AOV (IDR)'] = aggregated['Purchases conversion value for shared items only'] / aggregated['Purchases with shared items']
+      if (purchasesKey && purchasesCVKey && aggregated[purchasesKey] > 0 && aggregated[purchasesCVKey] > 0) {
+        const aovKey = keys.find(k => k.toLowerCase().includes('aov'))
+        if (aovKey) aggregated[aovKey] = aggregated[purchasesCVKey] / aggregated[purchasesKey]
       }
       
       return aggregated
