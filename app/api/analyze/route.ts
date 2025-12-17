@@ -477,6 +477,18 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       'Amount spent (IDR)': thisWeekData['Amount spent (IDR)'],
       'Impressions': thisWeekData['Impressions']
     })
+    console.log('Last Week Data Keys:', Object.keys(lastWeekData))
+    console.log('Last Week Sample Values:', {
+      'Reach': lastWeekData['Reach'],
+      'Link clicks': lastWeekData['Link clicks'],
+      'Frequency': lastWeekData['Frequency'],
+      'CTR (link click-through rate)': lastWeekData['CTR (link click-through rate)'],
+      'CPC (cost per link click)': lastWeekData['CPC (cost per link click)'],
+      'CPM (cost per 1,000 impressions)': lastWeekData['CPM (cost per 1,000 impressions)'],
+      'Amount spent (IDR)': lastWeekData['Amount spent (IDR)'],
+      'Impressions': lastWeekData['Impressions'],
+      'Adds to cart conversion value for shared items only': lastWeekData['Adds to cart conversion value for shared items only']
+    })
     
     // Calculate base metrics
     const thisWeekSpend = parseNum(thisWeekData['Amount spent (IDR)'])
@@ -600,7 +612,11 @@ Return the analysis as structured JSON data that can be used to generate the HTM
           purchases: results,
           addsToCart: parseNum(data['Adds to cart'] || data['Adds to cart with shared items']),
           contentViews: parseNum(data['Content views'] || data['Content views with shared items']),
-          atcConversionValue: parseNum(data['ATC conversion value'] || data['ATC conversion value (shared only)']),
+          atcConversionValue: parseNum(getFieldValue(data, 'Adds to cart conversion value for shared items only', [
+            'ATC conversion value (shared only)',
+            'ATC conversion value',
+            'Adds to cart conversion value for shared items only'
+          ])),
           purchasesConversionValue: parseNum(data['Purchases conversion value'] || data['Purchases conversion value for shared items only'])
         }
       }
