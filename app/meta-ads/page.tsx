@@ -1489,18 +1489,53 @@ export default function MetaAdsPage() {
         </div>
 
         {/* Action Buttons */}
-        <div style={{
+        <div className="action-buttons-wrapper" style={{
           display: 'flex',
           flexWrap: 'wrap',
           gap: '16px',
           marginBottom: '24px',
-          justifyContent: 'flex-end',
+          justifyContent: 'space-between',
           alignItems: 'center'
           }}>
-          <div style={{
+          {/* Back to Home Button - Desktop Position */}
+          <button
+            className="back-to-home-desktop"
+            onClick={() => router.push('/home')}
+            style={{
+              color: '#000000',
+              background: '#ECDC43',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '16px',
+              fontWeight: '600',
+              padding: '14px 28px',
+              borderRadius: '10px',
+              transition: 'all 0.2s ease',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              boxShadow: '0 4px 6px -1px rgba(236, 220, 67, 0.3)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#d4c539'
+              e.currentTarget.style.transform = 'translateY(-2px)'
+              e.currentTarget.style.boxShadow = '0 6px 8px -1px rgba(236, 220, 67, 0.4)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#ECDC43'
+              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(236, 220, 67, 0.3)'
+            }}
+          >
+            <i className="bi bi-arrow-left"></i>
+            Back to Home
+          </button>
+          
+          <div className="action-buttons-container" style={{
             display: 'flex',
             flexWrap: 'wrap',
-            gap: '16px'
+            gap: '16px',
+            alignItems: 'center'
           }}>
             <button
               onClick={handleAnalyze}

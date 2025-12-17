@@ -618,9 +618,11 @@ a {
   }
   
   .back-to-home-fixed {
+    display: none !important;
+  }
+  
+  .back-to-home-desktop {
     display: inline-flex !important;
-    top: 120px !important;
-    left: 24px !important;
   }
 }
 
@@ -628,6 +630,20 @@ a {
 @media (max-width: 768px) {
   .back-to-home-fixed {
     display: none !important;
+  }
+  
+  .back-to-home-desktop {
+    display: none !important;
+  }
+  
+  .action-buttons-wrapper {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  
+  .action-buttons-container {
+    width: 100% !important;
+    justify-content: center !important;
   }
   
   .back-to-home-mobile-container {
