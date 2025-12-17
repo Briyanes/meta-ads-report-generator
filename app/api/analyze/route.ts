@@ -376,9 +376,13 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         const impressions = parseNum(aggregated[impressionsKey])
         if (linkClicks > 0 && impressions > 0) {
           aggregated[ctrKey] = (linkClicks / impressions) * 100
+          console.log(`Recalculated CTR: ${aggregated[ctrKey]}% (from ${linkClicks} / ${impressions} * 100)`)
         } else {
           aggregated[ctrKey] = 0
+          console.log(`CTR set to 0 (linkClicks: ${linkClicks}, impressions: ${impressions})`)
         }
+      } else {
+        console.log(`CTR recalculation skipped - linkClicksKey: ${linkClicksKey}, impressionsKey: ${impressionsKey}, ctrKey: ${ctrKey}`)
       }
       
       // Recalculate CPC
@@ -387,9 +391,13 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         const amountSpent = parseNum(aggregated[amountSpentKey])
         if (linkClicks > 0 && amountSpent > 0) {
           aggregated[cpcKey] = amountSpent / linkClicks
+          console.log(`Recalculated CPC: ${aggregated[cpcKey]} (from ${amountSpent} / ${linkClicks})`)
         } else {
           aggregated[cpcKey] = 0
+          console.log(`CPC set to 0 (linkClicks: ${linkClicks}, amountSpent: ${amountSpent})`)
         }
+      } else {
+        console.log(`CPC recalculation skipped - linkClicksKey: ${linkClicksKey}, amountSpentKey: ${amountSpentKey}, cpcKey: ${cpcKey}`)
       }
       
       // Recalculate CPM
@@ -409,9 +417,13 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         const reach = parseNum(aggregated[reachKey])
         if (impressions > 0 && reach > 0) {
           aggregated[frequencyKey] = impressions / reach
+          console.log(`Recalculated Frequency: ${aggregated[frequencyKey]} (from ${impressions} / ${reach})`)
         } else {
           aggregated[frequencyKey] = 0
+          console.log(`Frequency set to 0 (impressions: ${impressions}, reach: ${reach})`)
         }
+      } else {
+        console.log(`Frequency recalculation skipped - impressionsKey: ${impressionsKey}, reachKey: ${reachKey}, frequencyKey: ${frequencyKey}`)
       }
       
       // Recalculate Cost per Reach
