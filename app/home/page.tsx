@@ -122,15 +122,34 @@ export default function HomePage() {
             alignItems: 'center',
             gap: '8px'
           }}>
-            <img
-              src="/logo/logo-hadona.png"
-              alt="Hadona Digital Media"
+            <a
+              href="https://hadona.id"
+              target="_blank"
+              rel="noopener noreferrer"
               style={{
-                height: '80px',
-                width: 'auto',
-                objectFit: 'contain'
+                display: 'flex',
+                alignItems: 'center',
+                textDecoration: 'none',
+                cursor: 'pointer',
+                transition: 'opacity 0.2s ease'
               }}
-            />
+              onMouseEnter={(e) => {
+                e.currentTarget.style.opacity = '0.8'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = '1'
+              }}
+            >
+              <img
+                src="/logo/logo-hadona.png"
+                alt="Hadona Digital Media"
+                style={{
+                  height: '80px',
+                  width: 'auto',
+                  objectFit: 'contain'
+                }}
+              />
+            </a>
           </div>
         </div>
       </header>

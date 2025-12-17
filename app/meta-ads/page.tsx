@@ -739,19 +739,38 @@ export default function MetaAdsPage() {
             flexGrow: 0,
             width: 'auto'
           }}>
-            <Image
-              src="/logo/logo-hadona.png"
-              alt="Hadona Digital Media"
-              className="responsive-header-logo"
-              width={200}
-              height={80}
+            <a
+              href="https://hadona.id"
+              target="_blank"
+              rel="noopener noreferrer"
               style={{
-                height: '80px',
-                width: 'auto',
-                objectFit: 'contain',
-                display: 'block'
+                display: 'flex',
+                alignItems: 'center',
+                textDecoration: 'none',
+                cursor: 'pointer',
+                transition: 'opacity 0.2s ease'
               }}
-            />
+              onMouseEnter={(e) => {
+                e.currentTarget.style.opacity = '0.8'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = '1'
+              }}
+            >
+              <Image
+                src="/logo/logo-hadona.png"
+                alt="Hadona Digital Media"
+                className="responsive-header-logo"
+                width={200}
+                height={80}
+                style={{
+                  height: '80px',
+                  width: 'auto',
+                  objectFit: 'contain',
+                  display: 'block'
+                }}
+              />
+            </a>
           </div>
         </div>
       </header>
