@@ -383,9 +383,12 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     <div id="root"></div>
 
     <script type="text/babel">
-        const App = () => {
-            const reportData = ${JSON.stringify(data)};
-            const reportName = ${JSON.stringify(reportName || 'Weekly Report')};
+        // Ensure React and ReactDOM are loaded before rendering
+        const checkAndRender = () => {
+            if (typeof React !== 'undefined' && typeof ReactDOM !== 'undefined' && document.getElementById('root')) {
+                const App = () => {
+                    const reportData = ${JSON.stringify(data)};
+                    const reportName = ${JSON.stringify(reportName || 'Weekly Report')};
             
             const formatNumber = (num) => {
                 if (!num && num !== 0) return '0';
@@ -779,9 +782,21 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                     </div>
                 </div>
             );
+                };
+
+                ReactDOM.render(<App />, document.getElementById('root'));
+            } else {
+                // Retry after a short delay
+                setTimeout(checkAndRender, 100);
+            }
         };
 
-        ReactDOM.render(<App />, document.getElementById('root'));
+        // Start rendering when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', checkAndRender);
+        } else {
+            checkAndRender();
+        }
     </script>
 </body>
 </html>`
