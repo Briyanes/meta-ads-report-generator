@@ -332,7 +332,12 @@ Return the analysis as structured JSON data that can be used to generate the HTM
           }
         } else {
           // Keep first non-numeric value, or 0 if empty
-          aggregated[key] = values[0] || 0
+          // But if it's a numeric field that should be summed, use 0 instead of empty string
+          if (shouldSumField(key)) {
+            aggregated[key] = 0
+          } else {
+            aggregated[key] = values[0] || 0
+          }
         }
       }
       
