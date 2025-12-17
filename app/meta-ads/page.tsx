@@ -35,7 +35,16 @@ export default function MetaAdsPage() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'thisWeek' | 'lastWeek') => {
     const selectedFiles = Array.from(e.target.files || [])
-    const csvFiles = selectedFiles.filter(file => file.type === 'text/csv' || file.name.endsWith('.csv'))
+    // More robust CSV detection - check MIME type or file extension
+    const csvFiles = selectedFiles.filter(file => {
+      const fileName = file.name.toLowerCase()
+      const fileType = file.type.toLowerCase()
+      return fileType === 'text/csv' || 
+             fileType === 'application/csv' ||
+             fileType === 'text/comma-separated-values' ||
+             fileType === 'application/vnd.ms-excel' ||
+             fileName.endsWith('.csv')
+    })
     
     if (csvFiles.length > 0) {
       if (type === 'thisWeek') {
@@ -44,6 +53,8 @@ export default function MetaAdsPage() {
         setFilesLastWeek(prev => [...prev, ...csvFiles])
       }
       setError(null)
+      // Reset input to allow selecting the same file again
+      e.target.value = ''
     } else {
       setError('Please upload valid CSV files')
     }
@@ -69,10 +80,20 @@ export default function MetaAdsPage() {
 
   const handleDrop = (e: React.DragEvent, type: 'thisWeek' | 'lastWeek') => {
     e.preventDefault()
+    e.stopPropagation()
     e.currentTarget.classList.remove('dragover')
     
     const droppedFiles = Array.from(e.dataTransfer.files)
-    const csvFiles = droppedFiles.filter(file => file.type === 'text/csv' || file.name.endsWith('.csv'))
+    // More robust CSV detection - check MIME type or file extension
+    const csvFiles = droppedFiles.filter(file => {
+      const fileName = file.name.toLowerCase()
+      const fileType = file.type.toLowerCase()
+      return fileType === 'text/csv' || 
+             fileType === 'application/csv' ||
+             fileType === 'text/comma-separated-values' ||
+             fileType === 'application/vnd.ms-excel' ||
+             fileName.endsWith('.csv')
+    })
     
     if (csvFiles.length > 0) {
       if (type === 'thisWeek') {

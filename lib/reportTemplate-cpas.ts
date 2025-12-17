@@ -815,12 +815,15 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
 
                 // Use React 18 createRoot API instead of ReactDOM.render
                 const rootElement = document.getElementById('root');
-                if (ReactDOM.createRoot) {
+                // Check if createRoot is available (React 18+)
+                if (typeof ReactDOM !== 'undefined' && ReactDOM.createRoot) {
                     const root = ReactDOM.createRoot(rootElement);
                     root.render(<App />);
-                } else {
+                } else if (typeof ReactDOM !== 'undefined' && ReactDOM.render) {
                     // Fallback for React 17
                     ReactDOM.render(<App />, rootElement);
+                } else {
+                    console.error('ReactDOM is not available');
                 }
             } else {
                 // Retry after a short delay
