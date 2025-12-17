@@ -774,7 +774,29 @@ function extractEventData(thisWeekData: any[], lastWeekData: any[], retentionTyp
   
   // Helper function to aggregate data for event
   const aggregateEventData = (data: any[]): any => {
-    if (data.length === 0) return {}
+    // Return default structure with all fields set to 0 if no data
+    // This ensures consistent structure for both periods
+    if (data.length === 0) {
+      return {
+        amountSpent: 0,
+        purchases: 0,
+        addsToCart: 0,
+        contentViews: 0,
+        atcConversionValue: 0,
+        purchasesConversionValue: 0,
+        linkClicks: 0,
+        impressions: 0,
+        ctr: 0,
+        cpc: 0,
+        cpm: 0,
+        frequency: 0,
+        purchaseROAS: 0,
+        costPerPurchase: 0,
+        costPerATC: 0,
+        conversionRate: 0,
+        avgPurchaseValue: 0
+      }
+    }
     
     const parseNum = (val: any) => {
       if (typeof val === 'string') {
@@ -868,19 +890,20 @@ function extractEventData(thisWeekData: any[], lastWeekData: any[], retentionTyp
     return date ? isPayday(date) : false
   })
   
-  // Aggregate event data
-  if (twindateThisData.length > 0) {
-    eventAnalysis.twindateThis = aggregateEventData(twindateThisData)
-  }
-  if (twindateLastData.length > 0) {
-    eventAnalysis.twindateLast = aggregateEventData(twindateLastData)
-  }
-  if (paydayThisData.length > 0) {
-    eventAnalysis.paydayThis = aggregateEventData(paydayThisData)
-  }
-  if (paydayLastData.length > 0) {
-    eventAnalysis.paydayLast = aggregateEventData(paydayLastData)
-  }
+  // Aggregate event data - always aggregate even if empty to ensure consistent structure
+  // This ensures both periods have the same structure even if one has no data
+  eventAnalysis.twindateThis = twindateThisData.length > 0 
+    ? aggregateEventData(twindateThisData) 
+    : aggregateEventData([])
+  eventAnalysis.twindateLast = twindateLastData.length > 0 
+    ? aggregateEventData(twindateLastData) 
+    : aggregateEventData([])
+  eventAnalysis.paydayThis = paydayThisData.length > 0 
+    ? aggregateEventData(paydayThisData) 
+    : aggregateEventData([])
+  eventAnalysis.paydayLast = paydayLastData.length > 0 
+    ? aggregateEventData(paydayLastData) 
+    : aggregateEventData([])
   
   return eventAnalysis
 }
