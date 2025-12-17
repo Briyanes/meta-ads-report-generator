@@ -253,8 +253,8 @@ a {
 
 @media (max-width: 768px) {
   .responsive-container {
-    padding: 8px 16px !important;
-    padding-top: 8px !important;
+    padding: 16px 16px !important;
+    padding-top: 16px !important;
   }
   
   .responsive-header {
@@ -320,7 +320,7 @@ a {
   .responsive-hero {
     padding: 32px 16px !important;
     margin-bottom: 32px !important;
-    margin-top: 0 !important;
+    margin-top: 24px !important;
   }
   
   .responsive-hero h1 {
@@ -344,16 +344,11 @@ a {
   }
   
   .header-spacer {
-    height: 60px !important;
-  }
-  
-  .responsive-container {
-    padding-top: 8px !important;
+    height: 80px !important;
   }
   
   .responsive-cta-section {
     padding: 32px 24px !important;
-    margin-top: 0 !important;
   }
   
   .responsive-cta-heading {
@@ -659,8 +654,8 @@ a {
 
 @media (max-width: 480px) {
   .responsive-container {
-    padding: 4px 12px !important;
-    padding-top: 4px !important;
+    padding: 12px 12px !important;
+    padding-top: 12px !important;
   }
   
   .responsive-header {
@@ -746,6 +741,7 @@ a {
   
   .responsive-hero {
     padding: 24px 12px !important;
+    margin-top: 20px !important;
   }
   
   .responsive-hero h1 {
@@ -764,16 +760,11 @@ a {
   }
   
   .header-spacer {
-    height: 50px !important;
-  }
-  
-  .responsive-container {
-    padding-top: 4px !important;
+    height: 70px !important;
   }
   
   .responsive-cta-section {
     padding: 24px 16px !important;
-    margin-top: 0 !important;
   }
   
   .responsive-cta-heading {
