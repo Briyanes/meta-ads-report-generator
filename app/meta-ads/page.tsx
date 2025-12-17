@@ -1259,7 +1259,9 @@ export default function MetaAdsPage() {
             color: '#111827',
             marginBottom: '12px'
           }}>
-            Upload CSV Files untuk {retentionType === 'wow' ? 'Week-on-Week' : 'Month-on-Month'} Analysis
+            Upload CSV Files untuk:
+            <br />
+            {retentionType === 'wow' ? 'Week-on-Week' : 'Month-on-Month'} Analysis
           </h2>
           <p style={{
             fontSize: '15px',
