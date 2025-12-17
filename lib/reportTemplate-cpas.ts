@@ -17,11 +17,21 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     data = analysisData || {}
   }
   
+  // Debug: Log data structure in server-side template
+  console.log('DEBUG template server-side - data:', JSON.stringify(data).substring(0, 500));
+  console.log('DEBUG template server-side - data.performanceSummary:', data?.performanceSummary);
+  console.log('DEBUG template server-side - data.performanceSummary?.thisWeek:', data?.performanceSummary?.thisWeek);
+  console.log('DEBUG template server-side - data.performanceSummary?.thisWeek?.reach:', data?.performanceSummary?.thisWeek?.reach);
+  
   // Extract data with fallbacks
   const perf = data?.performanceSummary || {}
   const thisWeek = perf.thisWeek || {}
   const lastWeek = perf.lastWeek || {}
   const breakdown = data?.breakdown || {}
+  
+  // Debug: Log extracted values
+  console.log('DEBUG template server-side - thisWeek.reach:', thisWeek.reach);
+  console.log('DEBUG template server-side - lastWeek.reach:', lastWeek.reach);
   
   // Determine period labels based on retention type
   const isMoM = retentionType === 'mom'
