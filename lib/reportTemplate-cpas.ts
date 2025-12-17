@@ -1783,15 +1783,26 @@ function generateEventAnalysisSlides(data: any, thisWeek: any, lastWeek: any, th
   }
   
   // Generate Twindate slides if data exists
-  if (hasTwindateData) {
+  // Only show if we have data in BOTH periods, or at least meaningful data in this period
+  const hasTwindateThisData = twindateThis.amountSpent !== undefined && twindateThis.amountSpent > 0
+  const hasTwindateLastData = twindateLast.amountSpent !== undefined && twindateLast.amountSpent > 0
+  const shouldShowTwindate = hasTwindateData && (hasTwindateThisData || hasTwindateLastData)
+  
+  if (shouldShowTwindate) {
     // Get highlights and lowlights for Twindate
+    // Only show lowlights if we have data in this period (to avoid misleading 100% decreases)
     const twindateHighlights = Object.entries(twindateMetrics)
       .filter(([_, metric]: [string, any]) => metric.isPositive && Math.abs(metric.percentage) >= 1)
       .sort(([_, a]: [string, any], [__, b]: [string, any]) => Math.abs(b.percentage) - Math.abs(a.percentage))
       .slice(0, 10)
     
     const twindateLowlights = Object.entries(twindateMetrics)
-      .filter(([_, metric]: [string, any]) => !metric.isPositive && Math.abs(metric.percentage) >= 1)
+      .filter(([_, metric]: [string, any]) => {
+        // Only show lowlights if we have meaningful data in this period
+        // This prevents showing misleading 100% decreases when this period has no data
+        if (!hasTwindateThisData) return false
+        return !metric.isPositive && Math.abs(metric.percentage) >= 1
+      })
       .sort(([_, a]: [string, any], [__, b]: [string, any]) => Math.abs(b.percentage) - Math.abs(a.percentage))
       .slice(0, 5)
     
