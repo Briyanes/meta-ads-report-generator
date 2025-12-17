@@ -624,9 +624,17 @@ a {
   }
 }
 
-/* Hide back to home button on mobile */
+/* Back to home button position for mobile */
 @media (max-width: 768px) {
   .back-to-home-fixed {
+    display: inline-flex !important;
+    top: 80px !important;
+    left: 16px !important;
+    padding: 8px 16px !important;
+    font-size: 13px !important;
+  }
+  
+  .back-to-home-text {
     display: none !important;
   }
 }
@@ -783,6 +791,17 @@ a {
   
   .header-spacer {
     height: 70px !important;
+  }
+  
+  .back-to-home-fixed {
+    top: 70px !important;
+    left: 12px !important;
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+  }
+  
+  .back-to-home-text {
+    display: none !important;
   }
   
   .responsive-cta-section {
