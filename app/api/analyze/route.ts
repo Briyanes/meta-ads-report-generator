@@ -542,7 +542,8 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         cpm: parseNum(getFieldValue(data, 'CPM (cost per 1,000 impressions)')),
         outboundClicks: parseNum(getFieldValue(data, 'Outbound clicks')),
         frequency: parseNum(getFieldValue(data, 'Frequency')),
-        reach: parseNum(getFieldValue(data, 'Reach')),
+        // Reach: try multiple field name variations to match Meta CSV export
+        reach: parseNum(getFieldValue(data, 'Reach', ['Reach', 'reach', 'Accounts Center accounts reached'])),
         cpr: cpr
       }
       
