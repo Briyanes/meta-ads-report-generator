@@ -756,13 +756,67 @@ function extractEventData(thisWeekData: any[], lastWeekData: any[], retentionTyp
     return null
   }
   
-  // Helper function to check if date is Twindate (tanggal kembar: 1.1, 2.2, 3.3, ..., 11.11, 12.12)
+  // Helper function to check if date is within Twindate period
+  // Twindate: iklan start H-4 sebelum tanggal kembar dan mati jam 00:00 di tanggal kembar
+  // Contoh: Twindate 12.12 = iklan start 8 Desember, mati 12 Desember jam 00:00
+  // Jadi periode: 8 Desember - 11 Desember (sampai sebelum 12 Desember jam 00:00)
   const isTwindate = (date: Date): boolean => {
     if (!date || isNaN(date.getTime())) return false
-    const day = date.getDate()
-    const month = date.getMonth() + 1
-    // Check if day and month are the same (e.g., 1/1, 2/2, 11/11, 12/12)
-    return day === month && day >= 1 && day <= 12
+    
+    // List semua tanggal kembar (1.1, 2.2, ..., 12.12)
+    const twindateDates = [
+      { month: 1, day: 1 },   // 1.1
+      { month: 2, day: 2 },   // 2.2
+      { month: 3, day: 3 },   // 3.3
+      { month: 4, day: 4 },   // 4.4
+      { month: 5, day: 5 },   // 5.5
+      { month: 6, day: 6 },   // 6.6
+      { month: 7, day: 7 },   // 7.7
+      { month: 8, day: 8 },   // 8.8
+      { month: 9, day: 9 },   // 9.9
+      { month: 10, day: 10 }, // 10.10
+      { month: 11, day: 11 }, // 11.11
+      { month: 12, day: 12 }  // 12.12
+    ]
+    
+    const checkDate = new Date(date)
+    checkDate.setHours(0, 0, 0, 0) // Normalize to start of day
+    
+    // Check each twindate
+    for (const twindate of twindateDates) {
+      // Calculate H-4 date (start date)
+      const twindateDate = new Date(checkDate.getFullYear(), twindate.month - 1, twindate.day)
+      twindateDate.setHours(0, 0, 0, 0)
+      
+      // Start date is H-4 (4 days before twindate)
+      const startDate = new Date(twindateDate)
+      startDate.setDate(startDate.getDate() - 4)
+      
+      // End date is H (twindate date) at 00:00, so we check up to H-1 (day before)
+      const endDate = new Date(twindateDate)
+      endDate.setDate(endDate.getDate() - 1) // Day before twindate (since it ends at 00:00 on twindate)
+      endDate.setHours(23, 59, 59, 999) // End of day
+      
+      // Check if date is within range [startDate, endDate]
+      if (checkDate >= startDate && checkDate <= endDate) {
+        return true
+      }
+      
+      // Also check for previous year (for dates like 1.1 that might span year boundary)
+      const prevYearTwindateDate = new Date(checkDate.getFullYear() - 1, twindate.month - 1, twindate.day)
+      prevYearTwindateDate.setHours(0, 0, 0, 0)
+      const prevYearStartDate = new Date(prevYearTwindateDate)
+      prevYearStartDate.setDate(prevYearStartDate.getDate() - 4)
+      const prevYearEndDate = new Date(prevYearTwindateDate)
+      prevYearEndDate.setDate(prevYearEndDate.getDate() - 1)
+      prevYearEndDate.setHours(23, 59, 59, 999)
+      
+      if (checkDate >= prevYearStartDate && checkDate <= prevYearEndDate) {
+        return true
+      }
+    }
+    
+    return false
   }
   
   // Helper function to check if date is Payday (tanggal 21-5: dari tanggal 21 bulan ini sampai tanggal 5 bulan berikutnya)
