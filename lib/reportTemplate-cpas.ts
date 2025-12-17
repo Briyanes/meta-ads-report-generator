@@ -1674,13 +1674,15 @@ function generateEventAnalysisSlides(data: any, thisWeek: any, lastWeek: any, th
   // Check if we have event data
   // Since aggregateEventData always returns object with all fields (even if 0),
   // we check if there's meaningful data (amountSpent > 0) in at least one period
-  // OR if the object exists (to show data even if both periods are 0, for comparison)
+  // This ensures we only show slides when there's actual data to display
   const hasTwindateData = (twindateThis.amountSpent !== undefined && twindateThis.amountSpent > 0) || 
                           (twindateLast.amountSpent !== undefined && twindateLast.amountSpent > 0) ||
-                          (Object.keys(twindateThis).length > 0 || Object.keys(twindateLast).length > 0)
+                          (twindateThis.purchases !== undefined && twindateThis.purchases > 0) ||
+                          (twindateLast.purchases !== undefined && twindateLast.purchases > 0)
   const hasPaydayData = (paydayThis.amountSpent !== undefined && paydayThis.amountSpent > 0) || 
                         (paydayLast.amountSpent !== undefined && paydayLast.amountSpent > 0) ||
-                        (Object.keys(paydayThis).length > 0 || Object.keys(paydayLast).length > 0)
+                        (paydayThis.purchases !== undefined && paydayThis.purchases > 0) ||
+                        (paydayLast.purchases !== undefined && paydayLast.purchases > 0)
   
   if (!hasTwindateData && !hasPaydayData) {
     // If no event data, return empty string (no slides)
