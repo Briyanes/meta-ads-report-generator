@@ -627,15 +627,19 @@ a {
 /* Back to home button position for mobile */
 @media (max-width: 768px) {
   .back-to-home-fixed {
-    display: inline-flex !important;
-    top: 80px !important;
-    left: 16px !important;
-    padding: 8px 16px !important;
-    font-size: 13px !important;
+    display: none !important;
   }
   
-  .back-to-home-text {
-    display: none !important;
+  .back-to-home-mobile-container {
+    display: block !important;
+  }
+  
+  .back-to-home-mobile {
+    display: inline-flex !important;
+  }
+  
+  .back-to-home-mobile .back-to-home-text {
+    display: inline !important;
   }
 }
 
@@ -794,14 +798,20 @@ a {
   }
   
   .back-to-home-fixed {
-    top: 70px !important;
-    left: 12px !important;
-    padding: 6px 12px !important;
-    font-size: 12px !important;
+    display: none !important;
   }
   
-  .back-to-home-text {
-    display: none !important;
+  .back-to-home-mobile-container {
+    display: block !important;
+  }
+  
+  .back-to-home-mobile {
+    padding: 8px 16px !important;
+    font-size: 13px !important;
+  }
+  
+  .back-to-home-mobile .back-to-home-text {
+    display: inline !important;
   }
   
   .responsive-cta-section {

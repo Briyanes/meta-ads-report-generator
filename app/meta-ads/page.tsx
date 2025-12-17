@@ -822,6 +822,43 @@ export default function MetaAdsPage() {
         padding: '48px',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
       }}>
+        {/* Back to Home Button - Mobile Position (above hero) */}
+        <div className="back-to-home-mobile-container" style={{ display: 'none' }}>
+          <button
+            className="back-to-home-mobile"
+            onClick={() => router.push('/home')}
+            style={{
+              color: '#000000',
+              background: '#ECDC43',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '600',
+              padding: '10px 20px',
+              borderRadius: '8px',
+              transition: 'all 0.2s ease',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              boxShadow: '0 4px 6px -1px rgba(236, 220, 67, 0.3)',
+              marginBottom: '16px'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#d4c539'
+              e.currentTarget.style.transform = 'translateY(-2px)'
+              e.currentTarget.style.boxShadow = '0 6px 8px -1px rgba(236, 220, 67, 0.4)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#ECDC43'
+              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(236, 220, 67, 0.3)'
+            }}
+          >
+            <i className="bi bi-arrow-left"></i>
+            <span className="back-to-home-text">Back to Home</span>
+          </button>
+        </div>
+        
         {/* Report Configuration */}
         <div className="responsive-card" style={{
           backgroundColor: '#ffffff',
