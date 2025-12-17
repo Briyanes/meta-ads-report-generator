@@ -757,9 +757,9 @@ function extractEventData(thisWeekData: any[], lastWeekData: any[], retentionTyp
   }
   
   // Helper function to check if date is within Twindate period
-  // Twindate: iklan start H-4 sebelum tanggal kembar dan mati jam 00:00 di tanggal kembar
-  // Contoh: Twindate 12.12 = iklan start 8 Desember, mati 12 Desember jam 00:00
-  // Jadi periode: 8 Desember - 11 Desember (sampai sebelum 12 Desember jam 00:00)
+  // Twindate: iklan start H-4 sebelum tanggal kembar dan mati setelah twindate selesai
+  // Contoh: Twindate 12.12 = iklan start 8 Desember, mati setelah 12 Desember selesai
+  // Jadi periode: 8 Desember - 12 Desember (sampai akhir hari 12 Desember)
   const isTwindate = (date: Date): boolean => {
     if (!date || isNaN(date.getTime())) return false
     
@@ -784,7 +784,7 @@ function extractEventData(thisWeekData: any[], lastWeekData: any[], retentionTyp
     
     // Check each twindate
     for (const twindate of twindateDates) {
-      // Calculate H-4 date (start date)
+      // Calculate twindate date (H)
       const twindateDate = new Date(checkDate.getFullYear(), twindate.month - 1, twindate.day)
       twindateDate.setHours(0, 0, 0, 0)
       
@@ -792,10 +792,9 @@ function extractEventData(thisWeekData: any[], lastWeekData: any[], retentionTyp
       const startDate = new Date(twindateDate)
       startDate.setDate(startDate.getDate() - 4)
       
-      // End date is H (twindate date) at 00:00, so we check up to H-1 (day before)
+      // End date is H (twindate date) sampai akhir hari (setelah twindate selesai)
       const endDate = new Date(twindateDate)
-      endDate.setDate(endDate.getDate() - 1) // Day before twindate (since it ends at 00:00 on twindate)
-      endDate.setHours(23, 59, 59, 999) // End of day
+      endDate.setHours(23, 59, 59, 999) // End of twindate day
       
       // Check if date is within range [startDate, endDate]
       if (checkDate >= startDate && checkDate <= endDate) {
@@ -808,8 +807,7 @@ function extractEventData(thisWeekData: any[], lastWeekData: any[], retentionTyp
       const prevYearStartDate = new Date(prevYearTwindateDate)
       prevYearStartDate.setDate(prevYearStartDate.getDate() - 4)
       const prevYearEndDate = new Date(prevYearTwindateDate)
-      prevYearEndDate.setDate(prevYearEndDate.getDate() - 1)
-      prevYearEndDate.setHours(23, 59, 59, 999)
+      prevYearEndDate.setHours(23, 59, 59, 999) // End of twindate day
       
       if (checkDate >= prevYearStartDate && checkDate <= prevYearEndDate) {
         return true
