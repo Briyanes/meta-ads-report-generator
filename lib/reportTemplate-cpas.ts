@@ -1887,8 +1887,8 @@ function generateEventAnalysisSlides(data: any, thisWeek: any, lastWeek: any, th
                                     <thead>
                                         <tr className="bg-gray-100">
                                             <th className="border p-2 text-left">Metric</th>
-                                            <th className="border p-2 text-right">Bulan-2 (8/8)</th>
-                                            <th className="border p-2 text-right">Bulan-1 (9/9)</th>
+                                            <th className="border p-2 text-right">${lastPeriodLabel}</th>
+                                            <th className="border p-2 text-right">${thisPeriodLabel}</th>
                                             <th className="border p-2 text-right">∆%</th>
                                             <th className="border p-2 text-center">Trend</th>
                                         </tr>
