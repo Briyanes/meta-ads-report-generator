@@ -908,7 +908,7 @@ a {
 
 @media (max-width: 768px) {
   .responsive-card {
-    padding: 16px !important;
+    padding: 20px !important;
   }
   
   .responsive-grid-3 {
@@ -937,11 +937,27 @@ a {
   .responsive-header img {
     height: 50px !important;
   }
+  
+  /* Ensure all boxes have adequate padding in mobile */
+  .responsive-card h2,
+  .responsive-card h3,
+  .responsive-card h4 {
+    margin-bottom: 12px !important;
+  }
+  
+  .responsive-card p {
+    margin-bottom: 12px !important;
+  }
+  
+  /* Add padding for drag & drop areas */
+  .responsive-card label[htmlFor] {
+    padding: 30px 20px !important;
+  }
 }
 
 @media (max-width: 480px) {
   .responsive-card {
-    padding: 12px !important;
+    padding: 16px !important;
   }
   
   .responsive-grid-3 {
@@ -995,6 +1011,22 @@ a {
   .responsive-container > div:has(button) > div:last-child {
     width: 100% !important;
     justify-content: center !important;
+  }
+  
+  /* Ensure all boxes have adequate padding in mobile */
+  .responsive-card h2,
+  .responsive-card h3,
+  .responsive-card h4 {
+    margin-bottom: 10px !important;
+  }
+  
+  .responsive-card p {
+    margin-bottom: 10px !important;
+  }
+  
+  /* Add padding for drag & drop areas */
+  .responsive-card label[htmlFor] {
+    padding: 24px 16px !important;
   }
   
   .responsive-container > div:has(button) > button:first-child {
