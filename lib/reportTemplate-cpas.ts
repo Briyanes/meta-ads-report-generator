@@ -856,36 +856,6 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
 function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, thisPeriodLabel: string, lastPeriodLabel: string): string {
   let slides = ''
   
-  // Helper function to get field value with multiple variations
-  const getFieldValue = (item: any, fieldName: string, alternatives: string[] = []): any => {
-    if (!item || typeof item !== 'object') return undefined
-    
-    const allFields = [fieldName, ...alternatives]
-    const itemKeys = Object.keys(item)
-    
-    for (const field of allFields) {
-      // Try exact match first
-      if (item[field] !== undefined && item[field] !== null && item[field] !== '') {
-        return item[field]
-      }
-      // Try case-insensitive exact match
-      const exactMatch = itemKeys.find(key => key.toLowerCase() === field.toLowerCase())
-      if (exactMatch && item[exactMatch] !== undefined && item[exactMatch] !== null && item[exactMatch] !== '') {
-        return item[exactMatch]
-      }
-      // Try partial match
-      const partialMatch = itemKeys.find(key => {
-        const keyLower = key.toLowerCase()
-        const fieldLower = field.toLowerCase()
-        return keyLower.includes(fieldLower) || fieldLower.includes(keyLower)
-      })
-      if (partialMatch && item[partialMatch] !== undefined && item[partialMatch] !== null && item[partialMatch] !== '') {
-        return item[partialMatch]
-      }
-    }
-    return undefined
-  }
-  
   // Slide 5: Age Performance
   const ageThisWeek = breakdown.thisWeek?.age || []
   const ageLastWeek = breakdown.lastWeek?.age || []
@@ -897,12 +867,12 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
       .sort((a: any, b: any) => {
         // Try multiple field name variations for purchases
         const getPurchases = (item: any) => {
-          const purchases = getFieldValue(item, 'Purchases with shared items', [
-            'Purchases',
-            'Purchases with shared items only',
-            'Purchases (shared items)'
-          ]) || 0
-          return parseFloat(String(purchases).replace(/,/g, '')) || 0
+          const purchasesRaw = item['Purchases with shared items'] || 
+                              item['Purchases'] || 
+                              item['Purchases with shared items only'] ||
+                              item['Purchases (shared items)'] ||
+                              0
+          return parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
         }
         const resultA = getPurchases(a)
         const resultB = getPurchases(b)
@@ -922,12 +892,12 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                         ${sortedAge.map((item: any) => {
           const age = item.Age || 'Unknown'
           // Try multiple field name variations for purchases
-          const purchases = getFieldValue(item, 'Purchases with shared items', [
-            'Purchases',
-            'Purchases with shared items only',
-            'Purchases (shared items)'
-          ]) || 0
-          const result = parseFloat(String(purchases).replace(/,/g, '')) || 0
+          const purchasesRaw = item['Purchases with shared items'] || 
+                              item['Purchases'] || 
+                              item['Purchases with shared items only'] ||
+                              item['Purchases (shared items)'] ||
+                              0
+          const result = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${age}</span>
                                             <span className="font-bold text-xs">{formatNumber(${result})}</span>
@@ -941,13 +911,13 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                         ${sortedAge.map((item: any) => {
           const age = item.Age || 'Unknown'
           // Try multiple field name variations for purchases
-          const purchasesRaw = getFieldValue(item, 'Purchases with shared items', [
-            'Purchases',
-            'Purchases with shared items only',
-            'Purchases (shared items)'
-          ]) || 0
+          const purchasesRaw = item['Purchases with shared items'] || 
+                              item['Purchases'] || 
+                              item['Purchases with shared items only'] ||
+                              item['Purchases (shared items)'] ||
+                              0
           const purchases = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
-          const amountSpentRaw = getFieldValue(item, 'Amount spent (IDR)', ['Amount spent']) || 0
+          const amountSpentRaw = item['Amount spent (IDR)'] || item['Amount spent'] || 0
           const amountSpent = parseFloat(String(amountSpentRaw).replace(/,/g, '')) || 0
           const cpa = purchases > 0 ? (amountSpent / purchases) : 0
           return `<div className="flex justify-between items-center">
@@ -965,11 +935,11 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                         <div className="flex-1">
                                             <p className="text-xs"><strong>Kesimpulan:</strong> ${sortedAge.length > 0 ? (() => {
           const topAge = sortedAge[0]
-          const purchases = getFieldValue(topAge, 'Purchases with shared items', [
-            'Purchases',
-            'Purchases with shared items only',
-            'Purchases (shared items)'
-          ]) || 0
+          const purchases = topAge['Purchases with shared items'] || 
+                           topAge['Purchases'] || 
+                           topAge['Purchases with shared items only'] ||
+                           topAge['Purchases (shared items)'] ||
+                           0
           return 'Demografi ' + topAge.Age + ' menghasilkan ' + purchases + ' purchases dengan CPA terendah.'
         })() : 'Data age breakdown menunjukkan variasi performa signifikan.'}</p>
                                             <p className="text-xs mt-1">${sortedAge.length > 0 ? 'Segment ini menjadi pilihan terbaik untuk optimasi budget dan scaling.' : 'Perlu analisis lebih lanjut untuk identifikasi segment terbaik.'}</p>
