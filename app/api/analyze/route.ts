@@ -871,12 +871,17 @@ function extractEventData(thisWeekData: any[], lastWeekData: any[], retentionTyp
     }
     
     // Build performance data similar to buildPerformanceData
-    const amountSpent = parseNum(aggregated['Amount spent (IDR)'])
-    const purchases = parseNum(aggregated['Purchases with shared items'])
-    const addsToCart = parseNum(aggregated['Adds to cart with shared items'])
-    const contentViews = parseNum(aggregated['Content views with shared items'])
-    const atcConversionValue = parseNum(aggregated['ATC conversion value (shared only)'])
-    const purchasesConversionValue = parseNum(aggregated['Purchases conversion value for shared items only'])
+    // Use field names that match Meta Ads CSV export format
+    const amountSpent = parseNum(aggregated['Amount spent (IDR)'] || aggregated['Amount spent'])
+    const purchases = parseNum(aggregated['Purchases with shared items'] || aggregated['Purchases'])
+    const addsToCart = parseNum(aggregated['Adds to cart with shared items'] || aggregated['Adds to cart'])
+    const contentViews = parseNum(aggregated['Content views with shared items'] || aggregated['Content views'])
+    // Meta CSV uses "Adds to cart conversion value for shared items only"
+    const atcConversionValue = parseNum(aggregated['Adds to cart conversion value for shared items only'] || 
+                                       aggregated['ATC conversion value (shared only)'] ||
+                                       aggregated['ATC conversion value'])
+    const purchasesConversionValue = parseNum(aggregated['Purchases conversion value for shared items only'] ||
+                                            aggregated['Purchases conversion value'])
     const linkClicks = parseNum(aggregated['Link clicks'])
     const impressions = parseNum(aggregated['Impressions'])
     const ctr = linkClicks > 0 && impressions > 0 ? linkClicks / impressions : 0
