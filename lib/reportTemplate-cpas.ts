@@ -848,16 +848,26 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
   
   if (ageThisWeek.length > 0 || ageLastWeek.length > 0) {
     // Sort by purchases (highest first)
-    const sortedAge = [...ageThisWeek]
+        const sortedAge = [...ageThisWeek]
       .filter((a: any) => a.Age && a.Age.trim())
       .sort((a: any, b: any) => {
         // Try multiple field name variations for purchases
         const getPurchases = (item: any) => {
-          const purchasesRaw = item['Purchases with shared items'] || 
+          let purchasesRaw = item['Purchases with shared items'] || 
                               item['Purchases'] || 
                               item['Purchases with shared items only'] ||
                               item['Purchases (shared items)'] ||
                               0
+          
+          // If purchases is empty/0, calculate from conversion value and AOV
+          if (!purchasesRaw || parseFloat(String(purchasesRaw).replace(/,/g, '')) === 0) {
+            const purchasesCV = parseFloat(String(item['Purchases conversion value for shared items only'] || item['Purchases conversion value'] || 0).replace(/,/g, '')) || 0
+            const aov = parseFloat(String(item['AOV (IDR)'] || item['AOV'] || 0).replace(/,/g, '')) || 0
+            if (purchasesCV > 0 && aov > 0) {
+              purchasesRaw = purchasesCV / aov
+            }
+          }
+          
           return parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
         }
         const resultA = getPurchases(a)
@@ -878,11 +888,21 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                         ${sortedAge.map((item: any) => {
           const age = item.Age || 'Unknown'
           // Try multiple field name variations for purchases
-          const purchasesRaw = item['Purchases with shared items'] || 
+          let purchasesRaw = item['Purchases with shared items'] || 
                               item['Purchases'] || 
                               item['Purchases with shared items only'] ||
                               item['Purchases (shared items)'] ||
                               0
+          
+          // If purchases is empty/0, calculate from conversion value and AOV
+          if (!purchasesRaw || parseFloat(String(purchasesRaw).replace(/,/g, '')) === 0) {
+            const purchasesCV = parseFloat(String(item['Purchases conversion value for shared items only'] || item['Purchases conversion value'] || 0).replace(/,/g, '')) || 0
+            const aov = parseFloat(String(item['AOV (IDR)'] || item['AOV'] || 0).replace(/,/g, '')) || 0
+            if (purchasesCV > 0 && aov > 0) {
+              purchasesRaw = purchasesCV / aov
+            }
+          }
+          
           const result = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${age}</span>
@@ -897,11 +917,21 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                         ${sortedAge.map((item: any) => {
           const age = item.Age || 'Unknown'
           // Try multiple field name variations for purchases
-          const purchasesRaw = item['Purchases with shared items'] || 
+          let purchasesRaw = item['Purchases with shared items'] || 
                               item['Purchases'] || 
                               item['Purchases with shared items only'] ||
                               item['Purchases (shared items)'] ||
                               0
+          
+          // If purchases is empty/0, calculate from conversion value and AOV
+          if (!purchasesRaw || parseFloat(String(purchasesRaw).replace(/,/g, '')) === 0) {
+            const purchasesCV = parseFloat(String(item['Purchases conversion value for shared items only'] || item['Purchases conversion value'] || 0).replace(/,/g, '')) || 0
+            const aov = parseFloat(String(item['AOV (IDR)'] || item['AOV'] || 0).replace(/,/g, '')) || 0
+            if (purchasesCV > 0 && aov > 0) {
+              purchasesRaw = purchasesCV / aov
+            }
+          }
+          
           const purchases = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
           const amountSpentRaw = item['Amount spent (IDR)'] || item['Amount spent'] || 0
           const amountSpent = parseFloat(String(amountSpentRaw).replace(/,/g, '')) || 0
@@ -921,12 +951,22 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                         <div className="flex-1">
                                             <p className="text-xs"><strong>Kesimpulan:</strong> ${sortedAge.length > 0 ? (() => {
           const topAge = sortedAge[0]
-          const purchases = topAge['Purchases with shared items'] || 
+          let purchases = topAge['Purchases with shared items'] || 
                            topAge['Purchases'] || 
                            topAge['Purchases with shared items only'] ||
                            topAge['Purchases (shared items)'] ||
                            0
-          return 'Demografi ' + topAge.Age + ' menghasilkan ' + purchases + ' purchases dengan CPA terendah.'
+          
+          // If purchases is empty/0, calculate from conversion value and AOV
+          if (!purchases || parseFloat(String(purchases).replace(/,/g, '')) === 0) {
+            const purchasesCV = parseFloat(String(topAge['Purchases conversion value for shared items only'] || topAge['Purchases conversion value'] || 0).replace(/,/g, '')) || 0
+            const aov = parseFloat(String(topAge['AOV (IDR)'] || topAge['AOV'] || 0).replace(/,/g, '')) || 0
+            if (purchasesCV > 0 && aov > 0) {
+              purchases = purchasesCV / aov
+            }
+          }
+          
+          return 'Demografi ' + topAge.Age + ' menghasilkan ' + Math.round(purchases) + ' purchases dengan CPA terendah.'
         })() : 'Data age breakdown menunjukkan variasi performa signifikan.'}</p>
                                             <p className="text-xs mt-1">${sortedAge.length > 0 ? 'Segment ini menjadi pilihan terbaik untuk optimasi budget dan scaling.' : 'Perlu analisis lebih lanjut untuk identifikasi segment terbaik.'}</p>
                                         </div>
@@ -1788,7 +1828,7 @@ function generateEventAnalysisSlides(data: any, thisWeek: any, lastWeek: any, th
       const formattedLast = formatMetricValue(key, lastValue)
       
       const icon = getTrendIconJSX(metric.isPositive)
-      return '<li className="flex items-start"><span className="mr-2">' + icon + '</span><span className="text-xs"><strong>' + label + ':</strong> ' + icon + ' ' + (metric.percentage >= 0 ? '' : '') + Math.abs(metric.percentage).toFixed(2) + '% (' + formattedLast + ' → ' + formattedThis + ')</span></li>'
+      return '<li className="flex items-start"><span className="mr-2">' + icon + '</span><span className="text-xs"><strong>' + label + ':</strong> ' + (metric.percentage >= 0 ? '' : '') + Math.abs(metric.percentage).toFixed(2) + '% (' + formattedLast + ' → ' + formattedThis + ')</span></li>'
     }).join('')}
                             </ul>
                         </div>
@@ -1812,7 +1852,7 @@ function generateEventAnalysisSlides(data: any, thisWeek: any, lastWeek: any, th
         
         return `<li className="flex items-start">
                                                 <span className="mr-2">${getTrendIconJSX(metric.isPositive)}</span>
-                                                <span className="text-xs"><strong>${label}:</strong> ${getTrendIconJSX(metric.isPositive)} ${metric.percentage >= 0 ? '' : ''}${Math.abs(metric.percentage).toFixed(2)}% (${formattedLast} → ${formattedThis})</span>
+                                                <span className="text-xs"><strong>${label}:</strong> ${metric.percentage >= 0 ? '' : ''}${Math.abs(metric.percentage).toFixed(2)}% (${formattedLast} → ${formattedThis})</span>
                                             </li>`
       }).join('')}
                             </ul>
@@ -1941,7 +1981,7 @@ function generateEventAnalysisSlides(data: any, thisWeek: any, lastWeek: any, th
       
       return `<li className="flex items-start">
                                             <span className="mr-2">${getTrendIconJSX(metric.isPositive)}</span>
-                                            <span className="text-xs"><strong>${label}:</strong> ${getTrendIconJSX(metric.isPositive)} ${metric.percentage >= 0 ? '' : ''}${Math.abs(metric.percentage).toFixed(2)}% (${formattedLast} → ${formattedThis})</span>
+                                            <span className="text-xs"><strong>${label}:</strong> ${metric.percentage >= 0 ? '' : ''}${Math.abs(metric.percentage).toFixed(2)}% (${formattedLast} → ${formattedThis})</span>
                                         </li>`
     }).join('')}
                             </ul>
@@ -1966,7 +2006,7 @@ function generateEventAnalysisSlides(data: any, thisWeek: any, lastWeek: any, th
         
         return `<li className="flex items-start">
                                                 <span className="mr-2">${getTrendIconJSX(metric.isPositive)}</span>
-                                                <span className="text-xs"><strong>${label}:</strong> ${getTrendIconJSX(metric.isPositive)} ${metric.percentage >= 0 ? '' : ''}${Math.abs(metric.percentage).toFixed(2)}% (${formattedLast} → ${formattedThis})</span>
+                                                <span className="text-xs"><strong>${label}:</strong> ${metric.percentage >= 0 ? '' : ''}${Math.abs(metric.percentage).toFixed(2)}% (${formattedLast} → ${formattedThis})</span>
                                             </li>`
       }).join('')}
                             </ul>
