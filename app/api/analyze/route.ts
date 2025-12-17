@@ -166,10 +166,6 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     //   // If Z AI fails, extract data from CSV and create structured analysis
     //   console.warn('Z AI API failed, extracting data from CSV:', zaiError.message)
     
-    // Extract data from CSV
-    const thisWeekData = parsedDataThisWeek.data[0] || {}
-    const lastWeekData = parsedDataLastWeek.data[0] || {}
-      
     // Helper to parse numbers
     const parseNum = (val: any): number => {
       if (!val && val !== 0) return 0
@@ -177,6 +173,107 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       const num = parseFloat(str)
       return isNaN(num) ? 0 : num
     }
+    
+    // Helper to aggregate CSV data (sum all rows for numeric fields)
+    const aggregateCSVData = (data: any[]): any => {
+      if (data.length === 0) return {}
+      if (data.length === 1) return data[0]
+      
+      // Get all keys from first row
+      const keys = Object.keys(data[0])
+      const aggregated: any = {}
+      
+      // Fields that should be summed
+      const sumFields = [
+        'Amount spent (IDR)', 'Impressions', 'Link clicks', 'Outbound clicks', 'Clicks (all)',
+        'Reach', 'Content views', 'Content views with shared items',
+        'Adds to cart', 'Adds to cart with shared items',
+        'Purchases', 'Purchases with shared items',
+        'Messaging conversations started', 'Checkouts initiated',
+        'ATC conversion value', 'ATC conversion value (shared only)',
+        'Purchases conversion value', 'Purchases conversion value for shared items only',
+        'Adds to cart conversion value for shared items only',
+        'Results'
+      ]
+      
+      // Fields that should be recalculated (not summed)
+      const recalcFields = ['CTR (link click-through rate)', 'CTR (all)', 'CPC (cost per link click)', 
+        'CPM (cost per 1,000 impressions)', 'Cost per 1,000 Accounts Center accounts reached',
+        'Cost /CV (IDR)', 'Cost /ATC (IDR)', 'Cost /Purchase (IDR)', 'Cost per result',
+        'Frequency', 'Purchase ROAS for shared items only', 'AOV (IDR)',
+        '* LC to CV', '* CV to ATC', 'ATC to Purchase', 'Conversion rate ranking']
+      
+      // For each key, sum all values if numeric, otherwise keep first value
+      for (const key of keys) {
+        // Skip date and text fields
+        if (key === 'Day' || key === 'Delivery status' || key === 'Delivery level' || 
+            key === 'Reporting starts' || key === 'Reporting ends' || key === 'Result type') {
+          aggregated[key] = data[0][key] || ''
+          continue
+        }
+        
+        // For fields that should be recalculated, skip summing
+        if (recalcFields.some(f => key.includes(f))) {
+          aggregated[key] = '' // Will be recalculated later if needed
+          continue
+        }
+        
+        const values = data.map(row => row[key])
+        const numericValues = values.map(v => parseNum(v)).filter(v => !isNaN(v))
+        
+        if (numericValues.length > 0) {
+          // Sum numeric values for sumFields, otherwise keep first value
+          if (sumFields.some(f => key.includes(f))) {
+            aggregated[key] = numericValues.reduce((sum, val) => sum + val, 0)
+          } else {
+            // For other numeric fields, try to sum, but if all values are same, keep first
+            const allSame = numericValues.every(v => v === numericValues[0])
+            aggregated[key] = allSame ? numericValues[0] : numericValues.reduce((sum, val) => sum + val, 0)
+          }
+        } else {
+          // Keep first non-numeric value
+          aggregated[key] = values[0] || ''
+        }
+      }
+      
+      // Recalculate CTR, CPC, CPM after aggregation
+      if (aggregated['Link clicks'] && aggregated['Impressions']) {
+        aggregated['CTR (link click-through rate)'] = (aggregated['Link clicks'] / aggregated['Impressions']) * 100
+      }
+      if (aggregated['Link clicks'] && aggregated['Amount spent (IDR)']) {
+        aggregated['CPC (cost per link click)'] = aggregated['Amount spent (IDR)'] / aggregated['Link clicks']
+      }
+      if (aggregated['Impressions'] && aggregated['Amount spent (IDR)']) {
+        aggregated['CPM (cost per 1,000 impressions)'] = (aggregated['Amount spent (IDR)'] / aggregated['Impressions']) * 1000
+      }
+      if (aggregated['Reach'] && aggregated['Amount spent (IDR)']) {
+        aggregated['Cost per 1,000 Accounts Center accounts reached'] = (aggregated['Amount spent (IDR)'] / aggregated['Reach']) * 1000
+      }
+      if (aggregated['Content views with shared items'] && aggregated['Amount spent (IDR)']) {
+        aggregated['Cost /CV (IDR)'] = aggregated['Amount spent (IDR)'] / aggregated['Content views with shared items']
+      }
+      if (aggregated['Adds to cart with shared items'] && aggregated['Amount spent (IDR)']) {
+        aggregated['Cost /ATC (IDR)'] = aggregated['Amount spent (IDR)'] / aggregated['Adds to cart with shared items']
+      }
+      if (aggregated['Purchases with shared items'] && aggregated['Amount spent (IDR)']) {
+        aggregated['Cost /Purchase (IDR)'] = aggregated['Amount spent (IDR)'] / aggregated['Purchases with shared items']
+      }
+      if (aggregated['Purchases with shared items'] && aggregated['Impressions']) {
+        aggregated['Frequency'] = aggregated['Impressions'] / aggregated['Reach']
+      }
+      if (aggregated['Purchases conversion value for shared items only'] && aggregated['Amount spent (IDR)']) {
+        aggregated['Purchase ROAS for shared items only'] = aggregated['Purchases conversion value for shared items only'] / aggregated['Amount spent (IDR)']
+      }
+      if (aggregated['Purchases with shared items'] && aggregated['Purchases conversion value for shared items only']) {
+        aggregated['AOV (IDR)'] = aggregated['Purchases conversion value for shared items only'] / aggregated['Purchases with shared items']
+      }
+      
+      return aggregated
+    }
+    
+    // Aggregate data from CSV (in case CSV has multiple rows/days)
+    const thisWeekData = aggregateCSVData(parsedDataThisWeek.data)
+    const lastWeekData = aggregateCSVData(parsedDataLastWeek.data)
     
     // Calculate base metrics
     const thisWeekSpend = parseNum(thisWeekData['Amount spent (IDR)'])

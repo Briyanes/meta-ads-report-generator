@@ -1,0 +1,4 @@
+﻿Gender,Impressions,"Outbound clicks","CTR (link click-through rate)","Content views with shared items","Adds to cart with shared items","Adds to cart conversion value for shared items only","Purchases with shared items","Purchase ROAS for shared items only","Purchases conversion value for shared items only","AOV (IDR)","Amount spent (IDR)","Reporting starts","Reporting ends"
+female,398974,4159,1.31537393,,,,,1.92432224,,302662.53333333,11796200,2025-10-26,2025-11-25
+male,59234,355,0.73944019,,,,,4.12966385,,320006,774896,2025-10-26,2025-11-25
+unknown,1249,15,1.28102482,,,,,,,,26508,2025-10-26,2025-11-25
