@@ -1812,13 +1812,13 @@ function generateEventAnalysisSlides(data: any, thisWeek: any, lastWeek: any, th
       cpm: 'CPM'
     }
     
-    // Slide: Twindate Highlight
-    if (twindateHighlights.length > 0) {
-      slides += `
+    // Slide: Twindate Highlight (always show before Lowlight)
+    slides += `
                     {/* EVENT ANALYSIS - TWINDATE HIGHLIGHT */}
                     <div className="bg-white p-8 border-t-4 border-hadona-blue">
                         <div className="max-w-6xl mx-auto">
                             <h2 className="text-2xl font-bold text-hadona-blue mb-4">Highlight (Event MoM) — Twindate</h2>
+                            ${twindateHighlights.length > 0 ? `
                             <ul className="space-y-2 text-sm">
                                 ${twindateHighlights.map(([key, metric]: [string, any]) => {
       const label = metricLabels[key] || key
@@ -1831,9 +1831,11 @@ function generateEventAnalysisSlides(data: any, thisWeek: any, lastWeek: any, th
       return '<li className="flex items-start"><span className="mr-2">' + icon + '</span><span className="text-xs"><strong>' + label + ':</strong> ' + (metric.percentage >= 0 ? '' : '') + Math.abs(metric.percentage).toFixed(2) + '% (' + formattedLast + ' → ' + formattedThis + ')</span></li>'
     }).join('')}
                             </ul>
+                            ` : `
+                            <p className="text-sm text-gray-500 italic">Tidak ada highlight untuk periode ini.</p>
+                            `}
                         </div>
                     </div>`
-    }
     
     // Slide: Twindate Lowlight
     if (twindateLowlights.length > 0) {
