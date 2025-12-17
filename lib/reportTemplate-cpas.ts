@@ -23,20 +23,6 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const lastWeek = perf.lastWeek || {}
   const breakdown = data?.breakdown || {}
   
-  // Debug logging
-  console.log('Report template - Extracted data:', {
-    hasPerformanceSummary: !!data?.performanceSummary,
-    thisWeekKeys: Object.keys(thisWeek),
-    lastWeekKeys: Object.keys(lastWeek),
-    breakdownKeys: Object.keys(breakdown),
-    thisWeekAmountSpent: thisWeek.amountSpent,
-    lastWeekAmountSpent: lastWeek.amountSpent,
-    thisWeekReach: thisWeek.reach,
-    lastWeekReach: lastWeek.reach,
-    thisWeekImpressions: thisWeek.impressions,
-    lastWeekImpressions: lastWeek.impressions
-  })
-  
   // Determine period labels based on retention type
   const isMoM = retentionType === 'mom'
   const periodLabel = isMoM ? 'Month' : 'Week'
@@ -1384,10 +1370,16 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
           const displayAdNames = adNamesList.slice(0, 3)
           const hasMore = adNamesList.length > 3
           
-          const purchases = item['Purchases'] || item['Purchases with shared items'] || 0
-          const instagramVisits = item['Instagram profile visits'] || 0
-          const instagramFollows = item['Instagram follows'] || 0
-          const amountSpent = item['Amount spent (IDR)'] || 0
+          const purchasesRaw = item['Purchases with shared items'] || 
+                              item['Purchases'] || 
+                              item['Purchases with shared items only'] ||
+                              item['Purchases (shared items)'] ||
+                              0
+          const purchases = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
+          const instagramVisits = parseFloat(String(item['Instagram profile visits'] || 0).replace(/,/g, '')) || 0
+          const instagramFollows = parseFloat(String(item['Instagram follows'] || 0).replace(/,/g, '')) || 0
+          const amountSpentRaw = item['Amount spent (IDR)'] || item['Amount spent'] || 0
+          const amountSpent = parseFloat(String(amountSpentRaw).replace(/,/g, '')) || 0
           const cpr = item['Cost per purchase'] || item['Cost per purchases with shared items'] || item['Cost /Purchase (IDR)'] || (amountSpent > 0 && purchases > 0 ? (amountSpent / purchases) : 0)
           const ctr = (item['CTR (link click-through rate)'] || item['CTR (all)'] || 0) * 100
           const impressions = item['Impressions'] || 0
@@ -1495,9 +1487,14 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                             <div className="grid grid-cols-4 gap-3">
                                 ${sortedObjective.map((item: any) => {
           const objective = item['Campaign objective'] || 'Unknown'
-          const purchases = item['Purchases'] || item['Purchases with shared items'] || 0
-          const impressions = item.Impressions || 0
-          const clicks = item['Outbound clicks'] || item['Clicks (all)'] || 0
+          const purchasesRaw = item['Purchases with shared items'] || 
+                              item['Purchases'] || 
+                              item['Purchases with shared items only'] ||
+                              item['Purchases (shared items)'] ||
+                              0
+          const purchases = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
+          const impressions = parseFloat(String(item.Impressions || 0).replace(/,/g, '')) || 0
+          const clicks = parseFloat(String(item['Outbound clicks'] || item['Clicks (all)'] || 0).replace(/,/g, '')) || 0
           const ctr = (item['CTR (link click-through rate)'] || item['CTR (all)'] || 0) * 100
           return `<div>
                                             <h3 className="text-base font-semibold mb-3">${objective}</h3>

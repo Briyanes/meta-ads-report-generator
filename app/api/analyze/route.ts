@@ -33,15 +33,6 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    // Debug log (remove in production)
-    console.log('Main files:', {
-      thisWeek: fileThisWeek?.name,
-      lastWeek: fileLastWeek?.name
-    })
-    console.log('Breakdown files:', {
-      thisWeek: breakdownThisWeek.map(f => f.name),
-      lastWeek: breakdownLastWeek.map(f => f.name)
-    })
 
     // Parse main CSV files
     const parsedDataThisWeek = await parseCSV(fileThisWeek)
@@ -469,13 +460,6 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     const thisWeekData = aggregateCSVData(parsedDataThisWeek.data)
     const lastWeekData = aggregateCSVData(parsedDataLastWeek.data)
     
-    // Debug: Verify aggregated Reach data
-    console.log('=== REACH VERIFICATION ===')
-    console.log('Last Week Data - Reach field:', lastWeekData['Reach'])
-    console.log('Last Week Data - Reach (case-insensitive):', lastWeekData['reach'] || lastWeekData['REACH'])
-    console.log('Last Week Data - All keys:', Object.keys(lastWeekData).filter(k => k.toLowerCase().includes('reach')))
-    console.log('This Week Data - Reach field:', thisWeekData['Reach'])
-    
     // Calculate base metrics
     const thisWeekSpend = parseNum(thisWeekData['Amount spent (IDR)'])
     const lastWeekSpend = parseNum(lastWeekData['Amount spent (IDR)'])
@@ -623,12 +607,6 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     
     const thisWeekPerf = buildPerformanceData(thisWeekData, thisWeekResults, thisWeekCPR)
     const lastWeekPerf = buildPerformanceData(lastWeekData, lastWeekResults, lastWeekCPR)
-    
-    // Debug: Verify performance data
-    console.log('=== PERFORMANCE DATA VERIFICATION ===')
-    console.log('Last Week Performance - Reach:', lastWeekPerf.reach)
-    console.log('Last Week Performance - All keys:', Object.keys(lastWeekPerf))
-    console.log('This Week Performance - Reach:', thisWeekPerf.reach)
     
     const analysis = {
         performanceSummary: {

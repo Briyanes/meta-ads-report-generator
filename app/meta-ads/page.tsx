@@ -34,11 +34,8 @@ export default function MetaAdsPage() {
   }, [])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'thisWeek' | 'lastWeek') => {
-    console.log('handleFileChange called', { type, files: e.target.files?.length })
     const selectedFiles = Array.from(e.target.files || [])
     const csvFiles = selectedFiles.filter(file => file.type === 'text/csv' || file.name.endsWith('.csv'))
-    
-    console.log('Filtered CSV files:', csvFiles.length)
     
     if (csvFiles.length > 0) {
       if (type === 'thisWeek') {
@@ -74,12 +71,8 @@ export default function MetaAdsPage() {
     e.preventDefault()
     e.currentTarget.classList.remove('dragover')
     
-    console.log('handleDrop called', { type, files: e.dataTransfer.files.length })
-    
     const droppedFiles = Array.from(e.dataTransfer.files)
     const csvFiles = droppedFiles.filter(file => file.type === 'text/csv' || file.name.endsWith('.csv'))
-    
-    console.log('Filtered CSV files from drop:', csvFiles.length)
     
     if (csvFiles.length > 0) {
       if (type === 'thisWeek') {
@@ -152,12 +145,6 @@ export default function MetaAdsPage() {
       }
 
       // Debug: Log detected files
-      console.log('Detected main files:', {
-        thisWeek: finalMainThisWeek?.name,
-        lastWeek: finalMainLastWeek?.name
-      })
-      console.log('All files this week:', filesThisWeek.map(f => f.name))
-      console.log('All files last week:', filesLastWeek.map(f => f.name))
 
       // Add main CSV files
       formData.append('fileThisWeek', finalMainThisWeek)
@@ -167,7 +154,6 @@ export default function MetaAdsPage() {
       filesThisWeek.forEach((file, index) => {
         if (file !== finalMainThisWeek) {
           formData.append(`breakdownThisWeek_${index}`, file)
-          console.log(`Added breakdown this week: ${file.name}`)
         }
       })
       
@@ -175,7 +161,6 @@ export default function MetaAdsPage() {
       filesLastWeek.forEach((file, index) => {
         if (file !== finalMainLastWeek) {
           formData.append(`breakdownLastWeek_${index}`, file)
-          console.log(`Added breakdown last week: ${file.name}`)
         }
       })
 

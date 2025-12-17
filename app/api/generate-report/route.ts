@@ -55,16 +55,7 @@ export async function POST(request: NextRequest) {
     // This ensures each objective type has its own isolated template and doesn't affect others
     let htmlReport: string
     try {
-      console.log(`Generating HTML report for objective type: ${objectiveType}, retention: ${retentionType}`)
-      console.log('Analysis data structure:', {
-        hasPerformanceSummary: !!analysisData?.performanceSummary,
-        hasBreakdown: !!analysisData?.breakdown,
-        performanceSummaryKeys: analysisData?.performanceSummary ? Object.keys(analysisData.performanceSummary) : [],
-        thisWeekData: analysisData?.performanceSummary?.thisWeek ? Object.keys(analysisData.performanceSummary.thisWeek) : [],
-        lastWeekData: analysisData?.performanceSummary?.lastWeek ? Object.keys(analysisData.performanceSummary.lastWeek) : []
-      })
       htmlReport = generateReport(analysisData, reportName, retentionType, objectiveType)
-      console.log(`Generated HTML report length: ${htmlReport?.length || 0} characters`)
       
       if (!htmlReport || htmlReport.length < 100) {
         throw new Error('Generated HTML report is too short or empty')
@@ -79,7 +70,6 @@ export async function POST(request: NextRequest) {
         throw new Error('Generated HTML report is missing root element')
       }
       
-      console.log('HTML report generated successfully')
     } catch (templateError: any) {
       console.error('Template generation error:', templateError)
       throw new Error(`Failed to generate report template: ${templateError.message}`)
