@@ -433,6 +433,13 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                 return ((current - previous) / previous) * 100;
             }
             
+            // Helper function to get trend icon JSX as string (for use in template strings)
+            const getTrendIconJSX = (isPositive) => {
+                return isPositive 
+                    ? '<i className="bi bi-arrow-up-circle-fill" style={{color: "#10b981", fontSize: "1.2em"}}></i>' 
+                    : '<i className="bi bi-arrow-down-circle-fill" style={{color: "#ef4444", fontSize: "1.2em"}}></i>'
+            }
+            
             // Age data
             const ageData = ${JSON.stringify(ageData)};
             const genderData = ${JSON.stringify(genderData)};
@@ -784,7 +791,15 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             );
                 };
 
-                ReactDOM.render(<App />, document.getElementById('root'));
+                // Use React 18 createRoot API instead of ReactDOM.render
+                const rootElement = document.getElementById('root');
+                if (ReactDOM.createRoot) {
+                    const root = ReactDOM.createRoot(rootElement);
+                    root.render(<App />);
+                } else {
+                    // Fallback for React 17
+                    ReactDOM.render(<App />, rootElement);
+                }
             } else {
                 // Retry after a short delay
                 setTimeout(checkAndRender, 100);
@@ -1522,10 +1537,11 @@ function generateEventAnalysisSlides(data: any, thisWeek: any, lastWeek: any, th
     return num.toFixed(2) + '%'
   }
   
-  const getTrendEmoji = (isPositive: boolean) => {
+  // Helper function to get trend icon JSX as string (for use in template strings)
+  const getTrendIconJSX = (isPositive: boolean) => {
     return isPositive 
-      ? '<i class="bi bi-arrow-up-circle-fill" style="color: #10b981; font-size: 1.2em;"></i>' 
-      : '<i class="bi bi-arrow-down-circle-fill" style="color: #ef4444; font-size: 1.2em;"></i>'
+      ? '<i className="bi bi-arrow-up-circle-fill" style={{color: "#10b981", fontSize: "1.2em"}}></i>' 
+      : '<i className="bi bi-arrow-down-circle-fill" style={{color: "#ef4444", fontSize: "1.2em"}}></i>'
   }
   
   let slides = ''
@@ -1648,7 +1664,8 @@ function generateEventAnalysisSlides(data: any, thisWeek: any, lastWeek: any, th
       const formattedThis = formatMetricValue(key, thisValue)
       const formattedLast = formatMetricValue(key, lastValue)
       
-      return '<li className="flex items-start"><span className="mr-2">' + getTrendEmoji(metric.isPositive) + '</span><span className="text-xs"><strong>' + label + ':</strong> ' + getTrendEmoji(metric.isPositive) + ' ' + (metric.percentage >= 0 ? '' : '') + Math.abs(metric.percentage).toFixed(2) + '% (' + formattedLast + ' → ' + formattedThis + ')</span></li>'
+      const icon = getTrendIconJSX(metric.isPositive)
+      return '<li className="flex items-start"><span className="mr-2">' + icon + '</span><span className="text-xs"><strong>' + label + ':</strong> ' + icon + ' ' + (metric.percentage >= 0 ? '' : '') + Math.abs(metric.percentage).toFixed(2) + '% (' + formattedLast + ' → ' + formattedThis + ')</span></li>'
     }).join('')}
                             </ul>
                         </div>
@@ -1671,8 +1688,8 @@ function generateEventAnalysisSlides(data: any, thisWeek: any, lastWeek: any, th
         const formattedLast = formatMetricValue(key, lastValue)
         
         return `<li className="flex items-start">
-                                                <span className="mr-2">${getTrendEmoji(metric.isPositive)}</span>
-                                                <span className="text-xs"><strong>${label}:</strong> ${getTrendEmoji(metric.isPositive)} ${metric.percentage >= 0 ? '' : ''}${Math.abs(metric.percentage).toFixed(2)}% (${formattedLast} → ${formattedThis})</span>
+                                                <span className="mr-2">${getTrendIconJSX(metric.isPositive)}</span>
+                                                <span className="text-xs"><strong>${label}:</strong> ${getTrendIconJSX(metric.isPositive)} ${metric.percentage >= 0 ? '' : ''}${Math.abs(metric.percentage).toFixed(2)}% (${formattedLast} → ${formattedThis})</span>
                                             </li>`
       }).join('')}
                             </ul>
@@ -1703,49 +1720,49 @@ function generateEventAnalysisSlides(data: any, thisWeek: any, lastWeek: any, th
                                             <td className="border p-2 text-right">${formatCurrency(twindateLast.amountSpent || 0)}</td>
                                             <td className="border p-2 text-right">${formatCurrency(twindateThis.amountSpent || 0)}</td>
                                             <td className="border p-2 text-right">${twindateMetrics.amountSpent.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendEmoji(twindateMetrics.amountSpent.isPositive)}</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(twindateMetrics.amountSpent.isPositive)}</td>
                                         </tr>
                                         <tr>
                                             <td className="border p-2">Purchases with shared items</td>
                                             <td className="border p-2 text-right">${formatNumber(twindateLast.purchases || 0)}</td>
                                             <td className="border p-2 text-right">${formatNumber(twindateThis.purchases || 0)}</td>
                                             <td className="border p-2 text-right">${twindateMetrics.purchases.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendEmoji(twindateMetrics.purchases.isPositive)}</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(twindateMetrics.purchases.isPositive)}</td>
                                         </tr>
                                         <tr>
                                             <td className="border p-2">Cost per purchases with shared items</td>
                                             <td className="border p-2 text-right">${formatCurrency(twindateLast.costPerPurchase || 0)}</td>
                                             <td className="border p-2 text-right">${formatCurrency(twindateThis.costPerPurchase || 0)}</td>
                                             <td className="border p-2 text-right">${twindateMetrics.costPerPurchase.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendEmoji(twindateMetrics.costPerPurchase.isPositive)}</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(twindateMetrics.costPerPurchase.isPositive)}</td>
                                         </tr>
                                         <tr>
                                             <td className="border p-2">Purchases conversion value for shared items only</td>
                                             <td className="border p-2 text-right">${formatCurrency(twindateLast.purchasesConversionValue || 0)}</td>
                                             <td className="border p-2 text-right">${formatCurrency(twindateThis.purchasesConversionValue || 0)}</td>
                                             <td className="border p-2 text-right">${twindateMetrics.purchasesConversionValue.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendEmoji(twindateMetrics.purchasesConversionValue.isPositive)}</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(twindateMetrics.purchasesConversionValue.isPositive)}</td>
                                         </tr>
                                         <tr>
                                             <td className="border p-2">Conversion Rate (Purchase ÷ Click)</td>
                                             <td className="border p-2 text-right">${formatPercent((twindateLast.conversionRate || 0) * 100)}</td>
                                             <td className="border p-2 text-right">${formatPercent((twindateThis.conversionRate || 0) * 100)}</td>
                                             <td className="border p-2 text-right">${twindateMetrics.conversionRate.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendEmoji(twindateMetrics.conversionRate.isPositive)}</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(twindateMetrics.conversionRate.isPositive)}</td>
                                         </tr>
                                         <tr>
                                             <td className="border p-2">Purchase ROAS (return on ad spend)</td>
                                             <td className="border p-2 text-right">${formatNumber(twindateLast.purchaseROAS || 0)}</td>
                                             <td className="border p-2 text-right">${formatNumber(twindateThis.purchaseROAS || 0)}</td>
                                             <td className="border p-2 text-right">${twindateMetrics.purchaseROAS.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendEmoji(twindateMetrics.purchaseROAS.isPositive)}</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(twindateMetrics.purchaseROAS.isPositive)}</td>
                                         </tr>
                                         <tr>
                                             <td className="border p-2">Average purchases conversion value</td>
                                             <td className="border p-2 text-right">${formatCurrency(twindateLast.avgPurchaseValue || 0)}</td>
                                             <td className="border p-2 text-right">${formatCurrency(twindateThis.avgPurchaseValue || 0)}</td>
                                             <td className="border p-2 text-right">${twindateMetrics.avgPurchaseValue.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendEmoji(twindateMetrics.avgPurchaseValue.isPositive)}</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(twindateMetrics.avgPurchaseValue.isPositive)}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -1800,8 +1817,8 @@ function generateEventAnalysisSlides(data: any, thisWeek: any, lastWeek: any, th
       const formattedLast = formatMetricValue(key, lastValue)
       
       return `<li className="flex items-start">
-                                            <span className="mr-2">${getTrendEmoji(metric.isPositive)}</span>
-                                            <span className="text-xs"><strong>${label}:</strong> ${getTrendEmoji(metric.isPositive)} ${metric.percentage >= 0 ? '' : ''}${Math.abs(metric.percentage).toFixed(2)}% (${formattedLast} → ${formattedThis})</span>
+                                            <span className="mr-2">${getTrendIconJSX(metric.isPositive)}</span>
+                                            <span className="text-xs"><strong>${label}:</strong> ${getTrendIconJSX(metric.isPositive)} ${metric.percentage >= 0 ? '' : ''}${Math.abs(metric.percentage).toFixed(2)}% (${formattedLast} → ${formattedThis})</span>
                                         </li>`
     }).join('')}
                             </ul>
@@ -1825,8 +1842,8 @@ function generateEventAnalysisSlides(data: any, thisWeek: any, lastWeek: any, th
         const formattedLast = formatMetricValue(key, lastValue)
         
         return `<li className="flex items-start">
-                                                <span className="mr-2">${getTrendEmoji(metric.isPositive)}</span>
-                                                <span className="text-xs"><strong>${label}:</strong> ${getTrendEmoji(metric.isPositive)} ${metric.percentage >= 0 ? '' : ''}${Math.abs(metric.percentage).toFixed(2)}% (${formattedLast} → ${formattedThis})</span>
+                                                <span className="mr-2">${getTrendIconJSX(metric.isPositive)}</span>
+                                                <span className="text-xs"><strong>${label}:</strong> ${getTrendIconJSX(metric.isPositive)} ${metric.percentage >= 0 ? '' : ''}${Math.abs(metric.percentage).toFixed(2)}% (${formattedLast} → ${formattedThis})</span>
                                             </li>`
       }).join('')}
                             </ul>
@@ -1857,49 +1874,49 @@ function generateEventAnalysisSlides(data: any, thisWeek: any, lastWeek: any, th
                                             <td className="border p-2 text-right">${formatCurrency(paydayLast.amountSpent || 0)}</td>
                                             <td className="border p-2 text-right">${formatCurrency(paydayThis.amountSpent || 0)}</td>
                                             <td className="border p-2 text-right">${paydayMetrics.amountSpent.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendEmoji(paydayMetrics.amountSpent.isPositive)}</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(paydayMetrics.amountSpent.isPositive)}</td>
                                         </tr>
                                         <tr>
                                             <td className="border p-2">Purchases with shared items</td>
                                             <td className="border p-2 text-right">${formatNumber(paydayLast.purchases || 0)}</td>
                                             <td className="border p-2 text-right">${formatNumber(paydayThis.purchases || 0)}</td>
                                             <td className="border p-2 text-right">${paydayMetrics.purchases.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendEmoji(paydayMetrics.purchases.isPositive)}</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(paydayMetrics.purchases.isPositive)}</td>
                                         </tr>
                                         <tr>
                                             <td className="border p-2">Cost per purchases with shared items</td>
                                             <td className="border p-2 text-right">${formatCurrency(paydayLast.costPerPurchase || 0)}</td>
                                             <td className="border p-2 text-right">${formatCurrency(paydayThis.costPerPurchase || 0)}</td>
                                             <td className="border p-2 text-right">${paydayMetrics.costPerPurchase.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendEmoji(paydayMetrics.costPerPurchase.isPositive)}</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(paydayMetrics.costPerPurchase.isPositive)}</td>
                                         </tr>
                                         <tr>
                                             <td className="border p-2">Purchases conversion value for shared items only</td>
                                             <td className="border p-2 text-right">${formatCurrency(paydayLast.purchasesConversionValue || 0)}</td>
                                             <td className="border p-2 text-right">${formatCurrency(paydayThis.purchasesConversionValue || 0)}</td>
                                             <td className="border p-2 text-right">${paydayMetrics.purchasesConversionValue.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendEmoji(paydayMetrics.purchasesConversionValue.isPositive)}</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(paydayMetrics.purchasesConversionValue.isPositive)}</td>
                                         </tr>
                                         <tr>
                                             <td className="border p-2">Conversion Rate (Purchase ÷ Click)</td>
                                             <td className="border p-2 text-right">${formatPercent((paydayLast.conversionRate || 0) * 100)}</td>
                                             <td className="border p-2 text-right">${formatPercent((paydayThis.conversionRate || 0) * 100)}</td>
                                             <td className="border p-2 text-right">${paydayMetrics.conversionRate.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendEmoji(paydayMetrics.conversionRate.isPositive)}</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(paydayMetrics.conversionRate.isPositive)}</td>
                                         </tr>
                                         <tr>
                                             <td className="border p-2">Purchase ROAS (return on ad spend)</td>
                                             <td className="border p-2 text-right">${formatNumber(paydayLast.purchaseROAS || 0)}</td>
                                             <td className="border p-2 text-right">${formatNumber(paydayThis.purchaseROAS || 0)}</td>
                                             <td className="border p-2 text-right">${paydayMetrics.purchaseROAS.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendEmoji(paydayMetrics.purchaseROAS.isPositive)}</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(paydayMetrics.purchaseROAS.isPositive)}</td>
                                         </tr>
                                         <tr>
                                             <td className="border p-2">Average purchases conversion value</td>
                                             <td className="border p-2 text-right">${formatCurrency(paydayLast.avgPurchaseValue || 0)}</td>
                                             <td className="border p-2 text-right">${formatCurrency(paydayThis.avgPurchaseValue || 0)}</td>
                                             <td className="border p-2 text-right">${paydayMetrics.avgPurchaseValue.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendEmoji(paydayMetrics.avgPurchaseValue.isPositive)}</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(paydayMetrics.avgPurchaseValue.isPositive)}</td>
                                         </tr>
                                     </tbody>
                                 </table>
