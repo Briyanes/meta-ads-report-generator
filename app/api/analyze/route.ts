@@ -524,6 +524,10 @@ Return the analysis as structured JSON data that can be used to generate the HTM
           return data[partialMatch]
         }
       }
+      // Final fallback: try direct access with original field name (for exact column names from CSV)
+      if (data[fieldName] !== undefined && data[fieldName] !== null && data[fieldName] !== '') {
+        return data[fieldName]
+      }
       return undefined
     }
     
