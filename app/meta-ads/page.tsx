@@ -34,8 +34,11 @@ export default function MetaAdsPage() {
   }, [])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'thisWeek' | 'lastWeek') => {
+    console.log('handleFileChange called', { type, files: e.target.files?.length })
     const selectedFiles = Array.from(e.target.files || [])
     const csvFiles = selectedFiles.filter(file => file.type === 'text/csv' || file.name.endsWith('.csv'))
+    
+    console.log('Filtered CSV files:', csvFiles.length)
     
     if (csvFiles.length > 0) {
       if (type === 'thisWeek') {
@@ -71,8 +74,12 @@ export default function MetaAdsPage() {
     e.preventDefault()
     e.currentTarget.classList.remove('dragover')
     
+    console.log('handleDrop called', { type, files: e.dataTransfer.files.length })
+    
     const droppedFiles = Array.from(e.dataTransfer.files)
     const csvFiles = droppedFiles.filter(file => file.type === 'text/csv' || file.name.endsWith('.csv'))
+    
+    console.log('Filtered CSV files from drop:', csvFiles.length)
     
     if (csvFiles.length > 0) {
       if (type === 'thisWeek') {
@@ -81,6 +88,8 @@ export default function MetaAdsPage() {
         setFilesLastWeek(prev => [...prev, ...csvFiles])
       }
       setError(null)
+    } else {
+      setError('Please drop valid CSV files')
     }
   }
 
