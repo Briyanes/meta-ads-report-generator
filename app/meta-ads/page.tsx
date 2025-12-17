@@ -1026,7 +1026,7 @@ export default function MetaAdsPage() {
             gap: '12px'
           }}>
             <h2 style={{
-              fontSize: '22px',
+              fontSize: '18px',
               fontWeight: 'bold',
               color: '#111827',
               marginBottom: '20px'
