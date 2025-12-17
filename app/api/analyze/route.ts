@@ -703,21 +703,66 @@ function extractEventData(thisWeekData: any[], lastWeekData: any[], retentionTyp
     return eventAnalysis
   }
   
-  // Helper function to parse date
+  // Helper function to parse date - handles multiple formats
   const parseDate = (dateStr: string): Date | null => {
     if (!dateStr) return null
-    // Try different date formats
-    const date = new Date(dateStr)
-    if (isNaN(date.getTime())) return null
-    return date
+    
+    // Clean the string
+    const cleaned = String(dateStr).trim()
+    if (!cleaned) return null
+    
+    // Try ISO format first (YYYY-MM-DD)
+    let date = new Date(cleaned)
+    if (!isNaN(date.getTime())) {
+      return date
+    }
+    
+    // Try DD/MM/YYYY or DD-MM-YYYY format
+    const ddmmyyyyMatch = cleaned.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/)
+    if (ddmmyyyyMatch) {
+      const [, day, month, year] = ddmmyyyyMatch
+      date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+      if (!isNaN(date.getTime())) {
+        return date
+      }
+    }
+    
+    // Try YYYY/MM/DD or YYYY-MM-DD format
+    const yyyymmddMatch = cleaned.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/)
+    if (yyyymmddMatch) {
+      const [, year, month, day] = yyyymmddMatch
+      date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+      if (!isNaN(date.getTime())) {
+        return date
+      }
+    }
+    
+    // Try MM/DD/YYYY format (US format)
+    const mmddyyyyMatch = cleaned.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/)
+    if (mmddyyyyMatch) {
+      const [, month, day, year] = mmddyyyyMatch
+      date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+      if (!isNaN(date.getTime())) {
+        return date
+      }
+    }
+    
+    // Fallback to native Date parsing
+    date = new Date(cleaned)
+    if (!isNaN(date.getTime())) {
+      return date
+    }
+    
+    return null
   }
   
-  // Helper function to check if date is Twindate (tanggal kembar: 11.11, 12.12, dll)
+  // Helper function to check if date is Twindate (tanggal kembar: 1.1, 2.2, 3.3, ..., 11.11, 12.12)
   const isTwindate = (date: Date): boolean => {
+    if (!date || isNaN(date.getTime())) return false
     const day = date.getDate()
     const month = date.getMonth() + 1
-    // Check if day and month are the same (e.g., 11/11, 12/12)
-    return day === month
+    // Check if day and month are the same (e.g., 1/1, 2/2, 11/11, 12/12)
+    return day === month && day >= 1 && day <= 12
   }
   
   // Helper function to check if date is Payday (tanggal 21-5: dari tanggal 21 bulan ini sampai tanggal 5 bulan berikutnya)
