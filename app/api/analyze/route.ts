@@ -321,22 +321,10 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         const values = data.map(row => row[key])
         const numericValues = values.map(v => parseNum(v)).filter(v => !isNaN(v) && v !== null && v !== undefined)
         
-        // Debug logging for Reach field
-        if (key === 'Reach' || key.toLowerCase() === 'reach') {
-          console.log(`Aggregating Reach field:`)
-          console.log(`  - Total rows: ${data.length}`)
-          console.log(`  - Values: ${values.slice(0, 5).join(', ')}...`)
-          console.log(`  - Numeric values: ${numericValues.slice(0, 5).join(', ')}...`)
-          console.log(`  - Should sum: ${shouldSumField(key)}`)
-        }
-        
         if (numericValues.length > 0) {
           // Sum numeric values for sumFields
           if (shouldSumField(key)) {
             aggregated[key] = numericValues.reduce((sum, val) => sum + val, 0)
-            if (key === 'Reach' || key.toLowerCase() === 'reach') {
-              console.log(`  - Aggregated Reach: ${aggregated[key]}`)
-            }
           } else {
             // For other numeric fields, try to sum, but if all values are same, keep first
             const allSame = numericValues.length > 0 && numericValues.every(v => v === numericValues[0])
@@ -347,9 +335,6 @@ Return the analysis as structured JSON data that can be used to generate the HTM
           // But if it's a numeric field that should be summed, use 0 instead of empty string
           if (shouldSumField(key)) {
             aggregated[key] = 0
-            if (key === 'Reach' || key.toLowerCase() === 'reach') {
-              console.log(`  - Reach set to 0 (no numeric values found)`)
-            }
           } else {
             aggregated[key] = values[0] || 0
           }
@@ -391,13 +376,9 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         const impressions = parseNum(aggregated[impressionsKey])
         if (linkClicks > 0 && impressions > 0) {
           aggregated[ctrKey] = (linkClicks / impressions) * 100
-          console.log(`Recalculated CTR: ${aggregated[ctrKey]}% (from ${linkClicks} / ${impressions} * 100)`)
         } else {
           aggregated[ctrKey] = 0
-          console.log(`CTR set to 0 (linkClicks: ${linkClicks}, impressions: ${impressions})`)
         }
-      } else {
-        console.log(`CTR recalculation skipped - linkClicksKey: ${linkClicksKey}, impressionsKey: ${impressionsKey}, ctrKey: ${ctrKey}`)
       }
       
       // Recalculate CPC
@@ -406,13 +387,9 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         const amountSpent = parseNum(aggregated[amountSpentKey])
         if (linkClicks > 0 && amountSpent > 0) {
           aggregated[cpcKey] = amountSpent / linkClicks
-          console.log(`Recalculated CPC: ${aggregated[cpcKey]} (from ${amountSpent} / ${linkClicks})`)
         } else {
           aggregated[cpcKey] = 0
-          console.log(`CPC set to 0 (linkClicks: ${linkClicks}, amountSpent: ${amountSpent})`)
         }
-      } else {
-        console.log(`CPC recalculation skipped - linkClicksKey: ${linkClicksKey}, amountSpentKey: ${amountSpentKey}, cpcKey: ${cpcKey}`)
       }
       
       // Recalculate CPM
@@ -432,13 +409,9 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         const reach = parseNum(aggregated[reachKey])
         if (impressions > 0 && reach > 0) {
           aggregated[frequencyKey] = impressions / reach
-          console.log(`Recalculated Frequency: ${aggregated[frequencyKey]} (from ${impressions} / ${reach})`)
         } else {
           aggregated[frequencyKey] = 0
-          console.log(`Frequency set to 0 (impressions: ${impressions}, reach: ${reach})`)
         }
-      } else {
-        console.log(`Frequency recalculation skipped - impressionsKey: ${impressionsKey}, reachKey: ${reachKey}, frequencyKey: ${frequencyKey}`)
       }
       
       // Recalculate Cost per Reach
@@ -496,31 +469,6 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     const thisWeekData = aggregateCSVData(parsedDataThisWeek.data)
     const lastWeekData = aggregateCSVData(parsedDataLastWeek.data)
     
-    // Debug: Log aggregated data to verify
-    console.log('=== AGGREGATION DEBUG ===')
-    console.log('This Week Data Keys:', Object.keys(thisWeekData))
-    console.log('This Week Sample Values:', {
-      'Reach': thisWeekData['Reach'],
-      'Link clicks': thisWeekData['Link clicks'],
-      'Frequency': thisWeekData['Frequency'],
-      'CTR (link click-through rate)': thisWeekData['CTR (link click-through rate)'],
-      'CPC (cost per link click)': thisWeekData['CPC (cost per link click)'],
-      'CPM (cost per 1,000 impressions)': thisWeekData['CPM (cost per 1,000 impressions)'],
-      'Amount spent (IDR)': thisWeekData['Amount spent (IDR)'],
-      'Impressions': thisWeekData['Impressions']
-    })
-    console.log('Last Week Data Keys:', Object.keys(lastWeekData))
-    console.log('Last Week Sample Values:', {
-      'Reach': lastWeekData['Reach'],
-      'Link clicks': lastWeekData['Link clicks'],
-      'Frequency': lastWeekData['Frequency'],
-      'CTR (link click-through rate)': lastWeekData['CTR (link click-through rate)'],
-      'CPC (cost per link click)': lastWeekData['CPC (cost per link click)'],
-      'CPM (cost per 1,000 impressions)': lastWeekData['CPM (cost per 1,000 impressions)'],
-      'Amount spent (IDR)': lastWeekData['Amount spent (IDR)'],
-      'Impressions': lastWeekData['Impressions'],
-      'Adds to cart conversion value for shared items only': lastWeekData['Adds to cart conversion value for shared items only']
-    })
     
     // Calculate base metrics
     const thisWeekSpend = parseNum(thisWeekData['Amount spent (IDR)'])
@@ -591,15 +539,6 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     
     // Build performance summary with all fields
     const buildPerformanceData = (data: any, results: number, cpr: number) => {
-      // Debug: Log data being processed
-      const reachValue = getFieldValue(data, 'Reach')
-      console.log('buildPerformanceData - Reach extraction:', {
-        'data keys': Object.keys(data),
-        'reach field found': data['Reach'],
-        'getFieldValue result': reachValue,
-        'parsed value': parseNum(reachValue)
-      })
-      
       const base = {
         amountSpent: parseNum(getFieldValue(data, 'Amount spent (IDR)')),
         impressions: parseNum(getFieldValue(data, 'Impressions')),
@@ -616,13 +555,6 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         reach: parseNum(getFieldValue(data, 'Reach')),
         cpr: cpr
       }
-      
-      console.log('buildPerformanceData - base values:', {
-        reach: base.reach,
-        linkClicks: base.linkClicks,
-        frequency: base.frequency,
-        cpc: base.cpc
-      })
       
       // CTWA fields
       if (objectiveType === 'ctwa') {
