@@ -319,15 +319,78 @@ export default function MetaAdsPage() {
           'CPC (all)',
           'Instagram follows'
         ],
-        breakdown: [
-          'Age (age.csv)',
-          'Gender (gender.csv)',
-          'Region (region.csv)',
-          'Platform (platform.csv)',
-          'Placement (placement.csv)',
-          'Campaign objective (objective.csv)',
-          'Ad creative/Ad name (ad-creative.csv)'
-        ]
+        breakdown: {
+          'Age (age.csv)': [
+            'Age',
+            'Impressions',
+            'CTR (link click-through rate)',
+            'Outbound clicks',
+            '* OC→WA landing ratio',
+            'Messaging conversations started',
+            'Cost per messaging conversation started',
+            'Amount spent (IDR)'
+          ],
+          'Gender (gender.csv)': [
+            'Gender',
+            'Impressions',
+            'CTR (link click-through rate)',
+            'Outbound clicks',
+            '* OC→WA landing ratio',
+            'Messaging conversations started',
+            'Cost per messaging conversation started',
+            'Amount spent (IDR)'
+          ],
+          'Region (region.csv)': [
+            'Region',
+            'Impressions',
+            'CTR (link click-through rate)',
+            'Outbound clicks',
+            '* OC→WA landing ratio',
+            'Messaging conversations started',
+            'Cost per messaging conversation started',
+            'Amount spent (IDR)'
+          ],
+          'Platform (platform.csv)': [
+            'Platform',
+            'Impressions',
+            'CTR (link click-through rate)',
+            'Outbound clicks',
+            '* OC→WA landing ratio',
+            'Messaging conversations started',
+            'Cost per messaging conversation started',
+            'Amount spent (IDR)'
+          ],
+          'Placement (placement.csv)': [
+            'Placement',
+            'Impressions',
+            'CTR (link click-through rate)',
+            'Outbound clicks',
+            '* OC→WA landing ratio',
+            'Messaging conversations started',
+            'Cost per messaging conversation started',
+            'Amount spent (IDR)'
+          ],
+          'Campaign objective (objective.csv)': [
+            'Campaign objective',
+            'Impressions',
+            'CTR (link click-through rate)',
+            'Outbound clicks',
+            '* OC→WA landing ratio',
+            'Messaging conversations started',
+            'Cost per messaging conversation started',
+            'Amount spent (IDR)'
+          ],
+          'Ad creative/Ad name (ad-creative.csv)': [
+            'Ad creative/Ad name',
+            'Impressions',
+            'CTR (link click-through rate)',
+            'Outbound clicks',
+            '* OC→WA landing ratio',
+            'Messaging conversations started',
+            'Cost per messaging conversation started',
+            'Amount spent (IDR)'
+          ]
+        }
       },
       cpas: {
         main: [
@@ -360,15 +423,134 @@ export default function MetaAdsPage() {
           'Instagram follows',
           '* COST /Follow (IDR)'
         ],
-        breakdown: [
-          'Age (age.csv)',
-          'Gender (gender.csv)',
-          'Region (region.csv)',
-          'Platform (platform.csv)',
-          'Placement (placement.csv)',
-          'Campaign objective (objective.csv)',
-          'Ad creative/Ad name (ad-creative.csv)'
-        ]
+        breakdown: {
+          'Age (age.csv)': [
+            'Age',
+            'Impressions',
+            'Outbound clicks',
+            'CTR (link click-through rate)',
+            'Content views with shared items',
+            'Adds to cart with shared items',
+            'Adds to cart conversion value for shared items only',
+            'Purchases with shared items',
+            'Cost /Purchase (IDR)',
+            'Purchase ROAS for shared items only',
+            'Purchases conversion value for shared items only',
+            'AOV (IDR)',
+            'Instagram profile visits',
+            'Instagram follows',
+            '* COST /Follow (IDR)',
+            'Amount spent (IDR)'
+          ],
+          'Gender (gender.csv)': [
+            'Gender',
+            'Impressions',
+            'Outbound clicks',
+            'CTR (link click-through rate)',
+            'Content views with shared items',
+            'Adds to cart with shared items',
+            'Adds to cart conversion value for shared items only',
+            'Purchases with shared items',
+            'Cost /Purchase (IDR)',
+            'Purchase ROAS for shared items only',
+            'Purchases conversion value for shared items only',
+            'AOV (IDR)',
+            'Instagram profile visits',
+            'Instagram follows',
+            '* COST /Follow (IDR)',
+            'Amount spent (IDR)'
+          ],
+          'Region (region.csv)': [
+            'Region',
+            'Impressions',
+            'Outbound clicks',
+            'CTR (link click-through rate)',
+            'Content views with shared items',
+            'Adds to cart with shared items',
+            'Adds to cart conversion value for shared items only',
+            'Purchases with shared items',
+            'Cost /Purchase (IDR)',
+            'Purchase ROAS for shared items only',
+            'Purchases conversion value for shared items only',
+            'AOV (IDR)',
+            'Instagram profile visits',
+            'Instagram follows',
+            '* COST /Follow (IDR)',
+            'Amount spent (IDR)'
+          ],
+          'Platform (platform.csv)': [
+            'Platform',
+            'Impressions',
+            'Outbound clicks',
+            'CTR (link click-through rate)',
+            'Content views with shared items',
+            'Adds to cart with shared items',
+            'Adds to cart conversion value for shared items only',
+            'Purchases with shared items',
+            'Cost /Purchase (IDR)',
+            'Purchase ROAS for shared items only',
+            'Purchases conversion value for shared items only',
+            'AOV (IDR)',
+            'Instagram profile visits',
+            'Instagram follows',
+            '* COST /Follow (IDR)',
+            'Amount spent (IDR)'
+          ],
+          'Placement (placement.csv)': [
+            'Placement',
+            'Impressions',
+            'Outbound clicks',
+            'CTR (link click-through rate)',
+            'Content views with shared items',
+            'Adds to cart with shared items',
+            'Adds to cart conversion value for shared items only',
+            'Purchases with shared items',
+            'Cost /Purchase (IDR)',
+            'Purchase ROAS for shared items only',
+            'Purchases conversion value for shared items only',
+            'AOV (IDR)',
+            'Instagram profile visits',
+            'Instagram follows',
+            '* COST /Follow (IDR)',
+            'Amount spent (IDR)'
+          ],
+          'Campaign objective (objective.csv)': [
+            'Campaign objective',
+            'Impressions',
+            'Outbound clicks',
+            'CTR (link click-through rate)',
+            'Content views with shared items',
+            'Adds to cart with shared items',
+            'Adds to cart conversion value for shared items only',
+            'Purchases with shared items',
+            'Cost /Purchase (IDR)',
+            'Purchase ROAS for shared items only',
+            'Purchases conversion value for shared items only',
+            'AOV (IDR)',
+            'Instagram profile visits',
+            'Instagram follows',
+            '* COST /Follow (IDR)',
+            'Amount spent (IDR)'
+          ],
+          'Ad creative/Ad name (ad-creative.csv)': [
+            'Ad creative/Ad name',
+            'Impressions',
+            'Outbound clicks',
+            'CTR (link click-through rate)',
+            'Content views with shared items',
+            'Adds to cart with shared items',
+            'Adds to cart conversion value for shared items only',
+            'Purchases with shared items',
+            'Cost /Purchase (IDR)',
+            'Purchase ROAS for shared items only',
+            'Purchases conversion value for shared items only',
+            'AOV (IDR)',
+            'Instagram profile visits',
+            'Instagram follows',
+            '* COST /Follow (IDR)',
+            'Amount spent (IDR)'
+          ]
+        }
       },
       ctlptowa: {
         main: [
@@ -397,15 +579,92 @@ export default function MetaAdsPage() {
           'Instagram follows',
           '* COST / Follow (IDR)'
         ],
-        breakdown: [
-          'Age (age.csv)',
-          'Gender (gender.csv)',
-          'Region (region.csv)',
-          'Platform (platform.csv)',
-          'Placement (placement.csv)',
-          'Campaign objective (objective.csv)',
-          'Ad creative/Ad name (ad-creative.csv)'
-        ]
+        breakdown: {
+          'Age (age.csv)': [
+            'Age',
+            'Impressions',
+            'Outbound clicks',
+            'CTR (link click-through rate)',
+            'Website landing page views',
+            'Checkouts initiated',
+            'Cost per checkout initiated',
+            'Instagram profile visits',
+            'Instagram follows',
+            'Amount spent (IDR)'
+          ],
+          'Gender (gender.csv)': [
+            'Gender',
+            'Impressions',
+            'Outbound clicks',
+            'CTR (link click-through rate)',
+            'Website landing page views',
+            'Checkouts initiated',
+            'Cost per checkout initiated',
+            'Instagram profile visits',
+            'Instagram follows',
+            'Amount spent (IDR)'
+          ],
+          'Region (region.csv)': [
+            'Region',
+            'Impressions',
+            'Outbound clicks',
+            'CTR (link click-through rate)',
+            'Website landing page views',
+            'Checkouts initiated',
+            'Cost per checkout initiated',
+            'Instagram profile visits',
+            'Instagram follows',
+            'Amount spent (IDR)'
+          ],
+          'Platform (platform.csv)': [
+            'Platform',
+            'Impressions',
+            'Outbound clicks',
+            'CTR (link click-through rate)',
+            'Website landing page views',
+            'Checkouts initiated',
+            'Cost per checkout initiated',
+            'Instagram profile visits',
+            'Instagram follows',
+            'Amount spent (IDR)'
+          ],
+          'Placement (placement.csv)': [
+            'Placement',
+            'Impressions',
+            'Outbound clicks',
+            'CTR (link click-through rate)',
+            'Website landing page views',
+            'Checkouts initiated',
+            'Cost per checkout initiated',
+            'Instagram profile visits',
+            'Instagram follows',
+            'Amount spent (IDR)'
+          ],
+          'Campaign objective (objective.csv)': [
+            'Campaign objective',
+            'Impressions',
+            'Outbound clicks',
+            'CTR (link click-through rate)',
+            'Website landing page views',
+            'Checkouts initiated',
+            'Cost per checkout initiated',
+            'Instagram profile visits',
+            'Instagram follows',
+            'Amount spent (IDR)'
+          ],
+          'Ad creative/Ad name (ad-creative.csv)': [
+            'Ad creative/Ad name',
+            'Impressions',
+            'Outbound clicks',
+            'CTR (link click-through rate)',
+            'Website landing page views',
+            'Checkouts initiated',
+            'Cost per checkout initiated',
+            'Instagram profile visits',
+            'Instagram follows',
+            'Amount spent (IDR)'
+          ]
+        }
       }
     }
     return requirements[objectiveType] || requirements.ctwa
@@ -727,66 +986,125 @@ export default function MetaAdsPage() {
                 }}>
                   Required Exports from Meta Ads Manager:
                 </h3>
-                <div className="responsive-grid-2" style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(2, 1fr)',
-                  gap: '16px'
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '24px'
                 }}>
                   <div>
                     <h4 style={{
                       fontWeight: '600',
-                      fontSize: '14px',
-                      color: '#374151',
-                      marginBottom: '8px'
+                      fontSize: '16px',
+                      color: '#111827',
+                      marginBottom: '12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
                     }}>
-                      Main Export File:
+                      <i className="bi bi-file-earmark-text" style={{ color: '#3b82f6' }}></i>
+                      Main Export File (CSV Metrics):
                     </h4>
-                    <ul style={{
-                      fontSize: '14px',
-                      color: '#4b5563',
-                      listStyle: 'none',
-                      padding: 0,
-                      margin: 0
+                    <div style={{
+                      backgroundColor: '#f9fafb',
+                      padding: '16px',
+                      borderRadius: '8px',
+                      border: '1px solid #e5e7eb'
                     }}>
-                      {requirements.main.map((metric: string, idx: number) => (
-                        <li key={idx} style={{
-                          display: 'flex',
-                          alignItems: 'flex-start',
-                          marginBottom: '4px'
-                        }}>
-                          <span style={{ color: '#3b82f6', marginRight: '8px' }}>•</span>
-                          <span>{metric}</span>
-                        </li>
-                      ))}
-                    </ul>
+                      <ul style={{
+                        fontSize: '13px',
+                        color: '#4b5563',
+                        listStyle: 'none',
+                        padding: 0,
+                        margin: 0,
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+                        gap: '6px'
+                      }}>
+                        {requirements.main.map((metric: string, idx: number) => (
+                          <li key={idx} style={{
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            marginBottom: '4px'
+                          }}>
+                            <span style={{ color: '#3b82f6', marginRight: '8px', fontSize: '12px' }}>•</span>
+                            <span>{metric}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                   <div>
                     <h4 style={{
                       fontWeight: '600',
-                      fontSize: '14px',
-                      color: '#374151',
-                      marginBottom: '8px'
+                      fontSize: '16px',
+                      color: '#111827',
+                      marginBottom: '12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
                     }}>
-                      Breakdown Export Files:
+                      <i className="bi bi-files" style={{ color: '#3b82f6' }}></i>
+                      Breakdown Export Files (with Required Metrics):
                     </h4>
-                    <ul style={{
+                    <div style={{
                       fontSize: '14px',
                       color: '#4b5563',
-                      listStyle: 'none',
-                      padding: 0,
-                      margin: 0
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                      gap: '12px'
                     }}>
-                      {requirements.breakdown.map((breakdown: string, idx: number) => (
-                        <li key={idx} style={{
-                          display: 'flex',
-                          alignItems: 'flex-start',
-                          marginBottom: '4px'
+                      {Object.entries(requirements.breakdown).map(([fileName, metrics]: [string, any]) => (
+                        <div key={fileName} style={{
+                          padding: '14px',
+                          backgroundColor: '#ffffff',
+                          borderRadius: '8px',
+                          border: '1px solid #e5e7eb',
+                          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
                         }}>
-                          <span style={{ color: '#3b82f6', marginRight: '8px' }}>•</span>
-                          <span>{breakdown}</span>
-                        </li>
+                          <div style={{
+                            fontWeight: '600',
+                            color: '#111827',
+                            marginBottom: '10px',
+                            fontSize: '14px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px'
+                          }}>
+                            <i className="bi bi-file-earmark-spreadsheet" style={{ color: '#3b82f6', fontSize: '16px' }}></i>
+                            {fileName}
+                          </div>
+                          <div style={{
+                            fontSize: '11px',
+                            color: '#6b7280',
+                            marginBottom: '8px',
+                            fontWeight: '500'
+                          }}>
+                            Required Metrics:
+                          </div>
+                          <ul style={{
+                            fontSize: '11px',
+                            color: '#4b5563',
+                            listStyle: 'none',
+                            padding: 0,
+                            margin: 0,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '3px'
+                          }}>
+                            {metrics.map((metric: string, idx: number) => (
+                              <li key={idx} style={{
+                                display: 'flex',
+                                alignItems: 'flex-start',
+                                padding: '2px 0'
+                              }}>
+                                <span style={{ color: '#3b82f6', marginRight: '6px', fontSize: '10px', marginTop: '2px' }}>▸</span>
+                                <span style={{ lineHeight: '1.4' }}>{metric}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                       ))}
-                    </ul>
+                    </div>
                   </div>
                 </div>
               </div>

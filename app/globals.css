@@ -519,6 +519,15 @@ a {
     display: none !important;
   }
   
+  /* Responsive grid for breakdown files */
+  .responsive-card div[style*="gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))'"] {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .responsive-card div[style*="gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))'"] {
+    grid-template-columns: 1fr !important;
+  }
+  
   .demo-button-container {
     padding: 8px 12px !important;
     margin-top: -8px !important;
