@@ -757,7 +757,7 @@ export default function MetaAdsPage() {
       </header>
 
       {/* Spacer for fixed header */}
-      <div style={{ height: '120px' }}></div>
+      <div className="header-spacer" style={{ height: '120px' }}></div>
 
       <main className="responsive-container" style={{
         maxWidth: '1400px',

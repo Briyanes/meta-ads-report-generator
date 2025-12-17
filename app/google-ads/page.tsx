@@ -94,7 +94,7 @@ export default function GoogleAdsPage() {
       </header>
 
       {/* Spacer for fixed header */}
-      <div style={{ height: '100px' }}></div>
+      <div className="header-spacer" style={{ height: '120px' }}></div>
 
       {/* Coming Soon Content */}
       <main className="responsive-container" style={{
