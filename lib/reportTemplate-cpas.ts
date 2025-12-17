@@ -1132,9 +1132,15 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
     const sortedPlatform = [...platformThisWeek]
       .filter((p: any) => p.Platform && p.Platform.trim())
       .sort((a: any, b: any) => {
-        const purchasesA = parseFloat(String(a['Purchases'] || a['Purchases with shared items'] || 0).replace(/,/g, '')) || 0
-        const purchasesB = parseFloat(String(b['Purchases'] || b['Purchases with shared items'] || 0).replace(/,/g, '')) || 0
-        return purchasesB - purchasesA
+        const getPurchases = (item: any) => {
+          const purchasesRaw = item['Purchases with shared items'] || 
+                              item['Purchases'] || 
+                              item['Purchases with shared items only'] ||
+                              item['Purchases (shared items)'] ||
+                              0
+          return parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
+        }
+        return getPurchases(b) - getPurchases(a)
       })
     
     slides += `
@@ -1148,7 +1154,12 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedPlatform.map((item: any) => {
           const platform = item.Platform || 'Unknown'
-          const purchases = parseFloat(String(item['Purchases'] || item['Purchases with shared items'] || 0).replace(/,/g, '')) || 0
+          const purchasesRaw = item['Purchases with shared items'] || 
+                              item['Purchases'] || 
+                              item['Purchases with shared items only'] ||
+                              item['Purchases (shared items)'] ||
+                              0
+          const purchases = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${platform}</span>
                                             <span className="font-bold text-xs">{formatNumber(${purchases})}</span>
@@ -1161,8 +1172,14 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedPlatform.map((item: any) => {
           const platform = item.Platform || 'Unknown'
-          const purchases = parseFloat(String(item['Purchases'] || item['Purchases with shared items'] || 0).replace(/,/g, '')) || 0
-          const amountSpent = parseFloat(String(item['Amount spent (IDR)'] || 0).replace(/,/g, '')) || 0
+          const purchasesRaw = item['Purchases with shared items'] || 
+                              item['Purchases'] || 
+                              item['Purchases with shared items only'] ||
+                              item['Purchases (shared items)'] ||
+                              0
+          const purchases = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
+          const amountSpentRaw = item['Amount spent (IDR)'] || item['Amount spent'] || 0
+          const amountSpent = parseFloat(String(amountSpentRaw).replace(/,/g, '')) || 0
           const cpa = purchases > 0 ? (amountSpent / purchases) : 0
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${platform}</span>
@@ -1177,7 +1194,15 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="flex items-start">
                                         <i className="fab fa-instagram text-purple-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
-                                            <p className="text-xs"><strong>Kesimpulan:</strong> ${sortedPlatform.length > 0 ? sortedPlatform[0].Platform + ' menghasilkan ' + (sortedPlatform[0]['Purchases'] || sortedPlatform[0]['Purchases with shared items'] || 0) + ' purchases dengan CPA terendah.' : 'Platform breakdown menunjukkan variasi performa signifikan antar platform.'}</p>
+                                            <p className="text-xs"><strong>Kesimpulan:</strong> ${sortedPlatform.length > 0 ? (() => {
+          const topPlatform = sortedPlatform[0]
+          const purchases = topPlatform['Purchases with shared items'] || 
+                           topPlatform['Purchases'] || 
+                           topPlatform['Purchases with shared items only'] ||
+                           topPlatform['Purchases (shared items)'] ||
+                           0
+          return topPlatform.Platform + ' menghasilkan ' + purchases + ' purchases dengan CPA terendah.'
+        })() : 'Platform breakdown menunjukkan variasi performa signifikan antar platform.'}</p>
                                             <p className="text-xs mt-1">${sortedPlatform.length > 0 ? 'Platform ini menjadi pilihan terbaik untuk optimasi budget dan scaling campaign.' : 'Perlu analisis lebih lanjut untuk identifikasi platform terbaik.'}</p>
                                         </div>
                                     </div>
@@ -1203,9 +1228,15 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
     const sortedPlacement = [...placementThisWeek]
       .filter((p: any) => p.Placement && p.Placement.trim())
       .sort((a: any, b: any) => {
-        const purchasesA = parseFloat(String(a['Purchases'] || a['Purchases with shared items'] || 0).replace(/,/g, '')) || 0
-        const purchasesB = parseFloat(String(b['Purchases'] || b['Purchases with shared items'] || 0).replace(/,/g, '')) || 0
-        return purchasesB - purchasesA
+        const getPurchases = (item: any) => {
+          const purchasesRaw = item['Purchases with shared items'] || 
+                              item['Purchases'] || 
+                              item['Purchases with shared items only'] ||
+                              item['Purchases (shared items)'] ||
+                              0
+          return parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
+        }
+        return getPurchases(b) - getPurchases(a)
       })
       .slice(0, 5)
     
@@ -1220,7 +1251,12 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedPlacement.map((item: any) => {
           const placement = item.Placement || 'Unknown'
-          const purchases = parseFloat(String(item['Purchases'] || item['Purchases with shared items'] || 0).replace(/,/g, '')) || 0
+          const purchasesRaw = item['Purchases with shared items'] || 
+                              item['Purchases'] || 
+                              item['Purchases with shared items only'] ||
+                              item['Purchases (shared items)'] ||
+                              0
+          const purchases = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${placement}</span>
                                             <span className="font-bold text-xs">{formatNumber(${purchases})}</span>
@@ -1233,8 +1269,14 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedPlacement.map((item: any) => {
           const placement = item.Placement || 'Unknown'
-          const purchases = parseFloat(String(item['Purchases'] || item['Purchases with shared items'] || 0).replace(/,/g, '')) || 0
-          const amountSpent = parseFloat(String(item['Amount spent (IDR)'] || 0).replace(/,/g, '')) || 0
+          const purchasesRaw = item['Purchases with shared items'] || 
+                              item['Purchases'] || 
+                              item['Purchases with shared items only'] ||
+                              item['Purchases (shared items)'] ||
+                              0
+          const purchases = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
+          const amountSpentRaw = item['Amount spent (IDR)'] || item['Amount spent'] || 0
+          const amountSpent = parseFloat(String(amountSpentRaw).replace(/,/g, '')) || 0
           const cpa = purchases > 0 ? (amountSpent / purchases) : 0
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${placement}</span>
@@ -1249,7 +1291,15 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="flex items-start">
                                         <i className="fas fa-photo-video text-blue-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
-                                            <p className="text-xs"><strong>Kesimpulan:</strong> ${sortedPlacement.length > 0 ? sortedPlacement[0].Placement + ' menghasilkan ' + (sortedPlacement[0]['Purchases'] || sortedPlacement[0]['Purchases with shared items'] || 0) + ' purchases dengan CPA terendah.' : 'Placement breakdown menunjukkan variasi performa signifikan antar format.'}</p>
+                                            <p className="text-xs"><strong>Kesimpulan:</strong> ${sortedPlacement.length > 0 ? (() => {
+          const topPlacement = sortedPlacement[0]
+          const purchases = topPlacement['Purchases with shared items'] || 
+                           topPlacement['Purchases'] || 
+                           topPlacement['Purchases with shared items only'] ||
+                           topPlacement['Purchases (shared items)'] ||
+                           0
+          return topPlacement.Placement + ' menghasilkan ' + purchases + ' purchases dengan CPA terendah.'
+        })() : 'Placement breakdown menunjukkan variasi performa signifikan antar format.'}</p>
                                             <p className="text-xs mt-1">${sortedPlacement.length > 0 ? 'Format konten ini menjadi pilihan terbaik untuk optimasi dan scaling.' : 'Perlu analisis lebih lanjut untuk identifikasi format terbaik.'}</p>
                                         </div>
                                     </div>
@@ -1274,16 +1324,25 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
     // Get top 5 performers based on: Purchases + Instagram Visits + Followers
     const sortedCreative = [...creativeThisWeek]
       .filter((c: any) => {
-        const purchases = c['Purchases'] || c['Purchases with shared items'] || 0
+        const purchases = c['Purchases with shared items'] || 
+                         c['Purchases'] || 
+                         c['Purchases with shared items only'] ||
+                         c['Purchases (shared items)'] ||
+                         0
         const instagramVisits = c['Instagram profile visits'] || 0
         const instagramFollows = c['Instagram follows'] || 0
         // Filter ads that have at least one of these metrics > 0
         return purchases > 0 || instagramVisits > 0 || instagramFollows > 0
       })
       .map((item: any) => {
-        const purchases = item['Purchases'] || item['Purchases with shared items'] || 0
-        const instagramVisits = item['Instagram profile visits'] || 0
-        const instagramFollows = item['Instagram follows'] || 0
+        const purchasesRaw = item['Purchases with shared items'] || 
+                            item['Purchases'] || 
+                            item['Purchases with shared items only'] ||
+                            item['Purchases (shared items)'] ||
+                            0
+        const purchases = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
+        const instagramVisits = parseFloat(String(item['Instagram profile visits'] || 0).replace(/,/g, '')) || 0
+        const instagramFollows = parseFloat(String(item['Instagram follows'] || 0).replace(/,/g, '')) || 0
         // Calculate combined score (weighted)
         const combinedScore = (purchases * 3) + (instagramVisits * 1) + (instagramFollows * 2)
         return { ...item, _combinedScore: combinedScore }
