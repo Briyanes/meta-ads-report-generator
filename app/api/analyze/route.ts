@@ -469,14 +469,6 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     const thisWeekData = aggregateCSVData(parsedDataThisWeek.data)
     const lastWeekData = aggregateCSVData(parsedDataLastWeek.data)
     
-    // Debug: Verify aggregated data
-    console.log('=== AGGREGATION VERIFICATION ===')
-    console.log('Last Week - Reach:', lastWeekData['Reach'])
-    console.log('Last Week - Link clicks:', lastWeekData['Link clicks'])
-    console.log('Last Week - Frequency:', lastWeekData['Frequency'])
-    console.log('Last Week - Impressions:', lastWeekData['Impressions'])
-    console.log('Last Week - Amount spent (IDR):', lastWeekData['Amount spent (IDR)'])
-    
     // Calculate base metrics
     const thisWeekSpend = parseNum(thisWeekData['Amount spent (IDR)'])
     const lastWeekSpend = parseNum(lastWeekData['Amount spent (IDR)'])
@@ -545,17 +537,7 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     }
     
     // Build performance summary with all fields
-    const buildPerformanceData = (data: any, results: number, cpr: number, label: string = '') => {
-      // Debug: Log data extraction
-      const reachValue = getFieldValue(data, 'Reach')
-      const reachParsed = parseNum(reachValue)
-      console.log(`buildPerformanceData [${label}] - Reach:`, {
-        'raw data Reach': data['Reach'],
-        'getFieldValue result': reachValue,
-        'parsed value': reachParsed,
-        'data keys': Object.keys(data).slice(0, 10)
-      })
-      
+    const buildPerformanceData = (data: any, results: number, cpr: number) => {
       const base = {
         amountSpent: parseNum(getFieldValue(data, 'Amount spent (IDR)')),
         impressions: parseNum(getFieldValue(data, 'Impressions')),
@@ -569,17 +551,9 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         cpm: parseNum(getFieldValue(data, 'CPM (cost per 1,000 impressions)')),
         outboundClicks: parseNum(getFieldValue(data, 'Outbound clicks')),
         frequency: parseNum(getFieldValue(data, 'Frequency')),
-        reach: reachParsed,
+        reach: parseNum(getFieldValue(data, 'Reach')),
         cpr: cpr
       }
-      
-      console.log(`buildPerformanceData [${label}] - Final base values:`, {
-        reach: base.reach,
-        linkClicks: base.linkClicks,
-        frequency: base.frequency,
-        cpc: base.cpc,
-        impressions: base.impressions
-      })
       
       // CTWA fields
       if (objectiveType === 'ctwa') {
@@ -642,8 +616,8 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     
     const analysis = {
         performanceSummary: {
-          thisWeek: buildPerformanceData(thisWeekData, thisWeekResults, thisWeekCPR, 'ThisWeek'),
-          lastWeek: buildPerformanceData(lastWeekData, lastWeekResults, lastWeekCPR, 'LastWeek'),
+          thisWeek: buildPerformanceData(thisWeekData, thisWeekResults, thisWeekCPR),
+          lastWeek: buildPerformanceData(lastWeekData, lastWeekResults, lastWeekCPR),
           growth: {
             spend: spendGrowth,
             results: resultsGrowth,
