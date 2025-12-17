@@ -30,7 +30,11 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     lastWeekKeys: Object.keys(lastWeek),
     breakdownKeys: Object.keys(breakdown),
     thisWeekAmountSpent: thisWeek.amountSpent,
-    lastWeekAmountSpent: lastWeek.amountSpent
+    lastWeekAmountSpent: lastWeek.amountSpent,
+    thisWeekReach: thisWeek.reach,
+    lastWeekReach: lastWeek.reach,
+    thisWeekImpressions: thisWeek.impressions,
+    lastWeekImpressions: lastWeek.impressions
   })
   
   // Determine period labels based on retention type
@@ -118,7 +122,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Meta Ads Performance Report</title>
+    <title>${comparisonLabel} Meta Ads Performance Report</title>
     <script src="https://cdn.jsdelivr.net/npm/react@18.0.0/umd/react.development.js" crossorigin></script>
     <script src="https://cdn.jsdelivr.net/npm/react-dom@18.0.0/umd/react-dom.development.js" crossorigin></script>
     <script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
