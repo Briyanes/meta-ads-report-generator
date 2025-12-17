@@ -912,10 +912,9 @@ function extractEventData(thisWeekData: any[], lastWeekData: any[], retentionTyp
   
   // Filter and aggregate Twindate data for this period
   // Twindate: iklan start H-4 sebelum tanggal kembar dan mati setelah twindate selesai
-  // Contoh dengan cutoff tanggal 25:
-  //   - Bulan ini (26 Okt - 25 Nov): akan memiliki Twindate 11.11 (periode 7-11 November)
-  //   - Bulan lalu (26 Sep - 25 Okt): akan memiliki Twindate 10.10 (periode 6-10 Oktober)
-  //   - 9.9 (periode 5-9 September) TIDAK masuk karena sebelum 26 September
+  // Deteksi berdasarkan tanggal yang ada di CSV, bukan berdasarkan periode report
+  // Contoh: Jika file "bulan ini" berisi data 10.10 (6-10 Oktober), akan terdeteksi sebagai Twindate
+  // Semua tanggal yang masuk dalam periode H-4 sampai H (tanggal kembar) akan terdeteksi
   const twindateThisData = thisWeekData.filter(row => {
     const dateStr = row[dateColumn!]
     if (!dateStr) return false
@@ -926,6 +925,7 @@ function extractEventData(thisWeekData: any[], lastWeekData: any[], retentionTyp
   })
   
   // Filter and aggregate Twindate data for last period
+  // Deteksi berdasarkan tanggal yang ada di CSV, bukan berdasarkan periode report
   const twindateLastData = lastWeekData.filter(row => {
     const dateStr = row[dateColumn!]
     if (!dateStr) return false
