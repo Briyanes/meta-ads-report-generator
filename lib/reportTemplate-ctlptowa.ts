@@ -362,6 +362,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         const App = () => {
             const reportData = ${JSON.stringify(data)};
             const isMoM = ${JSON.stringify(isMoM)};
+            const defaultReportName = isMoM ? 'Month-on-Month Report' : 'Week-on-Week Report';
             const reportName = ${JSON.stringify(reportName || (isMoM ? 'Month-on-Month Report' : 'Week-on-Week Report'))};
             
             const formatNumber = (num) => {
@@ -424,7 +425,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                             <img src="https://hadona.id/wp-content/uploads/2024/12/cropped-Hadona-Logo-1-300x300.png" alt="Hadona Logo" className="mx-auto mb-6" style={{width: '80px', height: '80px'}} />
                             <h1 className="text-4xl font-bold text-hadona-blue mb-3">{comparisonLabel} Reporting</h1>
                             <p className="text-2xl font-semibold text-hadona-blue mb-2">{objectiveLabel}</p>
-                            {reportName && reportName !== (isMoM ? 'Month-on-Month Report' : 'Week-on-Week Report') && reportName !== 'Month-on-Month Report' && reportName !== 'Week-on-Week Report' && (
+                            {reportName && reportName !== defaultReportName && (
                                 <p className="text-xl font-semibold text-hadona-blue mb-4">{reportName}</p>
                             )}
                             <p className="text-lg text-gray-500 mb-6">{periodLabel} vs {periodLabel}</p>

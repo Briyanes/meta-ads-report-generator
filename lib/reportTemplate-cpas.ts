@@ -393,6 +393,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                 const App = () => {
                     const reportData = ${JSON.stringify(data)};
                     const isMoM = ${JSON.stringify(isMoM)};
+                    const defaultReportName = isMoM ? 'Month-on-Month Report' : 'Week-on-Week Report';
                     const reportName = ${JSON.stringify(reportName || (isMoM ? 'Month-on-Month Report' : 'Week-on-Week Report'))};
             
             const formatNumber = (num) => {
@@ -685,7 +686,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                         <i className="fas fa-chart-line text-blue-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
                                             <p className="text-xs"><strong>Kesimpulan:</strong> {spendGrowth >= 0 ? 'Peningkatan' : 'Penurunan'} performa {Math.abs(spendGrowth).toFixed(1)}% di semua metrik.</p>
-                                            <p className="text-xs mt-1">{resultsGrowth >= 0 ? 'Engagement' : 'Cost efficiency'} menjadi {resultsGrowth >= 0 ? 'driver utama' : 'area perbaikan'} ${isMoM ? 'bulan' : 'minggu'} ini.</p>
+                                            <p className="text-xs mt-1">{resultsGrowth >= 0 ? 'Engagement' : 'Cost efficiency'} menjadi {resultsGrowth >= 0 ? 'driver utama' : 'area perbaikan'} {isMoM ? 'bulan' : 'minggu'} ini.</p>
                                         </div>
                                     </div>
                                 </div>
