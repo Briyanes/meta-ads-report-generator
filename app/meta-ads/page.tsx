@@ -778,6 +778,44 @@ export default function MetaAdsPage() {
       {/* Spacer for fixed header */}
       <div className="header-spacer" style={{ height: '120px' }}></div>
 
+      {/* Back to Home Button - Fixed Position */}
+      <button
+        className="back-to-home-fixed"
+        onClick={() => router.push('/home')}
+        style={{
+          position: 'fixed',
+          top: '120px',
+          left: '24px',
+          zIndex: 999,
+          color: '#000000',
+          background: '#ECDC43',
+          border: 'none',
+          cursor: 'pointer',
+          fontSize: '14px',
+          fontWeight: '600',
+          padding: '10px 20px',
+          borderRadius: '8px',
+          transition: 'all 0.2s ease',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '6px',
+          boxShadow: '0 4px 6px -1px rgba(236, 220, 67, 0.3)'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = '#d4c539'
+          e.currentTarget.style.transform = 'translateY(-2px)'
+          e.currentTarget.style.boxShadow = '0 6px 8px -1px rgba(236, 220, 67, 0.4)'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = '#ECDC43'
+          e.currentTarget.style.transform = 'translateY(0)'
+          e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(236, 220, 67, 0.3)'
+        }}
+      >
+        <i className="bi bi-arrow-left"></i>
+        <span className="back-to-home-text">Back to Home</span>
+      </button>
+
       <main className="responsive-container" style={{
         maxWidth: '1400px',
         margin: '0 auto',
@@ -1419,41 +1457,9 @@ export default function MetaAdsPage() {
           flexWrap: 'wrap',
           gap: '16px',
           marginBottom: '24px',
-          justifyContent: 'space-between',
+          justifyContent: 'flex-end',
           alignItems: 'center'
-        }}>
-          <button
-            onClick={() => router.push('/home')}
-            style={{
-              color: '#000000',
-              background: '#ECDC43',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '16px',
-              fontWeight: '600',
-              padding: '14px 28px',
-              borderRadius: '10px',
-              transition: 'all 0.2s ease',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              boxShadow: '0 4px 6px -1px rgba(236, 220, 67, 0.3)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#d4c539'
-              e.currentTarget.style.transform = 'translateY(-2px)'
-              e.currentTarget.style.boxShadow = '0 6px 8px -1px rgba(236, 220, 67, 0.4)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#ECDC43'
-              e.currentTarget.style.transform = 'translateY(0)'
-              e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(236, 220, 67, 0.3)'
-            }}
-          >
-            <i className="bi bi-arrow-left"></i>
-            Back to Home
-          </button>
-          
+          }}>
           <div style={{
             display: 'flex',
             flexWrap: 'wrap',

@@ -616,6 +616,28 @@ a {
   .footer-hadona {
     margin-left: 4px !important;
   }
+  
+  .back-to-home-fixed {
+    display: inline-flex !important;
+    top: 120px !important;
+    left: 24px !important;
+  }
+}
+
+/* Hide back to home button on mobile */
+@media (max-width: 768px) {
+  .back-to-home-fixed {
+    display: none !important;
+  }
+}
+
+/* Adjust back to home button position for smaller desktop screens */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .back-to-home-fixed {
+    left: 16px !important;
+    padding: 8px 16px !important;
+    font-size: 13px !important;
+  }
 }
 
 .social-link {
