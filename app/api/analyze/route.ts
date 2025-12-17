@@ -47,6 +47,62 @@ export async function POST(request: NextRequest) {
     const parsedDataThisWeek = await parseCSV(fileThisWeek)
     const parsedDataLastWeek = await parseCSV(fileLastWeek)
     
+    // Helper to aggregate breakdown data by dimension (age, platform, etc.)
+    const aggregateBreakdownData = (data: any[], dimensionKey: string): any[] => {
+      if (data.length === 0) return []
+      
+      const parseNum = (val: any): number => {
+        if (!val && val !== 0) return 0
+        const str = String(val).replace(/,/g, '')
+        const num = parseFloat(str)
+        return isNaN(num) ? 0 : num
+      }
+      
+      // Group by dimension (age, platform, placement, etc.)
+      const grouped: Record<string, any[]> = {}
+      for (const row of data) {
+        const key = row[dimensionKey] || 'Unknown'
+        if (!grouped[key]) {
+          grouped[key] = []
+        }
+        grouped[key].push(row)
+      }
+      
+      // Aggregate each group
+      const aggregated: any[] = []
+      for (const [key, rows] of Object.entries(grouped)) {
+        if (rows.length === 0) continue
+        
+        const firstRow = rows[0]
+        const aggregatedRow: any = { [dimensionKey]: key }
+        
+        // Sum numeric fields, keep first value for non-numeric
+        for (const fieldKey of Object.keys(firstRow)) {
+          if (fieldKey === dimensionKey || 
+              fieldKey === 'Reporting starts' || 
+              fieldKey === 'Reporting ends' ||
+              fieldKey === 'Day' ||
+              fieldKey === 'Date') {
+            aggregatedRow[fieldKey] = firstRow[fieldKey]
+            continue
+          }
+          
+          const values = rows.map(r => r[fieldKey])
+          const numericValues = values.map(v => parseNum(v)).filter(v => !isNaN(v))
+          
+          if (numericValues.length > 0) {
+            aggregatedRow[fieldKey] = numericValues.reduce((sum, val) => sum + val, 0)
+          } else {
+            aggregatedRow[fieldKey] = values[0] || ''
+          }
+        }
+        
+        aggregated.push(aggregatedRow)
+      }
+      
+      return aggregated
+    }
+    
     // Parse breakdown files
     const breakdownDataThisWeek: Record<string, any> = {}
     const breakdownDataLastWeek: Record<string, any> = {}
@@ -60,7 +116,24 @@ export async function POST(request: NextRequest) {
                       file.name.includes('-placement') ? 'placement' :
                       file.name.includes('-objective') ? 'objective' :
                       file.name.includes('-ad-creative') || file.name.includes('-creative') ? 'ad-creative' : 'other'
-      breakdownDataThisWeek[fileType] = parsed.data
+      
+      // Aggregate breakdown data by dimension
+      let aggregatedData = parsed.data
+      if (fileType === 'age' && parsed.data.length > 0) {
+        aggregatedData = aggregateBreakdownData(parsed.data, 'Age')
+      } else if (fileType === 'gender' && parsed.data.length > 0) {
+        aggregatedData = aggregateBreakdownData(parsed.data, 'Gender')
+      } else if (fileType === 'region' && parsed.data.length > 0) {
+        aggregatedData = aggregateBreakdownData(parsed.data, 'Region')
+      } else if (fileType === 'platform' && parsed.data.length > 0) {
+        aggregatedData = aggregateBreakdownData(parsed.data, 'Platform')
+      } else if (fileType === 'placement' && parsed.data.length > 0) {
+        aggregatedData = aggregateBreakdownData(parsed.data, 'Placement')
+      } else if (fileType === 'objective' && parsed.data.length > 0) {
+        aggregatedData = aggregateBreakdownData(parsed.data, 'Objective')
+      }
+      
+      breakdownDataThisWeek[fileType] = aggregatedData
     }
     
     for (const file of breakdownLastWeek) {
@@ -72,7 +145,24 @@ export async function POST(request: NextRequest) {
                       file.name.includes('-placement') ? 'placement' :
                       file.name.includes('-objective') ? 'objective' :
                       file.name.includes('-ad-creative') || file.name.includes('-creative') ? 'ad-creative' : 'other'
-      breakdownDataLastWeek[fileType] = parsed.data
+      
+      // Aggregate breakdown data by dimension
+      let aggregatedData = parsed.data
+      if (fileType === 'age' && parsed.data.length > 0) {
+        aggregatedData = aggregateBreakdownData(parsed.data, 'Age')
+      } else if (fileType === 'gender' && parsed.data.length > 0) {
+        aggregatedData = aggregateBreakdownData(parsed.data, 'Gender')
+      } else if (fileType === 'region' && parsed.data.length > 0) {
+        aggregatedData = aggregateBreakdownData(parsed.data, 'Region')
+      } else if (fileType === 'platform' && parsed.data.length > 0) {
+        aggregatedData = aggregateBreakdownData(parsed.data, 'Platform')
+      } else if (fileType === 'placement' && parsed.data.length > 0) {
+        aggregatedData = aggregateBreakdownData(parsed.data, 'Placement')
+      } else if (fileType === 'objective' && parsed.data.length > 0) {
+        aggregatedData = aggregateBreakdownData(parsed.data, 'Objective')
+      }
+      
+      breakdownDataLastWeek[fileType] = aggregatedData
     }
     
     // Analyze data structure

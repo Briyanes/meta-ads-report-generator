@@ -829,8 +829,8 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
     const sortedAge = [...ageThisWeek]
       .filter((a: any) => a.Age && a.Age.trim())
       .sort((a: any, b: any) => {
-        const resultA = a['Purchases'] || a['Purchases with shared items'] || 0
-        const resultB = b['Purchases'] || b['Purchases with shared items'] || 0
+        const resultA = parseFloat(String(a['Purchases'] || a['Purchases with shared items'] || 0).replace(/,/g, '')) || 0
+        const resultB = parseFloat(String(b['Purchases'] || b['Purchases with shared items'] || 0).replace(/,/g, '')) || 0
         return resultB - resultA
       })
       .slice(0, 6)
@@ -846,7 +846,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedAge.map((item: any) => {
           const age = item.Age || 'Unknown'
-          const result = item['Purchases'] || item['Purchases with shared items'] || 0
+          const result = parseFloat(String(item['Purchases'] || item['Purchases with shared items'] || 0).replace(/,/g, '')) || 0
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${age}</span>
                                             <span className="font-bold text-xs">{formatNumber(${result})}</span>
@@ -859,8 +859,8 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedAge.map((item: any) => {
           const age = item.Age || 'Unknown'
-          const purchases = item['Purchases'] || item['Purchases with shared items'] || 0
-          const amountSpent = item['Amount spent'] || 0
+          const purchases = parseFloat(String(item['Purchases'] || item['Purchases with shared items'] || 0).replace(/,/g, '')) || 0
+          const amountSpent = parseFloat(String(item['Amount spent (IDR)'] || 0).replace(/,/g, '')) || 0
           const cpa = purchases > 0 ? (amountSpent / purchases) : 0
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${age}</span>
@@ -1066,8 +1066,8 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
     const sortedPlatform = [...platformThisWeek]
       .filter((p: any) => p.Platform && p.Platform.trim())
       .sort((a: any, b: any) => {
-        const purchasesA = a['Purchases'] || a['Purchases with shared items'] || 0
-        const purchasesB = b['Purchases'] || b['Purchases with shared items'] || 0
+        const purchasesA = parseFloat(String(a['Purchases'] || a['Purchases with shared items'] || 0).replace(/,/g, '')) || 0
+        const purchasesB = parseFloat(String(b['Purchases'] || b['Purchases with shared items'] || 0).replace(/,/g, '')) || 0
         return purchasesB - purchasesA
       })
     
@@ -1082,7 +1082,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedPlatform.map((item: any) => {
           const platform = item.Platform || 'Unknown'
-          const purchases = item['Purchases'] || item['Purchases with shared items'] || 0
+          const purchases = parseFloat(String(item['Purchases'] || item['Purchases with shared items'] || 0).replace(/,/g, '')) || 0
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${platform}</span>
                                             <span className="font-bold text-xs">{formatNumber(${purchases})}</span>
@@ -1095,8 +1095,8 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedPlatform.map((item: any) => {
           const platform = item.Platform || 'Unknown'
-          const purchases = item['Purchases'] || item['Purchases with shared items'] || 0
-          const amountSpent = item['Amount spent'] || 0
+          const purchases = parseFloat(String(item['Purchases'] || item['Purchases with shared items'] || 0).replace(/,/g, '')) || 0
+          const amountSpent = parseFloat(String(item['Amount spent (IDR)'] || 0).replace(/,/g, '')) || 0
           const cpa = purchases > 0 ? (amountSpent / purchases) : 0
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${platform}</span>
@@ -1137,8 +1137,8 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
     const sortedPlacement = [...placementThisWeek]
       .filter((p: any) => p.Placement && p.Placement.trim())
       .sort((a: any, b: any) => {
-        const purchasesA = a['Purchases'] || a['Purchases with shared items'] || 0
-        const purchasesB = b['Purchases'] || b['Purchases with shared items'] || 0
+        const purchasesA = parseFloat(String(a['Purchases'] || a['Purchases with shared items'] || 0).replace(/,/g, '')) || 0
+        const purchasesB = parseFloat(String(b['Purchases'] || b['Purchases with shared items'] || 0).replace(/,/g, '')) || 0
         return purchasesB - purchasesA
       })
       .slice(0, 5)
@@ -1154,7 +1154,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedPlacement.map((item: any) => {
           const placement = item.Placement || 'Unknown'
-          const purchases = item['Purchases'] || item['Purchases with shared items'] || 0
+          const purchases = parseFloat(String(item['Purchases'] || item['Purchases with shared items'] || 0).replace(/,/g, '')) || 0
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${placement}</span>
                                             <span className="font-bold text-xs">{formatNumber(${purchases})}</span>
@@ -1167,8 +1167,8 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedPlacement.map((item: any) => {
           const placement = item.Placement || 'Unknown'
-          const purchases = item['Purchases'] || item['Purchases with shared items'] || 0
-          const amountSpent = item['Amount spent'] || 0
+          const purchases = parseFloat(String(item['Purchases'] || item['Purchases with shared items'] || 0).replace(/,/g, '')) || 0
+          const amountSpent = parseFloat(String(item['Amount spent (IDR)'] || 0).replace(/,/g, '')) || 0
           const cpa = purchases > 0 ? (amountSpent / purchases) : 0
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${placement}</span>
@@ -1262,7 +1262,8 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
           const purchases = item['Purchases'] || item['Purchases with shared items'] || 0
           const instagramVisits = item['Instagram profile visits'] || 0
           const instagramFollows = item['Instagram follows'] || 0
-          const cpr = item['Cost per purchase'] || item['Cost per purchases with shared items'] || (item['Amount spent'] && purchases ? (item['Amount spent'] / purchases) : 0)
+          const amountSpent = item['Amount spent (IDR)'] || 0
+          const cpr = item['Cost per purchase'] || item['Cost per purchases with shared items'] || item['Cost /Purchase (IDR)'] || (amountSpent > 0 && purchases > 0 ? (amountSpent / purchases) : 0)
           const ctr = (item['CTR (link click-through rate)'] || item['CTR (all)'] || 0) * 100
           const impressions = item['Impressions'] || 0
           const outboundClicks = item['Outbound clicks'] || item['Clicks (all)'] || 0
