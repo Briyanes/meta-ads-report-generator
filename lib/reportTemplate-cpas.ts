@@ -377,7 +377,14 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         const checkAndRender = () => {
             if (typeof React !== 'undefined' && typeof ReactDOM !== 'undefined' && document.getElementById('root')) {
                 const App = () => {
-                    const reportData = ${JSON.stringify(data)};
+                    // Safely stringify data with error handling
+                    let reportData;
+                    try {
+                        reportData = ${JSON.stringify(data)};
+                    } catch (e) {
+                        console.error('Error stringifying reportData:', e);
+                        reportData = {};
+                    }
                     const isMoM = ${JSON.stringify(isMoM)};
                     const defaultReportName = isMoM ? 'Month-on-Month Report' : 'Week-on-Week Report';
                     const reportName = ${JSON.stringify(reportName || (isMoM ? 'Month-on-Month Report' : 'Week-on-Week Report'))};
@@ -403,17 +410,19 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                 return isNaN(n) ? '0%' : n.toFixed(2) + '%';
             };
             
-            const perf = reportData.performanceSummary || {};
-            const thisWeek = perf.thisWeek || {};
-            const lastWeek = perf.lastWeek || {};
-            const breakdown = reportData.breakdown || {};
+            // Safely extract data with multiple fallback levels
+            const perf = (reportData && reportData.performanceSummary) ? reportData.performanceSummary : {};
+            const thisWeek = (perf && perf.thisWeek) ? perf.thisWeek : {};
+            const lastWeek = (perf && perf.lastWeek) ? perf.lastWeek : {};
+            const breakdown = (reportData && reportData.breakdown) ? reportData.breakdown : {};
             
             // Debug: Log data structure
             console.log('DEBUG reportData:', reportData);
             console.log('DEBUG perf:', perf);
             console.log('DEBUG thisWeek:', thisWeek);
-            console.log('DEBUG thisWeek.reach:', thisWeek.reach);
-            console.log('DEBUG lastWeek.reach:', lastWeek.reach);
+            console.log('DEBUG thisWeek.reach:', thisWeek.reach, 'type:', typeof thisWeek.reach);
+            console.log('DEBUG lastWeek.reach:', lastWeek.reach, 'type:', typeof lastWeek.reach);
+            console.log('DEBUG formatNumber(thisWeek.reach):', formatNumber(thisWeek.reach || 0));
             
             const spendGrowth = ${spendGrowth.toFixed(2)};
             const resultsGrowth = ${resultsGrowth.toFixed(2)};
