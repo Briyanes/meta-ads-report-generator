@@ -327,14 +327,20 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       }
       
       // Recalculate CTR, CPC, CPM after aggregation
-      if (aggregated['Link clicks'] && aggregated['Impressions']) {
+      if (aggregated['Link clicks'] && aggregated['Impressions'] && aggregated['Impressions'] > 0) {
         aggregated['CTR (link click-through rate)'] = (aggregated['Link clicks'] / aggregated['Impressions']) * 100
+      } else {
+        aggregated['CTR (link click-through rate)'] = 0
       }
-      if (aggregated['Link clicks'] && aggregated['Amount spent (IDR)']) {
+      if (aggregated['Link clicks'] && aggregated['Amount spent (IDR)'] && aggregated['Link clicks'] > 0) {
         aggregated['CPC (cost per link click)'] = aggregated['Amount spent (IDR)'] / aggregated['Link clicks']
+      } else {
+        aggregated['CPC (cost per link click)'] = 0
       }
-      if (aggregated['Impressions'] && aggregated['Amount spent (IDR)']) {
+      if (aggregated['Impressions'] && aggregated['Amount spent (IDR)'] && aggregated['Impressions'] > 0) {
         aggregated['CPM (cost per 1,000 impressions)'] = (aggregated['Amount spent (IDR)'] / aggregated['Impressions']) * 1000
+      } else {
+        aggregated['CPM (cost per 1,000 impressions)'] = 0
       }
       if (aggregated['Reach'] && aggregated['Amount spent (IDR)']) {
         aggregated['Cost per 1,000 Accounts Center accounts reached'] = (aggregated['Amount spent (IDR)'] / aggregated['Reach']) * 1000
@@ -348,8 +354,10 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       if (aggregated['Purchases with shared items'] && aggregated['Amount spent (IDR)']) {
         aggregated['Cost /Purchase (IDR)'] = aggregated['Amount spent (IDR)'] / aggregated['Purchases with shared items']
       }
-      if (aggregated['Purchases with shared items'] && aggregated['Impressions']) {
+      if (aggregated['Impressions'] && aggregated['Reach'] && aggregated['Reach'] > 0) {
         aggregated['Frequency'] = aggregated['Impressions'] / aggregated['Reach']
+      } else {
+        aggregated['Frequency'] = 0
       }
       if (aggregated['Purchases conversion value for shared items only'] && aggregated['Amount spent (IDR)']) {
         aggregated['Purchase ROAS for shared items only'] = aggregated['Purchases conversion value for shared items only'] / aggregated['Amount spent (IDR)']
