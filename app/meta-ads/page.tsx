@@ -1254,7 +1254,7 @@ export default function MetaAdsPage() {
           e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
         }}>
           <h2 style={{
-            fontSize: '22px',
+            fontSize: '18px',
             fontWeight: 'bold',
             color: '#111827',
             marginBottom: '12px'
