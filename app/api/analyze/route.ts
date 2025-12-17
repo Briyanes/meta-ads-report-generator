@@ -353,30 +353,46 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       const frequencyKey = keys.find(k => k.toLowerCase() === 'frequency')
       
       // Recalculate CTR (CSV format is already percentage, so we calculate from aggregated values)
-      if (linkClicksKey && impressionsKey && aggregated[linkClicksKey] > 0 && aggregated[impressionsKey] > 0) {
-        if (ctrKey) {
-          aggregated[ctrKey] = (aggregated[linkClicksKey] / aggregated[impressionsKey]) * 100
+      if (linkClicksKey && impressionsKey && ctrKey) {
+        const linkClicks = parseNum(aggregated[linkClicksKey])
+        const impressions = parseNum(aggregated[impressionsKey])
+        if (linkClicks > 0 && impressions > 0) {
+          aggregated[ctrKey] = (linkClicks / impressions) * 100
+        } else {
+          aggregated[ctrKey] = 0
         }
       }
       
       // Recalculate CPC
-      if (linkClicksKey && amountSpentKey && aggregated[linkClicksKey] > 0 && aggregated[amountSpentKey] > 0) {
-        if (cpcKey) {
-          aggregated[cpcKey] = aggregated[amountSpentKey] / aggregated[linkClicksKey]
+      if (linkClicksKey && amountSpentKey && cpcKey) {
+        const linkClicks = parseNum(aggregated[linkClicksKey])
+        const amountSpent = parseNum(aggregated[amountSpentKey])
+        if (linkClicks > 0 && amountSpent > 0) {
+          aggregated[cpcKey] = amountSpent / linkClicks
+        } else {
+          aggregated[cpcKey] = 0
         }
       }
       
       // Recalculate CPM
-      if (impressionsKey && amountSpentKey && aggregated[impressionsKey] > 0 && aggregated[amountSpentKey] > 0) {
-        if (cpmKey) {
-          aggregated[cpmKey] = (aggregated[amountSpentKey] / aggregated[impressionsKey]) * 1000
+      if (impressionsKey && amountSpentKey && cpmKey) {
+        const impressions = parseNum(aggregated[impressionsKey])
+        const amountSpent = parseNum(aggregated[amountSpentKey])
+        if (impressions > 0 && amountSpent > 0) {
+          aggregated[cpmKey] = (amountSpent / impressions) * 1000
+        } else {
+          aggregated[cpmKey] = 0
         }
       }
       
       // Recalculate Frequency
-      if (impressionsKey && reachKey && aggregated[impressionsKey] > 0 && aggregated[reachKey] > 0) {
-        if (frequencyKey) {
-          aggregated[frequencyKey] = aggregated[impressionsKey] / aggregated[reachKey]
+      if (impressionsKey && reachKey && frequencyKey) {
+        const impressions = parseNum(aggregated[impressionsKey])
+        const reach = parseNum(aggregated[reachKey])
+        if (impressions > 0 && reach > 0) {
+          aggregated[frequencyKey] = impressions / reach
+        } else {
+          aggregated[frequencyKey] = 0
         }
       }
       
