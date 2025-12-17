@@ -319,12 +319,24 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         }
         
         const values = data.map(row => row[key])
-        const numericValues = values.map(v => parseNum(v)).filter(v => !isNaN(v))
+        const numericValues = values.map(v => parseNum(v)).filter(v => !isNaN(v) && v !== null && v !== undefined)
+        
+        // Debug logging for Reach field
+        if (key === 'Reach' || key.toLowerCase() === 'reach') {
+          console.log(`Aggregating Reach field:`)
+          console.log(`  - Total rows: ${data.length}`)
+          console.log(`  - Values: ${values.slice(0, 5).join(', ')}...`)
+          console.log(`  - Numeric values: ${numericValues.slice(0, 5).join(', ')}...`)
+          console.log(`  - Should sum: ${shouldSumField(key)}`)
+        }
         
         if (numericValues.length > 0) {
           // Sum numeric values for sumFields
           if (shouldSumField(key)) {
             aggregated[key] = numericValues.reduce((sum, val) => sum + val, 0)
+            if (key === 'Reach' || key.toLowerCase() === 'reach') {
+              console.log(`  - Aggregated Reach: ${aggregated[key]}`)
+            }
           } else {
             // For other numeric fields, try to sum, but if all values are same, keep first
             const allSame = numericValues.length > 0 && numericValues.every(v => v === numericValues[0])
@@ -335,6 +347,9 @@ Return the analysis as structured JSON data that can be used to generate the HTM
           // But if it's a numeric field that should be summed, use 0 instead of empty string
           if (shouldSumField(key)) {
             aggregated[key] = 0
+            if (key === 'Reach' || key.toLowerCase() === 'reach') {
+              console.log(`  - Reach set to 0 (no numeric values found)`)
+            }
           } else {
             aggregated[key] = values[0] || 0
           }
@@ -576,6 +591,15 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     
     // Build performance summary with all fields
     const buildPerformanceData = (data: any, results: number, cpr: number) => {
+      // Debug: Log data being processed
+      const reachValue = getFieldValue(data, 'Reach')
+      console.log('buildPerformanceData - Reach extraction:', {
+        'data keys': Object.keys(data),
+        'reach field found': data['Reach'],
+        'getFieldValue result': reachValue,
+        'parsed value': parseNum(reachValue)
+      })
+      
       const base = {
         amountSpent: parseNum(getFieldValue(data, 'Amount spent (IDR)')),
         impressions: parseNum(getFieldValue(data, 'Impressions')),
@@ -592,6 +616,13 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         reach: parseNum(getFieldValue(data, 'Reach')),
         cpr: cpr
       }
+      
+      console.log('buildPerformanceData - base values:', {
+        reach: base.reach,
+        linkClicks: base.linkClicks,
+        frequency: base.frequency,
+        cpc: base.cpc
+      })
       
       // CTWA fields
       if (objectiveType === 'ctwa') {
