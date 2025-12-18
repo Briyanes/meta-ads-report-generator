@@ -529,8 +529,8 @@ a {
   }
   
   .demo-button-container {
-    padding: 8px 12px !important;
-    margin-top: -8px !important;
+    padding: 4px 12px !important;
+    margin-top: -12px !important;
   }
   
   .responsive-faq > div {
@@ -863,6 +863,11 @@ a {
   
   .demo-gradient-overlay {
     display: none !important;
+  }
+  
+  .demo-button-container {
+    padding: 2px 12px !important;
+    margin-top: -16px !important;
   }
   
   .responsive-platform-title {
