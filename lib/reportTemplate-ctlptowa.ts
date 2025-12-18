@@ -24,7 +24,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   // Determine objective label
   const objectiveLabels: Record<string, string> = {
     'ctwa': 'CTWA (Click to WhatsApp)',
-    'cpas': 'CPAS (Cost Per Action/Sale)',
+    'cpas': 'CPAS (Collaborative Performance Advertising Solution)',
     'ctlptowa': 'CTLP to WA (Click to Landing Page to WhatsApp)'
   }
   const objectiveLabel = objectiveLabels[objectiveType] || 'CTLP to WA (Click to Landing Page to WhatsApp)'

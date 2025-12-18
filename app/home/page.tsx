@@ -1816,7 +1816,7 @@ export default function HomePage() {
               },
               {
                 q: 'What advertising objectives are supported?',
-                a: 'We currently support CTWA (Click to WhatsApp), CPAS (Cost Per Action/Sale), and CTLP to WA (Click to Landing Page to WhatsApp). More objectives coming soon!'
+                a: 'We currently support CTWA (Click to WhatsApp), CPAS (Collaborative Performance Advertising Solution), and CTLP to WA (Click to Landing Page to WhatsApp). More objectives coming soon!'
               },
               {
                 q: 'Can I customize the report format?',
