@@ -1040,7 +1040,36 @@ a {
   }
 }
 
+/* Mobile styles for Tabel Ringkasan Metrik */
 @media (max-width: 768px) {
+  /* Reduce padding in slides for mobile */
+  .bg-white.p-8 {
+    padding: 16px !important;
+  }
+  
+  /* Make table more compact on mobile */
+  .overflow-x-auto table {
+    font-size: 10px !important;
+  }
+  
+  .overflow-x-auto table th,
+  .overflow-x-auto table td {
+    padding: 6px 4px !important;
+    font-size: 10px !important;
+  }
+  
+  /* Reduce heading size on mobile */
+  .text-2xl {
+    font-size: 18px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  /* Reduce max-width container padding on mobile */
+  .max-w-6xl {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+  
   .responsive-container > div:has(button) {
     flex-direction: column !important;
     gap: 12px !important;
