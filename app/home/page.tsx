@@ -517,7 +517,7 @@ export default function HomePage() {
           backgroundColor: '#ffffff',
           borderRadius: '12px',
           boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-          padding: '48px',
+          padding: '28px',
           border: '1px solid #e5e7eb',
           marginBottom: '48px'
         }}>
@@ -820,7 +820,7 @@ export default function HomePage() {
           backgroundColor: '#ffffff',
           borderRadius: '12px',
           boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-          padding: '48px',
+          padding: '28px',
           border: '1px solid #e5e7eb',
           marginBottom: '48px'
         }}>
@@ -1016,7 +1016,7 @@ export default function HomePage() {
           backgroundColor: '#ffffff',
           borderRadius: '12px',
           boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-          padding: '48px',
+          padding: '28px',
           border: '1px solid #e5e7eb',
           marginBottom: '48px'
         }}>
@@ -1286,7 +1286,7 @@ export default function HomePage() {
           backgroundColor: '#ffffff',
           borderRadius: '12px',
           boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-          padding: '48px',
+          padding: '28px',
           border: '1px solid #e5e7eb',
           marginBottom: '48px'
         }}>
@@ -1803,7 +1803,7 @@ export default function HomePage() {
           backgroundColor: '#ffffff',
           borderRadius: '12px',
           boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-          padding: '48px',
+          padding: '28px',
           border: '1px solid #e5e7eb',
           marginBottom: '48px'
         }}>
