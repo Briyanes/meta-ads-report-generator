@@ -172,17 +172,16 @@ export default function HomePage() {
           borderRadius: '16px',
           border: '1px solid #e0f2fe'
         }}>
-          <h1 style={{
-            fontSize: '72px',
+          <h1 className="hero-title" style={{
+            fontSize: '56px',
             fontWeight: 'bold',
             color: '#111827',
             marginBottom: '24px',
             margin: '0 0 24px 0',
-            lineHeight: '1.3'
+            lineHeight: '1.2'
           }}>
-            <span style={{ display: 'block', marginBottom: '12px' }}>Generate Professional</span>
-            <span style={{ color: '#2563eb', display: 'block', marginBottom: '12px' }}>Advertising Reports in</span>
-            <span style={{ display: 'block' }}>Minutes</span>
+            Generate Professional<br />
+            <span style={{ color: '#2563eb' }}> Advertising Reports</span> in Minutes
           </h1>
           <p style={{
             fontSize: '20px',
