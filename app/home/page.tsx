@@ -1384,7 +1384,8 @@ export default function HomePage() {
                 }}></div>
               </div>
               <div className="demo-button-container" style={{
-                padding: '12px 16px',
+                marginTop: '-8px',
+                padding: '18px 12px',
                 textAlign: 'center'
               }}>
                 <a
@@ -1495,7 +1496,8 @@ export default function HomePage() {
                 }}></div>
               </div>
               <div className="demo-button-container" style={{
-                padding: '12px 16px',
+                marginTop: '-8px',
+                padding: '18px 12px',
                 textAlign: 'center'
               }}>
                 <a
@@ -1610,7 +1612,8 @@ export default function HomePage() {
                 }}></div>
               </div>
               <div className="demo-button-container" style={{
-                padding: '12px 16px',
+                marginTop: '-8px',
+                padding: '18px 12px',
                 textAlign: 'center'
               }}>
                 <a
