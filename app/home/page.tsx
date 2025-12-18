@@ -1392,27 +1392,33 @@ export default function HomePage() {
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '8px',
-                    padding: '8px 16px',
-                    backgroundColor: '#2563eb',
+                    gap: '10px',
+                    padding: '12px 24px',
+                    background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #1e3a8a 100%)',
                     color: '#ffffff',
-                    borderRadius: '8px',
+                    borderRadius: '12px',
                     textDecoration: 'none',
-                    fontSize: '14px',
+                    fontSize: '15px',
                     fontWeight: '600',
-                    transition: 'all 0.2s ease'
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    boxShadow: '0 4px 14px 0 rgba(37, 99, 235, 0.39)',
+                    position: 'relative',
+                    overflow: 'hidden'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#1e40af'
-                    e.currentTarget.style.transform = 'translateY(-2px)'
+                    e.currentTarget.style.transform = 'translateY(-3px) scale(1.02)'
+                    e.currentTarget.style.boxShadow = '0 8px 25px 0 rgba(37, 99, 235, 0.5)'
+                    e.currentTarget.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1e40af 100%)'
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#2563eb'
-                    e.currentTarget.style.transform = 'translateY(0)'
+                    e.currentTarget.style.transform = 'translateY(0) scale(1)'
+                    e.currentTarget.style.boxShadow = '0 4px 14px 0 rgba(37, 99, 235, 0.39)'
+                    e.currentTarget.style.background = 'linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #1e3a8a 100%)'
                   }}
                 >
-                  <i className="bi bi-eye"></i>
-                  View Full Report
+                  <i className="bi bi-file-earmark-pdf-fill" style={{ fontSize: '18px' }}></i>
+                  <span>View Full Report</span>
+                  <i className="bi bi-arrow-right" style={{ fontSize: '14px', transition: 'transform 0.3s ease' }}></i>
                 </a>
               </div>
             </div>
@@ -1495,27 +1501,37 @@ export default function HomePage() {
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '8px',
-                    padding: '8px 16px',
-                    backgroundColor: '#2563eb',
+                    gap: '10px',
+                    padding: '12px 24px',
+                    background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #1e3a8a 100%)',
                     color: '#ffffff',
-                    borderRadius: '8px',
+                    borderRadius: '12px',
                     textDecoration: 'none',
-                    fontSize: '14px',
+                    fontSize: '15px',
                     fontWeight: '600',
-                    transition: 'all 0.2s ease'
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    boxShadow: '0 4px 14px 0 rgba(37, 99, 235, 0.39)',
+                    position: 'relative',
+                    overflow: 'hidden'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#1e40af'
-                    e.currentTarget.style.transform = 'translateY(-2px)'
+                    e.currentTarget.style.transform = 'translateY(-3px) scale(1.02)'
+                    e.currentTarget.style.boxShadow = '0 8px 25px 0 rgba(37, 99, 235, 0.5)'
+                    e.currentTarget.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1e40af 100%)'
+                    const arrow = e.currentTarget.querySelector('.bi-arrow-right') as HTMLElement
+                    if (arrow) arrow.style.transform = 'translateX(4px)'
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#2563eb'
-                    e.currentTarget.style.transform = 'translateY(0)'
+                    e.currentTarget.style.transform = 'translateY(0) scale(1)'
+                    e.currentTarget.style.boxShadow = '0 4px 14px 0 rgba(37, 99, 235, 0.39)'
+                    e.currentTarget.style.background = 'linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #1e3a8a 100%)'
+                    const arrow = e.currentTarget.querySelector('.bi-arrow-right') as HTMLElement
+                    if (arrow) arrow.style.transform = 'translateX(0)'
                   }}
                 >
-                  <i className="bi bi-eye"></i>
-                  View Full Report
+                  <i className="bi bi-file-earmark-pdf-fill" style={{ fontSize: '18px' }}></i>
+                  <span>View Full Report</span>
+                  <i className="bi bi-arrow-right" style={{ fontSize: '14px', transition: 'transform 0.3s ease' }}></i>
                 </a>
               </div>
             </div>
@@ -1598,27 +1614,37 @@ export default function HomePage() {
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '8px',
-                    padding: '8px 16px',
-                    backgroundColor: '#2563eb',
+                    gap: '10px',
+                    padding: '12px 24px',
+                    background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #1e3a8a 100%)',
                     color: '#ffffff',
-                    borderRadius: '8px',
+                    borderRadius: '12px',
                     textDecoration: 'none',
-                    fontSize: '14px',
+                    fontSize: '15px',
                     fontWeight: '600',
-                    transition: 'all 0.2s ease'
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    boxShadow: '0 4px 14px 0 rgba(37, 99, 235, 0.39)',
+                    position: 'relative',
+                    overflow: 'hidden'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#1e40af'
-                    e.currentTarget.style.transform = 'translateY(-2px)'
+                    e.currentTarget.style.transform = 'translateY(-3px) scale(1.02)'
+                    e.currentTarget.style.boxShadow = '0 8px 25px 0 rgba(37, 99, 235, 0.5)'
+                    e.currentTarget.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1e40af 100%)'
+                    const arrow = e.currentTarget.querySelector('.bi-arrow-right') as HTMLElement
+                    if (arrow) arrow.style.transform = 'translateX(4px)'
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#2563eb'
-                    e.currentTarget.style.transform = 'translateY(0)'
+                    e.currentTarget.style.transform = 'translateY(0) scale(1)'
+                    e.currentTarget.style.boxShadow = '0 4px 14px 0 rgba(37, 99, 235, 0.39)'
+                    e.currentTarget.style.background = 'linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #1e3a8a 100%)'
+                    const arrow = e.currentTarget.querySelector('.bi-arrow-right') as HTMLElement
+                    if (arrow) arrow.style.transform = 'translateX(0)'
                   }}
                 >
-                  <i className="bi bi-eye"></i>
-                  View Full Report
+                  <i className="bi bi-file-earmark-pdf-fill" style={{ fontSize: '18px' }}></i>
+                  <span>View Full Report</span>
+                  <i className="bi bi-arrow-right" style={{ fontSize: '14px', transition: 'transform 0.3s ease' }}></i>
                 </a>
               </div>
             </div>
