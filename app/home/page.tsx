@@ -223,7 +223,7 @@ export default function HomePage() {
                 e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(37, 99, 235, 0.3)'
               }}
             >
-              <i className="bi bi-rocket-takeoff mr-2"></i>Start Generating Reports
+              <i className="bi bi-rocket-takeoff" style={{ marginRight: '8px' }}></i>Start Generating Reports
             </button>
             <button
               onClick={() => {
@@ -250,7 +250,7 @@ export default function HomePage() {
                 e.currentTarget.style.transform = 'translateY(0)'
               }}
             >
-              <i className="bi bi-info-circle mr-2"></i>Learn More
+              <i className="bi bi-info-circle" style={{ marginRight: '8px' }}></i>Learn More
             </button>
           </div>
         </div>
