@@ -69,7 +69,6 @@ export default function HomePage() {
   }
 
   return (
-    <>
     <div style={{
       minHeight: '100vh',
       background: 'linear-gradient(to bottom right, #f9fafb, #ffffff, #f3f4f6)',
@@ -2330,6 +2329,5 @@ export default function HomePage() {
         </div>
       </footer>
     </div>
-    </>
   )
 }
