@@ -1352,7 +1352,7 @@ export default function HomePage() {
                 </p>
               </div>
               <div className="demo-preview-container" style={{
-                width: '266px',
+                width: '100%',
                 height: '365px',
                 overflow: 'hidden',
                 position: 'relative',
@@ -1463,7 +1463,7 @@ export default function HomePage() {
                 </p>
               </div>
               <div className="demo-preview-container" style={{
-                width: '266px',
+                width: '100%',
                 height: '365px',
                 overflow: 'hidden',
                 position: 'relative',
@@ -1578,7 +1578,7 @@ export default function HomePage() {
                 </p>
               </div>
               <div className="demo-preview-container" style={{
-                width: '266px',
+                width: '100%',
                 height: '365px',
                 overflow: 'hidden',
                 position: 'relative',
