@@ -1282,7 +1282,7 @@ export default function HomePage() {
         </div>
 
         {/* Demo Preview Section */}
-        <div className="demo-section-wrapper" style={{
+        <div style={{
           backgroundColor: '#ffffff',
           borderRadius: '12px',
           boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
@@ -1290,31 +1290,30 @@ export default function HomePage() {
           border: '1px solid #e5e7eb',
           marginBottom: '48px'
         }}>
-          <div className="demo-section-container">
-            <h3 className="demo-section-title" style={{
-              fontSize: '28px',
-              fontWeight: 'bold',
-              color: '#111827',
-              marginBottom: '8px',
-              textAlign: 'center',
-              margin: '0 0 8px 0'
-            }}>
-              See It In Action
-            </h3>
-            <p className="demo-section-subtitle" style={{
-              fontSize: '16px',
-              color: '#6b7280',
-              textAlign: 'center',
-              marginBottom: '40px',
-              margin: '0 0 40px 0'
-            }}>
-              Preview sample reports for each advertising objective
-            </p>
-            <div className="responsive-demo" style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: '24px'
-            }}>
+          <h3 style={{
+            fontSize: '28px',
+            fontWeight: 'bold',
+            color: '#111827',
+            marginBottom: '8px',
+            textAlign: 'center',
+            margin: '0 0 8px 0'
+          }}>
+            See It In Action
+          </h3>
+          <p style={{
+            fontSize: '16px',
+            color: '#6b7280',
+            textAlign: 'center',
+            marginBottom: '40px',
+            margin: '0 0 40px 0'
+          }}>
+            Preview sample reports for each advertising objective
+          </p>
+          <div className="responsive-demo" style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '24px'
+          }}>
             {/* CTWA Demo */}
             <div style={{
               backgroundColor: '#f9fafb',
@@ -1323,7 +1322,7 @@ export default function HomePage() {
               overflow: 'hidden',
               transition: 'all 0.3s ease'
             }}>
-              <div className="demo-card-header" style={{
+              <div style={{
                 padding: '20px',
                 backgroundColor: '#eff6ff',
                 borderBottom: '1px solid #e5e7eb'
@@ -1335,7 +1334,7 @@ export default function HomePage() {
                   marginBottom: '8px'
                 }}>
                   <i className="bi bi-whatsapp" style={{ fontSize: '24px', color: '#25d366' }}></i>
-                  <h4 className="demo-card-title" style={{
+                  <h4 style={{
                     fontWeight: '600',
                     color: '#111827',
                     margin: 0,
@@ -1344,7 +1343,7 @@ export default function HomePage() {
                     CTWA Report
                   </h4>
                 </div>
-                <p className="demo-card-subtitle" style={{
+                <p style={{
                   fontSize: '13px',
                   color: '#6b7280',
                   margin: 0
@@ -1390,7 +1389,6 @@ export default function HomePage() {
                   href="/demo/report-ctwa.pdf"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="demo-button"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -1427,7 +1425,7 @@ export default function HomePage() {
               overflow: 'hidden',
               transition: 'all 0.3s ease'
             }}>
-              <div className="demo-card-header" style={{
+              <div style={{
                 padding: '20px',
                 backgroundColor: '#f0fdf4',
                 borderBottom: '1px solid #e5e7eb'
@@ -1439,7 +1437,7 @@ export default function HomePage() {
                   marginBottom: '8px'
                 }}>
                   <i className="bi bi-link-45deg" style={{ fontSize: '24px', color: '#2563eb' }}></i>
-                  <h4 className="demo-card-title" style={{
+                  <h4 style={{
                     fontWeight: '600',
                     color: '#111827',
                     margin: 0,
@@ -1448,7 +1446,7 @@ export default function HomePage() {
                     CTLP to WA Report
                   </h4>
                 </div>
-                <p className="demo-card-subtitle" style={{
+                <p style={{
                   fontSize: '13px',
                   color: '#6b7280',
                   margin: 0
@@ -1494,7 +1492,6 @@ export default function HomePage() {
                   href="/demo/report-ctlptowa.pdf"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="demo-button"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -1531,7 +1528,7 @@ export default function HomePage() {
               overflow: 'hidden',
               transition: 'all 0.3s ease'
             }}>
-              <div className="demo-card-header" style={{
+              <div style={{
                 padding: '20px',
                 backgroundColor: '#fef3c7',
                 borderBottom: '1px solid #e5e7eb'
@@ -1543,7 +1540,7 @@ export default function HomePage() {
                   marginBottom: '8px'
                 }}>
                   <i className="bi bi-graph-up-arrow" style={{ fontSize: '24px', color: '#10b981' }}></i>
-                  <h4 className="demo-card-title" style={{
+                  <h4 style={{
                     fontWeight: '600',
                     color: '#111827',
                     margin: 0,
@@ -1552,7 +1549,7 @@ export default function HomePage() {
                     CPAS Report
                   </h4>
                 </div>
-                <p className="demo-card-subtitle" style={{
+                <p style={{
                   fontSize: '13px',
                   color: '#6b7280',
                   margin: 0
@@ -1598,7 +1595,6 @@ export default function HomePage() {
                   href="/demo/report-cpas.pdf"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="demo-button"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
