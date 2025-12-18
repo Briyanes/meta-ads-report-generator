@@ -386,7 +386,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         // Ensure React and ReactDOM are loaded before rendering
         const checkAndRender = () => {
             if (typeof React !== 'undefined' && typeof ReactDOM !== 'undefined' && document.getElementById('root')) {
-                const App = () => {
+        const App = () => {
                     // Safely stringify data with error handling
                     let reportData;
                     try {
@@ -449,6 +449,28 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             function calculateGrowth(current, previous) {
                 if (!previous || previous === 0) return 0;
                 return ((current - previous) / previous) * 100;
+            }
+            
+            // Helper function to calculate cost per metric with fallback
+            function getCostPerMetric(week, metric, valueKey) {
+                const costKey = 'costPer' + metric;
+                if (week[costKey]) return week[costKey];
+                if (week[valueKey] && week.amountSpent) return week.amountSpent / week[valueKey];
+                return 0;
+            }
+            
+            // Helper function to get ROAS with fallback
+            function getROAS(week) {
+                if (week.purchaseROAS) return week.purchaseROAS;
+                if (week.purchasesConversionValue && week.amountSpent) return week.purchasesConversionValue / week.amountSpent;
+                return 0;
+            }
+            
+            // Helper function to get AOV with fallback
+            function getAOV(week) {
+                if (week.aov) return week.aov;
+                if (week.purchases && week.purchasesConversionValue) return week.purchasesConversionValue / week.purchases;
+                return 0;
             }
             
             // Helper function to get trend icon JSX as string (for use in template strings)
@@ -651,10 +673,10 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                         </tr>
                                         <tr className="bg-gray-50">
                                             <td className="border border-gray-300 p-2 text-xs">Cost per content view</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((lastWeek.costPerCV || ((lastWeek.contentViews && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.contentViews) : 0)))}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((thisWeek.costPerCV || ((thisWeek.contentViews && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.contentViews) : 0)))}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(((thisWeek.costPerCV || ((thisWeek.contentViews && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.contentViews) : 0)) - (lastWeek.costPerCV || ((lastWeek.contentViews && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.contentViews) : 0))))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${((thisWeek.costPerCV || ((thisWeek.contentViews && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.contentViews) : 0)) <= (lastWeek.costPerCV || ((lastWeek.contentViews && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.contentViews) : 0)) ? 'text-green-500' : 'text-red-500'}\`}>{((thisWeek.costPerCV || ((thisWeek.contentViews && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.contentViews) : 0)) <= (lastWeek.costPerCV || ((lastWeek.contentViews && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.contentViews) : 0)) ? '' : '+')}{formatPercent(calculateGrowth((thisWeek.costPerCV || ((thisWeek.contentViews && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.contentViews) : 0)), (lastWeek.costPerCV || ((lastWeek.contentViews && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.contentViews) : 0))))}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(lastWeek, 'CV', 'contentViews'))}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(thisWeek, 'CV', 'contentViews'))}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(thisWeek, 'CV', 'contentViews') - getCostPerMetric(lastWeek, 'CV', 'contentViews'))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(getCostPerMetric(thisWeek, 'CV', 'contentViews') <= getCostPerMetric(lastWeek, 'CV', 'contentViews') ? 'text-green-500' : 'text-red-500')}\`}>{\`\${(getCostPerMetric(thisWeek, 'CV', 'contentViews') <= getCostPerMetric(lastWeek, 'CV', 'contentViews') ? '' : '+')}\${formatPercent(calculateGrowth(getCostPerMetric(thisWeek, 'CV', 'contentViews'), getCostPerMetric(lastWeek, 'CV', 'contentViews')))}\`}</td>
                                         </tr>
                                         <tr>
                                             <td className="border border-gray-300 p-2 text-xs">Adds to cart with shared items</td>
@@ -665,10 +687,10 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                         </tr>
                                         <tr className="bg-gray-50">
                                             <td className="border border-gray-300 p-2 text-xs">Cost per add to cart with shared items</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((lastWeek.costPerATC || ((lastWeek.addsToCart && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.addsToCart) : 0)))}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((thisWeek.costPerATC || ((thisWeek.addsToCart && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.addsToCart) : 0)))}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(((thisWeek.costPerATC || ((thisWeek.addsToCart && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.addsToCart) : 0)) - (lastWeek.costPerATC || ((lastWeek.addsToCart && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.addsToCart) : 0))))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${((thisWeek.costPerATC || ((thisWeek.addsToCart && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.addsToCart) : 0)) <= (lastWeek.costPerATC || ((lastWeek.addsToCart && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.addsToCart) : 0)) ? 'text-green-500' : 'text-red-500'}\`}>{((thisWeek.costPerATC || ((thisWeek.addsToCart && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.addsToCart) : 0)) <= (lastWeek.costPerATC || ((lastWeek.addsToCart && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.addsToCart) : 0)) ? '' : '+')}{formatPercent(calculateGrowth((thisWeek.costPerATC || ((thisWeek.addsToCart && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.addsToCart) : 0)), (lastWeek.costPerATC || ((lastWeek.addsToCart && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.addsToCart) : 0))))}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(lastWeek, 'ATC', 'addsToCart'))}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(thisWeek, 'ATC', 'addsToCart'))}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(thisWeek, 'ATC', 'addsToCart') - getCostPerMetric(lastWeek, 'ATC', 'addsToCart'))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(getCostPerMetric(thisWeek, 'ATC', 'addsToCart') <= getCostPerMetric(lastWeek, 'ATC', 'addsToCart') ? 'text-green-500' : 'text-red-500')}\`}>{\`\${(getCostPerMetric(thisWeek, 'ATC', 'addsToCart') <= getCostPerMetric(lastWeek, 'ATC', 'addsToCart') ? '' : '+')}\${formatPercent(calculateGrowth(getCostPerMetric(thisWeek, 'ATC', 'addsToCart'), getCostPerMetric(lastWeek, 'ATC', 'addsToCart')))}\`}</td>
                                         </tr>
                                         <tr>
                                             <td className="border border-gray-300 p-2 text-xs">ATC conversion value (shared only)</td>
@@ -686,10 +708,10 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                         </tr>
                                         <tr>
                                             <td className="border border-gray-300 p-2 text-xs">Cost per purchases with shared items</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((lastWeek.costPerPurchase || ((lastWeek.purchases && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.purchases) : 0)))}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((thisWeek.costPerPurchase || ((thisWeek.purchases && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.purchases) : 0)))}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(((thisWeek.costPerPurchase || ((thisWeek.purchases && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.purchases) : 0)) - (lastWeek.costPerPurchase || ((lastWeek.purchases && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.purchases) : 0))))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${((thisWeek.costPerPurchase || ((thisWeek.purchases && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.purchases) : 0)) <= (lastWeek.costPerPurchase || ((lastWeek.purchases && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.purchases) : 0)) ? 'text-green-500' : 'text-red-500'}\`}>{((thisWeek.costPerPurchase || ((thisWeek.purchases && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.purchases) : 0)) <= (lastWeek.costPerPurchase || ((lastWeek.purchases && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.purchases) : 0)) ? '' : '+')}{formatPercent(calculateGrowth((thisWeek.costPerPurchase || ((thisWeek.purchases && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.purchases) : 0)), (lastWeek.costPerPurchase || ((lastWeek.purchases && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.purchases) : 0))))}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(lastWeek, 'Purchase', 'purchases'))}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(thisWeek, 'Purchase', 'purchases'))}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(thisWeek, 'Purchase', 'purchases') - getCostPerMetric(lastWeek, 'Purchase', 'purchases'))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(getCostPerMetric(thisWeek, 'Purchase', 'purchases') <= getCostPerMetric(lastWeek, 'Purchase', 'purchases') ? 'text-green-500' : 'text-red-500')}\`}>{\`\${(getCostPerMetric(thisWeek, 'Purchase', 'purchases') <= getCostPerMetric(lastWeek, 'Purchase', 'purchases') ? '' : '+')}\${formatPercent(calculateGrowth(getCostPerMetric(thisWeek, 'Purchase', 'purchases'), getCostPerMetric(lastWeek, 'Purchase', 'purchases')))}\`}</td>
                                         </tr>
                                         <tr className="bg-gray-50">
                                             <td className="border border-gray-300 p-2 text-xs">Purchases conversion value for shared items only</td>
@@ -707,17 +729,17 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                         </tr>
                                         <tr className="bg-gray-50">
                                             <td className="border border-gray-300 p-2 text-xs">Purchase ROAS (return on ad spend)</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((lastWeek.purchaseROAS || ((lastWeek.purchasesConversionValue && lastWeek.amountSpent) ? (lastWeek.purchasesConversionValue / lastWeek.amountSpent) : 0)))}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((thisWeek.purchaseROAS || ((thisWeek.purchasesConversionValue && thisWeek.amountSpent) ? (thisWeek.purchasesConversionValue / thisWeek.amountSpent) : 0)))}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(((thisWeek.purchaseROAS || ((thisWeek.purchasesConversionValue && thisWeek.amountSpent) ? (thisWeek.purchasesConversionValue / thisWeek.amountSpent) : 0)) - (lastWeek.purchaseROAS || ((lastWeek.purchasesConversionValue && lastWeek.amountSpent) ? (lastWeek.purchasesConversionValue / lastWeek.amountSpent) : 0))))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${((thisWeek.purchaseROAS || ((thisWeek.purchasesConversionValue && thisWeek.amountSpent) ? (thisWeek.purchasesConversionValue / thisWeek.amountSpent) : 0)) >= (lastWeek.purchaseROAS || ((lastWeek.purchasesConversionValue && lastWeek.amountSpent) ? (lastWeek.purchasesConversionValue / lastWeek.amountSpent) : 0)) ? 'text-green-500' : 'text-red-500'}\`}>{((thisWeek.purchaseROAS || ((thisWeek.purchasesConversionValue && thisWeek.amountSpent) ? (thisWeek.purchasesConversionValue / thisWeek.amountSpent) : 0)) >= (lastWeek.purchaseROAS || ((lastWeek.purchasesConversionValue && lastWeek.amountSpent) ? (lastWeek.purchasesConversionValue / lastWeek.amountSpent) : 0)) ? '+' : '')}{formatPercent(calculateGrowth((thisWeek.purchaseROAS || ((thisWeek.purchasesConversionValue && thisWeek.amountSpent) ? (thisWeek.purchasesConversionValue / thisWeek.amountSpent) : 0)), (lastWeek.purchaseROAS || ((lastWeek.purchasesConversionValue && lastWeek.amountSpent) ? (lastWeek.purchasesConversionValue / lastWeek.amountSpent) : 0))))}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(getROAS(lastWeek))}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(getROAS(thisWeek))}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(getROAS(thisWeek) - getROAS(lastWeek))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(getROAS(thisWeek) >= getROAS(lastWeek) ? 'text-green-500' : 'text-red-500')}\`}>{\`\${(getROAS(thisWeek) >= getROAS(lastWeek) ? '+' : '')}\${formatPercent(calculateGrowth(getROAS(thisWeek), getROAS(lastWeek)))}\`}</td>
                                         </tr>
                                         <tr>
                                             <td className="border border-gray-300 p-2 text-xs">AOV (Average Order Value)</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((lastWeek.aov || ((lastWeek.purchases && lastWeek.purchasesConversionValue) ? (lastWeek.purchasesConversionValue / lastWeek.purchases) : 0)))}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((thisWeek.aov || ((thisWeek.purchases && thisWeek.purchasesConversionValue) ? (thisWeek.purchasesConversionValue / thisWeek.purchases) : 0)))}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(((thisWeek.aov || ((thisWeek.purchases && thisWeek.purchasesConversionValue) ? (thisWeek.purchasesConversionValue / thisWeek.purchases) : 0)) - (lastWeek.aov || ((lastWeek.purchases && lastWeek.purchasesConversionValue) ? (lastWeek.purchasesConversionValue / lastWeek.purchases) : 0))))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${((thisWeek.aov || ((thisWeek.purchases && thisWeek.purchasesConversionValue) ? (thisWeek.purchasesConversionValue / thisWeek.purchases) : 0)) >= (lastWeek.aov || ((lastWeek.purchases && lastWeek.purchasesConversionValue) ? (lastWeek.purchasesConversionValue / lastWeek.purchases) : 0)) ? 'text-green-500' : 'text-red-500'}\`}>{((thisWeek.aov || ((thisWeek.purchases && thisWeek.purchasesConversionValue) ? (thisWeek.purchasesConversionValue / thisWeek.purchases) : 0)) >= (lastWeek.aov || ((lastWeek.purchases && lastWeek.purchasesConversionValue) ? (lastWeek.purchasesConversionValue / lastWeek.purchases) : 0)) ? '+' : '')}{formatPercent(calculateGrowth((thisWeek.aov || ((thisWeek.purchases && thisWeek.purchasesConversionValue) ? (thisWeek.purchasesConversionValue / thisWeek.purchases) : 0)), (lastWeek.aov || ((lastWeek.purchases && lastWeek.purchasesConversionValue) ? (lastWeek.purchasesConversionValue / lastWeek.purchases) : 0))))}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getAOV(lastWeek))}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getAOV(thisWeek))}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getAOV(thisWeek) - getAOV(lastWeek))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(getAOV(thisWeek) >= getAOV(lastWeek) ? 'text-green-500' : 'text-red-500')}\`}>{\`\${(getAOV(thisWeek) >= getAOV(lastWeek) ? '+' : '')}\${formatPercent(calculateGrowth(getAOV(thisWeek), getAOV(lastWeek)))}\`}</td>
                                         </tr>
                                         ${(thisWeek.clicksAll || lastWeek.clicksAll) ? `
                                         <tr className="bg-gray-50">
@@ -855,7 +877,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                     </div>
                 </div>
             );
-                };
+        };
 
                 // Use React 18 createRoot API instead of ReactDOM.render
                 const rootElement = document.getElementById('root');
@@ -895,7 +917,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
   
   if (ageThisWeek.length > 0 || ageLastWeek.length > 0) {
     // Sort by purchases (highest first)
-        const sortedAge = [...ageThisWeek]
+    const sortedAge = [...ageThisWeek]
       .filter((a: any) => a.Age && a.Age.trim())
       .sort((a: any, b: any) => {
         // Try multiple field name variations for purchases
