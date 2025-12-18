@@ -1352,11 +1352,13 @@ export default function HomePage() {
                 </p>
               </div>
               <div className="demo-preview-container" style={{
-                height: '450px',
+                width: '266px',
+                height: '365px',
                 overflow: 'hidden',
                 position: 'relative',
                 backgroundColor: '#f3f4f6',
-                borderRadius: '0 0 12px 12px'
+                borderRadius: '0 0 12px 12px',
+                margin: '0 auto'
               }}>
                 <iframe
                   src="/demo/report-ctwa.pdf#view=FitH&toolbar=0&navpanes=0&scrollbar=0"
@@ -1392,39 +1394,33 @@ export default function HomePage() {
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '12px',
-                    padding: '16px 32px',
+                    gap: '10px',
+                    padding: '12px 24px',
                     background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #1e3a8a 100%)',
                     color: '#ffffff',
                     borderRadius: '12px',
                     textDecoration: 'none',
-                    fontSize: '16px',
+                    fontSize: '15px',
                     fontWeight: '600',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     boxShadow: '0 4px 14px 0 rgba(37, 99, 235, 0.39)',
                     position: 'relative',
-                    overflow: 'hidden',
-                    minWidth: '200px',
-                    justifyContent: 'center'
+                    overflow: 'hidden'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-3px) scale(1.02)'
                     e.currentTarget.style.boxShadow = '0 8px 25px 0 rgba(37, 99, 235, 0.5)'
                     e.currentTarget.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1e40af 100%)'
-                    const arrow = e.currentTarget.querySelector('.bi-arrow-right') as HTMLElement
-                    if (arrow) arrow.style.transform = 'translateX(4px)'
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'translateY(0) scale(1)'
                     e.currentTarget.style.boxShadow = '0 4px 14px 0 rgba(37, 99, 235, 0.39)'
                     e.currentTarget.style.background = 'linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #1e3a8a 100%)'
-                    const arrow = e.currentTarget.querySelector('.bi-arrow-right') as HTMLElement
-                    if (arrow) arrow.style.transform = 'translateX(0)'
                   }}
                 >
-                  <i className="bi bi-file-earmark-pdf-fill" style={{ fontSize: '20px' }}></i>
+                  <i className="bi bi-file-earmark-pdf-fill" style={{ fontSize: '18px' }}></i>
                   <span>View Full Report</span>
-                  <i className="bi bi-arrow-right" style={{ fontSize: '16px', transition: 'transform 0.3s ease' }}></i>
+                  <i className="bi bi-arrow-right" style={{ fontSize: '14px', transition: 'transform 0.3s ease' }}></i>
                 </a>
               </div>
             </div>
@@ -1467,11 +1463,13 @@ export default function HomePage() {
                 </p>
               </div>
               <div className="demo-preview-container" style={{
-                height: '450px',
+                width: '266px',
+                height: '365px',
                 overflow: 'hidden',
                 position: 'relative',
                 backgroundColor: '#f3f4f6',
-                borderRadius: '0 0 12px 12px'
+                borderRadius: '0 0 12px 12px',
+                margin: '0 auto'
               }}>
                 <iframe
                   src="/demo/report-ctlptowa.pdf#view=FitH&toolbar=0&navpanes=0&scrollbar=0"
@@ -1507,20 +1505,18 @@ export default function HomePage() {
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '12px',
-                    padding: '16px 32px',
+                    gap: '10px',
+                    padding: '12px 24px',
                     background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #1e3a8a 100%)',
                     color: '#ffffff',
                     borderRadius: '12px',
                     textDecoration: 'none',
-                    fontSize: '16px',
+                    fontSize: '15px',
                     fontWeight: '600',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     boxShadow: '0 4px 14px 0 rgba(37, 99, 235, 0.39)',
                     position: 'relative',
-                    overflow: 'hidden',
-                    minWidth: '200px',
-                    justifyContent: 'center'
+                    overflow: 'hidden'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-3px) scale(1.02)'
@@ -1537,9 +1533,9 @@ export default function HomePage() {
                     if (arrow) arrow.style.transform = 'translateX(0)'
                   }}
                 >
-                  <i className="bi bi-file-earmark-pdf-fill" style={{ fontSize: '20px' }}></i>
+                  <i className="bi bi-file-earmark-pdf-fill" style={{ fontSize: '18px' }}></i>
                   <span>View Full Report</span>
-                  <i className="bi bi-arrow-right" style={{ fontSize: '16px', transition: 'transform 0.3s ease' }}></i>
+                  <i className="bi bi-arrow-right" style={{ fontSize: '14px', transition: 'transform 0.3s ease' }}></i>
                 </a>
               </div>
             </div>
@@ -1582,11 +1578,13 @@ export default function HomePage() {
                 </p>
               </div>
               <div className="demo-preview-container" style={{
-                height: '450px',
+                width: '266px',
+                height: '365px',
                 overflow: 'hidden',
                 position: 'relative',
                 backgroundColor: '#f3f4f6',
-                borderRadius: '0 0 12px 12px'
+                borderRadius: '0 0 12px 12px',
+                margin: '0 auto'
               }}>
                 <iframe
                   src="/demo/report-cpas.pdf#view=FitH&toolbar=0&navpanes=0&scrollbar=0"
@@ -1622,20 +1620,18 @@ export default function HomePage() {
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '12px',
-                    padding: '16px 32px',
+                    gap: '10px',
+                    padding: '12px 24px',
                     background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #1e3a8a 100%)',
                     color: '#ffffff',
                     borderRadius: '12px',
                     textDecoration: 'none',
-                    fontSize: '16px',
+                    fontSize: '15px',
                     fontWeight: '600',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     boxShadow: '0 4px 14px 0 rgba(37, 99, 235, 0.39)',
                     position: 'relative',
-                    overflow: 'hidden',
-                    minWidth: '200px',
-                    justifyContent: 'center'
+                    overflow: 'hidden'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-3px) scale(1.02)'
@@ -1652,9 +1648,9 @@ export default function HomePage() {
                     if (arrow) arrow.style.transform = 'translateX(0)'
                   }}
                 >
-                  <i className="bi bi-file-earmark-pdf-fill" style={{ fontSize: '20px' }}></i>
+                  <i className="bi bi-file-earmark-pdf-fill" style={{ fontSize: '18px' }}></i>
                   <span>View Full Report</span>
-                  <i className="bi bi-arrow-right" style={{ fontSize: '16px', transition: 'transform 0.3s ease' }}></i>
+                  <i className="bi bi-arrow-right" style={{ fontSize: '14px', transition: 'transform 0.3s ease' }}></i>
                 </a>
               </div>
             </div>
