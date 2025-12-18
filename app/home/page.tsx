@@ -2331,5 +2331,6 @@ export default function HomePage() {
         </div>
       </footer>
     </div>
+    </React.Fragment>
   )
 }
