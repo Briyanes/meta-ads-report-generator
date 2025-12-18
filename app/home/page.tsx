@@ -1395,7 +1395,7 @@ export default function HomePage() {
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '10px',
+                    gap: '8px',
                     padding: '12px 24px',
                     background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #1e3a8a 100%)',
                     color: '#ffffff',
@@ -1419,9 +1419,9 @@ export default function HomePage() {
                     e.currentTarget.style.background = 'linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #1e3a8a 100%)'
                   }}
                 >
-                  <i className="bi bi-file-earmark-pdf-fill" style={{ fontSize: '18px' }}></i>
+                  <i className="bi bi-file-earmark-pdf-fill" style={{ fontSize: '18px', marginRight: '8px' }}></i>
                   <span>View Full Report</span>
-                  <i className="bi bi-arrow-right" style={{ fontSize: '14px', transition: 'transform 0.3s ease' }}></i>
+                  <i className="bi bi-arrow-right" style={{ fontSize: '14px', marginLeft: '8px', transition: 'transform 0.3s ease' }}></i>
                 </a>
               </div>
             </div>
@@ -1507,7 +1507,7 @@ export default function HomePage() {
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '10px',
+                    gap: '8px',
                     padding: '12px 24px',
                     background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #1e3a8a 100%)',
                     color: '#ffffff',
@@ -1535,9 +1535,9 @@ export default function HomePage() {
                     if (arrow) arrow.style.transform = 'translateX(0)'
                   }}
                 >
-                  <i className="bi bi-file-earmark-pdf-fill" style={{ fontSize: '18px' }}></i>
+                  <i className="bi bi-file-earmark-pdf-fill" style={{ fontSize: '18px', marginRight: '8px' }}></i>
                   <span>View Full Report</span>
-                  <i className="bi bi-arrow-right" style={{ fontSize: '14px', transition: 'transform 0.3s ease' }}></i>
+                  <i className="bi bi-arrow-right" style={{ fontSize: '14px', marginLeft: '8px', transition: 'transform 0.3s ease' }}></i>
                 </a>
               </div>
             </div>
@@ -1623,7 +1623,7 @@ export default function HomePage() {
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '10px',
+                    gap: '8px',
                     padding: '12px 24px',
                     background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #1e3a8a 100%)',
                     color: '#ffffff',
@@ -1651,9 +1651,9 @@ export default function HomePage() {
                     if (arrow) arrow.style.transform = 'translateX(0)'
                   }}
                 >
-                  <i className="bi bi-file-earmark-pdf-fill" style={{ fontSize: '18px' }}></i>
+                  <i className="bi bi-file-earmark-pdf-fill" style={{ fontSize: '18px', marginRight: '8px' }}></i>
                   <span>View Full Report</span>
-                  <i className="bi bi-arrow-right" style={{ fontSize: '14px', transition: 'transform 0.3s ease' }}></i>
+                  <i className="bi bi-arrow-right" style={{ fontSize: '14px', marginLeft: '8px', transition: 'transform 0.3s ease' }}></i>
                 </a>
               </div>
             </div>
