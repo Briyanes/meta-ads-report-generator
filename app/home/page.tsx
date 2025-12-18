@@ -1282,7 +1282,7 @@ export default function HomePage() {
         </div>
 
         {/* Demo Preview Section */}
-        <div style={{
+        <div className="demo-section-wrapper" style={{
           backgroundColor: '#ffffff',
           borderRadius: '12px',
           boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
@@ -1290,53 +1290,6 @@ export default function HomePage() {
           border: '1px solid #e5e7eb',
           marginBottom: '48px'
         }}>
-          <style jsx>{`
-            @media (max-width: 768px) {
-              .demo-section-container {
-                padding: 24px 16px !important;
-              }
-              .demo-section-title {
-                font-size: 22px !important;
-              }
-              .demo-section-subtitle {
-                font-size: 14px !important;
-                margin-bottom: 24px !important;
-              }
-              .responsive-demo {
-                grid-template-columns: 1fr !important;
-                gap: 20px !important;
-              }
-              .demo-preview-container {
-                height: 300px !important;
-              }
-              .demo-card-header {
-                padding: 16px !important;
-              }
-              .demo-card-title {
-                font-size: 16px !important;
-              }
-              .demo-card-subtitle {
-                font-size: 12px !important;
-              }
-              .demo-button-container {
-                padding: 10px 12px !important;
-              }
-              .demo-button {
-                font-size: 13px !important;
-                padding: 8px 14px !important;
-                width: 100% !important;
-                justify-content: center !important;
-              }
-            }
-            @media (max-width: 1024px) and (min-width: 769px) {
-              .responsive-demo {
-                grid-template-columns: repeat(2, 1fr) !important;
-              }
-              .demo-preview-container {
-                height: 350px !important;
-              }
-            }
-          `}</style>
           <div className="demo-section-container">
             <h3 className="demo-section-title" style={{
               fontSize: '28px',
