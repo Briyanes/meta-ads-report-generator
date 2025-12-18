@@ -1540,7 +1540,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
   if (objectiveThisWeek.length > 0) {
     // Sort by purchases (highest first)
     const sortedObjective = [...objectiveThisWeek]
-      .filter((o: any) => o['Campaign objective'] && o['Campaign objective'].trim())
+      .filter((o: any) => (o['Objective'] || o['Campaign objective']) && (o['Objective'] || o['Campaign objective']).trim())
       .sort((a: any, b: any) => {
         const purchasesA = a['Purchases'] || a['Purchases with shared items'] || 0
         const purchasesB = b['Purchases'] || b['Purchases with shared items'] || 0
@@ -1555,7 +1555,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                             <h2 className="text-2xl font-bold text-hadona-blue mb-4">Campaign Objective Performance</h2>
                             <div className="grid grid-cols-4 gap-3">
                                 ${sortedObjective.map((item: any) => {
-          const objective = item['Campaign objective'] || 'Unknown'
+          const objective = item['Objective'] || item['Campaign objective'] || 'Unknown'
           const purchasesRaw = item['Purchases with shared items'] || 
                               item['Purchases'] || 
                               item['Purchases with shared items only'] ||
@@ -1593,7 +1593,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="flex items-start">
                                         <i className="fas fa-bullseye text-blue-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
-                                            <p className="text-xs"><strong>Kesimpulan:</strong> ${sortedObjective.length > 0 ? sortedObjective[0]['Campaign objective'] + ' menghasilkan ' + (sortedObjective[0]['Purchases'] || sortedObjective[0]['Purchases with shared items'] || 0) + ' purchases dengan performa terbaik.' : 'Objective breakdown menunjukkan variasi performa signifikan antar objective.'}</p>
+                                            <p className="text-xs"><strong>Kesimpulan:</strong> ${sortedObjective.length > 0 ? (sortedObjective[0]['Objective'] || sortedObjective[0]['Campaign objective'] || 'Unknown') + ' menghasilkan ' + (sortedObjective[0]['Purchases'] || sortedObjective[0]['Purchases with shared items'] || 0) + ' purchases dengan performa terbaik.' : 'Objective breakdown menunjukkan variasi performa signifikan antar objective.'}</p>
                                             <p className="text-xs mt-1">${sortedObjective.length > 0 ? 'Objective ini menjadi pilihan terbaik untuk optimasi dan scaling campaign.' : 'Perlu analisis lebih lanjut untuk identifikasi objective terbaik.'}</p>
                                         </div>
                                     </div>
@@ -1602,7 +1602,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="flex items-start">
                                         <i className="fas fa-lightbulb text-green-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
-                                            <p className="text-xs"><strong>Rekomendasi:</strong> ${sortedObjective.length > 0 ? 'Fokus pada objective ' + sortedObjective[0]['Campaign objective'] + ' untuk hasil optimal dan scaling.' : 'Lakukan testing pada berbagai objective untuk menemukan performa terbaik.'}</p>
+                                            <p className="text-xs"><strong>Rekomendasi:</strong> ${sortedObjective.length > 0 ? 'Fokus pada objective ' + (sortedObjective[0]['Objective'] || sortedObjective[0]['Campaign objective'] || 'Unknown') + ' untuk hasil optimal dan scaling.' : 'Lakukan testing pada berbagai objective untuk menemukan performa terbaik.'}</p>
                                             <p className="text-xs mt-1">Pertimbangkan kombinasi objective dengan performa baik untuk diversifikasi strategi campaign.</p>
                                         </div>
                                     </div>
