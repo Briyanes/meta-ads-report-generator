@@ -239,13 +239,6 @@ export default function MetaAdsPage() {
         ? JSON.parse(analysis.analysis)
         : analysis;
       
-      // Debug: Log analysisData to verify structure
-      console.log('DEBUG page.tsx - analysis:', analysis);
-      console.log('DEBUG page.tsx - analysis.analysis:', analysis.analysis);
-      console.log('DEBUG page.tsx - analysisData:', analysisData);
-      console.log('DEBUG page.tsx - analysisData.performanceSummary:', analysisData?.performanceSummary);
-      console.log('DEBUG page.tsx - analysisData.performanceSummary?.thisWeek:', analysisData?.performanceSummary?.thisWeek);
-      console.log('DEBUG page.tsx - analysisData.performanceSummary?.thisWeek?.reach:', analysisData?.performanceSummary?.thisWeek?.reach);
       
       const response = await fetch('/api/generate-report', {
         method: 'POST',

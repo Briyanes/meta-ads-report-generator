@@ -26,11 +26,6 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    // Debug: Log analysisData structure
-    console.log('DEBUG generate-report - analysisData:', JSON.stringify(analysisData).substring(0, 500));
-    console.log('DEBUG generate-report - analysisData.performanceSummary:', analysisData?.performanceSummary);
-    console.log('DEBUG generate-report - analysisData.performanceSummary?.thisWeek:', analysisData?.performanceSummary?.thisWeek);
-    console.log('DEBUG generate-report - analysisData.performanceSummary?.thisWeek?.reach:', analysisData?.performanceSummary?.thisWeek?.reach);
 
     // Import template based on objective type
     let generateReport: (analysisData: any, reportName?: string, retentionType?: string, objectiveType?: string) => string
