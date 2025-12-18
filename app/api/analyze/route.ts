@@ -608,7 +608,23 @@ Return the analysis as structured JSON data that can be used to generate the HTM
             'ATC conversion value',
             'Adds to cart conversion value for shared items only'
           ])),
-          purchasesConversionValue: parseNum(data['Purchases conversion value'] || data['Purchases conversion value for shared items only'])
+          purchasesConversionValue: parseNum(data['Purchases conversion value'] || data['Purchases conversion value for shared items only']),
+          // Additional CPAS metrics from CSV
+          clicksAll: parseNum(data['Clicks (all)'] || 0),
+          ctrAll: parseNum(getFieldValue(data, 'CTR (all)', ['CTR (all)'])),
+          costPerCV: parseNum(getFieldValue(data, 'Cost /CV (IDR)', ['Cost /CV (IDR)', 'Cost per content view'])),
+          costPerATC: parseNum(getFieldValue(data, 'Cost /ATC (IDR)', ['Cost /ATC (IDR)', 'Cost per add to cart'])),
+          costPerPurchase: parseNum(getFieldValue(data, 'Cost /Purchase (IDR)', ['Cost /Purchase (IDR)', 'Cost per purchase'])),
+          purchaseROAS: parseNum(getFieldValue(data, 'Purchase ROAS for shared items only', [
+            'Purchase ROAS for shared items only',
+            'Purchase ROAS',
+            'ROAS'
+          ])),
+          aov: parseNum(getFieldValue(data, 'AOV (IDR)', ['AOV (IDR)', 'AOV', 'Average order value'])),
+          lcToCV: parseNum(getFieldValue(data, '* LC to CV', ['* LC to CV', 'LC to CV'])),
+          cvToATC: parseNum(getFieldValue(data, '* CV to ATC', ['* CV to ATC', 'CV to ATC'])),
+          atcToPurchase: parseNum(getFieldValue(data, 'ATC to Purchase', ['ATC to Purchase', 'ATC to Purchase conversion rate'])),
+          conversionRateRanking: data['Conversion rate ranking'] || ''
         }
       }
       
