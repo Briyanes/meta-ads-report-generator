@@ -264,6 +264,13 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       const keys = Object.keys(data[0])
       const aggregated: any = {}
       
+      // Debug: Log Reach-related keys
+      const reachKeys = keys.filter(k => k.toLowerCase().includes('reach'))
+      if (reachKeys.length > 0) {
+        console.log('DEBUG aggregateCSVData - Reach keys found:', reachKeys);
+        console.log('DEBUG aggregateCSVData - First row Reach values:', reachKeys.map(k => ({ key: k, value: data[0][k] })));
+      }
+      
       // Helper to check if field should be summed (case-insensitive, partial match)
       const shouldSumField = (key: string): boolean => {
         const keyLower = key.toLowerCase()
@@ -315,7 +322,12 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         if (numericValues.length > 0) {
           // Sum numeric values for sumFields
           if (shouldSumField(key)) {
-            aggregated[key] = numericValues.reduce((sum, val) => sum + val, 0)
+            const sum = numericValues.reduce((sum, val) => sum + val, 0)
+            aggregated[key] = sum
+            // Debug: Log Reach aggregation
+            if (key.toLowerCase().includes('reach')) {
+              console.log(`DEBUG aggregateCSVData - Aggregating Reach: key="${key}", sum=${sum}, values=${numericValues.slice(0, 5).join(', ')}...`)
+            }
           } else {
             // For other numeric fields, try to sum, but if all values are same, keep first
             const allSame = numericValues.length > 0 && numericValues.every(v => v === numericValues[0])
@@ -459,6 +471,10 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     // Aggregate data from CSV (in case CSV has multiple rows/days)
     const thisWeekData = aggregateCSVData(parsedDataThisWeek.data)
     const lastWeekData = aggregateCSVData(parsedDataLastWeek.data)
+    
+    // Debug: Log aggregated Reach values
+    console.log('DEBUG after aggregateCSVData - thisWeekData Reach:', thisWeekData['Reach']);
+    console.log('DEBUG after aggregateCSVData - lastWeekData Reach:', lastWeekData['Reach']);
     
     // Calculate base metrics
     const thisWeekSpend = parseNum(thisWeekData['Amount spent (IDR)'])
@@ -612,6 +628,10 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     
     const thisWeekPerf = buildPerformanceData(thisWeekData, thisWeekResults, thisWeekCPR)
     const lastWeekPerf = buildPerformanceData(lastWeekData, lastWeekResults, lastWeekCPR)
+    
+    // Debug: Log performance data Reach values
+    console.log('DEBUG after buildPerformanceData - thisWeekPerf.reach:', thisWeekPerf.reach);
+    console.log('DEBUG after buildPerformanceData - lastWeekPerf.reach:', lastWeekPerf.reach);
     
     const analysis = {
         performanceSummary: {
