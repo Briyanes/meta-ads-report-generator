@@ -1,6 +1,5 @@
 'use client'
 
-import React from 'react'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
@@ -70,7 +69,6 @@ export default function HomePage() {
   }
 
   return (
-    <React.Fragment>
     <div style={{
       minHeight: '100vh',
       background: 'linear-gradient(to bottom right, #f9fafb, #ffffff, #f3f4f6)',
@@ -2331,6 +2329,5 @@ export default function HomePage() {
         </div>
       </footer>
     </div>
-    </React.Fragment>
   )
 }
