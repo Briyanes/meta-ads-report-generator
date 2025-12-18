@@ -70,6 +70,7 @@ export default function HomePage() {
   }
 
   return (
+    <React.Fragment>
     <div style={{
       minHeight: '100vh',
       background: 'linear-gradient(to bottom right, #f9fafb, #ffffff, #f3f4f6)',
