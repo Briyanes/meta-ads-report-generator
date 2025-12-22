@@ -2282,7 +2282,8 @@ export default function HomePage() {
           background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
           borderRadius: '16px',
           padding: '64px 48px',
-          marginBottom: '48px',
+          marginTop: '0',
+          marginBottom: '28px',
           textAlign: 'center',
           boxShadow: '0 20px 25px -5px rgba(37, 99, 235, 0.3)'
         }}>
