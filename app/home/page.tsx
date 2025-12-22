@@ -168,7 +168,8 @@ export default function HomePage() {
         {/* Hero Section */}
         <div className="responsive-hero" style={{
           textAlign: 'center',
-          marginBottom: '64px',
+          marginBottom: '80px',
+          marginTop: '0',
           padding: '64px 32px',
           background: 'linear-gradient(135deg, #eff6ff 0%, #ffffff 100%)',
           borderRadius: '16px',
