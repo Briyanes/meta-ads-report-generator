@@ -140,9 +140,11 @@ export default function HomePage() {
                 e.currentTarget.style.opacity = '1'
               }}
             >
-              <img
+              <Image
                 src="/logo/logo-hadona.png"
                 alt="Hadona Digital Media"
+                width={200}
+                height={80}
                 style={{
                   height: '80px',
                   width: 'auto',
@@ -444,9 +446,11 @@ export default function HomePage() {
                   margin: '0 auto 16px auto',
                   opacity: platform.available ? 1 : 0.6
                 }}>
-                  <img
+                  <Image
                     src={platform.logo}
                     alt={`${platform.name} logo`}
+                    width={64}
+                    height={64}
                     style={{
                       width: '100%',
                       height: '100%',

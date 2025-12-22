@@ -7,6 +7,10 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Meta Ads Report Generator - Hadona',
   description: 'Generate professional Meta Ads performance reports with AI',
+  icons: {
+    icon: '/logo/logo-hadona.png',
+    apple: '/logo/logo-hadona.png',
+  },
 }
 
 export default function RootLayout({
