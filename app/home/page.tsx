@@ -263,7 +263,7 @@ export default function HomePage() {
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
           gap: '24px',
-          marginBottom: '64px'
+          marginBottom: '48px'
         }}>
           <div style={{
             textAlign: 'center',
@@ -2283,7 +2283,7 @@ export default function HomePage() {
           borderRadius: '16px',
           padding: '64px 48px',
           marginTop: '0',
-          marginBottom: '28px',
+          marginBottom: '48px',
           textAlign: 'center',
           boxShadow: '0 20px 25px -5px rgba(37, 99, 235, 0.3)'
         }}>
