@@ -3,8 +3,49 @@ import { NextRequest, NextResponse } from 'next/server'
 // Supabase import commented out - not needed for now
 // import { supabaseAdmin } from '@/lib/supabase'
 
+// Security: Check origin
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS?.split(',') || [
+  'http://localhost:3000',
+  'https://meta-ads-report-generator.vercel.app',
+  'https://hadona.id'
+]
+
+function isValidOrigin(origin: string | null): boolean {
+  if (!origin) return false
+  return ALLOWED_ORIGINS.some(allowed => origin === allowed || origin.endsWith(allowed.replace('https://', '.')))
+}
+
+// Security: Validate retention and objective types
+function isValidRetentionType(value: string): boolean {
+  return ['wow', 'mom'].includes(value)
+}
+
+function isValidObjectiveType(value: string): boolean {
+  return ['ctwa', 'cpas', 'ctlptowa'].includes(value)
+}
+
+// Security: Sanitize report name to prevent XSS
+function sanitizeReportName(name: string): string {
+  if (!name) return ''
+  // Remove any HTML tags and special characters
+  return name
+    .replace(/<[^>]*>/g, '') // Remove HTML tags
+    .replace(/[<>:"/\\|?*\x00-\x1f]/g, '') // Remove invalid filename characters
+    .trim()
+    .slice(0, 100) // Limit length
+}
+
 export async function POST(request: NextRequest) {
   try {
+    // Security: Check origin
+    const origin = request.headers.get('origin')
+    if (origin && !isValidOrigin(origin)) {
+      return NextResponse.json(
+        { error: 'Unauthorized origin' },
+        { status: 403 }
+      )
+    }
+
     // Parse request body with error handling
     let body
     try {
@@ -16,7 +57,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-    
+
     const { analysisData, reportName, retentionType = 'wow', objectiveType = 'ctwa' } = body
 
     if (!analysisData) {
@@ -25,6 +66,25 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    // Security: Validate retention type
+    if (!isValidRetentionType(retentionType)) {
+      return NextResponse.json(
+        { error: 'Invalid retention type' },
+        { status: 400 }
+      )
+    }
+
+    // Security: Validate objective type
+    if (!isValidObjectiveType(objectiveType)) {
+      return NextResponse.json(
+        { error: 'Invalid objective type' },
+        { status: 400 }
+      )
+    }
+
+    // Security: Sanitize report name
+    const sanitizedName = sanitizeReportName(reportName || '')
     
 
     // Import template based on objective type
@@ -56,7 +116,7 @@ export async function POST(request: NextRequest) {
     // This ensures each objective type has its own isolated template and doesn't affect others
     let htmlReport: string
     try {
-      htmlReport = generateReport(analysisData, reportName, retentionType, objectiveType)
+      htmlReport = generateReport(analysisData, sanitizedName, retentionType, objectiveType)
       
       if (!htmlReport || htmlReport.length < 100) {
         throw new Error('Generated HTML report is too short or empty')

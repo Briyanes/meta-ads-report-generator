@@ -2,17 +2,99 @@ import { NextRequest, NextResponse } from 'next/server'
 // import { analyzeCSVWithZAI } from '@/lib/zai'
 import { parseCSV, analyzeDataStructure } from '@/lib/csvParser'
 
+// Security: Check origin
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS?.split(',') || [
+  'http://localhost:3000',
+  'https://meta-ads-report-generator.vercel.app',
+  'https://hadona.id'
+]
+
+function isValidOrigin(origin: string | null): boolean {
+  if (!origin) return false
+  return ALLOWED_ORIGINS.some(allowed => origin === allowed || origin.endsWith(allowed.replace('https://', '.')))
+}
+
+// Security: Validate file type and size
+const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
+const ALLOWED_FILE_TYPES = ['text/csv', 'application/csv', 'text/comma-separated-values']
+
+function isValidFile(file: File): boolean {
+  // Check file size
+  if (file.size > MAX_FILE_SIZE) {
+    return false
+  }
+  // Check file extension
+  if (!file.name.toLowerCase().endsWith('.csv')) {
+    return false
+  }
+  // Check MIME type (if available)
+  if (file.type && !ALLOWED_FILE_TYPES.includes(file.type) && !file.type.includes('excel')) {
+    return false
+  }
+  return true
+}
+
+// Security: Validate retention and objective types
+function isValidRetentionType(value: string): boolean {
+  return ['wow', 'mom'].includes(value)
+}
+
+function isValidObjectiveType(value: string): boolean {
+  return ['ctwa', 'cpas', 'ctlptowa'].includes(value)
+}
+
 export async function POST(request: NextRequest) {
   try {
+    // Security: Check origin
+    const origin = request.headers.get('origin')
+    if (origin && !isValidOrigin(origin)) {
+      return NextResponse.json(
+        { error: 'Unauthorized origin' },
+        { status: 403 }
+      )
+    }
+
     const formData = await request.formData()
     const fileThisWeek = formData.get('fileThisWeek') as File
     const fileLastWeek = formData.get('fileLastWeek') as File
     const retentionType = (formData.get('retentionType') as string) || 'wow'
     const objectiveType = (formData.get('objectiveType') as string) || 'ctwa'
 
+    // Validate inputs
     if (!fileThisWeek || !fileLastWeek) {
       return NextResponse.json(
         { error: 'Please provide both main CSV files (This Week & Last Week)' },
+        { status: 400 }
+      )
+    }
+
+    // Security: Validate files
+    if (!isValidFile(fileThisWeek)) {
+      return NextResponse.json(
+        { error: 'Invalid file: This Week file must be a CSV under 50MB' },
+        { status: 400 }
+      )
+    }
+
+    if (!isValidFile(fileLastWeek)) {
+      return NextResponse.json(
+        { error: 'Invalid file: Last Week file must be a CSV under 50MB' },
+        { status: 400 }
+      )
+    }
+
+    // Security: Validate retention type
+    if (!isValidRetentionType(retentionType)) {
+      return NextResponse.json(
+        { error: 'Invalid retention type' },
+        { status: 400 }
+      )
+    }
+
+    // Security: Validate objective type
+    if (!isValidObjectiveType(objectiveType)) {
+      return NextResponse.json(
+        { error: 'Invalid objective type' },
         { status: 400 }
       )
     }
