@@ -16,7 +16,6 @@ function isValidOrigin(origin: string | null): boolean {
 
 // Security: Validate file type and size
 const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
-const ALLOWED_FILE_TYPES = ['text/csv', 'application/csv', 'text/comma-separated-values']
 
 function isValidFile(file: File): boolean {
   // Check file size
@@ -27,10 +26,8 @@ function isValidFile(file: File): boolean {
   if (!file.name.toLowerCase().endsWith('.csv')) {
     return false
   }
-  // Check MIME type (if available)
-  if (file.type && !ALLOWED_FILE_TYPES.includes(file.type) && !file.type.includes('excel')) {
-    return false
-  }
+  // MIME type check is optional - browsers send different MIME types for CSV
+  // We trust the file extension and will validate content during parsing
   return true
 }
 
