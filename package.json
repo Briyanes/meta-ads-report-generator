@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "postinstall": "cp -r node_modules/bootstrap-icons/font/fonts public/fonts 2>/dev/null || true",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -10,6 +11,7 @@
     "dev:reset": "bash scripts/dev-reset.sh"
   },
   "dependencies": {
+    "bootstrap-icons": "^1.13.1",
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.2",
     "next": "14.2.35",

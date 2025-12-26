@@ -1,17 +1,6 @@
 /**
- * IMPROVED HTML Report Template with React + Tailwind CSS for CPAS Objective
- * Focus on Business-Focused Reporting with Data Validation
- *
- * Key Improvements:
- * 1. Business-focused Executive Summary
- * 2. Data validation for breakdown files
- * 3. Funnel Analysis (CV → ATC → Purchase)
- * 4. Evidence-based recommendations
- * 5. Product-level analysis (if data available)
- * 6. Consistent Indonesian language
- *
- * @version 2.0.0
- * @date 2025-12-26
+ * Complete HTML Report Template with React + Tailwind CSS for CPAS Objective
+ * All 13 slides included
  */
 
 export function generateReactTailwindReport(analysisData: any, reportName?: string, retentionType: string = 'wow', objectiveType: string = 'cpas'): string {
@@ -27,40 +16,54 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   } else {
     data = analysisData || {}
   }
-
+  
   // Extract data with fallbacks
   const perf = data?.performanceSummary || {}
   const thisWeek = perf.thisWeek || {}
   const lastWeek = perf.lastWeek || {}
   const breakdown = data?.breakdown || {}
-
+  
   // Determine period labels based on retention type
   const isMoM = retentionType === 'mom'
+  const periodLabel = isMoM ? 'Month' : 'Week'
   const periodLabelId = isMoM ? 'Bulan' : 'Minggu'
-  const thisPeriodLabel = isMoM ? 'Bulan Ini' : 'Minggu Ini'
-  const lastPeriodLabel = isMoM ? 'Bulan Lalu' : 'Minggu Lalu'
+  const periodLabelEn = isMoM ? 'Month' : 'Week'
+  const thisPeriodLabel = isMoM ? 'Bulan Ini (This Month)' : 'Minggu Ini (This Week)'
+  const lastPeriodLabel = isMoM ? 'Bulan Lalu (Last Month)' : 'Minggu Lalu (Last Week)'
   const comparisonLabel = isMoM ? 'Month-on-Month' : 'Week-on-Week'
-
+  
+  // Determine objective label
+  const objectiveLabels: Record<string, string> = {
+    'ctwa': 'CTWA (Click to WhatsApp)',
+    'cpas': 'CPAS (Collaborative Performance Advertising Solution)',
+    'ctlptowa': 'CTLP to WA (Click to Landing Page to WhatsApp)'
+  }
+  const objectiveLabel = objectiveLabels[objectiveType] || 'CPAS (Collaborative Performance Advertising Solution)'
+  
   // Extract client name from reportName or analysisData
   const extractClientName = (): string => {
+    // Try to extract from reportName first
     if (reportName) {
       const nameLower = reportName.toLowerCase()
+      // Check for common location patterns
       if (nameLower.includes('makasar') || nameLower.includes('makassar')) {
         return 'RMODA Studio Makasar'
       }
       if (nameLower.includes('bsd')) {
         return 'RMODA Studio BSD'
       }
+      // If reportName contains "RMODA Studio", use it
       if (nameLower.includes('rmoda studio')) {
+        // Extract the full client name from reportName
         const match = reportName.match(/RMODA\s+Studio\s+([A-Za-z\s]+)/i)
         if (match) {
-          return \`RMODA Studio \${match[1].trim()}\`
+          return `RMODA Studio ${match[1].trim()}`
         }
         return 'RMODA Studio'
       }
-      return reportName
     }
-
+    
+    // Try to extract from analysisData if it contains file names
     const fileNames = data?.fileNames || []
     for (const fileName of fileNames) {
       const nameLower = fileName.toLowerCase()
@@ -71,1135 +74,2118 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         return 'RMODA Studio BSD'
       }
     }
-
-    return 'Klien Terhormat'
+    
+    // Default fallback
+    return 'RMODA Studio'
   }
-
-  const clientName = extractClientName()
-
-  // ============================================
-  // HELPER FUNCTIONS - IMPROVED LOGIC
-  // ============================================
-
-  /**
-   * Calculate growth percentage with proper handling of edge cases
-   */
-  const calculateGrowth = (current: number, previous: number): { value: number, isPositive: boolean, isZeroToNonZero: boolean } => {
-    if (!previous || previous === 0) {
-      if (current > 0) {
-        return { value: 100, isPositive: true, isZeroToNonZero: true }
-      }
-      return { value: 0, isPositive: false, isZeroToNonZero: false }
-    }
-    const growth = ((current - previous) / previous) * 100
-    return {
-      value: Math.round(growth * 100) / 100,
-      isPositive: growth >= 0,
-      isZeroToNonZero: false
-    }
-  }
-
-  /**
-   * Validate breakdown data consistency
-   */
-  const validateBreakdownData = (): { isValid: boolean, issues: string[] } => {
-    const issues: string[] = []
-
-    const agePurchases = breakdown.thisWeek?.age?.reduce((sum: number, item: any) => {
-      const purchases = item['Purchases with shared items'] || item.Purchases || 0
-      return sum + (Number(purchases) || 0)
-    }, 0) || 0
-
-    const totalPurchases = thisWeek.purchases || 0
-
-    if (totalPurchases > 0 && agePurchases === 0) {
-      issues.push('Data demografi usia tidak memiliki informasi pembelian. Silakan re-export breakdown file dengan metrik "Purchases".')
-    }
-
-    const platformPurchases = breakdown.thisWeek?.platform?.reduce((sum: number, item: any) => {
-      const purchases = item['Purchases with shared items'] || item.Purchases || 0
-      return sum + (Number(purchases) || 0)
-    }, 0) || 0
-
-    if (totalPurchases > 0 && platformPurchases === 0) {
-      issues.push('Data platform tidak memiliki informasi pembelian. Silakan re-export breakdown file dengan metrik "Purchases".')
-    }
-
-    return {
-      isValid: issues.length === 0,
-      issues
-    }
-  }
-
-  /**
-   * Calculate ROAS
-   */
-  const calculateROAS = (revenue: number, spend: number): number => {
-    if (!spend || spend === 0) return 0
-    return Number((revenue / spend).toFixed(2))
-  }
-
-  /**
-   * Calculate CPA (Cost Per Acquisition)
-   */
-  const calculateCPA = (spend: number, purchases: number): number => {
-    if (!purchases || purchases === 0) return 0
-    return Number((spend / purchases).toFixed(0))
-  }
-
-  /**
-   * Calculate conversion rate
-   */
-  const calculateConversionRate = (conversions: number, clicks: number): number => {
-    if (!clicks || clicks === 0) return 0
-    return Number(((conversions / clicks) * 100).toFixed(2))
-  }
-
-  /**
-   * Format currency in IDR
-   */
-  const formatCurrency = (amount: number): string => {
-    if (amount >= 1000000000) {
-      return \`Rp \${(amount / 1000000000).toFixed(1)}M\`
-    } else if (amount >= 1000000) {
-      return \`Rp \${(amount / 1000000).toFixed(1)}M\`
-    } else if (amount >= 1000) {
-      return \`Rp \${(amount / 1000).toFixed(0)}K\`
-    }
-    return \`Rp \${amount.toFixed(0)}\`
-  }
-
-  /**
-   * Format number with thousand separator
-   */
-  const formatNumber = (num: number): string => {
-    return new Intl.NumberFormat('id-ID').format(Math.round(num))
-  }
-
-  /**
-   * Get trend icon
-   */
-  const getTrendIcon = (isPositive: boolean, isNeutral: boolean = false): string => {
-    if (isNeutral) return '➖'
-    return isPositive ? '📈' : '📉'
-  }
-
-  /**
-   * Get trend color class
-   */
-  const getTrendColor = (isPositive: boolean): string => {
-    return isPositive ? 'text-green-600' : 'text-red-600'
-  }
-
-  // ============================================
-  // CALCULATE KEY METRICS
-  // ============================================
-
-  const thisSpend = thisWeek.amountSpent || 0
-  const lastSpend = lastWeek.amountSpent || 0
-  const thisPurchases = thisWeek.purchases || 0
-  const lastPurchases = lastWeek.purchases || 0
-  const thisRevenue = thisWeek.purchasesConversionValue || 0
-  const lastRevenue = lastWeek.purchasesConversionValue || 0
-  const thisATC = thisWeek.addToCart || thisWeek.addsToCart || 0
-  const lastATC = lastWeek.addToCart || lastWeek.addsToCart || 0
-  const thisCV = thisWeek.contentViews || 0
-  const lastCV = lastWeek.contentViews || 0
-  const thisClicks = thisWeek.linkClicks || thisWeek.outboundClicks || 0
-  const lastClicks = lastWeek.linkClicks || lastWeek.outboundClicks || 0
-
-  // Calculate ROAS
-  const thisROAS = calculateROAS(thisRevenue, thisSpend)
-  const lastROAS = calculateROAS(lastRevenue, lastSpend)
-
-  // Calculate CPA
-  const thisCPA = calculateCPA(thisSpend, thisPurchases)
-  const lastCPA = calculateCPA(lastSpend, lastPurchases)
-
-  // Calculate AOV
-  const thisAOV = thisPurchases > 0 ? (thisRevenue / thisPurchases) : 0
-  const lastAOV = lastPurchases > 0 ? (lastRevenue / lastPurchases) : 0
-
-  // Calculate funnel conversion rates
-  const thisCVToATC = calculateConversionRate(thisATC, thisCV)
-  const lastCVToATC = calculateConversionRate(lastATC, lastCV)
-  const thisATCToPurchase = calculateConversionRate(thisPurchases, thisATC)
-  const lastATCToPurchase = calculateConversionRate(lastPurchases, lastATC)
-  const thisCVToPurchase = calculateConversionRate(thisPurchases, thisCV)
-  const lastCVToPurchase = calculateConversionRate(lastPurchases, lastCV)
-
-  // Calculate growth
-  const spendGrowth = calculateGrowth(thisSpend, lastSpend)
-  const purchasesGrowth = calculateGrowth(thisPurchases, lastPurchases)
-  const revenueGrowth = calculateGrowth(thisRevenue, lastRevenue)
-  const roasGrowth = calculateGrowth(thisROAS, lastROAS)
-  const cpaGrowth = calculateGrowth(thisCPA, lastCPA)
-  const aovGrowth = calculateGrowth(thisAOV, lastAOV)
-
-  // Determine overall performance status
-  const performanceStatus = thisROAS >= lastROAS ? 'IMPROVING' : 'DECLINING'
-
-  // Validate breakdown data
-  const dataValidation = validateBreakdownData()
-
-  // ============================================
-  // GENERATE BUSINESS INSIGHTS
-  // ============================================
-
-  const generateBusinessInsights = (): { title: string, insights: string[], priority: string }[] => {
-    const insights: { title: string, insights: string[], priority: string }[] = []
-
-    // Profitability Analysis
-    if (thisROAS < 1.0) {
-      insights.push({
-        title: '⚠️ Peringatan Profitabilitas',
-        insights: [
-          \`ROAS saat ini \${thisROAS.toFixed(2)}x artinya campaign masih belum break-even.\`,
-          \`Setiap Rp 1 juta yang di-spent, hanya menghasilkan Rp \${(thisROAS * 1000000).toFixed(0)} revenue.\`,
-          \`Rekomendasi: Fokus improve ROAS ke minimal 2.0x sebelum scaling budget.\`
-        ],
-        priority: 'HIGH'
-      })
-    } else if (thisROAS < 2.0) {
-      insights.push({
-        title: '💡 Tip Profitabilitas',
-        insights: [
-          \`ROAS \${thisROAS.toFixed(2)}x sudah mendekati break-even (target 2.0x).\`,
-          \`Rekomendasi: Optimize CPA dari \${formatCurrency(thisCPA)} ke bawah untuk improve profitability.\`
-        ],
-        priority: 'MEDIUM'
-      })
-    } else {
-      insights.push({
-        title: '✅ Profitabilitas Baik',
-        insights: [
-          \`ROAS \${thisROAS.toFixed(2)}x sudah di atas break-even point.\`,
-          \`Campaign sudah profitable, pertimbangkan scaling dengan hati-hati.\`
-        ],
-        priority: 'LOW'
-      })
-    }
-
-    // Funnel Analysis
-    if (thisCVToATC < 5 && thisCV > 0) {
-      insights.push({
-        title: '🔻 Masalah Funnel: CV ke ATC',
-        insights: [
-          \`Hanya \${thisCVToATC.toFixed(1)}% content view yang add to cart (rendah).\`,
-          \`Ini menunjukkan product interest ada, tapi price/offer kurang menarik.\`,
-          \`Rekomendasi: Test diskon, bundle, atau free shipping offer.\`
-        ],
-        priority: 'HIGH'
-      })
-    }
-
-    if (thisATCToPurchase < 5 && thisATC > 0) {
-      insights.push({
-        title: '🔻 Masalah Funnel: ATC ke Purchase',
-        insights: [
-          \`Hanya \${thisATCToPurchase.toFixed(1)}% ATC yang menjadi purchase (rendah).\`,
-          \`Ini menunjukkan ada friction di checkout process.\`,
-          \`Rekomendasi: Review payment flow, ongkos kirim, atau stock availability.\`
-        ],
-        priority: 'HIGH'
-      })
-    }
-
-    // Spend vs Revenue Analysis
-    if (thisSpend > thisRevenue && thisSpend > 0) {
-      insights.push({
-        title: '💸 Peringatan Over-Spending',
-        insights: [
-          \`Spend (\${formatCurrency(thisSpend)}) lebih tinggi dari revenue (\${formatCurrency(thisRevenue)}).\`,
-          \`Loss: \${formatCurrency(thisSpend - thisRevenue)} - ini tidak sustainable.\`,
-          \`Rekomendasi: PAUSE campaign dan re-evaluate targeting/creative.\`
-        ],
-        priority: 'HIGH'
-      })
-    }
-
-    // Trend Analysis
-    if (roasGrowth.value < -20 && lastROAS > 0) {
-      insights.push({
-        title: '📉 Penurunan Performa',
-        insights: [
-          \`ROAS turun \${Math.abs(roasGrowth.value).toFixed(1)}% dari \${lastPeriodLabel}.\`,
-          \`Investigate: Apakah ada perubahan creative, targeting, atau kompetitor?\`,
-          \`Rekomendasi: A/B test new creatives dan review target audience.\`
-        ],
-        priority: 'HIGH'
-      })
-    }
-
-    return insights
-  }
-
-  const businessInsights = generateBusinessInsights()
-
-  // ============================================
-  // GENERATE EVIDENCE-BASED RECOMMENDATIONS
-  // ============================================
-
-  const generateRecommendations = (): string[] => {
-    const recommendations: string[] = []
-
-    // Platform-based recommendations
-    const platformData = breakdown.thisWeek?.platform || []
-    if (platformData.length > 0) {
-      const sortedByPurchases = [...platformData].sort((a: any, b: any) => {
-        const purchasesA = Number(a['Purchases with shared items'] || a.Purchases || 0)
-        const purchasesB = Number(b['Purchases with shared items'] || b.Purchases || 0)
-        return purchasesB - purchasesA
-      })
-
-      const topPlatform = sortedByPurchases[0]
-      if (topPlatform) {
-        const platform = topPlatform.Platform || topPlatform.platform || 'Platform'
-        const purchases = Number(topPlatform['Purchases with shared items'] || topPlatform.Purchases || 0)
-        const spend = Number(topPlatform['Amount spent (IDR)'] || topPlatform.amountSpent || 0)
-        const platformROAS = spend > 0 ? calculateROAS(
-          Number(topPlatform['Purchases conversion value for shared items only'] || 0),
-          spend
-        ) : 0
-
-        if (purchases > 0 && platformROAS >= 2.0) {
-          recommendations.push(\`**SCALE \${platform.toUpperCase()}**: Platform ini menghasilkan \${purchases} purchases dengan ROAS \${platformROAS.toFixed(2)}x. Pertimbangkan increase budget 20-30%.\`)
-        } else if (purchases > 0 && platformROAS < 1.0) {
-          recommendations.push(\`**OPTIMIZE \${platform.toUpperCase()}**: Platform ini menghasilkan \${purchases} purchases tapi ROAS \${platformROAS.toFixed(2)}x (belum break-even). Review creative dan targeting.\`)
-        }
-      }
-
-      const bottomPlatform = sortedByPurchases[sortedByPurchases.length - 1]
-      if (bottomPlatform) {
-        const platform = bottomPlatform.Platform || bottomPlatform.platform || 'Platform'
-        const purchases = Number(bottomPlatform['Purchases with shared items'] || bottomPlatform.Purchases || 0)
-        const spend = Number(bottomPlatform['Amount spent (IDR)'] || bottomPlatform.amountSpent || 0)
-
-        if (spend > 100000 && purchases === 0) {
-          recommendations.push(\`**PAUSE \${platform.toUpperCase()}**: Sudah spend \${formatCurrency(spend)} tapi 0 purchases. Hentikan atau re-strategikan.\`)
-        }
-      }
-    }
-
-    // Funnel-based recommendations
-    if (thisCVToATC < 5 && thisCV > 0) {
-      recommendations.push(\`**IMPROVE ATC RATE**: Dari \${formatNumber(thisCV)} content views, hanya \${thisATC} yang ATC (\${thisCVToATC.toFixed(1)}%). Test promotional offers, bundling, atau urgency messaging.\`)
-    }
-
-    if (thisATCToPurchase < 5 && thisATC > 0) {
-      recommendations.push(\`**IMPROVE CONVERSION RATE**: Dari \${thisATC} ATC, hanya \${thisPurchases} yang purchase (\${thisATCToPurchase.toFixed(1)}%). Review checkout process, payment methods, dan shipping cost.\`)
-    }
-
-    // CPA-based recommendations
-    if (thisCPA > thisAOV && thisAOV > 0) {
-      recommendations.push(\`**REDUCE CPA**: CPA \${formatCurrency(thisCPA)} lebih tinggi dari AOV \${formatCurrency(thisAOV)}. Perlu turunkan CPA ke minimal di bawah AOV untuk break-even.\`)
-    }
-
-    // Budget recommendations
-    if (thisROAS >= 2.0 && roasGrowth.isPositive && lastROAS > 0) {
-      recommendations.push(\`**SCALE BUDGET**: ROAS \${thisROAS.toFixed(2)}x dan trending upward. Pertimbangkan increase budget 20-30% untuk capture lebih banyak sales.\`)
-    } else if (thisROAS < 1.0) {
-      recommendations.push(\`**REDUCE BUDGET**: ROAS \${thisROAS.toFixed(2)}x belum break-even. Reduce budget dan fix foundation issues dulu.\`)
-    }
-
-    return recommendations
-  }
-
-  const recommendations = generateRecommendations()
-
   
-  // ============================================
-  // GENERATE HTML REPORT
-  // ============================================
-
-  let slides = ''
-
-  // ============================================
-  // SLIDE 1: COVER PAGE
-  // ============================================
-  slides += \`
-                    {/* SLIDE 1 - COVER PAGE */}
-                    <div className="bg-white p-8 border-t-4 border-blue-600">
-                        <div className="max-w-6xl mx-auto">
-                            <div className="text-center mb-8">
-                                <h1 className="text-4xl font-bold text-blue-600 mb-2">Laporan Performa Iklan Meta Ads</h1>
-                                <h2 className="text-2xl font-semibold text-gray-700 mb-4">CPAS - Collaborative Performance Advertising Solution</h2>
-                                <div className="h-1 w-32 bg-blue-600 mx-auto mb-6"></div>
-                                <h3 className="text-xl font-semibold text-gray-800">\${clientName}</h3>
-                                <p className="text-lg text-gray-600 mt-4">\${comparisonLabel} Comparison Report</p>
-                                <p className="text-md text-gray-500 mt-2">\${thisPeriodLabel} vs \${lastPeriodLabel}</p>
-                            </div>
-                            <div className="mt-12 text-center text-sm text-gray-500">
-                                <p>Dicetak pada: \${new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                            </div>
-                        </div>
-                    </div>\`
-
-  // ============================================
-  // SLIDE 2: EXECUTIVE SUMMARY (REDESIGNED - BUSINESS FOCUSED)
-  // ============================================
-  slides += \`
-                    {/* SLIDE 2 - EXECUTIVE SUMMARY */}
-                    <div className="bg-white p-8 border-t-4 border-blue-600">
-                        <div className="max-w-6xl mx-auto">
-                            <h2 className="text-3xl font-bold text-blue-600 mb-6">Ringkasan Eksekutif</h2>
-
-                            \${dataValidation.issues.length > 0 ? \`
-                            <div className="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
-                                <div className="flex items-start">
-                                    <span className="text-2xl mr-3">⚠️</span>
-                                    <div>
-                                        <h4 className="font-semibold text-yellow-800">Peringatan Kualitas Data</h4>
-                                        <ul className="mt-2 text-sm text-yellow-700 list-disc list-inside">
-                                            \${dataValidation.issues.map((issue) => \`<li>\${issue}</li>\`).join('')}
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            \` : ''}
-
-                            {/* Overall Performance Status */}
-                            <div className="mb-6 p-6 \${thisROAS >= lastROAS ? 'bg-green-50 border-l-4 border-green-500' : 'bg-red-50 border-l-4 border-red-500'} rounded">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <h3 className="text-xl font-bold \${thisROAS >= lastROAS ? 'text-green-700' : 'text-red-700'}">
-                                            Status Performa: \${performanceStatus}
-                                        </h3>
-                                        <p className="text-gray-700 mt-2">
-                                            \${thisROAS >= lastROAS
-                                              ? \`Campaign mengalami perbaikan dengan ROAS \${thisROAS.toFixed(2)}x, lebih tinggi dari \${lastPeriodLabel} (\${lastROAS.toFixed(2)}x).\`
-                                              : \`Campaign mengalami penurunan performa. ROAS turun dari \${lastROAS.toFixed(2)}x ke \${thisROAS.toFixed(2)}x (\${Math.abs(roasGrowth.value).toFixed(1)}% decline).\`
-                                            }
-                                        </p>
-                                    </div>
-                                    <div className="text-5xl">\${thisROAS >= lastROAS ? '✅' : '❌'}</div>
-                                </div>
-                            </div>
-
-                            {/* Key Metrics Comparison */}
-                            <div className="grid grid-cols-2 gap-4 mb-6">
-                                <div className="border rounded-lg p-4">
-                                    <div className="text-sm text-gray-600 mb-1">Total Spend</div>
-                                    <div className="text-2xl font-bold text-gray-800">\${formatCurrency(thisSpend)}</div>
-                                    <div className="text-sm \${getTrendColor(spendGrowth.isPositive)} mt-1">
-                                        \${getTrendIcon(spendGrowth.isPositive)} \${Math.abs(spendGrowth.value).toFixed(1)}% vs \${lastPeriodLabel}
-                                    </div>
-                                    <div className="text-xs text-gray-500 mt-1">\${formatCurrency(lastSpend)} → \${formatCurrency(thisSpend)}</div>
-                                </div>
-
-                                <div className="border rounded-lg p-4">
-                                    <div className="text-sm text-gray-600 mb-1">Total Purchases</div>
-                                    <div className="text-2xl font-bold text-gray-800">\${formatNumber(thisPurchases)}</div>
-                                    <div className="text-sm \${getTrendColor(purchasesGrowth.isPositive)} mt-1">
-                                        \${getTrendIcon(purchasesGrowth.isPositive)} \${purchasesGrowth.isZeroToNonZero ? '∞' : Math.abs(purchasesGrowth.value).toFixed(1) + '%'} vs \${lastPeriodLabel}
-                                    </div>
-                                    <div className="text-xs text-gray-500 mt-1">\${formatNumber(lastPurchases)} → \${formatNumber(thisPurchases)}</div>
-                                </div>
-
-                                <div className="border rounded-lg p-4">
-                                    <div className="text-sm text-gray-600 mb-1">Total Revenue</div>
-                                    <div className="text-2xl font-bold text-gray-800">\${formatCurrency(thisRevenue)}</div>
-                                    <div className="text-sm \${getTrendColor(revenueGrowth.isPositive)} mt-1">
-                                        \${getTrendIcon(revenueGrowth.isPositive)} \${Math.abs(revenueGrowth.value).toFixed(1)}% vs \${lastPeriodLabel}
-                                    </div>
-                                    <div className="text-xs text-gray-500 mt-1">\${formatCurrency(lastRevenue)} → \${formatCurrency(thisRevenue)}</div>
-                                </div>
-
-                                <div className="border rounded-lg p-4">
-                                    <div className="text-sm text-gray-600 mb-1">ROAS</div>
-                                    <div className="text-2xl font-bold \${thisROAS >= 2.0 ? 'text-green-600' : thisROAS >= 1.0 ? 'text-yellow-600' : 'text-red-600'}">\${thisROAS.toFixed(2)}x</div>
-                                    <div className="text-sm \${getTrendColor(roasGrowth.isPositive)} mt-1">
-                                        \${getTrendIcon(roasGrowth.isPositive)} \${lastROAS > 0 ? Math.abs(roasGrowth.value).toFixed(1) + '%' : 'N/A'} vs \${lastPeriodLabel}
-                                    </div>
-                                    <div className="text-xs text-gray-500 mt-1">\${lastROAS.toFixed(2)}x → \${thisROAS.toFixed(2)}x</div>
-                                </div>
-
-                                <div className="border rounded-lg p-4">
-                                    <div className="text-sm text-gray-600 mb-1">Cost Per Purchase</div>
-                                    <div className="text-2xl font-bold text-gray-800">\${formatCurrency(thisCPA)}</div>
-                                    <div className="text-sm \${getTrendColor(!cpaGrowth.isPositive)} mt-1">
-                                        \${getTrendIcon(!cpaGrowth.isPositive)} \${lastCPA > 0 ? Math.abs(cpaGrowth.value).toFixed(1) + '%' : 'N/A'} vs \${lastPeriodLabel}
-                                    </div>
-                                    <div className="text-xs text-gray-500 mt-1">\${formatCurrency(lastCPA)} → \${formatCurrency(thisCPA)}</div>
-                                </div>
-
-                                <div className="border rounded-lg p-4">
-                                    <div className="text-sm text-gray-600 mb-1">Average Order Value</div>
-                                    <div className="text-2xl font-bold text-gray-800">\${formatCurrency(thisAOV)}</div>
-                                    <div className="text-sm \${getTrendColor(aovGrowth.isPositive)} mt-1">
-                                        \${getTrendIcon(aovGrowth.isPositive)} \${lastAOV > 0 ? Math.abs(aovGrowth.value).toFixed(1) + '%' : 'N/A'} vs \${lastPeriodLabel}
-                                    </div>
-                                    <div className="text-xs text-gray-500 mt-1">\${formatCurrency(lastAOV)} → \${formatCurrency(thisAOV)}</div>
-                                </div>
-                            </div>
-
-                            {/* Profit/Loss Summary */}
-                            <div className="p-4 \${thisRevenue >= thisSpend ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'} rounded-lg">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <h4 className="font-semibold \${thisRevenue >= thisSpend ? 'text-green-700' : 'text-red-700'}">
-                                            \${thisRevenue >= thisSpend ? 'Net Profit' : 'Net Loss'}
-                                        </h4>
-                                        <p className="text-sm text-gray-600 mt-1">
-                                            Revenue (\${formatCurrency(thisRevenue)}) \${thisRevenue >= thisSpend ? '>' : '<'} Spend (\${formatCurrency(thisSpend)})
-                                        </p>
-                                    </div>
-                                    <div className="text-2xl font-bold \${thisRevenue >= thisSpend ? 'text-green-600' : 'text-red-600'}">
-                                        \${formatCurrency(Math.abs(thisRevenue - thisSpend))}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>\`
-
-  // ============================================
-  // SLIDE 3: FUNNEL ANALYSIS (NEW)
-  // ============================================
-  slides += \`
-                    {/* SLIDE 3 - FUNNEL ANALYSIS */}
-                    <div className="bg-white p-8 border-t-4 border-blue-600">
-                        <div className="max-w-6xl mx-auto">
-                            <h2 className="text-3xl font-bold text-blue-600 mb-6">Analisis Funnel Pembelian</h2>
-                            <p className="text-gray-600 mb-6">
-                                Memahami customer journey dari melihat konten hingga melakukan pembelian
-                            </p>
-
-                            {/* Funnel Visualization */}
-                            <div className="mb-8">
-                                \${[{
-                                  label: 'Content Views',
-                                  thisValue: thisCV,
-                                  lastValue: lastCV,
-                                  thisRate: 100,
-                                  lastRate: 100,
-                                  icon: '👁️'
-                                }, {
-                                  label: 'Adds to Cart',
-                                  thisValue: thisATC,
-                                  lastValue: lastATC,
-                                  thisRate: thisCV > 0 ? (thisATC / thisCV) * 100 : 0,
-                                  lastRate: lastCV > 0 ? (lastATC / lastCV) * 100 : 0,
-                                  icon: '🛒'
-                                }, {
-                                  label: 'Purchases',
-                                  thisValue: thisPurchases,
-                                  lastValue: lastPurchases,
-                                  thisRate: thisATC > 0 ? (thisPurchases / thisATC) * 100 : 0,
-                                  lastRate: lastATC > 0 ? (lastPurchases / lastATC) * 100 : 0,
-                                  icon: '💰'
-                                }].map((stage, index) => \`
-                                <div className="mb-4">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <div className="flex items-center">
-                                            <span class="text-2xl mr-2">\${stage.icon}</span>
-                                            <span class="font-semibold text-gray-700">\${stage.label}</span>
-                                        </div>
-                                        <div class="text-right">
-                                            <div class="text-lg font-bold text-gray-800">\${formatNumber(stage.thisValue)}</div>
-                                            <div class="text-xs text-gray-500">\${lastPeriodLabel}: \${formatNumber(stage.lastValue)}</div>
-                                        </div>
-                                    </div>
-                                    <div class="w-full bg-gray-200 rounded-full h-4">
-                                        <div class="h-4 rounded-full \${index === 0 ? 'bg-blue-500' : index === 1 ? 'bg-yellow-500' : 'bg-green-500'}"
-                                            style="width: \${Math.max(stage.thisRate, 5)}%"></div>
-                                    </div>
-                                    <div class="flex justify-between text-xs text-gray-600 mt-1">
-                                        <span>\${thisPeriodLabel}: \${stage.thisRate.toFixed(1)}%</span>
-                                        <span>\${lastPeriodLabel}: \${stage.lastRate.toFixed(1)}%</span>
-                                    </div>
-                                </div>
-                                \`).join('')}
-                            </div>
-
-                            {/* Funnel Insights */}
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="border rounded-lg p-4 \${thisCVToATC >= 5 ? 'bg-green-50' : 'bg-red-50'}">
-                                    <h4 class="font-semibold text-gray-700 mb-2">Conversion: View → ATC</h4>
-                                    <div class="text-2xl font-bold \${thisCVToATC >= 5 ? 'text-green-600' : 'text-red-600'}">\${thisCVToATC.toFixed(1)}%</div>
-                                    <p class="text-sm text-gray-600 mt-2">
-                                        \${thisCVToATC >= 5
-                                          ? '✅ Rate bagus. Product interest tinggi.'
-                                          : '❌ Rate rendah. Perlu improve offer/price.'
-                                        }
-                                    </p>
-                                </div>
-
-                                <div class="border rounded-lg p-4 \${thisATCToPurchase >= 5 ? 'bg-green-50' : 'bg-red-50'}">
-                                    <h4 class="font-semibold text-gray-700 mb-2">Conversion: ATC → Purchase</h4>
-                                    <div class="text-2xl font-bold \${thisATCToPurchase >= 5 ? 'text-green-600' : 'text-red-600'}">\${thisATCToPurchase.toFixed(1)}%</div>
-                                    <p class="text-sm text-gray-600 mt-2">
-                                        \${thisATCToPurchase >= 5
-                                          ? '✅ Rate bagus. Checkout process smooth.'
-                                          : '❌ Rate rendah. Perlu review checkout flow.'
-                                        }
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Overall Conversion Rate */}
-                            <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <h4 class="font-semibold text-blue-700">Overall Conversion Rate</h4>
-                                        <p class="text-sm text-gray-600">Dari Content View ke Purchase</p>
-                                    </div>
-                                    <div class="text-3xl font-bold text-blue-600">\${thisCVToPurchase.toFixed(2)}%</div>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-2">
-                                    \${lastPeriodLabel}: \${lastCVToPurchase.toFixed(2)}% → \${thisPeriodLabel}: \${thisCVToPurchase.toFixed(2)}%
-                                    (\${thisCVToPurchase >= lastCVToPurchase ? '↑' : '↓'} \${Math.abs(thisCVToPurchase - lastCVToPurchase).toFixed(2)}pp)
-                                </p>
-                            </div>
-                        </div>
-                    </div>\`
-
-  // ============================================
-  // SLIDE 4: BUSINESS INSIGHTS (NEW)
-  // ============================================
-  slides += \`
-                    {/* SLIDE 4 - BUSINESS INSIGHTS */}
-                    <div className="bg-white p-8 border-t-4 border-blue-600">
-                        <div className="max-w-6xl mx-auto">
-                            <h2 className="text-3xl font-bold text-blue-600 mb-6">Insight Bisnis</h2>
-                            <p className="text-gray-600 mb-6">
-                                Analisis mendalam untuk pengambilan keputusan strategis
-                            </p>
-
-                            <div className="space-y-4">
-                                \${businessInsights.map(insight => \`
-                                <div className="p-4 rounded-lg border-l-4 \${insight.priority === 'HIGH' ? 'bg-red-50 border-red-500' : insight.priority === 'MEDIUM' ? 'bg-yellow-50 border-yellow-500' : 'bg-green-50 border-green-500'}">
-                                    <div className="flex items-start">
-                                        <h4 className="font-bold text-lg \${insight.priority === 'HIGH' ? 'text-red-700' : insight.priority === 'MEDIUM' ? 'text-yellow-700' : 'text-green-700'} mb-2">
-                                            \${insight.title}
-                                        </h4>
-                                        <span class="ml-auto text-xs font-semibold px-2 py-1 rounded \${insight.priority === 'HIGH' ? 'bg-red-200 text-red-800' : insight.priority === 'MEDIUM' ? 'bg-yellow-200 text-yellow-800' : 'bg-green-200 text-green-800'}">
-                                            \${insight.priority}
-                                        </span>
-                                    </div>
-                                    <ul className="mt-3 space-y-2">
-                                        \${insight.insights.map(item => \`
-                                        <li className="flex items-start text-sm text-gray-700">
-                                            <span className="mr-2">•</span>
-                                            <span>\${item}</span>
-                                        </li>
-                                        \`).join('')}
-                                    </ul>
-                                </div>
-                                \`).join('')}
-                            </div>
-                        </div>
-                    </div>\`
-
-  // ============================================
-  // SLIDE 5: PLATFORM PERFORMANCE (IMPROVED)
-  // ============================================
-  const platformData = breakdown.thisWeek?.platform || []
-  if (platformData.length > 0) {
-    const sortedPlatform = [...platformData].sort((a: any, b: any) => {
-      const purchasesA = Number(a['Purchases with shared items'] || a.Purchases || 0)
-      const purchasesB = Number(b['Purchases with shared items'] || b.Purchases || 0)
-      return purchasesB - purchasesA
-    })
-
-    slides += \`
-                    {/* SLIDE 5 - PLATFORM PERFORMANCE */}
-                    <div className="bg-white p-8 border-t-4 border-blue-600">
-                        <div className="max-w-6xl mx-auto">
-                            <h2 className="text-3xl font-bold text-blue-600 mb-6">Performa Berdasarkan Platform</h2>
-                            <p className="text-gray-600 mb-6">
-                                Analisis performa iklan di berbagai platform Meta
-                            </p>
-
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-sm border-collapse">
-                                    <thead>
-                                        <tr className="bg-gray-100">
-                                            <th className="border p-3 text-left">Platform</th>
-                                            <th className="border p-3 text-right">Spend</th>
-                                            <th className="border p-3 text-right">Impressions</th>
-                                            <th className="border p-3 text-right">Clicks</th>
-                                            <th className="border p-3 text-right">Purchases</th>
-                                            <th className="border p-3 text-right">Revenue</th>
-                                            <th className="border p-3 text-right">ROAS</th>
-                                            <th className="border p-3 text-center">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        \${sortedPlatform.map((platform: any) => {
-                                          const platformName = platform.Platform || platform.platform || 'Unknown'
-                                          const spend = Number(platform['Amount spent (IDR)'] || platform.amountSpent || 0)
-                                          const impressions = Number(platform.Impressions || platform.impressions || 0)
-                                          const clicks = Number(platform['Outbound clicks'] || platform.clicks || 0)
-                                          const purchases = Number(platform['Purchases with shared items'] || platform.Purchases || 0)
-                                          const revenue = Number(platform['Purchases conversion value for shared items only'] || 0)
-                                          const roas = spend > 0 ? calculateROAS(revenue, spend) : 0
-
-                                          const ctr = clicks > 0 && impressions > 0 ? (clicks / impressions) * 100 : 0
-
-                                          let status = '⚪'
-                                          let statusText = 'Insufficient Data'
-
-                                          if (purchases > 0 && roas >= 2.0) {
-                                            status = '🟢'
-                                            statusText = 'Excellent'
-                                          } else if (purchases > 0 && roas >= 1.0) {
-                                            status = '🟡'
-                                            statusText = 'Good'
-                                          } else if (purchases > 0 && roas < 1.0) {
-                                            status = '🔴'
-                                            statusText = 'Below Break-even'
-                                          } else if (spend > 100000) {
-                                            status = '🔴'
-                                            statusText = 'No Sales'
-                                          }
-
-                                          return \`
-                                        <tr class="\${purchases === 0 ? 'bg-red-50' : ''}">
-                                            <td class="border p-3 font-semibold">\${platformName}</td>
-                                            <td class="border p-3 text-right">\${formatCurrency(spend)}</td>
-                                            <td class="border p-3 text-right">\${formatNumber(impressions)}</td>
-                                            <td class="border p-3 text-right">\${formatNumber(clicks)}</td>
-                                            <td class="border p-3 text-right">\${purchases > 0 ? \`<span class="font-bold text-green-600">\${formatNumber(purchases)}</span>\` : '<span class="text-red-600">0</span>'}</td>
-                                            <td class="border p-3 text-right">\${formatCurrency(revenue)}</td>
-                                            <td class="border p-3 text-right font-bold \${roas >= 2.0 ? 'text-green-600' : roas >= 1.0 ? 'text-yellow-600' : 'text-red-600'}">\${roas.toFixed(2)}x</td>
-                                            <td class="border p-3 text-center">\${status} \${statusText}</td>
-                                        </tr>\`
-                                        }).join('')}
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            {/* Platform Recommendations */}
-                            <div className="mt-6 grid grid-cols-3 gap-4">
-                                \${(() => {
-                                  const topPlatform = sortedPlatform[0]
-                                  if (!topPlatform) return ''
-
-                                  const platformName = topPlatform.Platform || topPlatform.platform || 'Platform'
-                                  const purchases = Number(topPlatform['Purchases with shared items'] || topPlatform.Purchases || 0)
-                                  const spend = Number(topPlatform['Amount spent (IDR)'] || topPlatform.amountSpent || 0)
-                                  const revenue = Number(topPlatform['Purchases conversion value for shared items only'] || 0)
-                                  const roas = spend > 0 ? calculateROAS(revenue, spend) : 0
-
-                                  if (purchases > 0 && roas >= 2.0) {
-                                    return \`
-                                    <div class="p-4 bg-green-50 border border-green-200 rounded">
-                                        <h4 class="font-semibold text-green-700 mb-2">✅ Scale</h4>
-                                        <p class="text-sm text-gray-700"><strong>\${platformName}</strong> performa terbaik dengan \${purchases} purchases dan ROAS \${roas.toFixed(2)}x.</p>
-                                    </div>\`
-                                  } else if (purchases > 0 && roas < 1.0) {
-                                    return \`
-                                    <div class="p-4 bg-yellow-50 border border-yellow-200 rounded">
-                                        <h4 class="font-semibold text-yellow-700 mb-2">⚠️ Optimize</h4>
-                                        <p class="text-sm text-gray-700"><strong>\${platformName}</strong> ada sales (\${purchases}) tapi ROAS \${roas.toFixed(2)}x belum break-even.</p>
-                                    </div>\`
-                                  }
-                                  return ''
-                                })()}
-
-                                \${(() => {
-                                  const zeroSalesPlatforms = sortedPlatform.filter((p: any) => {
-                                    const purchases = Number(p['Purchases with shared items'] || p.Purchases || 0)
-                                    const spend = Number(p['Amount spent (IDR)'] || p.amountSpent || 0)
-                                    return purchases === 0 && spend > 50000
-                                  })
-
-                                  if (zeroSalesPlatforms.length > 0) {
-                                    const platform = zeroSalesPlatforms[0]
-                                    const platformName = platform.Platform || platform.platform || 'Platform'
-                                    return \`
-                                    <div class="p-4 bg-red-50 border border-red-200 rounded">
-                                        <h4 class="font-semibold text-red-700 mb-2">❌ Pause/Review</h4>
-                                        <p class="text-sm text-gray-700"><strong>\${platformName}</strong> sudah spend tapi 0 sales. Pertimbangkan pause.</p>
-                                    </div>\`
-                                  }
-                                  return ''
-                                })()}
-                            </div>
-                        </div>
-                    </div>\`
+  const clientName = extractClientName()
+  
+  // Calculate growth percentage
+  const calculateGrowth = (current: number, previous: number) => {
+    if (!previous || previous === 0) return 0
+    return ((current - previous) / previous) * 100
   }
-
-  // ============================================
-  // SLIDE 6-10: DEMOGRAPHICS & BREAKDOWNS (WITH VALIDATION)
-  // ============================================
+  
+  const spendGrowth = calculateGrowth(thisWeek.amountSpent || 0, lastWeek.amountSpent || 0)
+  const resultsGrowth = calculateGrowth(thisWeek.purchases || 0, lastWeek.purchases || 0)
+  const cpaGrowth = calculateGrowth(
+    (thisWeek.purchases && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.purchases) : 0,
+    (lastWeek.purchases && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.purchases) : 0
+  )
+  
+  // Process breakdown data for slides
   const ageData = breakdown.thisWeek?.age || []
   const genderData = breakdown.thisWeek?.gender || []
   const regionData = breakdown.thisWeek?.region || []
+  const platformData = breakdown.thisWeek?.platform || []
   const placementData = breakdown.thisWeek?.placement || []
   const objectiveData = breakdown.thisWeek?.objective || []
+  const creativeData = breakdown.thisWeek?.['ad-creative'] || []
+  
+  return `<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${comparisonLabel} Meta Ads Performance Report</title>
+    <script src="https://cdn.jsdelivr.net/npm/react@18.0.0/umd/react.development.js" crossorigin></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.0.0/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="/css/bootstrap-icons-custom.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .bg-hadona-blue { background-color: #2B46BB; }
+        .text-hadona-blue { color: #2B46BB; }
+        .bg-hadona-yellow { background-color: #ECDC43; }
+        .text-hadona-yellow { color: #ECDC43; }
+        .border-hadona-blue { border-color: #2B46BB; }
+        .border-hadona-yellow { border-color: #ECDC43; }
+        
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            body { 
+                margin: 0; 
+                padding: 0; 
+                background: white !important;
+                font-size: 16px !important;
+                width: 100% !important;
+                overflow: visible !important;
+            }
+            /* Container optimization for landscape */
+            .min-h-screen {
+                min-height: auto !important;
+                height: auto !important;
+                width: 100% !important;
+            }
+            .max-w-6xl {
+                max-width: 95% !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+            }
+            /* Remove all min-height constraints for print */
+            .bg-white {
+                min-height: auto !important;
+                height: auto !important;
+                padding: 1.5rem !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            /* Prevent slides from being cut - force page break before each slide if needed */
+            .bg-white.border-t-4 {
+                page-break-before: auto !important;
+                page-break-after: auto !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                min-height: auto !important;
+                height: auto !important;
+                width: 100% !important;
+                orphans: 3 !important;
+                widows: 3 !important;
+            }
+            /* Ensure each slide container doesn't break */
+            .bg-white.border-t-4 > div {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            /* Force page break if slide is too tall for one page */
+            .bg-white.border-t-4:not(:first-child) {
+                page-break-before: auto !important;
+            }
+            /* Grid optimization for landscape */
+            .grid {
+                display: grid !important;
+            }
+            .grid-cols-2 {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 1rem !important;
+            }
+            .grid-cols-3 {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 0.75rem !important;
+            }
+            .grid-cols-4 {
+                grid-template-columns: repeat(4, 1fr) !important;
+                gap: 0.75rem !important;
+            }
+            /* Enlarge all text sizes for presentation */
+            h1 { font-size: 2.5rem !important; }
+            h2 { font-size: 2rem !important; }
+            h3 { font-size: 1.5rem !important; }
+            h4 { font-size: 1.25rem !important; }
+            .text-4xl { font-size: 2.5rem !important; }
+            .text-3xl { font-size: 2rem !important; }
+            .text-2xl { font-size: 1.75rem !important; }
+            .text-xl { font-size: 1.5rem !important; }
+            .text-lg { font-size: 1.25rem !important; }
+            .text-base { font-size: 1.125rem !important; }
+            .text-sm { font-size: 1rem !important; }
+            .text-xs { font-size: 0.9rem !important; }
+            /* Table optimization for landscape */
+            table { 
+                font-size: 1rem !important;
+                width: 100% !important;
+                table-layout: auto !important;
+            }
+            th, td { 
+                font-size: 1rem !important; 
+                padding: 0.5rem !important;
+                word-wrap: break-word !important;
+            }
+            /* Optimize spacing for landscape - more breathing room */
+            .space-y-2 > * + * { margin-top: 0.75rem !important; }
+            .space-y-3 > * + * { margin-top: 1rem !important; }
+            .space-y-4 > * + * { margin-top: 1.25rem !important; }
+            .mb-2 { margin-bottom: 0.75rem !important; }
+            .mb-3 { margin-bottom: 1rem !important; }
+            .mb-4 { margin-bottom: 1.5rem !important; }
+            .mb-6 { margin-bottom: 2rem !important; }
+            .mt-4 { margin-top: 1.5rem !important; }
+            .mt-1 { margin-top: 0.5rem !important; }
+            .p-3 { padding: 1rem !important; }
+            .p-4 { padding: 1.25rem !important; }
+            .p-6 { padding: 1.5rem !important; }
+            .p-8 { padding: 2rem !important; }
+            /* Gap optimization - more space between grid items */
+            .gap-3 { gap: 1rem !important; }
+            .gap-4 { gap: 1.25rem !important; }
+            .gap-8 { gap: 2rem !important; }
+            /* Add spacing between slides */
+            .bg-white.border-t-4 {
+                margin-bottom: 2rem !important;
+            }
+            /* Add spacing in grid containers */
+            .grid {
+                gap: 1rem !important;
+            }
+            .grid.grid-cols-2 {
+                gap: 1.5rem !important;
+            }
+            .grid.grid-cols-3 {
+                gap: 1rem !important;
+            }
+            .grid.grid-cols-4 {
+                gap: 0.75rem !important;
+            }
+            /* Enlarge icons */
+            .fas, .fab { font-size: 1.25rem !important; }
+            /* Enlarge borders */
+            .border-t-4 { 
+                border-top-width: 4px !important; 
+            }
+            .border-r-2 { 
+                border-right-width: 2px !important; 
+            }
+            .bg-white { 
+                background-color: white !important; 
+            }
+            .bg-blue-50 { 
+                background-color: #eff6ff !important; 
+            }
+            .bg-gray-50 { 
+                background-color: #f9fafb !important; 
+            }
+            .bg-yellow-50 { 
+                background-color: #fefce8 !important; 
+            }
+            .bg-green-50 { 
+                background-color: #f0fdf4 !important; 
+            }
+            .bg-hadona-blue { 
+                background-color: #2B46BB !important; 
+            }
+            .bg-hadona-yellow { 
+                background-color: #ECDC43 !important; 
+            }
+            .text-hadona-blue { 
+                color: #2B46BB !important; 
+            }
+            .text-hadona-yellow { 
+                color: #ECDC43 !important; 
+            }
+            /* Prevent breaking inside important elements */
+            table, thead, tbody, tr {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            /* Prevent breaking in key sections */
+            .space-y-2, .space-y-3, .space-y-4 {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            /* Prevent breaking in grid items */
+            .grid > div {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            /* Prevent breaking in flex containers */
+            .flex {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            /* Ensure images don't break */
+            img {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            /* Image optimization */
+            img {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+            /* Flex optimization */
+            .flex {
+                display: flex !important;
+            }
+            /* Overflow handling */
+            .overflow-x-auto {
+                overflow-x: visible !important;
+            }
+            /* Additional rules to prevent content cutting */
+            ul, ol {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            li {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            /* Ensure rounded boxes don't break */
+            .rounded-lg, .rounded {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            /* Prevent breaking in conclusion boxes */
+            .bg-blue-50, .bg-yellow-50, .bg-green-50 {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            /* Prevent breaking in space-y containers */
+            .space-y-2, .space-y-3, .space-y-4 {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            /* Ensure full slide containers don't break */
+            .min-h-screen {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            /* Prevent breaking in centered content */
+            .text-center {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            @page { 
+                margin: 10mm; 
+                size: A4 landscape; 
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
 
-  // AGE BREAKDOWN
-  if (ageData.length > 0 && !dataValidation.issues.some(issue => issue.includes('usia'))) {
-    slides += \`
-                    {/* SLIDE 6 - AGE DEMOGRAPHICS */}
-                    <div className="bg-white p-8 border-t-4 border-blue-600">
-                        <div className="max-w-6xl mx-auto">
-                            <h2 className="text-3xl font-bold text-blue-600 mb-6">Demografi: Kelompok Usia</h2>
-
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-sm border-collapse">
-                                    <thead>
-                                        <tr className="bg-gray-100">
-                                            <th className="border p-3 text-left">Kelompok Usia</th>
-                                            <th className="border p-3 text-right">Impressions</th>
-                                            <th className="border p-3 text-right">Clicks</th>
-                                            <th className="border p-3 text-right">CTR</th>
-                                            <th className="border p-3 text-right">Purchases</th>
-                                            <th className="border p-3 text-right">Spend</th>
-                                            <th className="border p-3 text-right">CPA</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        \${ageData.map((age: any) => {
-                                          const ageGroup = age.Age || age.age || 'Unknown'
-                                          const impressions = Number(age.Impressions || 0)
-                                          const clicks = Number(age['Outbound clicks'] || 0)
-                                          const ctr = clicks > 0 && impressions > 0 ? (clicks / impressions) * 100 : 0
-                                          const purchases = Number(age['Purchases with shared items'] || age.Purchases || 0)
-                                          const spend = Number(age['Amount spent (IDR)'] || 0)
-                                          const cpa = purchases > 0 ? spend / purchases : 0
-
-                                          return \`
-                                          <tr>
-                                              <td className="border p-3 font-semibold">\${ageGroup}</td>
-                                              <td className="border p-3 text-right">\${formatNumber(impressions)}</td>
-                                              <td className="border p-3 text-right">\${formatNumber(clicks)}</td>
-                                              <td className="border p-3 text-right">\${ctr.toFixed(2)}%</td>
-                                              <td className="border p-3 text-right \${purchases > 0 ? 'font-bold text-green-600' : 'text-red-600'}">\${purchases}</td>
-                                              <td className="border p-3 text-right">\${formatCurrency(spend)}</td>
-                                              <td className="border p-3 text-right">\${purchases > 0 ? formatCurrency(cpa) : '-'}</td>
-                                          </tr>\`
-                                        }).join('')}
-                                    </tbody>
-                                </table>
+    <script type="text/babel">
+        // Ensure React and ReactDOM are loaded before rendering
+        const checkAndRender = () => {
+            if (typeof React !== 'undefined' && typeof ReactDOM !== 'undefined' && document.getElementById('root')) {
+        const App = () => {
+                    // Safely stringify data with error handling
+                    let reportData;
+                    try {
+                        reportData = ${JSON.stringify(data)};
+                    } catch (e) {
+                        console.error('Error stringifying reportData:', e);
+                        reportData = {};
+                    }
+                    const isMoM = ${JSON.stringify(isMoM)};
+                    const defaultReportName = isMoM ? 'Month-on-Month Report' : 'Week-on-Week Report';
+                    const reportName = ${JSON.stringify(reportName || (isMoM ? 'Month-on-Month Report' : 'Week-on-Week Report'))};
+            
+            const formatNumber = (num) => {
+                if (!num && num !== 0) return '0';
+                const n = typeof num === 'string' ? parseFloat(String(num).replace(/,/g, '')) : num;
+                return isNaN(n) ? '0' : n.toLocaleString('id-ID');
+            };
+            
+            const formatCurrency = (num) => {
+                if (!num && num !== 0) return 'Rp 0';
+                const n = typeof num === 'string' ? parseFloat(String(num).replace(/,/g, '')) : num;
+                if (isNaN(n)) return 'Rp 0';
+                // Round to integer (no decimals)
+                const rounded = Math.round(n);
+                return 'Rp ' + rounded.toLocaleString('id-ID');
+            };
+            
+            const formatPercent = (num) => {
+                if (!num && num !== 0) return '0%';
+                const n = typeof num === 'string' ? parseFloat(String(num)) : num;
+                return isNaN(n) ? '0%' : n.toFixed(2) + '%';
+            };
+            
+            // Safely extract data with multiple fallback levels
+            const perf = (reportData && reportData.performanceSummary) ? reportData.performanceSummary : {};
+            const thisWeek = (perf && perf.thisWeek) ? perf.thisWeek : {};
+            const lastWeek = (perf && perf.lastWeek) ? perf.lastWeek : {};
+            const breakdown = (reportData && reportData.breakdown) ? reportData.breakdown : {};
+            
+            // Debug: Log data structure
+            
+            const spendGrowth = ${spendGrowth.toFixed(2)};
+            const resultsGrowth = ${resultsGrowth.toFixed(2)};
+            const cpaGrowth = ${cpaGrowth.toFixed(2)};
+            const clientName = ${JSON.stringify(clientName)};
+            const periodLabel = ${JSON.stringify(periodLabel)};
+            const periodLabelId = ${JSON.stringify(periodLabelId)};
+            const periodLabelEn = ${JSON.stringify(periodLabelEn)};
+            const thisPeriodLabel = ${JSON.stringify(thisPeriodLabel)};
+            const lastPeriodLabel = ${JSON.stringify(lastPeriodLabel)};
+            const comparisonLabel = ${JSON.stringify(comparisonLabel)};
+            const objectiveLabel = ${JSON.stringify(objectiveLabel)};
+            
+            function calculateGrowth(current, previous) {
+                if (!previous || previous === 0) return 0;
+                return ((current - previous) / previous) * 100;
+            }
+            
+            // Helper function to calculate cost per metric with fallback
+            function getCostPerMetric(week, metric, valueKey) {
+                const costKey = 'costPer' + metric;
+                if (week[costKey]) return week[costKey];
+                if (week[valueKey] && week.amountSpent) return week.amountSpent / week[valueKey];
+                return 0;
+            }
+            
+            // Helper function to get ROAS with fallback
+            function getROAS(week) {
+                if (week.purchaseROAS) return week.purchaseROAS;
+                if (week.purchasesConversionValue && week.amountSpent) return week.purchasesConversionValue / week.amountSpent;
+                return 0;
+            }
+            
+            // Helper function to get AOV with fallback
+            function getAOV(week) {
+                if (week.aov) return week.aov;
+                if (week.purchases && week.purchasesConversionValue) return week.purchasesConversionValue / week.purchases;
+                return 0;
+            }
+            
+            // Helper function to get trend icon JSX as string (for use in template strings)
+            const getTrendIconJSX = (isPositive) => {
+                return isPositive 
+                    ? '<i className="bi bi-arrow-up-circle-fill" style={{color: "#10b981", fontSize: "1.2em"}}></i>' 
+                    : '<i className="bi bi-arrow-down-circle-fill" style={{color: "#ef4444", fontSize: "1.2em"}}></i>'
+            }
+            
+            // Helper function to get field value with multiple variations
+            const getFieldValue = (item, fieldName, alternatives = []) => {
+                if (!item || typeof item !== 'object') return undefined
+                
+                const allFields = [fieldName, ...alternatives]
+                const itemKeys = Object.keys(item)
+                
+                for (const field of allFields) {
+                    // Try exact match first
+                    if (item[field] !== undefined && item[field] !== null && item[field] !== '') {
+                        return item[field]
+                    }
+                    // Try case-insensitive exact match
+                    const exactMatch = itemKeys.find(key => key.toLowerCase() === field.toLowerCase())
+                    if (exactMatch && item[exactMatch] !== undefined && item[exactMatch] !== null && item[exactMatch] !== '') {
+                        return item[exactMatch]
+                    }
+                    // Try partial match
+                    const partialMatch = itemKeys.find(key => {
+                        const keyLower = key.toLowerCase()
+                        const fieldLower = field.toLowerCase()
+                        return keyLower.includes(fieldLower) || fieldLower.includes(keyLower)
+                    })
+                    if (partialMatch && item[partialMatch] !== undefined && item[partialMatch] !== null && item[partialMatch] !== '') {
+                        return item[partialMatch]
+                    }
+                }
+                return undefined
+            }
+            
+            // Age data
+            const ageData = ${JSON.stringify(ageData)};
+            const genderData = ${JSON.stringify(genderData)};
+            const regionData = ${JSON.stringify(regionData)};
+            const platformData = ${JSON.stringify(platformData)};
+            const placementData = ${JSON.stringify(placementData)};
+            const objectiveData = ${JSON.stringify(objectiveData)};
+            const creativeData = ${JSON.stringify(creativeData)};
+            
+            return (
+                <div className="min-h-screen bg-gray-50">
+                    {/* SLIDE 1 - WELCOME */}
+                    <div className="bg-white p-8 min-h-screen flex items-center border-t-4 border-hadona-blue">
+                        <div className="max-w-6xl mx-auto w-full text-center">
+                            <img src="https://hadona.id/wp-content/uploads/2024/12/cropped-Hadona-Logo-1-300x300.png" alt="Hadona Logo" className="mx-auto mb-6" style={{width: '80px', height: '80px'}} />
+                            <h1 className="text-4xl font-bold text-hadona-blue mb-3">{comparisonLabel} Reporting</h1>
+                            <p className="text-2xl font-semibold text-hadona-blue mb-2">{objectiveLabel}</p>
+                            {reportName && reportName !== (isMoM ? 'Month-on-Month Report' : 'Week-on-Week Report') && reportName !== 'Month-on-Month Report' && reportName !== 'Week-on-Week Report' && (
+                                <p className="text-xl font-semibold text-hadona-blue mb-4">{reportName}</p>
+                            )}
+                            <p className="text-lg text-gray-500 mb-6">{periodLabel} vs {periodLabel}</p>
+                            <div className="bg-gray-100 p-6 rounded-lg max-w-2xl mx-auto">
+                                <p className="text-sm text-gray-700 font-semibold mb-2">Private & Confidential</p>
+                                <p className="text-sm text-gray-600">This presentation contains proprietary insights prepared exclusively for our valued client. Redistribution or disclosure is not permitted.</p>
                             </div>
                         </div>
-                    </div>\`
-  }
+                    </div>
 
-  // GENDER BREAKDOWN
-  if (genderData.length > 0) {
-    slides += \`
-                    {/* SLIDE 7 - GENDER DEMOGRAPHICS */}
-                    <div className="bg-white p-8 border-t-4 border-blue-600">
+                    {/* SLIDE 2 - PERFORMANCE SUMMARY */}
+                    <div className="bg-white p-8 border-t-4 border-hadona-blue">
                         <div className="max-w-6xl mx-auto">
-                            <h2 className="text-3xl font-bold text-blue-600 mb-6">Demografi: Jenis Kelamin</h2>
-
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-sm border-collapse">
-                                    <thead>
-                                        <tr className="bg-gray-100">
-                                            <th className="border p-3 text-left">Jenis Kelamin</th>
-                                            <th className="border p-3 text-right">Impressions</th>
-                                            <th className="border p-3 text-right">Clicks</th>
-                                            <th className="border p-3 text-right">CTR</th>
-                                            <th className="border p-3 text-right">Purchases</th>
-                                            <th className="border p-3 text-right">Spend</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        \${genderData.map((gender: any) => {
-                                          const genderName = gender.Gender || gender.gender || 'Unknown'
-                                          const impressions = Number(gender.Impressions || 0)
-                                          const clicks = Number(gender['Outbound clicks'] || 0)
-                                          const ctr = clicks > 0 && impressions > 0 ? (clicks / impressions) * 100 : 0
-                                          const purchases = Number(gender['Purchases with shared items'] || gender.Purchases || 0)
-                                          const spend = Number(gender['Amount spent (IDR)'] || 0)
-
-                                          return \`
-                                          <tr>
-                                              <td className="border p-3 font-semibold">\${genderName}</td>
-                                              <td className="border p-3 text-right">\${formatNumber(impressions)}</td>
-                                              <td className="border p-3 text-right">\${formatNumber(clicks)}</td>
-                                              <td className="border p-3 text-right">\${ctr.toFixed(2)}%</td>
-                                              <td className="border p-3 text-right \${purchases > 0 ? 'font-bold text-green-600' : 'text-red-600'}">\${purchases}</td>
-                                              <td className="border p-3 text-right">\${formatCurrency(spend)}</td>
-                                          </tr>\`
-                                        }).join('')}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>\`
-  }
-
-  // REGION BREAKDOWN
-  if (regionData.length > 0) {
-    slides += \`
-                    {/* SLIDE 8 - REGION BREAKDOWN */}
-                    <div className="bg-white p-8 border-t-4 border-blue-600">
-                        <div className="max-w-6xl mx-auto">
-                            <h2 className="text-3xl font-bold text-blue-600 mb-6">Performa Berdasarkan Wilayah</h2>
-
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-sm border-collapse">
-                                    <thead>
-                                        <tr className="bg-gray-100">
-                                            <th className="border p-3 text-left">Wilayah</th>
-                                            <th className="border p-3 text-right">Impressions</th>
-                                            <th className="border p-3 text-right">Clicks</th>
-                                            <th className="border p-3 text-right">Purchases</th>
-                                            <th className="border p-3 text-right">Spend</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        \${regionData.slice(0, 10).map((region: any) => {
-                                          const regionName = region.Region || region.region || 'Unknown'
-                                          const impressions = Number(region.Impressions || 0)
-                                          const clicks = Number(region['Outbound clicks'] || 0)
-                                          const purchases = Number(region['Purchases with shared items'] || region.Purchases || 0)
-                                          const spend = Number(region['Amount spent (IDR)'] || 0)
-
-                                          return \`
-                                          <tr>
-                                              <td className="border p-3 font-semibold">\${regionName}</td>
-                                              <td className="border p-3 text-right">\${formatNumber(impressions)}</td>
-                                              <td className="border p-3 text-right">\${formatNumber(clicks)}</td>
-                                              <td className="border p-3 text-right \${purchases > 0 ? 'font-bold text-green-600' : 'text-red-600'}">\${purchases}</td>
-                                              <td className="border p-3 text-right">\${formatCurrency(spend)}</td>
-                                          </tr>\`
-                                        }).join('')}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>\`
-  }
-
-  // PLACEMENT BREAKDOWN
-  if (placementData.length > 0) {
-    slides += \`
-                    {/* SLIDE 9 - PLACEMENT PERFORMANCE */}
-                    <div className="bg-white p-8 border-t-4 border-blue-600">
-                        <div className="max-w-6xl mx-auto">
-                            <h2 className="text-3xl font-bold text-blue-600 mb-6">Performa Berdasarkan Placement</h2>
-
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-sm border-collapse">
-                                    <thead>
-                                        <tr className="bg-gray-100">
-                                            <th className="border p-3 text-left">Placement</th>
-                                            <th className="border p-3 text-right">Impressions</th>
-                                            <th className="border p-3 text-right">Clicks</th>
-                                            <th className="border p-3 text-right">Purchases</th>
-                                            <th className="border p-3 text-right">Spend</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        \${placementData.map((placement: any) => {
-                                          const placementName = placement.Placement || placement.placement || 'Unknown'
-                                          const impressions = Number(placement.Impressions || 0)
-                                          const clicks = Number(placement['Outbound clicks'] || 0)
-                                          const purchases = Number(placement['Purchases with shared items'] || placement.Purchases || 0)
-                                          const spend = Number(placement['Amount spent (IDR)'] || 0)
-
-                                          return \`
-                                          <tr>
-                                              <td className="border p-3 font-semibold">\${placementName}</td>
-                                              <td className="border p-3 text-right">\${formatNumber(impressions)}</td>
-                                              <td className="border p-3 text-right">\${formatNumber(clicks)}</td>
-                                              <td className="border p-3 text-right \${purchases > 0 ? 'font-bold text-green-600' : 'text-red-600'}">\${purchases}</td>
-                                              <td className="border p-3 text-right">\${formatCurrency(spend)}</td>
-                                          </tr>\`
-                                        }).join('')}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>\`
-  }
-
-  // OBJECTIVE BREAKDOWN
-  if (objectiveData.length > 0) {
-    slides += \`
-                    {/* SLIDE 10 - OBJECTIVE PERFORMANCE */}
-                    <div className="bg-white p-8 border-t-4 border-blue-600">
-                        <div className="max-w-6xl mx-auto">
-                            <h2 className="text-3xl font-bold text-blue-600 mb-6">Performa Berdasarkan Objective</h2>
-
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-sm border-collapse">
-                                    <thead>
-                                        <tr className="bg-gray-100">
-                                            <th className="border p-3 text-left">Objective</th>
-                                            <th className="border p-3 text-right">Impressions</th>
-                                            <th className="border p-3 text-right">Clicks</th>
-                                            <th className="border p-3 text-right">Purchases</th>
-                                            <th className="border p-3 text-right">Spend</th>
-                                            <th className="border p-3 text-right">ROAS</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        \${objectiveData.map((objective: any) => {
-                                          const objectiveName = objective.Objective || objective.objective || 'Unknown'
-                                          const impressions = Number(objective.Impressions || 0)
-                                          const clicks = Number(objective['Outbound clicks'] || 0)
-                                          const purchases = Number(objective['Purchases with shared items'] || objective.Purchases || 0)
-                                          const spend = Number(objective['Amount spent (IDR)'] || 0)
-                                          const revenue = Number(objective['Purchases conversion value for shared items only'] || 0)
-                                          const roas = spend > 0 ? calculateROAS(revenue, spend) : 0
-
-                                          return \`
-                                          <tr>
-                                              <td className="border p-3 font-semibold">\${objectiveName}</td>
-                                              <td className="border p-3 text-right">\${formatNumber(impressions)}</td>
-                                              <td className="border p-3 text-right">\${formatNumber(clicks)}</td>
-                                              <td className="border p-3 text-right \${purchases > 0 ? 'font-bold text-green-600' : 'text-red-600'}">\${purchases}</td>
-                                              <td className="border p-3 text-right">\${formatCurrency(spend)}</td>
-                                              <td className="border p-3 text-right font-bold \${roas >= 2.0 ? 'text-green-600' : roas >= 1.0 ? 'text-yellow-600' : 'text-red-600'}">\${roas > 0 ? roas.toFixed(2) + 'x' : '-'}</td>
-                                          </tr>\`
-                                        }).join('')}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>\`
-  }
-
-  // ============================================
-  // SLIDE 11: ACTIONABLE RECOMMENDATIONS (NEW)
-  // ============================================
-  slides += \`
-                    {/* SLIDE 11 - ACTIONABLE RECOMMENDATIONS */}
-                    <div className="bg-white p-8 border-t-4 border-blue-600">
-                        <div className="max-w-6xl mx-auto">
-                            <h2 className="text-3xl font-bold text-blue-600 mb-6">Rekomendasi Tindakan</h2>
-                            <p className="text-gray-600 mb-6">
-                                Langkah konkret untuk mengoptimalkan performa campaign bulan depan
-                            </p>
-
-                            \${recommendations.length > 0 ? \`
-                            <div class="space-y-4">
-                                \${recommendations.map((rec, index) => \`
-                                <div class="flex items-start p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                                    <div class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-4">
-                                        \${index + 1}
-                                    </div>
-                                    <div class="flex-1">
-                                        <p class="text-gray-800">\${rec.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>
+                            <h2 className="text-2xl font-bold text-hadona-blue mb-4">Performance Summary</h2>
+                            <div className="grid grid-cols-2 gap-8">
+                                <div className="bg-blue-50 p-6 rounded-lg border-2 border-hadona-blue">
+                                    <h3 className="text-lg font-semibold text-hadona-blue mb-3">{thisPeriodLabel}</h3>
+                                    <div className="space-y-4">
+                                        <div className="flex justify-between">
+                                            <span>Spend</span>
+                                            <span className="font-bold">{formatCurrency(thisWeek.amountSpent || 0)}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span>Result (Purchases with shared items)</span>
+                                            <span className="font-bold">{formatNumber(thisWeek.purchases || 0)}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span>Cost per purchases with shared items</span>
+                                            <span className="font-bold">{formatCurrency((thisWeek.purchases && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.purchases) : 0)}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span>Growth %</span>
+                                            <span className={\`font-bold ${spendGrowth >= 0 ? 'text-green-500' : 'text-red-500'}\`}>{spendGrowth >= 0 ? '+' : ''}{formatPercent(spendGrowth)}</span>
+                                        </div>
                                     </div>
                                 </div>
-                                \`).join('')}
+                                <div className="bg-gray-50 p-6 rounded-lg border-2 border-gray-300">
+                                    <h3 className="text-lg font-semibold text-gray-600 mb-3">{lastPeriodLabel}</h3>
+                                    <div className="space-y-4">
+                                        <div className="flex justify-between">
+                                            <span>Spend</span>
+                                            <span className="font-bold">{formatCurrency(lastWeek.amountSpent || 0)}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span>Result (Purchases with shared items)</span>
+                                            <span className="font-bold">{formatNumber(lastWeek.purchases || 0)}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span>Cost per purchases with shared items</span>
+                                            <span className="font-bold">{formatCurrency((lastWeek.purchases && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.purchases) : 0)}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span>Growth %</span>
+                                            <span className="font-bold text-gray-500">-</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            \` : \`
-                            <div class="p-4 bg-gray-50 border border-gray-200 rounded">
-                                <p class="text-gray-600">Insufficient data untuk generate recommendations. Silakan upload breakdown files yang lengkap.</p>
-                            </div>
-                            \`}
-
-                            <div class="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                                <h4 class="font-semibold text-yellow-800 mb-2">📅 Checklist Bulan Depan</h4>
-                                <ul class="space-y-2 text-sm text-gray-700">
-                                    <li class="flex items-start">
-                                        <input type="checkbox" class="mt-1 mr-2" />
-                                        <span>Review dan implementasi rekomendasi di atas</span>
-                                    </li>
-                                    <li class="flex items-start">
-                                        <input type="checkbox" class="mt-1 mr-2" />
-                                        <span>A/B test new creatives berdasarkan best performing ads</span>
-                                    </li>
-                                    <li class="flex items-start">
-                                        <input type="checkbox" class="mt-1 mr-2" />
-                                        <span>Monitor funnel metrics harian untuk detect early warning signs</span>
-                                    </li>
-                                    <li class="flex items-start">
-                                        <input type="checkbox" class="mt-1 mr-2" />
-                                        <span>Optimize berdasarkan data \${thisPeriodLabel.toLowerCase()} untuk improvement berkelanjutan</span>
-                                    </li>
-                                </ul>
+                            <div className="mt-4 p-3 bg-yellow-50 rounded-lg border-l-4 border-hadona-yellow">
+                                <p className="text-xs"><i className="fas fa-lightbulb text-yellow-500 mr-2"></i> <strong>Key Insight:</strong> {spendGrowth >= 0 ? 'Performance meningkat' : 'Performance menurun'} {Math.abs(spendGrowth).toFixed(1)}% dengan {resultsGrowth >= 0 ? 'peningkatan' : 'penurunan'} {Math.abs(resultsGrowth).toFixed(1)}% purchases dan efisiensi cost yang {cpaGrowth <= 0 ? 'lebih baik' : 'perlu optimasi'}.</p>
                             </div>
                         </div>
-                    </div>\`
+                    </div>
 
-  // ============================================
-  // SLIDE 12: NEXT STEPS (NEW)
-  // ============================================
-  slides += \`
-                    {/* SLIDE 12 - NEXT STEPS */}
-                    <div className="bg-white p-8 border-t-4 border-blue-600">
+                    {/* SLIDE 3 - TABEL RINGKASAN METRIK */}
+                    <div className="bg-white p-8 border-t-4 border-hadona-blue">
                         <div className="max-w-6xl mx-auto">
-                            <h2 className="text-3xl font-bold text-blue-600 mb-6">Langkah Selanjutnya</h2>
+                            <h2 className="text-2xl font-bold text-hadona-blue mb-4">Tabel Ringkasan Metrik</h2>
+                            <div className="overflow-x-auto">
+                                <table className="w-full border-collapse border border-gray-300 text-sm">
+                                    <thead>
+                                        <tr className="bg-hadona-blue text-white">
+                                            <th className="border border-gray-300 p-2 text-left text-xs">Metrik</th>
+                                            <th className="border border-gray-300 p-2 text-right text-xs">{lastPeriodLabel}</th>
+                                            <th className="border border-gray-300 p-2 text-right text-xs">{thisPeriodLabel}</th>
+                                            <th className="border border-gray-300 p-2 text-right text-xs">Trending Value</th>
+                                            <th className="border border-gray-300 p-2 text-right text-xs">Trending %</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td className="border border-gray-300 p-2 text-xs">Amount spent</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(lastWeek.amountSpent || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(thisWeek.amountSpent || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((thisWeek.amountSpent || 0) - (lastWeek.amountSpent || 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${spendGrowth >= 0 ? 'text-green-500' : 'text-red-500'}\`}>{spendGrowth >= 0 ? '+' : ''}{formatPercent(spendGrowth)}</td>
+                                        </tr>
+                                        <tr className="bg-gray-50">
+                                            <td className="border border-gray-300 p-2 text-xs">Reach</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(lastWeek.reach || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(thisWeek.reach || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((thisWeek.reach || 0) - (lastWeek.reach || 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.reach || 0) >= (lastWeek.reach || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.reach || 0) >= (lastWeek.reach || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.reach || 0, lastWeek.reach || 0))}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="border border-gray-300 p-2 text-xs">Impressions</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(lastWeek.impressions || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(thisWeek.impressions || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((thisWeek.impressions || 0) - (lastWeek.impressions || 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.impressions || 0) >= (lastWeek.impressions || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.impressions || 0) >= (lastWeek.impressions || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.impressions || 0, lastWeek.impressions || 0))}</td>
+                                        </tr>
+                                        <tr className="bg-gray-50">
+                                            <td className="border border-gray-300 p-2 text-xs">CPM</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(lastWeek.cpm || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(thisWeek.cpm || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((thisWeek.cpm || 0) - (lastWeek.cpm || 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.cpm || 0) <= (lastWeek.cpm || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.cpm || 0) <= (lastWeek.cpm || 0) ? '' : '+'}{formatPercent(calculateGrowth(thisWeek.cpm || 0, lastWeek.cpm || 0))}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="border border-gray-300 p-2 text-xs">Frequency</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(lastWeek.frequency || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(thisWeek.frequency || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((thisWeek.frequency || 0) - (lastWeek.frequency || 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.frequency || 0) >= (lastWeek.frequency || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.frequency || 0) >= (lastWeek.frequency || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.frequency || 0, lastWeek.frequency || 0))}</td>
+                                        </tr>
+                                        <tr className="bg-gray-50">
+                                            <td className="border border-gray-300 p-2 text-xs">Link clicks</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(lastWeek.linkClicks || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(thisWeek.linkClicks || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((thisWeek.linkClicks || 0) - (lastWeek.linkClicks || 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.linkClicks || 0) >= (lastWeek.linkClicks || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.linkClicks || 0) >= (lastWeek.linkClicks || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.linkClicks || 0, lastWeek.linkClicks || 0))}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="border border-gray-300 p-2 text-xs">CTR (link click-through rate)</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatPercent((lastWeek.ctr || 0) * 100)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatPercent((thisWeek.ctr || 0) * 100)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatPercent(((thisWeek.ctr || 0) - (lastWeek.ctr || 0)) * 100)}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.ctr || 0) >= (lastWeek.ctr || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.ctr || 0) >= (lastWeek.ctr || 0) ? '+' : ''}{formatPercent(calculateGrowth((thisWeek.ctr || 0) * 100, (lastWeek.ctr || 0) * 100))}</td>
+                                        </tr>
+                                        <tr className="bg-gray-50">
+                                            <td className="border border-gray-300 p-2 text-xs">CPC (link)</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(lastWeek.cpc || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(thisWeek.cpc || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((thisWeek.cpc || 0) - (lastWeek.cpc || 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.cpc || 0) <= (lastWeek.cpc || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.cpc || 0) <= (lastWeek.cpc || 0) ? '' : '+'}{formatPercent(calculateGrowth(thisWeek.cpc || 0, lastWeek.cpc || 0))}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="border border-gray-300 p-2 text-xs">Content views with shared items</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(lastWeek.contentViews || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(thisWeek.contentViews || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((thisWeek.contentViews || 0) - (lastWeek.contentViews || 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.contentViews || 0) >= (lastWeek.contentViews || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.contentViews || 0) >= (lastWeek.contentViews || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.contentViews || 0, lastWeek.contentViews || 0))}</td>
+                                        </tr>
+                                        <tr className="bg-gray-50">
+                                            <td className="border border-gray-300 p-2 text-xs">Cost per content view</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(lastWeek, 'CV', 'contentViews'))}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(thisWeek, 'CV', 'contentViews'))}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(thisWeek, 'CV', 'contentViews') - getCostPerMetric(lastWeek, 'CV', 'contentViews'))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(getCostPerMetric(thisWeek, 'CV', 'contentViews') <= getCostPerMetric(lastWeek, 'CV', 'contentViews') ? 'text-green-500' : 'text-red-500')}\`}>{(getCostPerMetric(thisWeek, 'CV', 'contentViews') <= getCostPerMetric(lastWeek, 'CV', 'contentViews') ? '' : '+')}{formatPercent(calculateGrowth(getCostPerMetric(thisWeek, 'CV', 'contentViews'), getCostPerMetric(lastWeek, 'CV', 'contentViews')))}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="border border-gray-300 p-2 text-xs">Adds to cart with shared items</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(lastWeek.addsToCart || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(thisWeek.addsToCart || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((thisWeek.addsToCart || 0) - (lastWeek.addsToCart || 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.addsToCart || 0) >= (lastWeek.addsToCart || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.addsToCart || 0) >= (lastWeek.addsToCart || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.addsToCart || 0, lastWeek.addsToCart || 0))}</td>
+                                        </tr>
+                                        <tr className="bg-gray-50">
+                                            <td className="border border-gray-300 p-2 text-xs">Cost per add to cart with shared items</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(lastWeek, 'ATC', 'addsToCart'))}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(thisWeek, 'ATC', 'addsToCart'))}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(thisWeek, 'ATC', 'addsToCart') - getCostPerMetric(lastWeek, 'ATC', 'addsToCart'))}</td>
+                                            <td className={\\`border border-gray-300 p-2 text-right text-xs \\${(getCostPerMetric(thisWeek, 'ATC', 'addsToCart') <= getCostPerMetric(lastWeek, 'ATC', 'addsToCart') ? 'text-green-500' : 'text-red-500')}\\`}>{(getCostPerMetric(thisWeek, 'ATC', 'addsToCart') <= getCostPerMetric(lastWeek, 'ATC', 'addsToCart') ? '' : '+')}{formatPercent(calculateGrowth(getCostPerMetric(thisWeek, 'ATC', 'addsToCart'), getCostPerMetric(lastWeek, 'ATC', 'addsToCart')))}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="border border-gray-300 p-2 text-xs">ATC conversion value (shared only)</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(lastWeek.atcConversionValue || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(thisWeek.atcConversionValue || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((thisWeek.atcConversionValue || 0) - (lastWeek.atcConversionValue || 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.atcConversionValue || 0) >= (lastWeek.atcConversionValue || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.atcConversionValue || 0) >= (lastWeek.atcConversionValue || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.atcConversionValue || 0, lastWeek.atcConversionValue || 0))}</td>
+                                        </tr>
+                                        <tr className="bg-gray-50">
+                                            <td className="border border-gray-300 p-2 text-xs">Purchases with shared items</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(lastWeek.purchases || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(thisWeek.purchases || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((thisWeek.purchases || 0) - (lastWeek.purchases || 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.purchases || 0) >= (lastWeek.purchases || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.purchases || 0) >= (lastWeek.purchases || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.purchases || 0, lastWeek.purchases || 0))}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="border border-gray-300 p-2 text-xs">Cost per purchases with shared items</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(lastWeek, 'Purchase', 'purchases'))}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(thisWeek, 'Purchase', 'purchases'))}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(thisWeek, 'Purchase', 'purchases') - getCostPerMetric(lastWeek, 'Purchase', 'purchases'))}</td>
+                                            <td className={\\`border border-gray-300 p-2 text-right text-xs \\${(getCostPerMetric(thisWeek, 'Purchase', 'purchases') <= getCostPerMetric(lastWeek, 'Purchase', 'purchases') ? 'text-green-500' : 'text-red-500')}\\`}>{(getCostPerMetric(thisWeek, 'Purchase', 'purchases') <= getCostPerMetric(lastWeek, 'Purchase', 'purchases') ? '' : '+')}{formatPercent(calculateGrowth(getCostPerMetric(thisWeek, 'Purchase', 'purchases'), getCostPerMetric(lastWeek, 'Purchase', 'purchases')))}</td>
+                                        </tr>
+                                        <tr className="bg-gray-50">
+                                            <td className="border border-gray-300 p-2 text-xs">Purchases conversion value for shared items only</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(lastWeek.purchasesConversionValue || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(thisWeek.purchasesConversionValue || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((thisWeek.purchasesConversionValue || 0) - (lastWeek.purchasesConversionValue || 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.purchasesConversionValue || 0) >= (lastWeek.purchasesConversionValue || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.purchasesConversionValue || 0) >= (lastWeek.purchasesConversionValue || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.purchasesConversionValue || 0, lastWeek.purchasesConversionValue || 0))}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="border border-gray-300 p-2 text-xs">Conversion Rate (Purchase ÷ Click)</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatPercent((lastWeek.linkClicks && lastWeek.purchases) ? (lastWeek.purchases / lastWeek.linkClicks * 100) : 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatPercent((thisWeek.linkClicks && thisWeek.purchases) ? (thisWeek.purchases / thisWeek.linkClicks * 100) : 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatPercent(((thisWeek.linkClicks && thisWeek.purchases) ? (thisWeek.purchases / thisWeek.linkClicks * 100) : 0) - ((lastWeek.linkClicks && lastWeek.purchases) ? (lastWeek.purchases / lastWeek.linkClicks * 100) : 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${((thisWeek.linkClicks && thisWeek.purchases) ? (thisWeek.purchases / thisWeek.linkClicks * 100) : 0) >= ((lastWeek.linkClicks && lastWeek.purchases) ? (lastWeek.purchases / lastWeek.linkClicks * 100) : 0) ? 'text-green-500' : 'text-red-500'}\`}>{((thisWeek.linkClicks && thisWeek.purchases) ? (thisWeek.purchases / thisWeek.linkClicks * 100) : 0) >= ((lastWeek.linkClicks && lastWeek.purchases) ? (lastWeek.purchases / lastWeek.linkClicks * 100) : 0) ? '+' : ''}{formatPercent(calculateGrowth((thisWeek.linkClicks && thisWeek.purchases) ? (thisWeek.purchases / thisWeek.linkClicks * 100) : 0, (lastWeek.linkClicks && lastWeek.purchases) ? (lastWeek.purchases / lastWeek.linkClicks * 100) : 0))}</td>
+                                        </tr>
+                                        <tr className="bg-gray-50">
+                                            <td className="border border-gray-300 p-2 text-xs">Purchase ROAS (return on ad spend)</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(getROAS(lastWeek))}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(getROAS(thisWeek))}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(getROAS(thisWeek) - getROAS(lastWeek))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(getROAS(thisWeek) >= getROAS(lastWeek) ? 'text-green-500' : 'text-red-500')}\`}>{(getROAS(thisWeek) >= getROAS(lastWeek) ? '+' : '')}{formatPercent(calculateGrowth(getROAS(thisWeek), getROAS(lastWeek)))}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="border border-gray-300 p-2 text-xs">AOV (Average Order Value)</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getAOV(lastWeek))}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getAOV(thisWeek))}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getAOV(thisWeek) - getAOV(lastWeek))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(getAOV(thisWeek) >= getAOV(lastWeek) ? 'text-green-500' : 'text-red-500')}\`}>{(getAOV(thisWeek) >= getAOV(lastWeek) ? '+' : '')}{formatPercent(calculateGrowth(getAOV(thisWeek), getAOV(lastWeek)))}</td>
+                                        </tr>
+                                        ${(thisWeek.clicksAll || lastWeek.clicksAll) ? `
+                                        <tr className="bg-gray-50">
+                                            <td className="border border-gray-300 p-2 text-xs">Clicks (all)</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(lastWeek.clicksAll || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(thisWeek.clicksAll || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((thisWeek.clicksAll || 0) - (lastWeek.clicksAll || 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.clicksAll || 0) >= (lastWeek.clicksAll || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.clicksAll || 0) >= (lastWeek.clicksAll || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.clicksAll || 0, lastWeek.clicksAll || 0))}</td>
+                                        </tr>
+                                        ` : ''}
+                                        ${(thisWeek.ctrAll || lastWeek.ctrAll) ? `
+                                        <tr>
+                                            <td className="border border-gray-300 p-2 text-xs">CTR (all)</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatPercent((lastWeek.ctrAll || 0) * 100)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatPercent((thisWeek.ctrAll || 0) * 100)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatPercent(((thisWeek.ctrAll || 0) - (lastWeek.ctrAll || 0)) * 100)}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.ctrAll || 0) >= (lastWeek.ctrAll || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.ctrAll || 0) >= (lastWeek.ctrAll || 0) ? '+' : ''}{formatPercent(calculateGrowth((thisWeek.ctrAll || 0) * 100, (lastWeek.ctrAll || 0) * 100))}</td>
+                                        </tr>
+                                        ` : ''}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div className="mt-4 space-y-2">
+                                <div className="p-3 bg-yellow-50 rounded-lg">
+                                    <div className="flex items-start">
+                                        <i className="fas fa-chart-line text-blue-500 mr-2 mt-0.5"></i>
+                                        <div className="flex-1">
+                                            <p className="text-xs"><strong>Kesimpulan:</strong> {spendGrowth >= 0 ? 'Peningkatan' : 'Penurunan'} performa {Math.abs(spendGrowth).toFixed(1)}% di semua metrik.</p>
+                                            <p className="text-xs mt-1">{resultsGrowth >= 0 ? 'Engagement' : 'Cost efficiency'} menjadi {resultsGrowth >= 0 ? 'driver utama' : 'area perbaikan'} {isMoM ? 'bulan' : 'minggu'} ini.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="p-3 bg-green-50 rounded-lg">
+                                    <div className="flex items-start">
+                                        <i className="fas fa-lightbulb text-green-500 mr-2 mt-0.5"></i>
+                                        <div className="flex-1">
+                                            <p className="text-xs"><strong>Rekomendasi:</strong> {spendGrowth >= 0 ? 'Pertahankan momentum dengan' : 'Fokus pada optimasi'} {resultsGrowth >= 0 ? 'scaling budget ke performa terbaik' : 'cost efficiency dan targeting'}.</p>
+                                            <p className="text-xs mt-1">Monitor metrik kunci secara berkala untuk memastikan growth berkelanjutan.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                            <div class="grid grid-cols-2 gap-6">
-                                <div>
-                                    <h3 class="text-xl font-semibold text-gray-800 mb-4">🎯 Prioritas Tinggi</h3>
-                                    <ul class="space-y-3">
-                                        <li class="flex items-start">
-                                            <span class="text-red-600 mr-2">1.</span>
-                                            <span class="text-gray-700">\${thisROAS < 1.0 ? 'Investigate dan fix root cause of low ROAS sebelum scaling' : 'Validate dan scale winning campaigns dengan hati-hati'}</span>
+                    {/* SLIDE 4 - WEEK-ON-WEEK ANALYSIS */}
+                    <div className="bg-white p-8 border-t-4 border-hadona-blue">
+                        <div className="max-w-6xl mx-auto">
+                            <h2 className="text-2xl font-bold text-hadona-blue mb-4">{comparisonLabel} Analysis</h2>
+                            <div className="grid grid-cols-2 gap-0">
+                                <div className="border-r-2 border-gray-300 pr-6">
+                                    <h3 className="text-lg font-semibold text-green-600 mb-3"><i className="fas fa-arrow-up mr-2"></i>Highlight</h3>
+                                    <ul className="space-y-3">
+                                        <li className="flex items-start">
+                                            <i className="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                                            <span><strong>Purchases</strong> {resultsGrowth >= 0 ? 'meningkat' : 'menurun'} {Math.abs(resultsGrowth).toFixed(1)}% dengan {resultsGrowth >= 0 ? 'peningkatan' : 'penurunan'} conversion rate</span>
                                         </li>
-                                        <li class="flex items-start">
-                                            <span class="text-red-600 mr-2">2.</span>
-                                            <span class="text-gray-700">\${thisCVToATC < 5 ? 'Improve ATC rate dengan testing offer/price' : 'Maintain ATC rate dan explore upsell opportunities'}</span>
+                                        <li className="flex items-start">
+                                            <i className="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                                            <span><strong>Click-Through Rate</strong> {thisWeek.ctr >= lastWeek.ctr ? 'stabil' : 'meningkat'} di {formatPercent((thisWeek.ctr || 0) * 100)} meskipun impressions {thisWeek.impressions >= lastWeek.impressions ? 'meningkat' : 'menurun'}</span>
                                         </li>
-                                        <li class="flex items-start">
-                                            <span class="text-red-600 mr-2">3.</span>
-                                            <span class="text-gray-700">\${thisATCToPurchase < 5 ? 'Review dan optimize checkout process' : 'Optimize average order value dengan bundling'}</span>
+                                        <li className="flex items-start">
+                                            <i className="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                                            <span><strong>Cost Efficiency</strong> {cpaGrowth <= 0 ? 'meningkat' : 'menurun'} dengan CPA {cpaGrowth <= 0 ? 'turun' : 'naik'} {Math.abs(cpaGrowth).toFixed(1)}%</span>
+                                        </li>
+                                        <li className="flex items-start">
+                                            <i className="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                                            <span><strong>Budget Utilization</strong> optimal dengan spend {spendGrowth >= 0 ? 'meningkat' : 'menurun'} {Math.abs(spendGrowth).toFixed(1)}%</span>
                                         </li>
                                     </ul>
                                 </div>
-
-                                <div>
-                                    <h3 class="text-xl font-semibold text-gray-800 mb-4">📊 Monitoring Plan</h3>
-                                    <ul class="space-y-3 text-sm text-gray-700">
-                                        <li class="flex items-start">
-                                            <span class="text-blue-600 mr-2">•</span>
-                                            <span>Track ROAS harian untuk detect trend early</span>
+                                <div className="pl-6">
+                                    <h3 className="text-lg font-semibold text-red-600 mb-3"><i className="fas fa-arrow-down mr-2"></i>Lowlight</h3>
+                                    <ul className="space-y-3">
+                                        <li className="flex items-start">
+                                            <i className="fas fa-exclamation-circle text-red-500 mt-1 mr-2"></i>
+                                            <span><strong>CPC Link</strong> {thisWeek.cpc > lastWeek.cpc ? 'meningkat' : 'stabil'} {thisWeek.cpc > lastWeek.cpc ? 'meskipun hasil baik' : ''}</span>
                                         </li>
-                                        <li class="flex items-start">
-                                            <span class="text-blue-600 mr-2">•</span>
-                                            <span>Monitor funnel metrics setiap 3 hari</span>
+                                        <li className="flex items-start">
+                                            <i className="fas fa-exclamation-circle text-red-500 mt-1 mr-2"></i>
+                                            <span><strong>Impressions</strong> {thisWeek.impressions < lastWeek.impressions ? 'menurun' : 'meningkat'} {Math.abs(calculateGrowth(thisWeek.impressions || 0, lastWeek.impressions || 0)).toFixed(1)}% {thisWeek.impressions < lastWeek.impressions ? 'perlu optimasi targeting' : ''}</span>
                                         </li>
-                                        <li class="flex items-start">
-                                            <span class="text-blue-600 mr-2">•</span>
-                                            <span>Review platform performance weekly</span>
+                                        <li className="flex items-start">
+                                            <i className="fas fa-exclamation-circle text-red-500 mt-1 mr-2"></i>
+                                            <span><strong>Frequency</strong> {thisWeek.frequency > lastWeek.frequency ? 'meningkat' : 'stabil'} {thisWeek.frequency > lastWeek.frequency ? '- perlu monitor ad fatigue' : ''}</span>
                                         </li>
-                                        <li class="flex items-start">
-                                            <span class="text-blue-600 mr-2">•</span>
-                                            <span>Prepare report \${isMoM ? 'bulan' : 'minggu'} depan untuk comparison</span>
+                                        <li className="flex items-start">
+                                            <i className="fas fa-exclamation-circle text-red-500 mt-1 mr-2"></i>
+                                            <span><strong>Reach</strong> {thisWeek.reach < lastWeek.reach ? 'menurun' : 'meningkat'} {thisWeek.reach < lastWeek.reach ? '- perlu expand audience' : ''}</span>
                                         </li>
                                     </ul>
                                 </div>
                             </div>
+                            <div className="mt-4 space-y-2">
+                                <div className="p-3 bg-yellow-50 rounded-lg">
+                                    <div className="flex items-start">
+                                        <i className="fas fa-lightbulb text-yellow-500 mr-2 mt-0.5"></i>
+                                        <div className="flex-1">
+                                            <p className="text-xs"><strong>Kesimpulan:</strong> Fokus optimasi {thisWeek.cpc > lastWeek.cpc ? 'CPC' : 'CTR'} untuk efisiensi sambil {thisWeek.impressions < lastWeek.impressions ? 'expand reach' : 'maintain reach'} dan meningkatkan conversion rate.</p>
+                                            <p className="text-xs mt-1">Growth berkelanjutan memerlukan monitoring metrik kunci (purchases, CPA, conversion rate) secara berkala dan penyesuaian strategi.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="p-3 bg-green-50 rounded-lg">
+                                    <div className="flex items-start">
+                                        <i className="fas fa-lightbulb text-green-500 mr-2 mt-0.5"></i>
+                                        <div className="flex-1">
+                                            <p className="text-xs"><strong>Rekomendasi:</strong> {thisWeek.cpc > lastWeek.cpc ? 'Optimasi CPC dengan testing creative dan targeting untuk menurunkan cost per purchase.' : 'Tingkatkan CTR dengan testing creative dan optimasi placement untuk meningkatkan purchases.'}</p>
+                                            <p className="text-xs mt-1">{thisWeek.impressions < lastWeek.impressions ? 'Ekspansi reach dengan penambahan audience dan budget untuk meningkatkan exposure dan purchases.' : 'Pertahankan reach sambil fokus pada optimasi conversion rate (purchase/click) dan cost efficiency (CPA).'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                            <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                                <h4 class="font-semibold text-blue-800 mb-2">💬 Diskusi dengan Tim</h4>
-                                <p class="text-sm text-gray-700">
-                                    Jadwalkan meeting dengan tim untuk membahas:
-                                    1) Hasil implementasi rekomendasi, 2) Hasil A/B test creatives,
-                                    3) Budget allocation untuk \${isMoM ? 'bulan' : 'minggu'} depan, 4) Strategic priorities
+                    ${generateBreakdownSlides(breakdown, thisWeek, lastWeek, thisPeriodLabel, lastPeriodLabel)}
+
+                    ${generateEventAnalysisSlides(data, thisWeek, lastWeek, thisPeriodLabel, lastPeriodLabel, isMoM)}
+
+                    {/* SLIDE 13 - THANK YOU */}
+                    <div className="bg-white p-8 border-t-4 border-hadona-blue min-h-screen flex items-center">
+                        <div className="max-w-6xl mx-auto w-full text-center">
+                            <img src="https://hadona.id/wp-content/uploads/2024/12/cropped-Hadona-Logo-1-300x300.png" alt="Hadona Logo" className="mx-auto mb-6" style={{width: '100px', height: '100px'}} />
+                            <h2 className="text-4xl font-bold text-hadona-blue mb-6">Terima Kasih</h2>
+                            <div className="space-y-3 mb-6">
+                                <p className="text-xl"><i className="fab fa-instagram text-purple-500 mr-2"></i> Instagram: @hadona.id</p>
+                                <p className="text-xl"><i className="fab fa-tiktok text-black mr-2"></i> TikTok: @hadona.id</p>
+                                <p className="text-xl"><i className="fas fa-globe text-blue-500 mr-2"></i> Website: www.hadona.id</p>
+                            </div>
+                            <div className="mt-8 pt-6 border-t border-gray-300">
+                                <p className="text-sm text-gray-500">Powered by <span className="font-semibold text-gray-700">Hadona Digital Media</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+                // Use React 18 createRoot API instead of ReactDOM.render
+                const rootElement = document.getElementById('root');
+                // Check if createRoot is available (React 18+)
+                if (typeof ReactDOM !== 'undefined' && ReactDOM.createRoot) {
+                    const root = ReactDOM.createRoot(rootElement);
+                    root.render(<App />);
+                } else if (typeof ReactDOM !== 'undefined' && ReactDOM.render) {
+                    // Fallback for React 17
+                    ReactDOM.render(<App />, rootElement);
+                } else {
+                    console.error('ReactDOM is not available');
+                }
+            } else {
+                // Retry after a short delay
+                setTimeout(checkAndRender, 100);
+            }
+        };
+
+        // Start rendering when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', checkAndRender);
+        } else {
+            checkAndRender();
+        }
+    </script>
+</body>
+</html>`
+}
+
+function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, thisPeriodLabel: string, lastPeriodLabel: string): string {
+  let slides = ''
+  
+  // Slide 5: Age Performance
+  const ageThisWeek = breakdown.thisWeek?.age || []
+  const ageLastWeek = breakdown.lastWeek?.age || []
+  
+  if (ageThisWeek.length > 0 || ageLastWeek.length > 0) {
+    // Sort by purchases (highest first)
+    const sortedAge = [...ageThisWeek]
+      .filter((a: any) => a.Age && a.Age.trim())
+      .sort((a: any, b: any) => {
+        // Try multiple field name variations for purchases
+        const getPurchases = (item: any) => {
+          let purchasesRaw = item['Purchases with shared items'] || 
+                              item['Purchases'] || 
+                              item['Purchases with shared items only'] ||
+                              item['Purchases (shared items)'] ||
+                              0
+          
+          // If purchases is empty/0, calculate from conversion value and AOV
+          if (!purchasesRaw || parseFloat(String(purchasesRaw).replace(/,/g, '')) === 0) {
+            const purchasesCV = parseFloat(String(item['Purchases conversion value for shared items only'] || item['Purchases conversion value'] || 0).replace(/,/g, '')) || 0
+            const aov = parseFloat(String(item['AOV (IDR)'] || item['AOV'] || 0).replace(/,/g, '')) || 0
+            if (purchasesCV > 0 && aov > 0) {
+              purchasesRaw = purchasesCV / aov
+            }
+          }
+          
+          return parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
+        }
+        const resultA = getPurchases(a)
+        const resultB = getPurchases(b)
+        return resultB - resultA
+      })
+      .slice(0, 6)
+    
+    slides += `
+                    {/* SLIDE 5 - AUDIENCE PERFORMANCE: AGE */}
+                    <div className="bg-white p-8 border-t-4 border-hadona-blue">
+                        <div className="max-w-6xl mx-auto">
+                            <h2 className="text-2xl font-bold text-hadona-blue mb-4">Audience Performance: Age</h2>
+                            <div className="grid grid-cols-2 gap-0">
+                                <div className="border-r-2 border-gray-300 pr-6">
+                                    <h3 className="text-base font-semibold mb-3">Total Purchases</h3>
+                                    <div className="space-y-2">
+                                        ${sortedAge.map((item: any) => {
+          const age = item.Age || 'Unknown'
+          // Try multiple field name variations for purchases
+          let purchasesRaw = item['Purchases with shared items'] || 
+                              item['Purchases'] || 
+                              item['Purchases with shared items only'] ||
+                              item['Purchases (shared items)'] ||
+                              0
+          
+          // If purchases is empty/0, calculate from conversion value and AOV
+          if (!purchasesRaw || parseFloat(String(purchasesRaw).replace(/,/g, '')) === 0) {
+            const purchasesCV = parseFloat(String(item['Purchases conversion value for shared items only'] || item['Purchases conversion value'] || 0).replace(/,/g, '')) || 0
+            const aov = parseFloat(String(item['AOV (IDR)'] || item['AOV'] || 0).replace(/,/g, '')) || 0
+            if (purchasesCV > 0 && aov > 0) {
+              purchasesRaw = purchasesCV / aov
+            }
+          }
+          
+          const result = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
+          return `<div className="flex justify-between items-center">
+                                            <span className="text-xs">${age}</span>
+                                            <span className="font-bold text-xs">{formatNumber(${result})}</span>
+                                        </div>`
+        }).join('')}
+                                    </div>
+                                </div>
+                                <div className="pl-6">
+                                    <h3 className="text-base font-semibold mb-3">CPA (Cost Per Purchase)</h3>
+                                    <div className="space-y-2">
+                                        ${sortedAge.map((item: any) => {
+          const age = item.Age || 'Unknown'
+          // Try multiple field name variations for purchases
+          let purchasesRaw = item['Purchases with shared items'] || 
+                              item['Purchases'] || 
+                              item['Purchases with shared items only'] ||
+                              item['Purchases (shared items)'] ||
+                              0
+          
+          // If purchases is empty/0, calculate from conversion value and AOV
+          if (!purchasesRaw || parseFloat(String(purchasesRaw).replace(/,/g, '')) === 0) {
+            const purchasesCV = parseFloat(String(item['Purchases conversion value for shared items only'] || item['Purchases conversion value'] || 0).replace(/,/g, '')) || 0
+            const aov = parseFloat(String(item['AOV (IDR)'] || item['AOV'] || 0).replace(/,/g, '')) || 0
+            if (purchasesCV > 0 && aov > 0) {
+              purchasesRaw = purchasesCV / aov
+            }
+          }
+          
+          const purchases = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
+          const amountSpentRaw = item['Amount spent (IDR)'] || item['Amount spent'] || 0
+          const amountSpent = parseFloat(String(amountSpentRaw).replace(/,/g, '')) || 0
+          const cpa = purchases > 0 ? (amountSpent / purchases) : 0
+          return `<div className="flex justify-between items-center">
+                                            <span className="text-xs">${age}</span>
+                                            <span className="font-bold text-xs">{formatCurrency(${cpa})}</span>
+                                        </div>`
+        }).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mt-4 space-y-2">
+                                <div className="p-3 bg-yellow-50 rounded-lg">
+                                    <div className="flex items-start">
+                                        <i className="fas fa-users text-blue-500 mr-2 mt-0.5"></i>
+                                        <div className="flex-1">
+                                            <p className="text-xs"><strong>Kesimpulan:</strong> ${sortedAge.length > 0 ? (() => {
+          const topAge = sortedAge[0]
+          let purchases = topAge['Purchases with shared items'] || 
+                           topAge['Purchases'] || 
+                           topAge['Purchases with shared items only'] ||
+                           topAge['Purchases (shared items)'] ||
+                           0
+          
+          // If purchases is empty/0, calculate from conversion value and AOV
+          if (!purchases || parseFloat(String(purchases).replace(/,/g, '')) === 0) {
+            const purchasesCV = parseFloat(String(topAge['Purchases conversion value for shared items only'] || topAge['Purchases conversion value'] || 0).replace(/,/g, '')) || 0
+            const aov = parseFloat(String(topAge['AOV (IDR)'] || topAge['AOV'] || 0).replace(/,/g, '')) || 0
+            if (purchasesCV > 0 && aov > 0) {
+              purchases = purchasesCV / aov
+            }
+          }
+          
+          return 'Demografi ' + topAge.Age + ' menghasilkan ' + Math.round(purchases) + ' purchases dengan CPA terendah.'
+        })() : 'Data age breakdown menunjukkan variasi performa signifikan.'}</p>
+                                            <p className="text-xs mt-1">${sortedAge.length > 0 ? 'Segment ini menjadi pilihan terbaik untuk optimasi budget dan scaling.' : 'Perlu analisis lebih lanjut untuk identifikasi segment terbaik.'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="p-3 bg-green-50 rounded-lg">
+                                    <div className="flex items-start">
+                                        <i className="fas fa-lightbulb text-green-500 mr-2 mt-0.5"></i>
+                                        <div className="flex-1">
+                                            <p className="text-xs"><strong>Rekomendasi:</strong> ${sortedAge.length > 0 ? 'Alokasikan lebih banyak budget ke demografi ' + sortedAge[0].Age + ' untuk hasil optimal.' : 'Lakukan A/B testing pada berbagai segment age untuk menemukan performa terbaik.'}</p>
+                                            <p className="text-xs mt-1">Pertimbangkan ekspansi ke segment age serupa dengan performa baik untuk meningkatkan reach dan purchases.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`
+  }
+  
+  // Slide 6: Gender Performance
+  const genderThisWeek = breakdown.thisWeek?.gender || []
+  if (genderThisWeek.length > 0) {
+    // Sort by impressions (highest first)
+    const sortedGender = [...genderThisWeek]
+      .filter((g: any) => g.Gender && g.Gender.trim())
+      .sort((a: any, b: any) => {
+        const impA = a.Impressions || 0
+        const impB = b.Impressions || 0
+        return impB - impA
+      })
+    
+    slides += `
+                    {/* SLIDE 6 - AUDIENCE PERFORMANCE: GENDER */}
+                    <div className="bg-white p-8 border-t-4 border-hadona-blue">
+                        <div className="max-w-6xl mx-auto">
+                            <h2 className="text-2xl font-bold text-hadona-blue mb-4">Audience Performance: Gender</h2>
+                            <div className="grid grid-cols-3 gap-0">
+                                <div className="border-r-2 border-gray-300 pr-4">
+                                    <h3 className="text-base font-semibold mb-3">Impressions</h3>
+                                    <div className="space-y-2">
+                                        ${sortedGender.map((item: any) => {
+          const gender = item.Gender || 'Unknown'
+          const impressions = item.Impressions || 0
+          return `<div className="flex justify-between items-center">
+                                            <span className="text-xs">${gender}</span>
+                                            <span className="font-bold text-xs">{formatNumber(${impressions})}</span>
+                                        </div>`
+        }).join('')}
+                                    </div>
+                                </div>
+                                <div className="border-r-2 border-gray-300 px-4">
+                                    <h3 className="text-base font-semibold mb-3">Outbound Click</h3>
+                                    <div className="space-y-2">
+                                        ${sortedGender.map((item: any) => {
+          const gender = item.Gender || 'Unknown'
+          const clicks = item['Outbound clicks'] || 0
+          return `<div className="flex justify-between items-center">
+                                            <span className="text-xs">${gender}</span>
+                                            <span className="font-bold text-xs">{formatNumber(${clicks})}</span>
+                                        </div>`
+        }).join('')}
+                                    </div>
+                                </div>
+                                <div className="pl-4">
+                                    <h3 className="text-base font-semibold mb-3">CTR (Link)</h3>
+                                    <div className="space-y-2">
+                                        ${sortedGender.map((item: any) => {
+          const gender = item.Gender || 'Unknown'
+          const ctr = (item['CTR (link click-through rate)'] || 0) * 100
+          return `<div className="flex justify-between items-center">
+                                            <span className="text-xs">${gender}</span>
+                                            <span className="font-bold text-xs">{formatPercent(${ctr})}</span>
+                                        </div>`
+        }).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mt-4 space-y-2">
+                                <div className="p-3 bg-yellow-50 rounded-lg">
+                                    <div className="flex items-start">
+                                        <i className="fas fa-venus-mars text-blue-500 mr-2 mt-0.5"></i>
+                                        <div className="flex-1">
+                                            <p className="text-xs"><strong>Kesimpulan:</strong> ${sortedGender.length > 0 ? sortedGender[0].Gender + ' menghasilkan impressions tertinggi dengan CTR ' + ((sortedGender[0]['CTR (link click-through rate)'] || 0) * 100).toFixed(2) + '%.' : 'Gender breakdown menunjukkan variasi performa signifikan antar segment.'}</p>
+                                            <p className="text-xs mt-1">${sortedGender.length > 0 ? 'Segment ini menunjukkan engagement lebih tinggi dibanding segment lainnya.' : 'Perlu analisis lebih lanjut untuk identifikasi segment terbaik.'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="p-3 bg-green-50 rounded-lg">
+                                    <div className="flex items-start">
+                                        <i className="fas fa-lightbulb text-green-500 mr-2 mt-0.5"></i>
+                                        <div className="flex-1">
+                                            <p className="text-xs"><strong>Rekomendasi:</strong> ${sortedGender.length > 0 ? 'Fokus targeting pada segment ' + sortedGender[0].Gender + ' untuk optimasi budget dan hasil maksimal.' : 'Lakukan testing pada berbagai segment gender untuk menemukan performa terbaik.'}</p>
+                                            <p className="text-xs mt-1">Pertimbangkan ekspansi ke segment gender lain dengan performa baik untuk diversifikasi audience.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`
+  }
+  
+  // Slide 7: Region Performance
+  const regionThisWeek = breakdown.thisWeek?.region || []
+  if (regionThisWeek.length > 0) {
+    // Sort by impressions (highest first)
+    const sortedRegion = [...regionThisWeek]
+      .filter((r: any) => r.Region && r.Region.trim())
+      .sort((a: any, b: any) => {
+        const impA = a.Impressions || 0
+        const impB = b.Impressions || 0
+        return impB - impA
+      })
+      .slice(0, 5)
+    
+    slides += `
+                    {/* SLIDE 7 - AUDIENCE PERFORMANCE: REGION */}
+                    <div className="bg-white p-8 border-t-4 border-hadona-blue">
+                        <div className="max-w-6xl mx-auto">
+                            <h2 className="text-2xl font-bold text-hadona-blue mb-4">Audience Performance: Region</h2>
+                            <div className="grid grid-cols-3 gap-0">
+                                <div className="border-r-2 border-gray-300 pr-4">
+                                    <h3 className="text-base font-semibold mb-3">Impressions</h3>
+                                    <div className="space-y-2">
+                                        ${sortedRegion.map((item: any) => {
+          const region = item.Region || 'Unknown'
+          const impressions = item.Impressions || 0
+          return `<div className="flex justify-between items-center">
+                                            <span className="text-xs">${region}</span>
+                                            <span className="font-bold text-xs">{formatNumber(${impressions})}</span>
+                                        </div>`
+        }).join('')}
+                                    </div>
+                                </div>
+                                <div className="border-r-2 border-gray-300 px-4">
+                                    <h3 className="text-base font-semibold mb-3">Link Click</h3>
+                                    <div className="space-y-2">
+                                        ${sortedRegion.map((item: any) => {
+          const region = item.Region || 'Unknown'
+          const clicks = item['Outbound clicks'] || 0
+          return `<div className="flex justify-between items-center">
+                                            <span className="text-xs">${region}</span>
+                                            <span className="font-bold text-xs">{formatNumber(${clicks})}</span>
+                                        </div>`
+        }).join('')}
+                                    </div>
+                                </div>
+                                <div className="pl-4">
+                                    <h3 className="text-base font-semibold mb-3">CTR (Link)</h3>
+                                    <div className="space-y-2">
+                                        ${sortedRegion.map((item: any) => {
+          const region = item.Region || 'Unknown'
+          const ctr = (item['CTR (link click-through rate)'] || 0) * 100
+          return `<div className="flex justify-between items-center">
+                                            <span className="text-xs">${region}</span>
+                                            <span className="font-bold text-xs">{formatPercent(${ctr})}</span>
+                                        </div>`
+        }).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mt-4 space-y-2">
+                                <div className="p-3 bg-yellow-50 rounded-lg">
+                                    <div className="flex items-start">
+                                        <i className="fas fa-map-marker-alt text-blue-500 mr-2 mt-0.5"></i>
+                                        <div className="flex-1">
+                                            <p className="text-xs"><strong>Kesimpulan:</strong> ${sortedRegion.length > 0 ? sortedRegion[0].Region + ' menghasilkan impressions tertinggi dengan CTR ' + ((sortedRegion[0]['CTR (link click-through rate)'] || 0) * 100).toFixed(2) + '%.' : 'Region breakdown menunjukkan variasi performa signifikan antar lokasi.'}</p>
+                                            <p className="text-xs mt-1">${sortedRegion.length > 0 ? 'Region ini menjadi pilihan terbaik untuk fokus targeting dan optimasi budget.' : 'Perlu analisis lebih lanjut untuk identifikasi region terbaik.'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="p-3 bg-green-50 rounded-lg">
+                                    <div className="flex items-start">
+                                        <i className="fas fa-lightbulb text-green-500 mr-2 mt-0.5"></i>
+                                        <div className="flex-1">
+                                            <p className="text-xs"><strong>Rekomendasi:</strong> ${sortedRegion.length > 0 ? 'Alokasikan lebih banyak budget ke region ' + sortedRegion[0].Region + ' untuk hasil optimal.' : 'Lakukan testing pada berbagai region untuk menemukan performa terbaik.'}</p>
+                                            <p className="text-xs mt-1">Pertimbangkan ekspansi ke region serupa dengan performa baik untuk meningkatkan reach dan diversifikasi.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`
+  }
+  
+  // Slide 8: Platform Performance
+  const platformThisWeek = breakdown.thisWeek?.platform || []
+  if (platformThisWeek.length > 0) {
+    // Sort by purchases (highest first)
+    const sortedPlatform = [...platformThisWeek]
+      .filter((p: any) => p.Platform && p.Platform.trim())
+      .sort((a: any, b: any) => {
+        const getPurchases = (item: any) => {
+          const purchasesRaw = item['Purchases with shared items'] || 
+                              item['Purchases'] || 
+                              item['Purchases with shared items only'] ||
+                              item['Purchases (shared items)'] ||
+                              0
+          return parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
+        }
+        return getPurchases(b) - getPurchases(a)
+      })
+    
+    slides += `
+                    {/* SLIDE 8 - PLATFORM PERFORMANCE */}
+                    <div className="bg-white p-8 border-t-4 border-hadona-blue">
+                        <div className="max-w-6xl mx-auto">
+                            <h2 className="text-2xl font-bold text-hadona-blue mb-4">Platform Performance</h2>
+                            <div className="grid grid-cols-2 gap-0">
+                                <div className="border-r-2 border-gray-300 pr-6">
+                                    <h3 className="text-base font-semibold mb-3">Total Purchases</h3>
+                                    <div className="space-y-2">
+                                        ${sortedPlatform.map((item: any) => {
+          const platform = item.Platform || 'Unknown'
+          const purchasesRaw = item['Purchases with shared items'] || 
+                              item['Purchases'] || 
+                              item['Purchases with shared items only'] ||
+                              item['Purchases (shared items)'] ||
+                              0
+          const purchases = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
+          return `<div className="flex justify-between items-center">
+                                            <span className="text-xs">${platform}</span>
+                                            <span className="font-bold text-xs">{formatNumber(${purchases})}</span>
+                                        </div>`
+        }).join('')}
+                                    </div>
+                                </div>
+                                <div className="pl-6">
+                                    <h3 className="text-base font-semibold mb-3">CPA (Cost Per Purchase)</h3>
+                                    <div className="space-y-2">
+                                        ${sortedPlatform.map((item: any) => {
+          const platform = item.Platform || 'Unknown'
+          const purchasesRaw = item['Purchases with shared items'] || 
+                              item['Purchases'] || 
+                              item['Purchases with shared items only'] ||
+                              item['Purchases (shared items)'] ||
+                              0
+          const purchases = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
+          const amountSpentRaw = item['Amount spent (IDR)'] || item['Amount spent'] || 0
+          const amountSpent = parseFloat(String(amountSpentRaw).replace(/,/g, '')) || 0
+          const cpa = purchases > 0 ? (amountSpent / purchases) : 0
+          return `<div className="flex justify-between items-center">
+                                            <span className="text-xs">${platform}</span>
+                                            <span className="font-bold text-xs">{formatCurrency(${cpa})}</span>
+                                        </div>`
+        }).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mt-4 space-y-2">
+                                <div className="p-3 bg-yellow-50 rounded-lg">
+                                    <div className="flex items-start">
+                                        <i className="fab fa-instagram text-purple-500 mr-2 mt-0.5"></i>
+                                        <div className="flex-1">
+                                            <p className="text-xs"><strong>Kesimpulan:</strong> ${sortedPlatform.length > 0 ? (() => {
+          const topPlatform = sortedPlatform[0]
+          const purchases = topPlatform['Purchases with shared items'] || 
+                           topPlatform['Purchases'] || 
+                           topPlatform['Purchases with shared items only'] ||
+                           topPlatform['Purchases (shared items)'] ||
+                           0
+          return topPlatform.Platform + ' menghasilkan ' + purchases + ' purchases dengan CPA terendah.'
+        })() : 'Platform breakdown menunjukkan variasi performa signifikan antar platform.'}</p>
+                                            <p className="text-xs mt-1">${sortedPlatform.length > 0 ? 'Platform ini menjadi pilihan terbaik untuk optimasi budget dan scaling campaign.' : 'Perlu analisis lebih lanjut untuk identifikasi platform terbaik.'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="p-3 bg-green-50 rounded-lg">
+                                    <div className="flex items-start">
+                                        <i className="fas fa-lightbulb text-green-500 mr-2 mt-0.5"></i>
+                                        <div className="flex-1">
+                                            <p className="text-xs"><strong>Rekomendasi:</strong> ${sortedPlatform.length > 0 ? 'Alokasikan lebih banyak budget ke platform ' + sortedPlatform[0].Platform + ' untuk hasil maksimal.' : 'Lakukan testing pada berbagai platform untuk menemukan performa terbaik.'}</p>
+                                            <p className="text-xs mt-1">Pertimbangkan ekspansi ke platform lain dengan performa baik untuk diversifikasi dan meningkatkan purchases.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`
+  }
+  
+  // Slide 9: Placement Performance
+  const placementThisWeek = breakdown.thisWeek?.placement || []
+  if (placementThisWeek.length > 0) {
+    // Sort by purchases (highest first)
+    const sortedPlacement = [...placementThisWeek]
+      .filter((p: any) => p.Placement && p.Placement.trim())
+      .sort((a: any, b: any) => {
+        const getPurchases = (item: any) => {
+          const purchasesRaw = item['Purchases with shared items'] || 
+                              item['Purchases'] || 
+                              item['Purchases with shared items only'] ||
+                              item['Purchases (shared items)'] ||
+                              0
+          return parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
+        }
+        return getPurchases(b) - getPurchases(a)
+      })
+      .slice(0, 5)
+    
+    slides += `
+                    {/* SLIDE 9 - CONTENT PERFORMANCE: PLACEMENT */}
+                    <div className="bg-white p-8 border-t-4 border-hadona-blue">
+                        <div className="max-w-6xl mx-auto">
+                            <h2 className="text-2xl font-bold text-hadona-blue mb-4">Content Performance: Placement</h2>
+                            <div className="grid grid-cols-2 gap-0">
+                                <div className="border-r-2 border-gray-300 pr-6">
+                                    <h3 className="text-base font-semibold mb-3">Total Purchases</h3>
+                                    <div className="space-y-2">
+                                        ${sortedPlacement.map((item: any) => {
+          const placement = item.Placement || 'Unknown'
+          const purchasesRaw = item['Purchases with shared items'] || 
+                              item['Purchases'] || 
+                              item['Purchases with shared items only'] ||
+                              item['Purchases (shared items)'] ||
+                              0
+          const purchases = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
+          return `<div className="flex justify-between items-center">
+                                            <span className="text-xs">${placement}</span>
+                                            <span className="font-bold text-xs">{formatNumber(${purchases})}</span>
+                                        </div>`
+        }).join('')}
+                                    </div>
+                                </div>
+                                <div className="pl-6">
+                                    <h3 className="text-base font-semibold mb-3">CPA (Cost Per Purchase)</h3>
+                                    <div className="space-y-2">
+                                        ${sortedPlacement.map((item: any) => {
+          const placement = item.Placement || 'Unknown'
+          const purchasesRaw = item['Purchases with shared items'] || 
+                              item['Purchases'] || 
+                              item['Purchases with shared items only'] ||
+                              item['Purchases (shared items)'] ||
+                              0
+          const purchases = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
+          const amountSpentRaw = item['Amount spent (IDR)'] || item['Amount spent'] || 0
+          const amountSpent = parseFloat(String(amountSpentRaw).replace(/,/g, '')) || 0
+          const cpa = purchases > 0 ? (amountSpent / purchases) : 0
+          return `<div className="flex justify-between items-center">
+                                            <span className="text-xs">${placement}</span>
+                                            <span className="font-bold text-xs">{formatCurrency(${cpa})}</span>
+                                        </div>`
+        }).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mt-4 space-y-2">
+                                <div className="p-3 bg-yellow-50 rounded-lg">
+                                    <div className="flex items-start">
+                                        <i className="fas fa-photo-video text-blue-500 mr-2 mt-0.5"></i>
+                                        <div className="flex-1">
+                                            <p className="text-xs"><strong>Kesimpulan:</strong> ${sortedPlacement.length > 0 ? (() => {
+          const topPlacement = sortedPlacement[0]
+          const purchases = topPlacement['Purchases with shared items'] || 
+                           topPlacement['Purchases'] || 
+                           topPlacement['Purchases with shared items only'] ||
+                           topPlacement['Purchases (shared items)'] ||
+                           0
+          return topPlacement.Placement + ' menghasilkan ' + purchases + ' purchases dengan CPA terendah.'
+        })() : 'Placement breakdown menunjukkan variasi performa signifikan antar format.'}</p>
+                                            <p className="text-xs mt-1">${sortedPlacement.length > 0 ? 'Format konten ini menjadi pilihan terbaik untuk optimasi dan scaling.' : 'Perlu analisis lebih lanjut untuk identifikasi format terbaik.'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="p-3 bg-green-50 rounded-lg">
+                                    <div className="flex items-start">
+                                        <i className="fas fa-lightbulb text-green-500 mr-2 mt-0.5"></i>
+                                        <div className="flex-1">
+                                            <p className="text-xs"><strong>Rekomendasi:</strong> ${sortedPlacement.length > 0 ? 'Buat lebih banyak konten dengan format ' + sortedPlacement[0].Placement + ' untuk hasil optimal.' : 'Lakukan testing pada berbagai format placement untuk menemukan performa terbaik.'}</p>
+                                            <p className="text-xs mt-1">Pertimbangkan ekspansi ke format placement lain dengan performa baik untuk diversifikasi konten dan meningkatkan purchases.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`
+  }
+  
+  // Slide 10: Creative Performance
+  const creativeThisWeek = breakdown.thisWeek?.['ad-creative'] || []
+  if (creativeThisWeek.length > 0) {
+    // Get top 5 performers based on: Purchases + Instagram Visits + Followers
+    const sortedCreative = [...creativeThisWeek]
+      .filter((c: any) => {
+        const purchases = c['Purchases with shared items'] || 
+                         c['Purchases'] || 
+                         c['Purchases with shared items only'] ||
+                         c['Purchases (shared items)'] ||
+                         0
+        const instagramVisits = c['Instagram profile visits'] || 0
+        const instagramFollows = c['Instagram follows'] || 0
+        // Filter ads that have at least one of these metrics > 0
+        return purchases > 0 || instagramVisits > 0 || instagramFollows > 0
+      })
+      .map((item: any) => {
+        const purchasesRaw = item['Purchases with shared items'] || 
+                            item['Purchases'] || 
+                            item['Purchases with shared items only'] ||
+                            item['Purchases (shared items)'] ||
+                            0
+        const purchases = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
+        const instagramVisits = parseFloat(String(item['Instagram profile visits'] || 0).replace(/,/g, '')) || 0
+        const instagramFollows = parseFloat(String(item['Instagram follows'] || 0).replace(/,/g, '')) || 0
+        // Calculate combined score (weighted)
+        const combinedScore = (purchases * 3) + (instagramVisits * 1) + (instagramFollows * 2)
+        return { ...item, _combinedScore: combinedScore }
+      })
+      .sort((a: any, b: any) => b._combinedScore - a._combinedScore)
+      .slice(0, 5)
+    
+    slides += `
+                    {/* SLIDE 10 - CREATIVE PERFORMANCE: AD ANALYSIS */}
+                    <div className="bg-white p-8 border-t-4 border-hadona-blue">
+                        <div className="max-w-6xl mx-auto">
+                            <h2 className="text-2xl font-bold text-hadona-blue mb-4">Creative Performance: Ad Analysis</h2>
+                            <div className="mb-3">
+                                <p className="text-xs text-gray-600">
+                                    <i className="fas fa-info-circle text-blue-500 mr-2"></i>
+                                    Top 5 Iklan berdasarkan kombinasi: Purchases, Instagram Profile Visits, dan Instagram Follows
                                 </p>
                             </div>
+                            <div className="space-y-4">
+                                ${sortedCreative.map((item: any, index: number) => {
+          const adNameRaw = item['Ads'] || item['Ad name'] || item['Ad Name'] || item['Campaign name'] || item['Campaign Name'] || item['Ad'] || item['Creative'] || item['Ad creative'] || (item['Campaign'] && item['Ad set'] ? item['Campaign'] + ' - ' + item['Ad set'] : null) || Object.values(item).find((v: any) => typeof v === 'string' && v.length > 0 && !v.match(/^[0-9.,]+$/)) || 'N/A'
+          
+          // Parse ad names - split by semicolon and clean up
+          let adNamesList: string[] = []
+          if (adNameRaw && typeof adNameRaw === 'string') {
+            // Split by semicolon
+            adNamesList = adNameRaw.split(';').map((name: string) => name.trim()).filter((name: string) => name.length > 0)
+            // Remove "...and X more ads" pattern
+            adNamesList = adNamesList.map((name: string) => name.replace(/\.\.\.and \d+ more ads?/i, '').trim()).filter((name: string) => name.length > 0)
+            // If still empty or only one item, use original
+            if (adNamesList.length === 0) {
+              adNamesList = [adNameRaw]
+            }
+          } else {
+            adNamesList = [String(adNameRaw || 'N/A')]
+          }
+          
+          // Take first 3 ad names for display
+          const displayAdNames = adNamesList.slice(0, 3)
+          const hasMore = adNamesList.length > 3
+          
+          const purchasesRaw = item['Purchases with shared items'] || 
+                              item['Purchases'] || 
+                              item['Purchases with shared items only'] ||
+                              item['Purchases (shared items)'] ||
+                              0
+          const purchases = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
+          const instagramVisits = parseFloat(String(item['Instagram profile visits'] || 0).replace(/,/g, '')) || 0
+          const instagramFollows = parseFloat(String(item['Instagram follows'] || 0).replace(/,/g, '')) || 0
+          const amountSpentRaw = item['Amount spent (IDR)'] || item['Amount spent'] || 0
+          const amountSpent = parseFloat(String(amountSpentRaw).replace(/,/g, '')) || 0
+          const cpr = item['Cost per purchase'] || item['Cost per purchases with shared items'] || item['Cost /Purchase (IDR)'] || (amountSpent > 0 && purchases > 0 ? (amountSpent / purchases) : 0)
+          const ctr = (item['CTR (link click-through rate)'] || item['CTR (all)'] || 0) * 100
+          const impressions = item['Impressions'] || 0
+          const outboundClicks = item['Outbound clicks'] || item['Clicks (all)'] || 0
+          
+          return `<div className="border-2 ${index === 0 ? 'border-yellow-400 bg-yellow-50' : index === 1 ? 'border-green-300 bg-green-50' : index === 2 ? 'border-blue-300 bg-blue-50' : 'border-gray-200 bg-gray-50'} p-3 rounded-lg">
+                                            <div className="mb-3">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <span className="text-base font-bold ${index === 0 ? 'text-yellow-600' : index === 1 ? 'text-green-600' : index === 2 ? 'text-blue-600' : 'text-gray-600'}">#${index + 1}</span>
+                                                    <h4 className="font-semibold text-xs text-gray-800">Daftar Nama Ads:</h4>
+                                                </div>
+                                                <div className="bg-white p-2 rounded border border-gray-200">
+                                                    <ul className="space-y-1">
+                                                        ${displayAdNames.map((name: string) => {
+            const cleanName = name.length > 70 ? name.substring(0, 67) + '...' : name
+            return `<li className="text-xs text-gray-700 flex items-start">
+                                                            <span className="text-gray-400 mr-2">•</span>
+                                                            <span>${cleanName}</span>
+                                                        </li>`
+          }).join('')}
+                                                        ${hasMore ? `<li className="text-xs text-gray-500 italic flex items-start">
+                                                            <span className="text-gray-400 mr-2">•</span>
+                                                            <span>...dan ${adNamesList.length - 3} ads lainnya</span>
+                                                        </li>` : ''}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div className="grid grid-cols-3 gap-3 mt-3">
+                                                <div className="bg-white p-3 rounded border">
+                                                    <div className="text-xs text-gray-600 mb-1">Purchases</div>
+                                                    <div className="text-sm font-bold text-green-600">{formatNumber(${purchases})}</div>
+                                                </div>
+                                                <div className="bg-white p-3 rounded border">
+                                                    <div className="text-xs text-gray-600 mb-1">Instagram Visits</div>
+                                                    <div className="text-sm font-bold text-purple-600">{formatNumber(${instagramVisits})}</div>
+                                                </div>
+                                                <div className="bg-white p-3 rounded border">
+                                                    <div className="text-xs text-gray-600 mb-1">Instagram Follows</div>
+                                                    <div className="text-sm font-bold text-pink-600">{formatNumber(${instagramFollows})}</div>
+                                                </div>
+                                            </div>
+                                            <div className="grid grid-cols-4 gap-3 mt-3 pt-3 border-t">
+                                                <div>
+                                                    <div className="text-xs text-gray-600">CPR</div>
+                                                    <div className="text-sm font-semibold">{formatCurrency(${cpr})}</div>
+                                                </div>
+                                                <div>
+                                                    <div className="text-xs text-gray-600">CTR</div>
+                                                    <div className="text-sm font-semibold">{formatPercent(${ctr})}</div>
+                                                </div>
+                                                <div>
+                                                    <div className="text-xs text-gray-600">Impressions</div>
+                                                    <div className="text-sm font-semibold">{formatNumber(${impressions})}</div>
+                                                </div>
+                                                <div>
+                                                    <div className="text-xs text-gray-600">Outbound Clicks</div>
+                                                    <div className="text-sm font-semibold">{formatNumber(${outboundClicks})}</div>
+                                                </div>
+                                            </div>
+                                        </div>`
+        }).join('')}
+                            </div>
+                            <div className="mt-4 space-y-2">
+                                <div className="p-3 bg-yellow-50 rounded-lg">
+                                    <div className="flex items-start">
+                                        <i className="fas fa-palette text-yellow-500 mr-2 mt-0.5"></i>
+                                        <div className="flex-1">
+                                            <p className="text-xs"><strong>Kesimpulan:</strong> ${sortedCreative.length > 0 ? 'Top iklan menghasilkan ' + (sortedCreative[0]['Purchases'] || sortedCreative[0]['Purchases with shared items'] || 0) + ' Purchases dengan ' + (sortedCreative[0]['Instagram profile visits'] || 0) + ' Instagram visits.' : 'Creative breakdown menunjukkan variasi performa signifikan antar iklan.'}</p>
+                                            <p className="text-xs mt-1">${sortedCreative.length > 0 ? 'Format dan strategi ini menunjukkan performa terbaik untuk scaling campaign.' : 'Perlu analisis lebih lanjut untuk identifikasi format creative terbaik.'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="p-3 bg-green-50 rounded-lg">
+                                    <div className="flex items-start">
+                                        <i className="fas fa-lightbulb text-green-500 mr-2 mt-0.5"></i>
+                                        <div className="flex-1">
+                                            <p className="text-xs"><strong>Rekomendasi:</strong> ${sortedCreative.length > 0 ? 'Buat lebih banyak creative dengan format dan strategi serupa untuk hasil maksimal.' : 'Lakukan A/B testing pada berbagai format creative untuk menemukan performa terbaik.'}</p>
+                                            <p className="text-xs mt-1">Pertimbangkan variasi creative dengan elemen yang terbukti efektif untuk meningkatkan engagement dan conversion.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>\`
-
-  // ============================================
-  // SLIDE 13: CLOSING
-  // ============================================
-  slides += \`
-                    {/* SLIDE 13 - CLOSING */}
-                    <div className="bg-white p-8 border-t-4 border-blue-600">
-                        <div className="max-w-6xl mx-auto text-center">
-                            <h2 className="text-3xl font-bold text-blue-600 mb-6">Terima Kasih</h2>
-                            <p className="text-lg text-gray-700 mb-4">
-                                Laporan ini dihasilkan oleh Meta Ads Report Generator
-                            </p>
-                            <p className="text-gray-600 mb-8">
-                                Untuk pertanyaan atau diskusi lebih lanjut, silakan hubungi tim marketing Anda
-                            </p>
-                            <div className="h-1 w-32 bg-blue-600 mx-auto mb-6"></div>
-                            <p class="text-sm text-gray-500">
-                                \${new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                            </p>
+                    </div>`
+  }
+  
+  // Slide 11: Campaign Objective Performance
+  const objectiveThisWeek = breakdown.thisWeek?.objective || []
+  if (objectiveThisWeek.length > 0) {
+    // Sort by purchases (highest first)
+    const sortedObjective = [...objectiveThisWeek]
+      .filter((o: any) => (o['Objective'] || o['Campaign objective']) && (o['Objective'] || o['Campaign objective']).trim())
+      .sort((a: any, b: any) => {
+        const purchasesA = a['Purchases'] || a['Purchases with shared items'] || 0
+        const purchasesB = b['Purchases'] || b['Purchases with shared items'] || 0
+        return purchasesB - purchasesA
+      })
+      .slice(0, 4)
+    
+    slides += `
+                    {/* SLIDE 11 - CAMPAIGN OBJECTIVE PERFORMANCE */}
+                    <div className="bg-white p-8 border-t-4 border-hadona-blue">
+                        <div className="max-w-6xl mx-auto">
+                            <h2 className="text-2xl font-bold text-hadona-blue mb-4">Campaign Objective Performance</h2>
+                            <div className="grid grid-cols-4 gap-3">
+                                ${sortedObjective.map((item: any) => {
+          const objective = item['Objective'] || item['Campaign objective'] || 'Unknown'
+          const purchasesRaw = item['Purchases with shared items'] || 
+                              item['Purchases'] || 
+                              item['Purchases with shared items only'] ||
+                              item['Purchases (shared items)'] ||
+                              0
+          const purchases = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
+          const impressions = parseFloat(String(item.Impressions || 0).replace(/,/g, '')) || 0
+          const clicks = parseFloat(String(item['Outbound clicks'] || item['Clicks (all)'] || 0).replace(/,/g, '')) || 0
+          const ctr = (item['CTR (link click-through rate)'] || item['CTR (all)'] || 0) * 100
+          return `<div>
+                                            <h3 className="text-base font-semibold mb-3">${objective}</h3>
+                                            <div className="space-y-2">
+                                                <div className="flex justify-between">
+                                                    <span>Purchases</span>
+                                                    <span className="font-bold">{formatNumber(${purchases})}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span>Impressions</span>
+                                                    <span className="font-bold">{formatNumber(${impressions})}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span>Outbound Click</span>
+                                                    <span className="font-bold">{formatNumber(${clicks})}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span>CTR</span>
+                                                    <span className="font-bold">{formatPercent(${ctr})}</span>
+                                                </div>
+                                            </div>
+                                        </div>`
+        }).join('')}
+                            </div>
+                            <div className="mt-4 space-y-2">
+                                <div className="p-3 bg-yellow-50 rounded-lg">
+                                    <div className="flex items-start">
+                                        <i className="fas fa-bullseye text-blue-500 mr-2 mt-0.5"></i>
+                                        <div className="flex-1">
+                                            <p className="text-xs"><strong>Kesimpulan:</strong> ${sortedObjective.length > 0 ? (sortedObjective[0]['Objective'] || sortedObjective[0]['Campaign objective'] || 'Unknown') + ' menghasilkan ' + (sortedObjective[0]['Purchases'] || sortedObjective[0]['Purchases with shared items'] || 0) + ' purchases dengan performa terbaik.' : 'Objective breakdown menunjukkan variasi performa signifikan antar objective.'}</p>
+                                            <p className="text-xs mt-1">${sortedObjective.length > 0 ? 'Objective ini menjadi pilihan terbaik untuk optimasi dan scaling campaign.' : 'Perlu analisis lebih lanjut untuk identifikasi objective terbaik.'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="p-3 bg-green-50 rounded-lg">
+                                    <div className="flex items-start">
+                                        <i className="fas fa-lightbulb text-green-500 mr-2 mt-0.5"></i>
+                                        <div className="flex-1">
+                                            <p className="text-xs"><strong>Rekomendasi:</strong> ${sortedObjective.length > 0 ? 'Fokus pada objective ' + (sortedObjective[0]['Objective'] || sortedObjective[0]['Campaign objective'] || 'Unknown') + ' untuk hasil optimal dan scaling.' : 'Lakukan testing pada berbagai objective untuk menemukan performa terbaik.'}</p>
+                                            <p className="text-xs mt-1">Pertimbangkan kombinasi objective dengan performa baik untuk diversifikasi strategi campaign.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>\`
+                    </div>`
+  }
+  
+  // Slide 12: Overall Conclusion & Strategic Action Plan
+  slides += `
+                    {/* SLIDE 12 - OVERALL CONCLUSION & STRATEGIC ACTION PLAN */}
+                    <div className="bg-white p-8 border-t-4 border-hadona-blue">
+                        <div className="max-w-6xl mx-auto">
+                            <h2 className="text-2xl font-bold text-hadona-blue mb-4">Overall Conclusion & Strategic Action Plan</h2>
+                            <div className="grid grid-cols-2 gap-0">
+                                <div className="border-r-2 border-gray-300 pr-6">
+                                    <h3 className="text-base font-semibold mb-3">Ringkasan Performa</h3>
+                                    <ul className="space-y-2 text-sm">
+                                        <li className="flex items-start">
+                                            <i className="fas fa-check-circle text-green-500 mt-1 mr-2 text-xs"></i>
+                                            <span className="text-xs"><strong>Performa ${thisPeriodLabel}:</strong> ${thisWeek.amountSpent >= lastWeek.amountSpent ? 'Meningkat' : 'Menurun'} ${Math.abs(((thisWeek.amountSpent || 0) - (lastWeek.amountSpent || 0)) / (lastWeek.amountSpent || 1) * 100).toFixed(1)}% dengan spend ${((thisWeek.purchases && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.purchases) : 0) <= ((lastWeek.purchases && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.purchases) : 0) ? 'lebih efisien' : 'kurang efisien'}</span>
+                                        </li>
+                                        <li className="flex items-start">
+                                            <i className="fas fa-check-circle text-green-500 mt-1 mr-2 text-xs"></i>
+                                            <span className="text-xs"><strong>Platform Terbaik:</strong> ${platformThisWeek.length > 0 ? platformThisWeek[0]?.Platform || 'Platform tertentu' : 'Platform tertentu'} memberikan hasil terbaik</span>
+                                        </li>
+                                        <li className="flex items-start">
+                                            <i className="fas fa-check-circle text-green-500 mt-1 mr-2 text-xs"></i>
+                                            <span className="text-xs"><strong>Demografi Terbaik:</strong> ${ageThisWeek.length > 0 ? ageThisWeek.find((a: any) => a.Age && a.Age.trim())?.Age || '25-34 tahun' : '25-34 tahun'} dengan cost per result terendah</span>
+                                        </li>
+                                        <li className="flex items-start">
+                                            <i className="fas fa-check-circle text-green-500 mt-1 mr-2 text-xs"></i>
+                                            <span className="text-xs"><strong>Content Terbaik:</strong> ${placementThisWeek.length > 0 ? placementThisWeek[0]?.Placement || 'Format tertentu' : 'Format tertentu'} memberikan hasil terbaik</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div className="pl-6">
+                                    <h3 className="text-base font-semibold mb-3">Rencana Aksi Strategis</h3>
+                                    <ul className="space-y-2 text-sm">
+                                        <li className="flex items-start">
+                                            <i className="fas fa-arrow-right text-blue-500 mt-1 mr-2 text-xs"></i>
+                                            <span className="text-xs"><strong>Optimasi Budget:</strong> Alokasikan lebih banyak budget ke platform dan placement yang memberikan hasil terbaik</span>
+                                        </li>
+                                        <li className="flex items-start">
+                                            <i className="fas fa-arrow-right text-blue-500 mt-1 mr-2 text-xs"></i>
+                                            <span className="text-xs"><strong>TARGETING:</strong> Fokus pada demografi yang memberikan cost per purchase (CPA) terendah</span>
+                                        </li>
+                                        <li className="flex items-start">
+                                            <i className="fas fa-arrow-right text-blue-500 mt-1 mr-2 text-xs"></i>
+                                            <span className="text-xs"><strong>Creative:</strong> Buat lebih banyak konten dengan format yang terbukti efektif</span>
+                                        </li>
+                                        <li className="flex items-start">
+                                            <i className="fas fa-arrow-right text-blue-500 mt-1 mr-2 text-xs"></i>
+                                            <span className="text-xs"><strong>Testing:</strong> A/B test berbagai creative untuk meningkatkan CTR dan menurunkan CPA</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div className="mt-4 space-y-2">
+                                <div className="p-3 bg-yellow-50 rounded-lg">
+                                    <div className="flex items-start">
+                                        <i className="fas fa-chart-line text-blue-500 mr-2 mt-0.5"></i>
+                                        <div className="flex-1">
+                                            <p className="text-xs"><strong>Kesimpulan:</strong> ${thisWeek.amountSpent >= lastWeek.amountSpent ? 'Peningkatan' : 'Penurunan'} performa ${Math.abs(((thisWeek.amountSpent || 0) - (lastWeek.amountSpent || 0)) / (lastWeek.amountSpent || 1) * 100).toFixed(1)}% dengan ${platformThisWeek.length > 0 ? platformThisWeek[0]?.Platform : 'platform'} dan ${ageThisWeek.length > 0 ? ageThisWeek.find((a: any) => a.Age && a.Age.trim())?.Age : 'demografi'} sebagai driver utama.</p>
+                                            <p className="text-xs mt-1">Perlu optimasi budget dan targeting untuk scaling dan growth berkelanjutan.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="p-3 bg-green-50 rounded-lg">
+                                    <div className="flex items-start">
+                                        <i className="fas fa-lightbulb text-green-500 mr-2 mt-0.5"></i>
+                                        <div className="flex-1">
+                                            <p className="text-xs"><strong>Rekomendasi:</strong> Alokasikan budget ke performa terbaik dan fokus targeting pada demografi dengan cost per result terendah.</p>
+                                            <p className="text-xs mt-1">Lakukan A/B testing creative dan ekspansi ke segment serupa untuk meningkatkan reach dan diversifikasi.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`
+  
+  return slides
+}
 
-  // Close HTML tags
-  slides += \`
-                    </div>
-                </body>
-            </html>\`
 
+function generateEventAnalysisSlides(data: any, thisWeek: any, lastWeek: any, thisPeriodLabel: string, lastPeriodLabel: string, isMoM: boolean): string {
+  // Extract event data from analysisData
+  const eventData = data?.eventAnalysis || {}
+  const twindateThis = eventData.twindateThis || {}
+  const twindateLast = eventData.twindateLast || {}
+  const paydayThis = eventData.paydayThis || {}
+  const paydayLast = eventData.paydayLast || {}
+  
+  // Check if we have event data
+  // Since aggregateEventData always returns object with all fields (even if 0),
+  // we check if there's meaningful data (amountSpent > 0) in at least one period
+  // This ensures we only show slides when there's actual data to display
+  const hasTwindateData = (twindateThis.amountSpent !== undefined && twindateThis.amountSpent > 0) || 
+                          (twindateLast.amountSpent !== undefined && twindateLast.amountSpent > 0) ||
+                          (twindateThis.purchases !== undefined && twindateThis.purchases > 0) ||
+                          (twindateLast.purchases !== undefined && twindateLast.purchases > 0)
+  const hasPaydayData = (paydayThis.amountSpent !== undefined && paydayThis.amountSpent > 0) || 
+                        (paydayLast.amountSpent !== undefined && paydayLast.amountSpent > 0) ||
+                        (paydayThis.purchases !== undefined && paydayThis.purchases > 0) ||
+                        (paydayLast.purchases !== undefined && paydayLast.purchases > 0)
+  
+  if (!hasTwindateData && !hasPaydayData) {
+    // If no event data, return empty string (no slides)
+    return ''
+  }
+  
+  // Helper functions
+  const calculateGrowth = (current: number, previous: number) => {
+    if (!previous || previous === 0) return { value: 0, percentage: 0, isPositive: current >= 0 }
+    const growth = current - previous
+    const percentage = (growth / previous) * 100
+    return { value: growth, percentage: Math.round(percentage * 100) / 100, isPositive: growth >= 0 }
+  }
+  
+  const formatCurrency = (num: number) => {
+    if (!num || isNaN(num)) return 'Rp 0'
+    return 'Rp ' + num.toLocaleString('id-ID')
+  }
+  
+  const formatNumber = (num: number) => {
+    if (!num || isNaN(num)) return '0'
+    return num.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  }
+  
+  const formatPercent = (num: number) => {
+    if (!num || isNaN(num)) return '0%'
+    return num.toFixed(2) + '%'
+  }
+  
+  // Helper function to get trend icon JSX as string (for use in template strings)
+  const getTrendIconJSX = (isPositive: boolean) => {
+    return isPositive 
+      ? '<i className="bi bi-arrow-up-circle-fill" style={{color: "#10b981", fontSize: "1.2em"}}></i>' 
+      : '<i className="bi bi-arrow-down-circle-fill" style={{color: "#ef4444", fontSize: "1.2em"}}></i>'
+  }
+  
+  let slides = ''
+  
+  // Calculate Twindate metrics
+  const twindateMetrics: any = {}
+  if (hasTwindateData) {
+    twindateMetrics.amountSpent = calculateGrowth(twindateThis.amountSpent || 0, twindateLast.amountSpent || 0)
+    twindateMetrics.purchases = calculateGrowth(twindateThis.purchases || 0, twindateLast.purchases || 0)
+    twindateMetrics.costPerPurchase = calculateGrowth(twindateThis.costPerPurchase || 0, twindateLast.costPerPurchase || 0)
+    twindateMetrics.purchasesConversionValue = calculateGrowth(twindateThis.purchasesConversionValue || 0, twindateLast.purchasesConversionValue || 0)
+    twindateMetrics.conversionRate = calculateGrowth((twindateThis.conversionRate || 0) * 100, (twindateLast.conversionRate || 0) * 100)
+    twindateMetrics.purchaseROAS = calculateGrowth(twindateThis.purchaseROAS || 0, twindateLast.purchaseROAS || 0)
+    twindateMetrics.avgPurchaseValue = calculateGrowth(twindateThis.avgPurchaseValue || 0, twindateLast.avgPurchaseValue || 0)
+    twindateMetrics.addsToCart = calculateGrowth(twindateThis.addsToCart || 0, twindateLast.addsToCart || 0)
+    twindateMetrics.costPerATC = calculateGrowth(twindateThis.costPerATC || 0, twindateLast.costPerATC || 0)
+    twindateMetrics.atcConversionValue = calculateGrowth(twindateThis.atcConversionValue || 0, twindateLast.atcConversionValue || 0)
+    twindateMetrics.ctr = calculateGrowth((twindateThis.ctr || 0) * 100, (twindateLast.ctr || 0) * 100)
+    twindateMetrics.cpc = calculateGrowth(twindateThis.cpc || 0, twindateLast.cpc || 0)
+    twindateMetrics.frequency = calculateGrowth(twindateThis.frequency || 0, twindateLast.frequency || 0)
+    twindateMetrics.cpm = calculateGrowth(twindateThis.cpm || 0, twindateLast.cpm || 0)
+  }
+  
+  // Calculate Payday metrics
+  const paydayMetrics: any = {}
+  if (hasPaydayData) {
+    paydayMetrics.amountSpent = calculateGrowth(paydayThis.amountSpent || 0, paydayLast.amountSpent || 0)
+    paydayMetrics.purchases = calculateGrowth(paydayThis.purchases || 0, paydayLast.purchases || 0)
+    paydayMetrics.costPerPurchase = calculateGrowth(paydayThis.costPerPurchase || 0, paydayLast.costPerPurchase || 0)
+    paydayMetrics.purchasesConversionValue = calculateGrowth(paydayThis.purchasesConversionValue || 0, paydayLast.purchasesConversionValue || 0)
+    paydayMetrics.conversionRate = calculateGrowth((paydayThis.conversionRate || 0) * 100, (paydayLast.conversionRate || 0) * 100)
+    paydayMetrics.purchaseROAS = calculateGrowth(paydayThis.purchaseROAS || 0, paydayLast.purchaseROAS || 0)
+    paydayMetrics.avgPurchaseValue = calculateGrowth(paydayThis.avgPurchaseValue || 0, paydayLast.avgPurchaseValue || 0)
+    paydayMetrics.addsToCart = calculateGrowth(paydayThis.addsToCart || 0, paydayLast.addsToCart || 0)
+    paydayMetrics.costPerATC = calculateGrowth(paydayThis.costPerATC || 0, paydayLast.costPerATC || 0)
+    paydayMetrics.atcConversionValue = calculateGrowth(paydayThis.atcConversionValue || 0, paydayLast.atcConversionValue || 0)
+    paydayMetrics.ctr = calculateGrowth((paydayThis.ctr || 0) * 100, (paydayLast.ctr || 0) * 100)
+    paydayMetrics.cpc = calculateGrowth(paydayThis.cpc || 0, paydayLast.cpc || 0)
+    paydayMetrics.frequency = calculateGrowth(paydayThis.frequency || 0, paydayLast.frequency || 0)
+    paydayMetrics.cpm = calculateGrowth(paydayThis.cpm || 0, paydayLast.cpm || 0)
+  }
+  
+  // Helper function to get metric value
+  const getMetricValue = (eventData: any, key: string) => {
+    switch(key) {
+      case 'amountSpent': return eventData.amountSpent || 0
+      case 'purchases': return eventData.purchases || 0
+      case 'costPerPurchase': return eventData.costPerPurchase || 0
+      case 'purchasesConversionValue': return eventData.purchasesConversionValue || 0
+      case 'conversionRate': return (eventData.conversionRate || 0) * 100
+      case 'purchaseROAS': return eventData.purchaseROAS || 0
+      case 'avgPurchaseValue': return eventData.avgPurchaseValue || 0
+      case 'addsToCart': return eventData.addsToCart || 0
+      case 'costPerATC': return eventData.costPerATC || 0
+      case 'atcConversionValue': return eventData.atcConversionValue || 0
+      case 'ctr': return (eventData.ctr || 0) * 100
+      case 'cpc': return eventData.cpc || 0
+      case 'frequency': return eventData.frequency || 0
+      case 'cpm': return eventData.cpm || 0
+      default: return 0
+    }
+  }
+  
+  // Helper function to format metric value
+  const formatMetricValue = (key: string, value: number) => {
+    const currencyKeys = ['amountSpent', 'costPerPurchase', 'costPerATC', 'cpc', 'cpm', 'purchasesConversionValue', 'atcConversionValue', 'avgPurchaseValue']
+    const percentKeys = ['ctr', 'conversionRate']
+    
+    if (currencyKeys.includes(key)) {
+      return formatCurrency(value)
+    } else if (percentKeys.includes(key)) {
+      return formatPercent(value)
+    } else {
+      return formatNumber(value)
+    }
+  }
+  
+  // Generate Twindate slides if data exists
+  if (hasTwindateData) {
+    // Get highlights and lowlights for Twindate
+    const twindateHighlights = Object.entries(twindateMetrics)
+      .filter(([_, metric]: [string, any]) => metric.isPositive && Math.abs(metric.percentage) >= 1)
+      .sort(([_, a]: [string, any], [__, b]: [string, any]) => Math.abs(b.percentage) - Math.abs(a.percentage))
+      .slice(0, 10)
+    
+    const twindateLowlights = Object.entries(twindateMetrics)
+      .filter(([_, metric]: [string, any]) => !metric.isPositive && Math.abs(metric.percentage) >= 1)
+      .sort(([_, a]: [string, any], [__, b]: [string, any]) => Math.abs(b.percentage) - Math.abs(a.percentage))
+      .slice(0, 5)
+    
+    const metricLabels: Record<string, string> = {
+      amountSpent: 'Amount spent',
+      purchases: 'Purchases with shared items',
+      costPerPurchase: 'Cost per purchases with shared items',
+      purchasesConversionValue: 'Purchases conversion value for shared items only',
+      conversionRate: 'Conversion Rate (Purchase ÷ Click)',
+      purchaseROAS: 'Purchase ROAS (return on ad spend)',
+      avgPurchaseValue: 'Average purchases conversion value',
+      addsToCart: 'Adds to cart with shared items',
+      costPerATC: 'Cost per add to cart with shared items',
+      atcConversionValue: 'ATC conversion value (shared only)',
+      ctr: 'CTR (link click-through rate)',
+      cpc: 'CPC (link)',
+      frequency: 'Frequency',
+      cpm: 'CPM'
+    }
+    
+    // Slide: Twindate Highlight (always show before Lowlight)
+    slides += `
+                    {/* EVENT ANALYSIS - TWINDATE HIGHLIGHT */}
+                    <div className="bg-white p-8 border-t-4 border-hadona-blue">
+                        <div className="max-w-6xl mx-auto">
+                            <h2 className="text-2xl font-bold text-hadona-blue mb-4">Highlight (Event MoM) — Twindate</h2>
+                            ${twindateHighlights.length > 0 ? `
+                            <ul className="space-y-2 text-sm">
+                                ${twindateHighlights.map(([key, metric]: [string, any]) => {
+      const label = metricLabels[key] || key
+      const thisValue = getMetricValue(twindateThis, key)
+      const lastValue = getMetricValue(twindateLast, key)
+      const formattedThis = formatMetricValue(key, thisValue)
+      const formattedLast = formatMetricValue(key, lastValue)
+      
+      const icon = getTrendIconJSX(metric.isPositive)
+      return '<li className="flex items-start"><span className="mr-2">' + icon + '</span><span className="text-xs"><strong>' + label + ':</strong> ' + (metric.percentage >= 0 ? '' : '') + Math.abs(metric.percentage).toFixed(2) + '% (' + formattedLast + ' → ' + formattedThis + ')</span></li>'
+    }).join('')}
+                            </ul>
+                            ` : `
+                            <p className="text-sm text-gray-500 italic">Tidak ada highlight untuk periode ini.</p>
+                            `}
+                        </div>
+                    </div>`
+    
+    // Slide: Twindate Lowlight (always show after Highlight)
+    slides += `
+                    {/* EVENT ANALYSIS - TWINDATE LOWLIGHT */}
+                    <div className="bg-white p-8 border-t-4 border-hadona-blue">
+                        <div className="max-w-6xl mx-auto">
+                            <h2 className="text-2xl font-bold text-hadona-blue mb-4">Lowlight (Event MoM) — Twindate</h2>
+                            ${twindateLowlights.length > 0 ? `
+                            <ul className="space-y-2 text-sm">
+                                ${twindateLowlights.map(([key, metric]: [string, any]) => {
+        const label = metricLabels[key] || key
+        const thisValue = getMetricValue(twindateThis, key)
+        const lastValue = getMetricValue(twindateLast, key)
+        const formattedThis = formatMetricValue(key, thisValue)
+        const formattedLast = formatMetricValue(key, lastValue)
+        
+        return `<li className="flex items-start">
+                                                <span className="mr-2">${getTrendIconJSX(metric.isPositive)}</span>
+                                                <span className="text-xs"><strong>${label}:</strong> ${metric.percentage >= 0 ? '' : ''}${Math.abs(metric.percentage).toFixed(2)}% (${formattedLast} → ${formattedThis})</span>
+                                            </li>`
+      }).join('')}
+                            </ul>
+                            ` : `
+                            <p className="text-sm text-gray-500 italic">Tidak ada lowlight untuk periode ini.</p>
+                            `}
+                        </div>
+                    </div>`
+    
+    // Slide: Twindate Table
+    slides += `
+                    {/* EVENT ANALYSIS - TWINDATE TABLE */}
+                    <div className="bg-white p-8 border-t-4 border-hadona-blue">
+                        <div className="max-w-6xl mx-auto">
+                            <h2 className="text-2xl font-bold text-hadona-blue mb-4">Tabel Metric (MoM — Twindate)</h2>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-xs border-collapse">
+                                    <thead>
+                                        <tr className="bg-gray-100">
+                                            <th className="border p-2 text-left">Metric</th>
+                                            <th className="border p-2 text-right">${lastPeriodLabel}</th>
+                                            <th className="border p-2 text-right">${thisPeriodLabel}</th>
+                                            <th className="border p-2 text-right">∆%</th>
+                                            <th className="border p-2 text-center">Trend</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td className="border p-2">Amount spent</td>
+                                            <td className="border p-2 text-right">${formatCurrency(twindateLast.amountSpent || 0)}</td>
+                                            <td className="border p-2 text-right">${formatCurrency(twindateThis.amountSpent || 0)}</td>
+                                            <td className="border p-2 text-right">${twindateMetrics.amountSpent.percentage.toFixed(2)}%</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(twindateMetrics.amountSpent.isPositive)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="border p-2">Purchases with shared items</td>
+                                            <td className="border p-2 text-right">${formatNumber(twindateLast.purchases || 0)}</td>
+                                            <td className="border p-2 text-right">${formatNumber(twindateThis.purchases || 0)}</td>
+                                            <td className="border p-2 text-right">${twindateMetrics.purchases.percentage.toFixed(2)}%</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(twindateMetrics.purchases.isPositive)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="border p-2">Cost per purchases with shared items</td>
+                                            <td className="border p-2 text-right">${formatCurrency(twindateLast.costPerPurchase || 0)}</td>
+                                            <td className="border p-2 text-right">${formatCurrency(twindateThis.costPerPurchase || 0)}</td>
+                                            <td className="border p-2 text-right">${twindateMetrics.costPerPurchase.percentage.toFixed(2)}%</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(twindateMetrics.costPerPurchase.isPositive)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="border p-2">Purchases conversion value for shared items only</td>
+                                            <td className="border p-2 text-right">${formatCurrency(twindateLast.purchasesConversionValue || 0)}</td>
+                                            <td className="border p-2 text-right">${formatCurrency(twindateThis.purchasesConversionValue || 0)}</td>
+                                            <td className="border p-2 text-right">${twindateMetrics.purchasesConversionValue.percentage.toFixed(2)}%</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(twindateMetrics.purchasesConversionValue.isPositive)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="border p-2">Conversion Rate (Purchase ÷ Click)</td>
+                                            <td className="border p-2 text-right">${formatPercent((twindateLast.conversionRate || 0) * 100)}</td>
+                                            <td className="border p-2 text-right">${formatPercent((twindateThis.conversionRate || 0) * 100)}</td>
+                                            <td className="border p-2 text-right">${twindateMetrics.conversionRate.percentage.toFixed(2)}%</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(twindateMetrics.conversionRate.isPositive)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="border p-2">Purchase ROAS (return on ad spend)</td>
+                                            <td className="border p-2 text-right">${formatNumber(twindateLast.purchaseROAS || 0)}</td>
+                                            <td className="border p-2 text-right">${formatNumber(twindateThis.purchaseROAS || 0)}</td>
+                                            <td className="border p-2 text-right">${twindateMetrics.purchaseROAS.percentage.toFixed(2)}%</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(twindateMetrics.purchaseROAS.isPositive)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="border p-2">Average purchases conversion value</td>
+                                            <td className="border p-2 text-right">${formatCurrency(twindateLast.avgPurchaseValue || 0)}</td>
+                                            <td className="border p-2 text-right">${formatCurrency(twindateThis.avgPurchaseValue || 0)}</td>
+                                            <td className="border p-2 text-right">${twindateMetrics.avgPurchaseValue.percentage.toFixed(2)}%</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(twindateMetrics.avgPurchaseValue.isPositive)}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>`
+  }
+  
+  // Generate Payday slides if data exists
+  if (hasPaydayData) {
+    // Get highlights and lowlights for Payday
+    const paydayHighlights = Object.entries(paydayMetrics)
+      .filter(([_, metric]: [string, any]) => metric.isPositive && Math.abs(metric.percentage) >= 1)
+      .sort(([_, a]: [string, any], [__, b]: [string, any]) => Math.abs(b.percentage) - Math.abs(a.percentage))
+      .slice(0, 10)
+    
+    const paydayLowlights = Object.entries(paydayMetrics)
+      .filter(([_, metric]: [string, any]) => !metric.isPositive && Math.abs(metric.percentage) >= 1)
+      .sort(([_, a]: [string, any], [__, b]: [string, any]) => Math.abs(b.percentage) - Math.abs(a.percentage))
+      .slice(0, 5)
+    
+    const metricLabels: Record<string, string> = {
+      amountSpent: 'Amount spent',
+      purchases: 'Purchases with shared items',
+      costPerPurchase: 'Cost per purchases with shared items',
+      purchasesConversionValue: 'Purchases conversion value for shared items only',
+      conversionRate: 'Conversion Rate (Purchase ÷ Click)',
+      purchaseROAS: 'Purchase ROAS (return on ad spend)',
+      avgPurchaseValue: 'Average purchases conversion value',
+      addsToCart: 'Adds to cart with shared items',
+      costPerATC: 'Cost per add to cart with shared items',
+      atcConversionValue: 'ATC conversion value (shared only)',
+      ctr: 'CTR (link click-through rate)',
+      cpc: 'CPC (link)',
+      frequency: 'Frequency',
+      cpm: 'CPM'
+    }
+    
+    // Slide: Payday Highlight
+    if (paydayHighlights.length > 0) {
+      slides += `
+                    {/* EVENT ANALYSIS - PAYDAY HIGHLIGHT */}
+                    <div className="bg-white p-8 border-t-4 border-hadona-blue">
+                        <div className="max-w-6xl mx-auto">
+                            <h2 className="text-2xl font-bold text-hadona-blue mb-4">Highlight (Event MoM) — Payday (≥25)</h2>
+                            <ul className="space-y-2 text-sm">
+                                ${paydayHighlights.map(([key, metric]: [string, any]) => {
+      const label = metricLabels[key] || key
+      const thisValue = getMetricValue(paydayThis, key)
+      const lastValue = getMetricValue(paydayLast, key)
+      const formattedThis = formatMetricValue(key, thisValue)
+      const formattedLast = formatMetricValue(key, lastValue)
+      
+      return `<li className="flex items-start">
+                                            <span className="mr-2">${getTrendIconJSX(metric.isPositive)}</span>
+                                            <span className="text-xs"><strong>${label}:</strong> ${metric.percentage >= 0 ? '' : ''}${Math.abs(metric.percentage).toFixed(2)}% (${formattedLast} → ${formattedThis})</span>
+                                        </li>`
+    }).join('')}
+                            </ul>
+                        </div>
+                    </div>`
+    }
+    
+    // Slide: Payday Lowlight
+    if (paydayLowlights.length > 0) {
+      slides += `
+                    {/* EVENT ANALYSIS - PAYDAY LOWLIGHT */}
+                    <div className="bg-white p-8 border-t-4 border-hadona-blue">
+                        <div className="max-w-6xl mx-auto">
+                            <h2 className="text-2xl font-bold text-hadona-blue mb-4">Lowlight (Event MoM) — Payday (≥25)</h2>
+                            <ul className="space-y-2 text-sm">
+                                ${paydayLowlights.map(([key, metric]: [string, any]) => {
+        const label = metricLabels[key] || key
+        const thisValue = getMetricValue(paydayThis, key)
+        const lastValue = getMetricValue(paydayLast, key)
+        const formattedThis = formatMetricValue(key, thisValue)
+        const formattedLast = formatMetricValue(key, lastValue)
+        
+        return `<li className="flex items-start">
+                                                <span className="mr-2">${getTrendIconJSX(metric.isPositive)}</span>
+                                                <span className="text-xs"><strong>${label}:</strong> ${metric.percentage >= 0 ? '' : ''}${Math.abs(metric.percentage).toFixed(2)}% (${formattedLast} → ${formattedThis})</span>
+                                            </li>`
+      }).join('')}
+                            </ul>
+                        </div>
+                    </div>`
+    }
+    
+    // Slide: Payday Table
+    slides += `
+                    {/* EVENT ANALYSIS - PAYDAY TABLE */}
+                    <div className="bg-white p-8 border-t-4 border-hadona-blue">
+                        <div className="max-w-6xl mx-auto">
+                            <h2 className="text-2xl font-bold text-hadona-blue mb-4">Tabel Metric (MoM — Payday)</h2>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-xs border-collapse">
+                                    <thead>
+                                        <tr className="bg-gray-100">
+                                            <th className="border p-2 text-left">Metric</th>
+                                            <th className="border p-2 text-right">Bulan-2 (≥25)</th>
+                                            <th className="border p-2 text-right">Bulan-1 (≥25)</th>
+                                            <th className="border p-2 text-right">∆%</th>
+                                            <th className="border p-2 text-center">Trend</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td className="border p-2">Amount spent</td>
+                                            <td className="border p-2 text-right">${formatCurrency(paydayLast.amountSpent || 0)}</td>
+                                            <td className="border p-2 text-right">${formatCurrency(paydayThis.amountSpent || 0)}</td>
+                                            <td className="border p-2 text-right">${paydayMetrics.amountSpent.percentage.toFixed(2)}%</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(paydayMetrics.amountSpent.isPositive)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="border p-2">Purchases with shared items</td>
+                                            <td className="border p-2 text-right">${formatNumber(paydayLast.purchases || 0)}</td>
+                                            <td className="border p-2 text-right">${formatNumber(paydayThis.purchases || 0)}</td>
+                                            <td className="border p-2 text-right">${paydayMetrics.purchases.percentage.toFixed(2)}%</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(paydayMetrics.purchases.isPositive)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="border p-2">Cost per purchases with shared items</td>
+                                            <td className="border p-2 text-right">${formatCurrency(paydayLast.costPerPurchase || 0)}</td>
+                                            <td className="border p-2 text-right">${formatCurrency(paydayThis.costPerPurchase || 0)}</td>
+                                            <td className="border p-2 text-right">${paydayMetrics.costPerPurchase.percentage.toFixed(2)}%</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(paydayMetrics.costPerPurchase.isPositive)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="border p-2">Purchases conversion value for shared items only</td>
+                                            <td className="border p-2 text-right">${formatCurrency(paydayLast.purchasesConversionValue || 0)}</td>
+                                            <td className="border p-2 text-right">${formatCurrency(paydayThis.purchasesConversionValue || 0)}</td>
+                                            <td className="border p-2 text-right">${paydayMetrics.purchasesConversionValue.percentage.toFixed(2)}%</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(paydayMetrics.purchasesConversionValue.isPositive)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="border p-2">Conversion Rate (Purchase ÷ Click)</td>
+                                            <td className="border p-2 text-right">${formatPercent((paydayLast.conversionRate || 0) * 100)}</td>
+                                            <td className="border p-2 text-right">${formatPercent((paydayThis.conversionRate || 0) * 100)}</td>
+                                            <td className="border p-2 text-right">${paydayMetrics.conversionRate.percentage.toFixed(2)}%</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(paydayMetrics.conversionRate.isPositive)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="border p-2">Purchase ROAS (return on ad spend)</td>
+                                            <td className="border p-2 text-right">${formatNumber(paydayLast.purchaseROAS || 0)}</td>
+                                            <td className="border p-2 text-right">${formatNumber(paydayThis.purchaseROAS || 0)}</td>
+                                            <td className="border p-2 text-right">${paydayMetrics.purchaseROAS.percentage.toFixed(2)}%</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(paydayMetrics.purchaseROAS.isPositive)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="border p-2">Average purchases conversion value</td>
+                                            <td className="border p-2 text-right">${formatCurrency(paydayLast.avgPurchaseValue || 0)}</td>
+                                            <td className="border p-2 text-right">${formatCurrency(paydayThis.avgPurchaseValue || 0)}</td>
+                                            <td className="border p-2 text-right">${paydayMetrics.avgPurchaseValue.percentage.toFixed(2)}%</td>
+                                            <td className="border p-2 text-center">${getTrendIconJSX(paydayMetrics.avgPurchaseValue.isPositive)}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>`
+  }
+  
+  // Slide: Next Action Plan (Event)
+  if (hasTwindateData || hasPaydayData) {
+    slides += `
+                    {/* EVENT ANALYSIS - NEXT ACTION PLAN */}
+                    <div className="bg-white p-8 border-t-4 border-hadona-blue">
+                        <div className="max-w-6xl mx-auto">
+                            <h2 className="text-2xl font-bold text-hadona-blue mb-4">Next Action Plan (Event)</h2>
+                            <ul className="space-y-2 text-sm">
+                                <li className="flex items-start">
+                                    <i className="fas fa-arrow-right text-blue-500 mt-1 mr-2 text-xs"></i>
+                                    <span className="text-xs">Pulihkan metrik yang turun pada window event; aktifkan pre-heat 3–5 hari sebelum puncak.</span>
+                                </li>
+                                <li className="flex items-start">
+                                    <i className="fas fa-arrow-right text-blue-500 mt-1 mr-2 text-xs"></i>
+                                    <span className="text-xs">Pakai countdown & scarcity copy spesifik (contoh: 'Hanya hari ini 9.9').</span>
+                                </li>
+                                <li className="flex items-start">
+                                    <i className="fas fa-arrow-right text-blue-500 mt-1 mr-2 text-xs"></i>
+                                    <span className="text-xs">Budget pacing: naikkan 20–30% H-1 s/d H+1 jika ROAS stabil; turunkan jika CPC/CPM naik.</span>
+                                </li>
+                                <li className="flex items-start">
+                                    <i className="fas fa-arrow-right text-blue-500 mt-1 mr-2 text-xs"></i>
+                                    <span className="text-xs">Bundling/upsell untuk dorong Average purchases conversion value.</span>
+                                </li>
+                                <li className="flex items-start">
+                                    <i className="fas fa-arrow-right text-blue-500 mt-1 mr-2 text-xs"></i>
+                                    <span className="text-xs">Aktifkan Advantage+ placement & optimasi katalog saat traffic puncak.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>`
+  }
+  
   return slides
 }
