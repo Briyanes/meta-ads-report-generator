@@ -474,7 +474,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                         </div>
                                         <div className="flex justify-between">
                                             <span>Growth %</span>
-                                            <span className={\`font-bold \${spendGrowth >= 0 ? 'text-green-500' : 'text-red-500'}\`}>{spendGrowth >= 0 ? '+' : ''}{formatPercent(spendGrowth)}</span>
+                                            <span className={\`font-bold \${spendGrowth.isPositive ? 'text-green-500' : 'text-red-500'}\`}>{spendGrowth.isPositive ? '+' : ''}{spendGrowth.percent}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -501,7 +501,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                 </div>
                             </div>
                             <div className="mt-4 p-3 bg-yellow-50 rounded-lg border-l-4 border-hadona-yellow">
-                                <p className="text-xs"><i className="fas fa-lightbulb text-yellow-500 mr-2"></i> <strong>Key Insight:</strong> {spendGrowth >= 0 ? 'Performance meningkat' : 'Performance menurun'} {Math.abs(spendGrowth).toFixed(1)}% dengan {resultsGrowth >= 0 ? 'peningkatan' : 'penurunan'} {Math.abs(resultsGrowth).toFixed(1)}% checkouts initiated dan efisiensi cost yang {cprGrowth <= 0 ? 'lebih baik' : 'perlu optimasi'}.</p>
+                                <p className="text-xs"><i className="fas fa-lightbulb text-yellow-500 mr-2"></i> <strong>Key Insight:</strong> {spendGrowth.isPositive ? 'Performance meningkat' : 'Performance menurun'} {Math.abs(spendGrowth).toFixed(1)}% dengan {resultsGrowth.isPositive ? 'peningkatan' : 'penurunan'} {Math.abs(resultsGrowth).toFixed(1)}% checkouts initiated dan efisiensi cost yang {cprGrowth <= 0 ? 'lebih baik' : 'perlu optimasi'}.</p>
                             </div>
                         </div>
                     </div>
@@ -527,7 +527,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(lastWeek.amountSpent || 0)}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(thisWeek.amountSpent || 0)}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((thisWeek.amountSpent || 0) - (lastWeek.amountSpent || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${spendGrowth >= 0 ? 'text-green-500' : 'text-red-500'}\`}>{spendGrowth >= 0 ? '+' : ''}{formatPercent(spendGrowth)}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${spendGrowth.isPositive ? 'text-green-500' : 'text-red-500'}\`}>{spendGrowth.isPositive ? '+' : ''}{spendGrowth.percent}</td>
                                         </tr>
                                         <tr className="bg-gray-50">
                                             <td className="border border-gray-300 p-2 text-xs">Reach</td>
@@ -670,8 +670,8 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                     <div className="flex items-start">
                                         <i className="fas fa-chart-line text-blue-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
-                                            <p className="text-xs"><strong>Kesimpulan:</strong> {spendGrowth >= 0 ? 'Peningkatan' : 'Penurunan'} performa {Math.abs(spendGrowth).toFixed(1)}% di semua metrik.</p>
-                                            <p className="text-xs mt-1">{resultsGrowth >= 0 ? 'Engagement' : 'Cost efficiency'} menjadi {resultsGrowth >= 0 ? 'driver utama' : 'area perbaikan'} ${isMoM ? 'bulan' : 'minggu'} ini.</p>
+                                            <p className="text-xs"><strong>Kesimpulan:</strong> {spendGrowth.isPositive ? 'Peningkatan' : 'Penurunan'} performa {Math.abs(spendGrowth).toFixed(1)}% di semua metrik.</p>
+                                            <p className="text-xs mt-1">{resultsGrowth.isPositive ? 'Engagement' : 'Cost efficiency'} menjadi {resultsGrowth.isPositive ? 'driver utama' : 'area perbaikan'} ${isMoM ? 'bulan' : 'minggu'} ini.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -679,7 +679,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                     <div className="flex items-start">
                                         <i className="fas fa-lightbulb text-green-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
-                                            <p className="text-xs"><strong>Rekomendasi:</strong> {spendGrowth >= 0 ? 'Pertahankan momentum dengan' : 'Fokus pada optimasi'} {resultsGrowth >= 0 ? 'scaling budget ke performa terbaik' : 'cost efficiency dan targeting'}.</p>
+                                            <p className="text-xs"><strong>Rekomendasi:</strong> {spendGrowth.isPositive ? 'Pertahankan momentum dengan' : 'Fokus pada optimasi'} {resultsGrowth.isPositive ? 'scaling budget ke performa terbaik' : 'cost efficiency dan targeting'}.</p>
                                             <p className="text-xs mt-1">Monitor metrik kunci secara berkala untuk memastikan growth berkelanjutan.</p>
                                         </div>
                                     </div>
@@ -698,7 +698,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                     <ul className="space-y-3">
                                         <li className="flex items-start">
                                             <i className="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                                            <span><strong>Checkouts Initiated</strong> {resultsGrowth >= 0 ? 'meningkat' : 'menurun'} {Math.abs(resultsGrowth).toFixed(1)}% dengan {resultsGrowth >= 0 ? 'peningkatan' : 'penurunan'} kualitas conversion</span>
+                                            <span><strong>Checkouts Initiated</strong> {resultsGrowth.isPositive ? 'meningkat' : 'menurun'} {Math.abs(resultsGrowth).toFixed(1)}% dengan {resultsGrowth.isPositive ? 'peningkatan' : 'penurunan'} kualitas conversion</span>
                                         </li>
                                         <li className="flex items-start">
                                             <i className="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
@@ -710,7 +710,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                         </li>
                                         <li className="flex items-start">
                                             <i className="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                                            <span><strong>Budget Utilization</strong> optimal dengan spend {spendGrowth >= 0 ? 'meningkat' : 'menurun'} {Math.abs(spendGrowth).toFixed(1)}%</span>
+                                            <span><strong>Budget Utilization</strong> optimal dengan spend {spendGrowth.isPositive ? 'meningkat' : 'menurun'} {Math.abs(spendGrowth).toFixed(1)}%</span>
                                         </li>
                                     </ul>
                                 </div>
