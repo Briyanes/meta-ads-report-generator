@@ -121,14 +121,17 @@ export async function POST(request: NextRequest) {
       if (!htmlReport || htmlReport.length < 100) {
         throw new Error('Generated HTML report is too short or empty')
       }
-      
-      // Validate HTML structure
-      if (!htmlReport.includes('<!DOCTYPE html>') && !htmlReport.includes('<html')) {
+
+      // Validate HTML structure - CPAS uses different format
+      const hasValidHTML = htmlReport.includes('<!DOCTYPE html>') || htmlReport.includes('<html')
+      const hasRoot = htmlReport.includes('<div id="root">') || htmlReport.includes('class="slide')
+
+      if (!hasValidHTML) {
         throw new Error('Generated HTML report is missing required HTML structure')
       }
-      
-      if (!htmlReport.includes('<div id="root">')) {
-        throw new Error('Generated HTML report is missing root element')
+
+      if (!hasRoot) {
+        throw new Error('Generated HTML report is missing root element (div id="root" or class="slide")')
       }
       
     } catch (templateError: any) {
