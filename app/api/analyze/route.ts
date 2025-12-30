@@ -546,15 +546,33 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     // Extract first row from OBJECTIVE breakdown (matching Report Manual approach)
     // Report Manual uses objective.data[0] for CPAS metrics
     // objective.csv contains AGGREGATED totals, not daily data like main CSV
+    // CRITICAL: NO FALLBACK to main CSV - objective.csv is REQUIRED for CPAS!
 
     console.log('[DEBUG] breakdownDataThisWeek keys:', Object.keys(breakdownDataThisWeek))
     console.log('[DEBUG] breakdownDataThisWeek.objective:', breakdownDataThisWeek.objective)
     console.log('[DEBUG] breakdownDataLastWeek.objective:', breakdownDataLastWeek.objective)
 
-    const thisWeekData = breakdownDataThisWeek.objective?.[0] || parsedDataThisWeek.data[0] || {}
-    const lastWeekData = breakdownDataLastWeek.objective?.[0] || parsedDataLastWeek.data[0] || {}
+    const thisWeekData = breakdownDataThisWeek.objective?.[0]
+    const lastWeekData = breakdownDataLastWeek.objective?.[0]
 
-    console.log('[DEBUG] thisWeekData source:', breakdownDataThisWeek.objective?.[0] ? 'objective.csv' : 'main.csv')
+    // Validate objective data exists
+    if (!thisWeekData || Object.keys(thisWeekData).length === 0) {
+      console.error('[ERROR] Objective breakdown file not found for thisWeek!')
+      return NextResponse.json(
+        { error: 'Objective breakdown file is required for CPAS reports. Please upload the -objective.csv file for this week.' },
+        { status: 400 }
+      )
+    }
+
+    if (!lastWeekData || Object.keys(lastWeekData).length === 0) {
+      console.error('[ERROR] Objective breakdown file not found for lastWeek!')
+      return NextResponse.json(
+        { error: 'Objective breakdown file is required for CPAS reports. Please upload the -objective.csv file for last week.' },
+        { status: 400 }
+      )
+    }
+
+    console.log('[DEBUG] ✓ Using objective.csv for both weeks')
     console.log('[DEBUG] thisWeekData Amount Spent:', thisWeekData['Amount spent (IDR)'])
     console.log('[DEBUG] lastWeekData Amount Spent:', lastWeekData['Amount spent (IDR)'])
 
@@ -577,9 +595,10 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     let lastWeekResults = 0
     
     if (objectiveType === 'cpas') {
-      // CPAS: Use purchases
-      thisWeekResults = parseNum(thisWeekData['Purchases'] || thisWeekData['Purchases with shared items'] || 0)
-      lastWeekResults = parseNum(lastWeekData['Purchases'] || lastWeekData['Purchases with shared items'] || 0)
+      // CPAS: Use EXACT field name from objective.csv
+      // objective.csv has "Purchases with shared items" field
+      thisWeekResults = parseNum(thisWeekData['Purchases with shared items'])
+      lastWeekResults = parseNum(lastWeekData['Purchases with shared items'])
     } else if (objectiveType === 'ctlptowa') {
       // CTLP to WA: Use checkouts initiated
       thisWeekResults = parseNum(thisWeekData['Checkouts initiated'] || 0)
