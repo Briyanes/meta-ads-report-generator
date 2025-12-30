@@ -1,0 +1,2305 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Meta Ads CPAS Report - Hadona</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --primary-blue: #2B46BB;
+            --primary-yellow: #ECDC43;
+            --green-growth: #10B981;
+            --red-decline: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+        }
+
+        .slide {
+            min-height: 900px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            padding: 48px 48px;
+            position: relative;
+            overflow: hidden;
+            page-break-inside: avoid;
+        }
+
+        .slide::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-blue) 0%, var(--primary-yellow) 50%, var(--primary-blue) 100%);
+        }
+
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-blue) 0%, var(--primary-yellow) 100%);
+        }
+
+        /* Logo */
+        .logo {
+            position: absolute;
+            top: 40px;
+            left: 56px;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            object-fit: contain;
+        }
+
+        /* Navigation */
+        .nav-controls {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 10px 16px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(43, 70, 187, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(43, 70, 187, 0.1);
+        }
+
+        .nav-btn {
+            width: 42px;
+            height: 42px;
+            border: 1px solid rgba(43, 70, 187, 0.1);
+            border-radius: 10px;
+            background: white;
+            color: var(--primary-blue);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--primary-blue);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            border-color: var(--primary-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(43, 70, 187, 0.2);
+        }
+
+        .nav-btn:hover:not(:disabled)::before {
+            opacity: 1;
+        }
+
+        .nav-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .nav-btn > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .slide-indicator {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 10px 16px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(43, 70, 187, 0.1);
+            border: 1px solid rgba(43, 70, 187, 0.1);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(43, 70, 187, 0.1);
+            z-index: 1001;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-blue) 0%, var(--primary-yellow) 100%);
+            transition: width 0.3s ease;
+            border-radius: 0 2px 2px 0;
+        }
+
+        /* Slide visibility */
+        .slide-content {
+            display: block;
+        }
+
+        .slide-content.active {
+            display: block;
+        }
+
+        /* Hide navigation in print mode */
+        @media screen {
+            .slide-content {
+                display: none;
+            }
+            .slide-content.active {
+                display: block;
+            }
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 8px;
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+
+        h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 24px;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(43, 70, 187, 0.06), 0 1px 3px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-blue) 0%, var(--primary-yellow) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(43, 70, 187, 0.12), 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-color: rgba(43, 70, 187, 0.2);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .metric-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin: 8px 0;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #1e3088 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        /* Growth indicators */
+        .growth-positive {
+            color: var(--green-growth);
+            font-weight: 600;
+        }
+
+        .growth-negative {
+            color: var(--red-decline);
+            font-weight: 600;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        .badge-green {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            border: 1px solid #6ee7b7;
+        }
+
+        .badge-red {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        th {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #1e3088 100%);
+            color: white;
+            font-weight: 600;
+            text-align: left;
+            padding: 14px 16px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            position: relative;
+        }
+
+        th::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-yellow) 0%, var(--primary-yellow) 100%);
+            opacity: 0.3;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.2s ease;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: linear-gradient(90deg, rgba(43, 70, 187, 0.03) 0%, rgba(236, 220, 67, 0.03) 100%);
+        }
+
+        tbody tr {
+            transition: transform 0.2s ease;
+        }
+
+        tbody tr:hover {
+            transform: scale(1.005);
+        }
+
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+
+        /* Key insight box */
+        .key-insight {
+            background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%);
+            border-left: 4px solid var(--primary-yellow);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 24px;
+            box-shadow: 0 4px 12px rgba(236, 220, 67, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .key-insight::before {
+            content: '💡';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 60px;
+            opacity: 0.1;
+        }
+
+        .key-insight p {
+            font-size: 14px;
+            color: #854d0e;
+            margin: 0;
+            line-height: 1.7;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Highlight/Lowlight columns */
+        .highlight-col {
+            background: #f0fdf4;
+            border-left: 4px solid var(--green-growth);
+        }
+
+        .lowlight-col {
+            background: #fef2f2;
+            border-left: 4px solid var(--red-decline);
+        }
+
+        .point-item {
+            padding: 10px 12px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        /* Print styles */
+        @media print {
+            /* Hide navigation elements */
+            .nav-controls, .slide-indicator, .progress-bar { display: none !important; }
+
+            /* Ensure colors print accurately */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            /* Body styling */
+            body {
+                background: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                font-size: 10px !important;
+                -webkit-print-color-adjust: exact !important;
+            }
+
+            /* Slide container */
+            .slide {
+                page-break-after: always !important;
+                page-break-inside: avoid !important;
+                margin: 0 !important;
+                padding: 25px 30px !important;
+                min-height: auto !important;
+                max-height: none !important;
+                height: auto !important;
+                overflow: visible !important;
+                clear: both !important;
+            }
+
+            .slide:last-child {
+                page-break-after: auto !important;
+            }
+
+            @page {
+                size: A4 portrait !important;
+                margin: 0.4cm !important;
+            }
+
+            /* Typography - readable */
+            h1 {
+                font-size: 18px !important;
+                margin-bottom: 8px !important;
+                margin-top: 10px !important;
+                line-height: 1.3 !important;
+            }
+
+            h2 {
+                font-size: 13px !important;
+                margin-bottom: 6px !important;
+                margin-top: 0 !important;
+                line-height: 1.3 !important;
+            }
+
+            h3 {
+                font-size: 11px !important;
+                margin-bottom: 8px !important;
+                margin-top: 0 !important;
+                line-height: 1.3 !important;
+            }
+
+            p {
+                font-size: 10px !important;
+                line-height: 1.4 !important;
+                margin-bottom: 8px !important;
+            }
+
+            /* Metrics */
+            .metric-value {
+                font-size: 16px !important;
+                line-height: 1.3 !important;
+                margin: 4px 0 !important;
+            }
+
+            .metric-label {
+                font-size: 10px !important;
+                line-height: 1.3 !important;
+                margin-bottom: 3px !important;
+            }
+
+            /* Tables - comfortable spacing */
+            table {
+                font-size: 9px !important;
+                width: 100% !important;
+                margin-bottom: 12px !important;
+                table-layout: auto !important;
+                page-break-inside: auto !important;
+            }
+
+            th {
+                padding: 6px 8px !important;
+                font-size: 9px !important;
+                line-height: 1.3 !important;
+            }
+
+            td {
+                padding: 5px 8px !important;
+                font-size: 9px !important;
+                line-height: 1.3 !important;
+            }
+
+            /* Cards - more breathing room */
+            .card {
+                padding: 10px 12px !important;
+                margin-bottom: 10px !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+
+            /* Key insights */
+            .key-insight {
+                font-size: 10px !important;
+                padding: 10px 12px !important;
+                margin-top: 12px !important;
+                line-height: 1.4 !important;
+                page-break-inside: avoid !important;
+            }
+
+            /* Logo */
+            .logo {
+                width: 36px !important;
+                height: 36px !important;
+            }
+
+            /* Charts */
+            .chart-container {
+                height: 160px !important;
+                margin-bottom: 12px !important;
+                page-break-inside: avoid !important;
+            }
+
+            /* Badges */
+            .badge {
+                font-size: 8px !important;
+                padding: 3px 6px !important;
+                white-space: nowrap !important;
+            }
+
+            /* Highlight columns */
+            .highlight-col {
+                padding: 12px !important;
+            }
+
+            /* Grid adjustments */
+            [style*="grid-template-columns"] {
+                gap: 12px !important;
+            }
+
+            /* Margin adjustments */
+            .slide [style*="margin-top: 60px"] {
+                margin-top: 35px !important;
+            }
+
+            .slide [style*="margin-top: 80px"] {
+                margin-top: 45px !important;
+            }
+
+            .slide h1 + h2 {
+                margin-top: 0 !important;
+            }
+
+            /* Text wrapping */
+            p, div, span, td, th {
+                overflow-wrap: break-word !important;
+                word-wrap: break-word !important;
+                word-break: break-word !important;
+            }
+
+            /* Slide 1 specific */
+            .slide[data-slide="1"] h1 {
+                font-size: 22px !important;
+                margin-bottom: 10px !important;
+            }
+
+            .slide[data-slide="1"] h2 {
+                font-size: 16px !important;
+            }
+
+            .slide[data-slide="1"] .subtitle {
+                font-size: 12px !important;
+            }
+
+            .slide[data-slide="1"] [style*="margin: 80px auto 0"] {
+                margin: 40px auto 0 !important;
+            }
+
+            .slide[data-slide="1"] [style*="position: absolute"] {
+                position: relative !important;
+                bottom: auto !important;
+                left: auto !important;
+                right: auto !important;
+                margin-top: 25px !important;
+            }
+
+            /* Footer slide */
+            .slide[data-slide="13"] [style*="margin-top: 60px"] {
+                margin-top: 30px !important;
+                padding: 15px !important;
+            }
+
+            /* Canvas and charts */
+            canvas {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+
+            /* Grid-specific sizing */
+            [style*="grid-template-columns: repeat(2, 1fr)"] .metric-value {
+                font-size: 14px !important;
+            }
+
+            [style*="grid-template-columns: repeat(3, 1fr)"] .metric-value,
+            [style*="grid-template-columns: repeat(4, 1fr)"] .metric-value {
+                font-size: 12px !important;
+            }
+
+            [style*="grid-template-columns"] .card {
+                padding: 8px 10px !important;
+            }
+
+            [style*="grid-template-columns"] .metric-label {
+                font-size: 9px !important;
+                margin-bottom: 3px !important;
+            }
+
+            /* Icons */
+            .bi {
+                font-size: 12px !important;
+            }
+
+            /* Lists */
+            li {
+                margin-bottom: 4px !important;
+                font-size: 10px !important;
+                line-height: 1.3 !important;
+            }
+
+            /* Strong/bold */
+            strong, b {
+                font-size: inherit !important;
+            }
+
+            /* Dividers */
+            .divider {
+                margin: 12px 0 !important;
+            }
+
+            /* Point items */
+            .point-item {
+                font-size: 10px !important;
+                padding: 5px 8px !important;
+                margin-bottom: 5px !important;
+            }
+
+            /* Hide decorative elements */
+            .key-insight::before,
+            .slide::before,
+            .slide::after {
+                display: none !important;
+            }
+
+            /* Ensure all content fits */
+            * {
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Fix for tables with too many columns */
+            table[style*="font-size: 12px"] {
+                font-size: 8px !important;
+            }
+
+            table[style*="font-size: 12px"] th,
+            table[style*="font-size: 12px"] td {
+                padding: 4px 6px !important;
+                font-size: 8px !important;
+                line-height: 1.2 !important;
+            }
+
+            /* Ensure inline styles don't break layout */
+            [style*="font-size: 24px"] {
+                font-size: 13px !important;
+            }
+
+            [style*="font-size: 20px"] {
+                font-size: 11px !important;
+            }
+
+            [style*="font-size: 16px"] {
+                font-size: 10px !important;
+            }
+
+            [style*="font-size: 13px"] {
+                font-size: 9px !important;
+            }
+
+            /* Fix margins with inline styles */
+            [style*="margin-top: 16px"],
+            [style*="margin-top: 20px"],
+            [style*="margin-top: 24px"] {
+                margin-top: 10px !important;
+            }
+
+            [style*="margin-bottom: 16px"],
+            [style*="margin-bottom: 20px"],
+            [style*="margin-bottom: 24px"] {
+                margin-bottom: 10px !important;
+            }
+
+            /* Compact gaps */
+            [style*="gap: 16px"],
+            [style*="gap: 24px"],
+            [style*="gap: 32px"] {
+                gap: 10px !important;
+            }
+
+            /* Fix padding */
+            [style*="padding: 16px"],
+            [style*="padding: 20px"],
+            [style*="padding: 24px"] {
+                padding: 10px !important;
+            }
+
+            /* More spacing for readability */
+            [style*="margin-top: 8px"],
+            [style*="margin-top: 12px"] {
+                margin-top: 6px !important;
+            }
+
+            /* Better spacing in cards */
+            .card div {
+                margin-bottom: 6px !important;
+            }
+
+            .card div:last-child {
+                margin-bottom: 0 !important;
+            }
+        }
+
+        /* Charts */
+        .chart-container {
+            position: relative;
+            height: 280px;
+        }
+
+        /* Divider */
+        .divider {
+            border: none;
+            border-top: 1px solid #e2e8f0;
+            margin: 16px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()" id="prevBtn">‹</button>
+        <button class="nav-btn" onclick="nextSlide()" id="nextBtn">›</button>
+        <button class="nav-btn" onclick="downloadPDF()" title="Download PDF" style="background: linear-gradient(135deg, #2B46BB 0%, #1e3088 100%); color: white; font-weight: 600;">
+            <i class="bi bi-download"></i> Download PDF
+        </button>
+        <button class="nav-btn" onclick="window.print()" title="Print PDF">⎙</button>
+        <button class="nav-btn" onclick="goToSlide(0)" title="First">⇤</button>
+        <button class="nav-btn" onclick="toggleViewMode()" id="viewModeBtn" title="View All">📄</button>
+    </div>
+
+    <div class="slide-indicator">
+        <span id="currentSlide">1</span> / <span id="totalSlides">13</span>
+    </div>
+
+    <!-- SLIDE 1: WELCOME -->
+    <div class="slide slide-content active" data-slide="1">
+        <img src="https://hadona.id/wp-content/uploads/2024/12/cropped-Hadona-Logo-1-300x300.png" alt="Hadona Logo" class="logo">
+
+        <div style="max-width: 900px; margin: 80px auto 0; text-align: center;">
+            <h1 style="font-size: 42px; margin-bottom: 16px;">Monthly over Monthly Reporting</h1>
+            <h2 style="font-size: 20px;">Meta Ads – Hadona × Ayyuwa Store</h2>
+            <div class="divider" style="max-width: 200px; margin: 24px auto; border-top: 3px solid var(--primary-yellow);"></div>
+            <p class="subtitle" style="font-size: 16px; margin-top: 24px;">
+                <strong>Periode:</strong> 1-30 November 2025 vs 1-5 Oktober 2025
+            </p>
+        </div>
+
+        <div style="position: absolute; bottom: 60px; left: 56px; right: 56px;">
+            <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; border-radius: 8px;">
+                <p style="font-size: 13px; color: #92400e; margin: 0; font-weight: 600;">
+                    <i class="bi bi-shield-lock"></i> Private & Confidential
+                </p>
+                <p style="font-size: 12px; color: #78350f; margin: 8px 0 0 0; line-height: 1.6;">
+                    This presentation contains proprietary insights prepared exclusively for our valued client. Redistribution or disclosure is not permitted.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 2: PERFORMANCE SUMMARY -->
+    <div class="slide slide-content" data-slide="2">
+        <img src="https://hadona.id/wp-content/uploads/2024/12/cropped-Hadona-Logo-1-300x300.png" alt="Hadona Logo" class="logo">
+
+        <div style="margin-top: 60px; margin-bottom: 24px;">
+            <h1>Performance Summary</h1>
+            <h2>Monthly Comparison</h2>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 24px;">
+            <!-- Bulan Ini (November) -->
+            <div class="card">
+                <div class="metric-label">Bulan Ini (November)</div>
+                <div style="margin-top: 16px;">
+                    <div class="metric-label">Amount Spent</div>
+                    <div class="metric-value">Rp 2,130,319</div>
+                </div>
+                <div style="margin-top: 16px;">
+                    <div class="metric-label">Results (Add to Cart)</div>
+                    <div class="metric-value">653</div>
+                </div>
+                <div style="margin-top: 16px;">
+                    <div class="metric-label">Cost per Result</div>
+                    <div class="metric-value">Rp 3,262</div>
+                </div>
+                <div style="margin-top: 16px;">
+                    <span class="badge badge-green">Growth: +461.42%</span>
+                </div>
+            </div>
+
+            <!-- Minggu Lalu (Oktober) -->
+            <div class="card">
+                <div class="metric-label">Bulan Lalu (Oktober)</div>
+                <div style="margin-top: 16px;">
+                    <div class="metric-label">Amount Spent</div>
+                    <div class="metric-value">Rp 379,401</div>
+                </div>
+                <div style="margin-top: 16px;">
+                    <div class="metric-label">Results (Add to Cart)</div>
+                    <div class="metric-value">0</div>
+                </div>
+                <div style="margin-top: 16px;">
+                    <div class="metric-label">Cost per Result</div>
+                    <div class="metric-value">-</div>
+                </div>
+                <div style="margin-top: 16px;">
+                    <span class="badge badge-red">No Results</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="key-insight">
+            <p><strong>Key Insight:</strong> November menunjukkan performa yang signifikan dengan 653 add to cart dan CPR Rp 3,262, meningkat drastis dari Oktober yang tidak menghasilkan konversi. Pertumbuhan spend sebesar 461.42% sebanding dengan hasil yang dicapai.</p>
+        </div>
+    </div>
+
+    <!-- SLIDE 3: DETAILED METRICS -->
+    <div class="slide slide-content" data-slide="3">
+        <img src="https://hadona.id/wp-content/uploads/2024/12/cropped-Hadona-Logo-1-300x300.png" alt="Hadona Logo" class="logo">
+
+        <div style="margin-top: 60px; margin-bottom: 20px;">
+            <h1>Detailed Performance Metrics</h1>
+            <h2>Complete Monthly Comparison</h2>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Metrik</th>
+                        <th class="text-right">Oktober</th>
+                        <th class="text-right">November</th>
+                        <th class="text-right">Trending Value</th>
+                        <th class="text-right">Trending %</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Amount Spent (IDR)</strong></td>
+                        <td class="text-right">379,401</td>
+                        <td class="text-right">2,130,319</td>
+                        <td class="text-right growth-positive">+1,750,918</td>
+                        <td class="text-right"><span class="badge badge-green">+461.42%</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Impressions</strong></td>
+                        <td class="text-right">8,442</td>
+                        <td class="text-right">131,127</td>
+                        <td class="text-right growth-positive">+122,685</td>
+                        <td class="text-right"><span class="badge badge-green">+1,453.17%</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Link Clicks</strong></td>
+                        <td class="text-right">288</td>
+                        <td class="text-right">917</td>
+                        <td class="text-right growth-positive">+629</td>
+                        <td class="text-right"><span class="badge badge-green">+218.40%</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>CTR (Link)</strong></td>
+                        <td class="text-right">3.41%</td>
+                        <td class="text-right">0.70%</td>
+                        <td class="text-right growth-negative">-2.71%</td>
+                        <td class="text-right"><span class="badge badge-red">-79.47%</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>CPC (Link)</strong></td>
+                        <td class="text-right">Rp 1,317</td>
+                        <td class="text-right">Rp 2,324</td>
+                        <td class="text-right growth-negative">+Rp 1,007</td>
+                        <td class="text-right"><span class="badge badge-red">+76.46%</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>CPM</strong></td>
+                        <td class="text-right">Rp 44,939</td>
+                        <td class="text-right">Rp 16,247</td>
+                        <td class="text-right growth-positive">-Rp 28,692</td>
+                        <td class="text-right"><span class="badge badge-green">-63.84%</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Outbound Clicks</strong></td>
+                        <td class="text-right">288</td>
+                        <td class="text-right">917</td>
+                        <td class="text-right growth-positive">+629</td>
+                        <td class="text-right"><span class="badge badge-green">+218.40%</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Content Views</strong></td>
+                        <td class="text-right">0</td>
+                        <td class="text-right">2,803</td>
+                        <td class="text-right growth-positive">+2,803</td>
+                        <td class="text-right"><span class="badge badge-green">N/A</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Add to Cart</strong></td>
+                        <td class="text-right">0</td>
+                        <td class="text-right">653</td>
+                        <td class="text-right growth-positive">+653</td>
+                        <td class="text-right"><span class="badge badge-green">N/A</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Purchases</strong></td>
+                        <td class="text-right">0</td>
+                        <td class="text-right">9</td>
+                        <td class="text-right growth-positive">+9</td>
+                        <td class="text-right"><span class="badge badge-green">N/A</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Instagram Profile Visits</strong></td>
+                        <td class="text-right">0</td>
+                        <td class="text-right">1,303</td>
+                        <td class="text-right growth-positive">+1,303</td>
+                        <td class="text-right"><span class="badge badge-green">N/A</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Instagram Followers</strong></td>
+                        <td class="text-right">0</td>
+                        <td class="text-right">70</td>
+                        <td class="text-right growth-positive">+70</td>
+                        <td class="text-right"><span class="badge badge-green">N/A</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Add to Cart Conversion Value</strong></td>
+                        <td class="text-right">Rp 0</td>
+                        <td class="text-right">Rp 51,793,250</td>
+                        <td class="text-right growth-positive">+Rp 51,793,250</td>
+                        <td class="text-right"><span class="badge badge-green">N/A</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Purchases Conversion Value</strong></td>
+                        <td class="text-right">Rp 0</td>
+                        <td class="text-right">Rp 523,200</td>
+                        <td class="text-right growth-positive">+Rp 523,200</td>
+                        <td class="text-right"><span class="badge badge-green">N/A</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Purchase ROAS</strong></td>
+                        <td class="text-right">0</td>
+                        <td class="text-right">0.25</td>
+                        <td class="text-right growth-positive">+0.25</td>
+                        <td class="text-right"><span class="badge badge-green">N/A</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>AOV (Average Order Value)</strong></td>
+                        <td class="text-right">Rp 0</td>
+                        <td class="text-right">Rp 58,133</td>
+                        <td class="text-right growth-positive">+Rp 58,133</td>
+                        <td class="text-right"><span class="badge badge-green">N/A</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cost per Result (ATC)</strong></td>
+                        <td class="text-right">Rp 0</td>
+                        <td class="text-right">Rp 3,262</td>
+                        <td class="text-right growth-negative">Rp 3,262</td>
+                        <td class="text-right"><span class="badge badge-yellow">N/A</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Conversion Rate (ATC)</strong></td>
+                        <td class="text-right">0%</td>
+                        <td class="text-right">71.21%</td>
+                        <td class="text-right growth-positive">+71.21%</td>
+                        <td class="text-right"><span class="badge badge-green">N/A</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Purchase Rate</strong></td>
+                        <td class="text-right">0%</td>
+                        <td class="text-right">0.98%</td>
+                        <td class="text-right growth-positive">+0.98%</td>
+                        <td class="text-right"><span class="badge badge-green">N/A</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>CPR (Purchase)</strong></td>
+                        <td class="text-right">Rp 0</td>
+                        <td class="text-right">Rp 236,702</td>
+                        <td class="text-right growth-negative">Rp 236,702</td>
+                        <td class="text-right"><span class="badge badge-yellow">N/A</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>CTR (Content View)</strong></td>
+                        <td class="text-right">0%</td>
+                        <td class="text-right">305.67%</td>
+                        <td class="text-right growth-positive">+305.67%</td>
+                        <td class="text-right"><span class="badge badge-green">N/A</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="key-insight">
+            <p><strong>Kesimpulan:</strong> November menunjukkan peningkatan dramatis di semua metrik konversi. Meskipun CTR menurun (karena ekspansi reach), CPM turun signifikan menjadikan biaya impresi lebih efisien. Konversi nyata (653 ATC, 9 purchases) mulai tercapai dengan CPR yang sangat efisien Rp 3,262. ROAS 0.25 dengan AOV Rp 58,133 menunjukkan potensi revenue yang baik. Conversion rate 71.21% (ATC per outbound click) sangat tinggi, mengindikasikan kualitas traffic yang excellent.</p>
+        </div>
+    </div>
+
+    <!-- SLIDE 4: WEEK-ON-WEEK ANALYSIS -->
+    <div class="slide slide-content" data-slide="4">
+        <img src="https://hadona.id/wp-content/uploads/2024/12/cropped-Hadona-Logo-1-300x300.png" alt="Hadona Logo" class="logo">
+
+        <div style="margin-top: 60px; margin-bottom: 20px;">
+            <h1>Monthly Analysis</h1>
+            <h2>Highlights & Lowlights</h2>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <!-- Highlights -->
+            <div class="highlight-col" style="padding: 20px; border-radius: 12px;">
+                <h3 style="color: var(--green-growth); margin-bottom: 16px;">
+                    <i class="bi bi-arrow-up-circle-fill"></i> Highlights
+                </h3>
+                <div class="point-item">
+                    <i class="bi bi-check-circle-fill" style="color: var(--green-growth);"></i>
+                    <div>
+                        <strong>653 Add to Cart</strong><br>
+                        Konversi pertama tercapai dengan CPR Rp 3,262
+                    </div>
+                </div>
+                <div class="point-item">
+                    <i class="bi bi-check-circle-fill" style="color: var(--green-growth);"></i>
+                    <div>
+                        <strong>9 Purchases</strong><br>
+                        ROAS mencapai 0.25 dengan AOV Rp 58,133
+                    </div>
+                </div>
+                <div class="point-item">
+                    <i class="bi bi-check-circle-fill" style="color: var(--green-growth);"></i>
+                    <div>
+                        <strong>CPM Turun 63.84%</strong><br>
+                        Biaya impressi menjadi lebih efisien (Rp 16,247)
+                    </div>
+                </div>
+                <div class="point-item">
+                    <i class="bi bi-check-circle-fill" style="color: var(--green-growth);"></i>
+                    <div>
+                        <strong>70 New Followers</strong><br>
+                        Instagram community terus bertumbuh
+                    </div>
+                </div>
+                <div class="point-item">
+                    <i class="bi bi-check-circle-fill" style="color: var(--green-growth);"></i>
+                    <div>
+                        <strong>1,303 Profile Visits</strong><br>
+                        Brand awareness meningkat signifikan
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lowlights -->
+            <div class="lowlight-col" style="padding: 20px; border-radius: 12px;">
+                <h3 style="color: var(--red-decline); margin-bottom: 16px;">
+                    <i class="bi bi-arrow-down-circle-fill"></i> Lowlights
+                </h3>
+                <div class="point-item">
+                    <i class="bi bi-x-circle-fill" style="color: var(--red-decline);"></i>
+                    <div>
+                        <strong>CTR Turun 79.47%</strong><br>
+                        Dari 3.41% ke 0.70% karena ekspansi reach ke audiens baru
+                    </div>
+                </div>
+                <div class="point-item">
+                    <i class="bi bi-x-circle-fill" style="color: var(--red-decline);"></i>
+                    <div>
+                        <strong>CPC Naik 76.46%</strong><br>
+                        Dari Rp 1,317 ke Rp 2,324 per click
+                    </div>
+                </div>
+                <div class="point-item">
+                    <i class="bi bi-x-circle-fill" style="color: var(--red-decline);"></i>
+                    <div>
+                        <strong>Oktober Tanpa Konversi</strong><br>
+                        Campaign sebelumnya tidak menghasilkan ATC maupun purchases
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="key-insight">
+            <p><strong>Insight Utama:</strong> Performa November jauh melampaui Oktober dengan tercapainya konversi nyata untuk pertama kalinya. Penurunan CTR dan kenaikan CPC adalah trade-off wajar dari ekspansi reach yang berhasil mengkonversi audiens baru dengan biaya yang efisien.</p>
+        </div>
+    </div>
+
+    <!-- SLIDE 5: AUDIENCE PERFORMANCE - AGE -->
+    <div class="slide slide-content" data-slide="5">
+        <img src="https://hadona.id/wp-content/uploads/2024/12/cropped-Hadona-Logo-1-300x300.png" alt="Hadona Logo" class="logo">
+
+        <div style="margin-top: 60px; margin-bottom: 20px;">
+            <h1>Audience Performance: Age</h1>
+            <h2>Demografi Usia Terbaik</h2>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <h3 style="margin-bottom: 12px;">🏆 Performa Berdasarkan Usia (Top 3 Highlighted)</h3>
+            <div style="overflow-x: auto;">
+                <table style="font-size: 12px;">
+                    <thead>
+                        <tr>
+                            <th>Usia</th>
+                            <th class="text-right">Impressions</th>
+                            <th class="text-right">Link Clicks</th>
+                            <th class="text-right">CTR</th>
+                            <th class="text-right">CPC (IDR)</th>
+                            <th class="text-right">Content Views</th>
+                            <th class="text-right">ATC</th>
+                            <th class="text-right">CPR (IDR)</th>
+                            <th class="text-right">Purchases</th>
+                            <th class="text-right">ROAS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="background: #f0fdf4;">
+                            <td><strong>35-44 🥇</strong></td>
+                            <td class="text-right">43,831</td>
+                            <td class="text-right">265</td>
+                            <td class="text-right">1.23%</td>
+                            <td class="text-right">Rp 512</td>
+                            <td class="text-right">196</td>
+                            <td class="text-right"><strong style="color: #16a34a;">24</strong></td>
+                            <td class="text-right">Rp 27,729</td>
+                            <td class="text-right">1</td>
+                            <td class="text-right">0.21</td>
+                        </tr>
+                        <tr style="background: #fef9c3;">
+                            <td><strong>25-34 🥈</strong></td>
+                            <td class="text-right">34,990</td>
+                            <td class="text-right">147</td>
+                            <td class="text-right">0.83%</td>
+                            <td class="text-right"><strong>Rp 445</strong></td>
+                            <td class="text-right">285</td>
+                            <td class="text-right"><strong style="color: #16a34a;">19</strong></td>
+                            <td class="text-right"><strong style="color: #16a34a;">Rp 20,604</strong></td>
+                            <td class="text-right">2</td>
+                            <td class="text-right">0.20</td>
+                        </tr>
+                        <tr style="background: #fed7aa;">
+                            <td><strong>45-54 🥉</strong></td>
+                            <td class="text-right">31,905</td>
+                            <td class="text-right">309</td>
+                            <td class="text-right">1.86%</td>
+                            <td class="text-right">Rp 512</td>
+                            <td class="text-right">98</td>
+                            <td class="text-right"><strong style="color: #16a34a;">20</strong></td>
+                            <td class="text-right">Rp 33,169</td>
+                            <td class="text-right">1</td>
+                            <td class="text-right">0.16</td>
+                        </tr>
+                        <tr>
+                            <td><strong>55-64</strong></td>
+                            <td class="text-right">10,343</td>
+                            <td class="text-right">129</td>
+                            <td class="text-right">2.67%</td>
+                            <td class="text-right">Rp 545</td>
+                            <td class="text-right">119</td>
+                            <td class="text-right">5</td>
+                            <td class="text-right">Rp 56,423</td>
+                            <td class="text-right">5</td>
+                            <td class="text-right">0.55</td>
+                        </tr>
+                        <tr>
+                            <td><strong>18-24</strong></td>
+                            <td class="text-right">6,933</td>
+                            <td class="text-right">29</td>
+                            <td class="text-right">0.88%</td>
+                            <td class="text-right">Rp 498</td>
+                            <td class="text-right">682</td>
+                            <td class="text-right">2</td>
+                            <td class="text-right">Rp 32,074</td>
+                            <td class="text-right">0</td>
+                            <td class="text-right">0</td>
+                        </tr>
+                        <tr>
+                            <td><strong>65+</strong></td>
+                            <td class="text-right">3,125</td>
+                            <td class="text-right">38</td>
+                            <td class="text-right">2.34%</td>
+                            <td class="text-right">Rp 695</td>
+                            <td class="text-right">28</td>
+                            <td class="text-right">0</td>
+                            <td class="text-right">-</td>
+                            <td class="text-right">0</td>
+                            <td class="text-right">0.73</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px;">
+            <div class="card">
+                <div class="metric-label">🏅 Top Performer</div>
+                <div class="metric-value" style="font-size: 24px;">35-44 Tahun</div>
+                <div style="margin-top: 8px;">
+                    <div class="metric-label">Total ATC</div>
+                    <div style="font-size: 20px; font-weight: 700; color: var(--primary-blue);">24</div>
+                </div>
+                <div style="margin-top: 8px;">
+                    <div class="metric-label">Market Share</div>
+                    <div style="font-size: 16px; font-weight: 700; color: var(--primary-blue);">36.9%</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="metric-label">💡 Best CPR</div>
+                <div class="metric-value" style="font-size: 24px;">Rp 20,604</div>
+                <div style="margin-top: 8px;">
+                    <div class="metric-label">Usia 25-34</div>
+                    <div style="font-size: 13px; color: #64748b;">19 ATC, 2 Purchases</div>
+                </div>
+                <div style="margin-top: 8px;">
+                    <div class="metric-label">Best CPC</div>
+                    <div style="font-size: 16px; font-weight: 700; color: var(--primary-blue);">Rp 445</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="metric-label">🎯 Best ROAS</div>
+                <div class="metric-value" style="font-size: 24px; color: var(--green-growth);">0.55</div>
+                <div style="margin-top: 8px;">
+                    <div class="metric-label">Usia 55-64</div>
+                    <div style="font-size: 13px; color: #64748b;">5 ATC, 5 Purchases</div>
+                </div>
+                <div style="margin-top: 8px;">
+                    <div class="metric-label">CPR</div>
+                    <div style="font-size: 16px; font-weight: 700; color: var(--primary-blue);">Rp 56,423</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="key-insight">
+            <p><strong>Insight:</strong> Top 3 usia (25-34, 35-44, 45-54) mendominasi dengan 63 ATC atau 96.5% dari total konversi. 35-44 adalah top performer dengan 24 ATC (36.9% market share), sementara 25-34 menawarkan CPR terbaik (Rp 20,604) dan CPC terbaik (Rp 445). 55-64 memiliki ROAS tertinggi (0.55) dengan konversi rate 100%. Rekomendasi: Fokus 80% budget pada segmen 25-54 tahun untuk hasil maksimal.</p>
+        </div>
+    </div>
+
+    <!-- SLIDE 6: AUDIENCE PERFORMANCE - GENDER -->
+    <div class="slide slide-content" data-slide="6">
+        <img src="https://hadona.id/wp-content/uploads/2024/12/cropped-Hadona-Logo-1-300x300.png" alt="Hadona Logo" class="logo">
+
+        <div style="margin-top: 60px; margin-bottom: 20px;">
+            <h1>Audience Performance: Gender</h1>
+            <h2>Analisis Performa Berdasarkan Gender</h2>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 20px;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Gender</th>
+                        <th class="text-right">Impressions</th>
+                        <th class="text-right">ATC</th>
+                        <th class="text-right">CPR (IDR)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background: #f0fdf4;">
+                        <td><strong>Female ⭐</strong></td>
+                        <td class="text-right">75,108</td>
+                        <td class="text-right">46</td>
+                        <td class="text-right">Rp 29,714</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Male</strong></td>
+                        <td class="text-right">55,488</td>
+                        <td class="text-right">24</td>
+                        <td class="text-right">Rp 31,478</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Unknown</strong></td>
+                        <td class="text-right">531</td>
+                        <td class="text-right">0</td>
+                        <td class="text-right">-</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Gender</th>
+                        <th class="text-right">Outbound Clicks</th>
+                        <th class="text-right">CTR (Link)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background: #f0fdf4;">
+                        <td><strong>Female</strong></td>
+                        <td class="text-right">568</td>
+                        <td class="text-right">1.48%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Male</strong></td>
+                        <td class="text-right">344</td>
+                        <td class="text-right">1.28%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Unknown</strong></td>
+                        <td class="text-right">5</td>
+                        <td class="text-right">1.88%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <div class="chart-container">
+                <canvas id="genderImpressionsChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="genderCTRChart"></canvas>
+            </div>
+        </div>
+
+        <div class="key-insight">
+            <p><strong>Insight:</strong> Female dominan dengan 46 ATC (70% dari total) dan CPR Rp 29,714. Male mencatat CTR lebih rendah (1.28%) dengan volume konversi hampir setengah dari female. Female adalah segmen prioritas untuk scaling campaign.</p>
+        </div>
+    </div>
+
+    <!-- SLIDE 7: AUDIENCE PERFORMANCE - REGION -->
+    <div class="slide slide-content" data-slide="7">
+        <img src="https://hadona.id/wp-content/uploads/2024/12/cropped-Hadona-Logo-1-300x300.png" alt="Hadona Logo" class="logo">
+
+        <div style="margin-top: 60px; margin-bottom: 20px;">
+            <h1>Audience Performance: Region</h1>
+            <h2>Analisis Performa Regional</h2>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Region</th>
+                    <th class="text-right">Impressions</th>
+                    <th class="text-right">Link Clicks</th>
+                    <th class="text-right">CTR</th>
+                    <th class="text-right">ATC</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="background: #f0fdf4;">
+                    <td><strong>West Java ⭐</strong></td>
+                    <td class="text-right">32,022</td>
+                    <td class="text-right">232</td>
+                    <td class="text-right">1.48%</td>
+                    <td class="text-right">30</td>
+                </tr>
+                <tr>
+                    <td><strong>East Java</strong></td>
+                    <td class="text-right">15,257</td>
+                    <td class="text-right">91</td>
+                    <td class="text-right">1.23%</td>
+                    <td class="text-right">9</td>
+                </tr>
+                <tr>
+                    <td><strong>Central Java</strong></td>
+                    <td class="text-right">11,696</td>
+                    <td class="text-right">74</td>
+                    <td class="text-right">1.08%</td>
+                    <td class="text-right">6</td>
+                </tr>
+                <tr>
+                    <td><strong>Jakarta</strong></td>
+                    <td class="text-right">14,065</td>
+                    <td class="text-right">123</td>
+                    <td class="text-right">1.71%</td>
+                    <td class="text-right">7</td>
+                </tr>
+                <tr>
+                    <td><strong>Banten</strong></td>
+                    <td class="text-right">8,010</td>
+                    <td class="text-right">67</td>
+                    <td class="text-right">1.40%</td>
+                    <td class="text-right">6</td>
+                </tr>
+                <tr>
+                    <td><strong>South Sumatra</strong></td>
+                    <td class="text-right">4,441</td>
+                    <td class="text-right">34</td>
+                    <td class="text-right">1.55%</td>
+                    <td class="text-right">2</td>
+                </tr>
+                <tr>
+                    <td><strong>North Sumatra</strong></td>
+                    <td class="text-right">4,885</td>
+                    <td class="text-right">29</td>
+                    <td class="text-right">1.56%</td>
+                    <td class="text-right">1</td>
+                </tr>
+                <tr>
+                    <td><strong>Bali</strong></td>
+                    <td class="text-right">1,450</td>
+                    <td class="text-right">13</td>
+                    <td class="text-right">1.38%</td>
+                    <td class="text-right">2</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="margin-top: 20px;">
+            <div class="chart-container">
+                <canvas id="regionChart"></canvas>
+            </div>
+        </div>
+
+        <div class="key-insight">
+            <p><strong>Insight:</strong> West Java mendominasi dengan 30 ATC (46% dari total) dan CTR 1.48%. Jawa (West, Central, East) + Jakarta menyumbang 78% total konversi. Pertimbangkan scaling di region dengan performa tinggi ini sebelum ekspansi ke region baru.</p>
+        </div>
+    </div>
+
+    <!-- SLIDE 8: PLATFORM PERFORMANCE -->
+    <div class="slide slide-content" data-slide="8">
+        <img src="https://hadona.id/wp-content/uploads/2024/12/cropped-Hadona-Logo-1-300x300.png" alt="Hadona Logo" class="logo">
+
+        <div style="margin-top: 60px; margin-bottom: 20px;">
+            <h1>Platform Performance</h1>
+            <h2>Fokus Instagram Analysis</h2>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Platform</th>
+                    <th class="text-right">Impressions</th>
+                    <th class="text-right">Outbound Clicks</th>
+                    <th class="text-right">CTR</th>
+                    <th class="text-right">ATC</th>
+                    <th class="text-right">CPR (IDR)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="background: #f0fdf4;">
+                    <td><strong>Instagram ⭐</strong></td>
+                    <td class="text-right">79,152</td>
+                    <td class="text-right">647</td>
+                    <td class="text-right">1.10%</td>
+                    <td class="text-right">439</td>
+                    <td class="text-right">Rp 3,289</td>
+                </tr>
+                <tr>
+                    <td><strong>Facebook</strong></td>
+                    <td class="text-right">51,728</td>
+                    <td class="text-right">264</td>
+                    <td class="text-right">1.84%</td>
+                    <td class="text-right">206</td>
+                    <td class="text-right">Rp 3,296</td>
+                </tr>
+                <tr>
+                    <td><strong>Audience Network</strong></td>
+                    <td class="text-right">247</td>
+                    <td class="text-right">6</td>
+                    <td class="text-right">2.43%</td>
+                    <td class="text-right">8</td>
+                    <td class="text-right">Rp 965</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 20px;">
+            <div class="card">
+                <div class="metric-label">Instagram Dominance</div>
+                <div style="font-size: 16px; color: #64748b; margin-top: 8px;">
+                    <strong style="color: var(--primary-blue);">67%</strong> dari total Impressions<br>
+                    <strong style="color: var(--primary-blue);">71%</strong> dari total Outbound Clicks<br>
+                    <strong style="color: var(--primary-blue);">67%</strong> dari total Add to Cart
+                </div>
+            </div>
+            <div class="card">
+                <div class="metric-label">Cost Efficiency</div>
+                <div style="font-size: 16px; color: #64748b; margin-top: 8px;">
+                    CPR Instagram: <strong style="color: var(--primary-blue);">Rp 3,289</strong><br>
+                    CPR Facebook: <strong style="color: var(--primary-blue);">Rp 3,296</strong><br>
+                    Kedua platform equally efficient
+                </div>
+            </div>
+        </div>
+
+        <div class="key-insight">
+            <p><strong>Insight:</strong> Instagram adalah platform utama dengan 67% share dari total konversi. CTR lebih rendah (1.10% vs 1.84%) namun volume jauh lebih besar. Facebook tetap efisien dengan CPR serupa. Rekomendasi: pertahankan alokasi 60:40 Instagram:Facebook untuk diversifikasi.</p>
+        </div>
+    </div>
+
+    <!-- SLIDE 9: CONTENT PERFORMANCE - PLACEMENT -->
+    <div class="slide slide-content" data-slide="9">
+        <img src="https://hadona.id/wp-content/uploads/2024/12/cropped-Hadona-Logo-1-300x300.png" alt="Hadona Logo" class="logo">
+
+        <div style="margin-top: 60px; margin-bottom: 20px;">
+            <h1>Content Performance: Placement</h1>
+            <h2>Stories vs Reels vs Feed Analysis</h2>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Placement</th>
+                    <th class="text-right">Impressions</th>
+                    <th class="text-right">Outbound Clicks</th>
+                    <th class="text-right">CTR</th>
+                    <th class="text-right">ATC</th>
+                    <th class="text-right">CPR (IDR)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="background: #f0fdf4;">
+                    <td><strong>Feed ⭐</strong></td>
+                    <td class="text-right">45,802</td>
+                    <td class="text-right">351</td>
+                    <td class="text-right">2.10%</td>
+                    <td class="text-right">254</td>
+                    <td class="text-right">Rp 3,326</td>
+                </tr>
+                <tr>
+                    <td><strong>Instagram Reels</strong></td>
+                    <td class="text-right">57,626</td>
+                    <td class="text-right">382</td>
+                    <td class="text-right">0.90%</td>
+                    <td class="text-right">312</td>
+                    <td class="text-right">Rp 2,905</td>
+                </tr>
+                <tr>
+                    <td><strong>Instagram Stories</strong></td>
+                    <td class="text-right">8,894</td>
+                    <td class="text-right">86</td>
+                    <td class="text-right">1.47%</td>
+                    <td class="text-right">15</td>
+                    <td class="text-right">Rp 11,269</td>
+                </tr>
+                <tr>
+                    <td><strong>Facebook Reels</strong></td>
+                    <td class="text-right">16,734</td>
+                    <td class="text-right">85</td>
+                    <td class="text-right">1.14%</td>
+                    <td class="text-right">63</td>
+                    <td class="text-right">Rp 2,888</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 20px;">
+            <div class="card">
+                <div class="metric-label">Feed Performance</div>
+                <div style="font-size: 20px; font-weight: 700; color: var(--primary-blue); margin: 8px 0;">CTR Terbaik</div>
+                <div style="font-size: 13px; color: #64748b;">2.10% dengan CPR kompetitif Rp 3,326</div>
+            </div>
+            <div class="card">
+                <div class="metric-label">Reels Performance</div>
+                <div style="font-size: 20px; font-weight: 700; color: var(--primary-blue); margin: 8px 0;">Volume Tertinggi</div>
+                <div style="font-size: 13px; color: #64748b;">375 ATC dengan CPR terbaik Rp 2,900</div>
+            </div>
+            <div class="card">
+                <div class="metric-label">Stories Performance</div>
+                <div style="font-size: 20px; font-weight: 700; color: var(--red-decline); margin: 8px 0;">Perlu Optimalisasi</div>
+                <div style="font-size: 13px; color: #64748b;">Hanya 15 ATC dengan CPR Rp 11,269</div>
+            </div>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <div class="chart-container">
+                <canvas id="placementChart"></canvas>
+            </div>
+        </div>
+
+        <div class="key-insight">
+            <p><strong>Insight:</strong> Reels (IG + FB) adalah placement terbaik dengan kombinasi volume tertinggi (375 ATC) dan CPR paling efisient (~Rp 2,900). Feed menawarkan CTR terbaik (2.10%) namun dengan volume lebih rendah. Stories underperform dengan CPR tinggi. Rekomendasi: alokasikan 70% budget ke Reels, 25% ke Feed, dan 5% testing ke Stories.</p>
+        </div>
+    </div>
+
+    <!-- SLIDE 10: CREATIVE PERFORMANCE - AD ANALYSIS -->
+    <div class="slide slide-content" data-slide="10">
+        <img src="https://hadona.id/wp-content/uploads/2024/12/cropped-Hadona-Logo-1-300x300.png" alt="Hadona Logo" class="logo">
+
+        <div style="margin-top: 60px; margin-bottom: 20px;">
+            <h1>Creative Performance: Ad Analysis</h1>
+            <h2>Top 5 Ads Berdasarkan Add to Cart</h2>
+        </div>
+
+        <h3 style="margin-bottom: 12px;">🏆 Top 5 Creative dengan Lead Tertinggi</h3>
+
+        <table style="margin-bottom: 24px;">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Ad Name</th>
+                    <th class="text-right">Impressions</th>
+                    <th class="text-right">Outbound Clicks</th>
+                    <th class="text-right">CTR</th>
+                    <th class="text-right">ATC</th>
+                    <th class="text-right">CPR (IDR)</th>
+                    <th class="text-right">Spend (IDR)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="background: #f0fdf4;">
+                    <td><strong>#1 🥇</strong></td>
+                    <td><strong>Collection || Ads 5;...and 3 more</strong></td>
+                    <td class="text-right">58,629</td>
+                    <td class="text-right">314</td>
+                    <td class="text-right">1.36%</td>
+                    <td class="text-right"><strong style="color: #16a34a;">310</strong></td>
+                    <td class="text-right"><strong style="color: #16a34a;">Rp 2,320</strong></td>
+                    <td class="text-right">Rp 719,271</td>
+                </tr>
+                <tr style="background: #fef9c3;">
+                    <td><strong>#2 🥈</strong></td>
+                    <td><strong>Collection || Ads 5;...and 9 more</strong></td>
+                    <td class="text-right">18,185</td>
+                    <td class="text-right">116</td>
+                    <td class="text-right">1.25%</td>
+                    <td class="text-right"><strong style="color: #16a34a;">113</strong></td>
+                    <td class="text-right"><strong style="color: #16a34a;">Rp 2,471</strong></td>
+                    <td class="text-right">Rp 279,233</td>
+                </tr>
+                <tr style="background: #fed7aa;">
+                    <td><strong>#3 🥉</strong></td>
+                    <td><strong>Collection || Ads 1;...and 13 more</strong></td>
+                    <td class="text-right">10,785</td>
+                    <td class="text-right">99</td>
+                    <td class="text-right">1.62%</td>
+                    <td class="text-right"><strong style="color: #16a34a;">60</strong></td>
+                    <td class="text-right"><strong style="color: #16a34a;">Rp 4,475</strong></td>
+                    <td class="text-right">Rp 268,512</td>
+                </tr>
+                <tr style="background: #e0e7ff;">
+                    <td><strong>#4 4️⃣</strong></td>
+                    <td><strong>Collection || Ads 2;...and 13 more</strong></td>
+                    <td class="text-right">6,816</td>
+                    <td class="text-right">41</td>
+                    <td class="text-right">1.14%</td>
+                    <td class="text-right"><strong style="color: #16a34a;">22</strong></td>
+                    <td class="text-right"><strong style="color: #16a34a;">Rp 5,861</strong></td>
+                    <td class="text-right">Rp 128,948</td>
+                </tr>
+                <tr style="background: #fae8ff;">
+                    <td><strong>#5 5️⃣</strong></td>
+                    <td><strong>Collection || Ads 3;...and 13 more</strong></td>
+                    <td class="text-right">15,763</td>
+                    <td class="text-right">128</td>
+                    <td class="text-right">1.68%</td>
+                    <td class="text-right"><strong style="color: #16a34a;">61</strong></td>
+                    <td class="text-right"><strong style="color: #16a34a;">Rp 4,579</strong></td>
+                    <td class="text-right">Rp 319,518</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px;">
+            <div class="card">
+                <div class="metric-label">Top 5 Market Share</div>
+                <div class="metric-value" style="font-size: 28px;">86.1%</div>
+                <div style="font-size: 12px; color: #64748b;">566 dari 653 ATC</div>
+            </div>
+            <div class="card">
+                <div class="metric-label">Avg CPR Top 5</div>
+                <div class="metric-value" style="font-size: 28px;">Rp 3,141</div>
+                <div style="font-size: 12px; color: #64748b;">Di bawah rata-rata</div>
+            </div>
+            <div class="card">
+                <div class="metric-label">Collection Ads</div>
+                <div class="metric-value" style="font-size: 28px;">100%</div>
+                <div style="font-size: 12px; color: #64748b;">Semua top 5 adalah Collection</div>
+            </div>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <div class="chart-container" style="height: 200px;">
+                <canvas id="adPerformanceChart"></canvas>
+            </div>
+        </div>
+
+        <div class="key-insight">
+            <p><strong>Insight:</strong> <strong>Collection Ads mendominasi sepenuhnya top 5</strong> dengan 566 ATC (86.1% market share). Ads 5 variants (rank 1 & 2) adalah champion dengan 423 ATC atau 64.8% dari total konversi. Rekomendasi: Scale up Collection Ads format, particularly multi-product collections. Pause single-product dan underperforming ads.</p>
+        </div>
+    </div>
+
+    <!-- SLIDE 11: CAMPAIGN OBJECTIVE PERFORMANCE -->
+    <div class="slide slide-content" data-slide="11">
+        <img src="https://hadona.id/wp-content/uploads/2024/12/cropped-Hadona-Logo-1-300x300.png" alt="Hadona Logo" class="logo">
+
+        <div style="margin-top: 60px; margin-bottom: 20px;">
+            <h1>Campaign Objective Performance</h1>
+            <h2>Sales Objective Analysis</h2>
+        </div>
+
+        <div style="background: #f0fdf4; border: 2px solid #86efac; border-radius: 16px; padding: 24px; margin-bottom: 24px;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                <i class="bi bi-trophy-fill" style="color: #16a34a; font-size: 32px;"></i>
+                <div>
+                    <h3 style="color: #16a34a; margin: 0; font-size: 20px;">Sales Objective (OUTCOME_SALES)</h3>
+                    <p style="font-size: 13px; color: #64748b; margin: 4px 0 0 0;">Satu-satunya objective yang dijalankan</p>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px;">
+                <div class="card" style="background: white;">
+                    <div class="metric-label">Impressions</div>
+                    <div class="metric-value" style="font-size: 24px;">131,127</div>
+                </div>
+                <div class="card" style="background: white;">
+                    <div class="metric-label">Outbound Clicks</div>
+                    <div class="metric-value" style="font-size: 24px;">917</div>
+                </div>
+                <div class="card" style="background: white;">
+                    <div class="metric-label">CTR</div>
+                    <div class="metric-value" style="font-size: 24px;">1.40%</div>
+                </div>
+                <div class="card" style="background: white;">
+                    <div class="metric-label">ATC Conversions</div>
+                    <div class="metric-value" style="font-size: 28px; color: #16a34a;">653</div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                <div class="card" style="background: white;">
+                    <div class="metric-label">Conversion Rate</div>
+                    <div class="metric-value" style="font-size: 24px; color: var(--primary-blue);">71.2%</div>
+                    <div style="font-size: 11px; color: #64748b;">ATC per Outbound Click</div>
+                </div>
+                <div class="card" style="background: white;">
+                    <div class="metric-label">Profile Visits</div>
+                    <div class="metric-value" style="font-size: 24px; color: var(--primary-blue);">1,303</div>
+                    <div style="font-size: 11px; color: #64748b;">Instagram engagement</div>
+                </div>
+                <div class="card" style="background: white;">
+                    <div class="metric-label">New Followers</div>
+                    <div class="metric-value" style="font-size: 24px; color: var(--green-growth);">+70</div>
+                    <div style="font-size: 11px; color: #64748b;">Community growth</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="key-insight">
+            <p><strong>Insight:</strong> <strong>Sales objective adalah satu-satunya campaign yang aktif</strong> dan performa sangat impresif dengan 653 ATC, 1,303 profile visits, dan 70 new followers. Conversion rate 71.2% menunjukkan targeting yang sangat tepat. Sales objective terbukti efektif tidak hanya untuk konversi tapi juga untuk branding & engagement.</p>
+        </div>
+    </div>
+
+    <!-- SLIDE 12: CONCLUSION & ACTION PLAN -->
+    <div class="slide slide-content" data-slide="12">
+        <img src="https://hadona.id/wp-content/uploads/2024/12/cropped-Hadona-Logo-1-300x300.png" alt="Hadona Logo" class="logo">
+
+        <div style="margin-top: 60px; margin-bottom: 20px;">
+            <h1>Overall Conclusion & Strategic Action Plan</h1>
+            <h2>Ringkasan & Rencana Aksi</h2>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <!-- Conclusion -->
+            <div class="card">
+                <h3 style="margin-bottom: 16px;"><i class="bi bi-check2-circle" style="color: var(--green-growth);"></i> Kesimpulan Performa</h3>
+                <div style="font-size: 13px; line-height: 1.7; color: #475569;">
+                    <div style="margin-bottom: 10px;">
+                        <strong>1. Konversi Terpercaya:</strong> November mencatat 653 ATC dan 9 purchases dengan CPR Rp 3,262 - breakthrough dari Oktober yang nihil konversi.
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <strong>2. Reels Mendominasi:</strong> Instagram Reels + Facebook Reels menyumbang 57% total konversi dengan CPR terbaik ~Rp 2,900.
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <strong>3. Female & Usia 35-44:</strong> Segmen ini adalah core audience dengan 70% konversi dan CPR yang efisien.
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <strong>4. Jawa Island Focus:</strong> West + Central + East Java + Jakarta = 78% total konversi.
+                    </div>
+                    <div>
+                        <strong>5. Collection Ads Work:</strong> Multi-product collection ads outperform single ads dengan margin signifikan.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Plan -->
+            <div class="card" style="background: #fef9c3; border-color: var(--primary-yellow);">
+                <h3 style="margin-bottom: 16px;"><i class="bi bi-lightning-charge" style="color: #854d0e;"></i> Rencana Aksi Strategis</h3>
+                <div style="font-size: 13px; line-height: 1.7; color: #854d0e;">
+                    <div style="margin-bottom: 10px;">
+                        <strong>IMMEDIATE (1-2 Minggu):</strong>
+                    </div>
+                    <ul style="margin-left: 20px; margin-bottom: 12px;">
+                        <li>Scale budget Reels placement sebesar 50%</li>
+                        <li>Pause underperforming ads (CPR > Rp 5,000)</li>
+                        <li>Duplicate top performer "Collection || Ads 5"</li>
+                        <li>Increase female & 35-44 age targeting</li>
+                    </ul>
+                    <div style="margin-bottom: 10px;">
+                        <strong>SHORT-TERM (3-4 Minggu):</strong>
+                    </div>
+                    <ul style="margin-left: 20px; margin-bottom: 12px;">
+                        <li>Test new creative formats untuk Stories</li>
+                        <li>Expand ke high-potential regions (Bali, Sumatra)</li>
+                        <li>Implement retargeting campaign untuk 644 cart abandoners</li>
+                    </ul>
+                    <div>
+                        <strong>TARGET DESEMBER:</strong>
+                    </div>
+                    <div style="margin-left: 20px;">
+                        Target: 1,000 ATC dengan CPR ≤ Rp 3,000
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 20px;">
+            <div class="card" style="text-align: center;">
+                <div class="metric-label">Target ATC</div>
+                <div style="font-size: 28px; font-weight: 700; color: var(--primary-blue);">1,000</div>
+            </div>
+            <div class="card" style="text-align: center;">
+                <div class="metric-label">Target CPR</div>
+                <div style="font-size: 28px; font-weight: 700; color: var(--primary-blue);">≤ Rp 3K</div>
+            </div>
+            <div class="card" style="text-align: center;">
+                <div class="metric-label">Target Purchases</div>
+                <div style="font-size: 28px; font-weight: 700; color: var(--primary-blue);">20</div>
+            </div>
+            <div class="card" style="text-align: center;">
+                <div class="metric-label">Target ROAS</div>
+                <div style="font-size: 28px; font-weight: 700; color: var(--primary-blue);">≥ 0.5</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 13: THANK YOU -->
+    <div class="slide slide-content" data-slide="13">
+        <img src="https://hadona.id/wp-content/uploads/2024/12/cropped-Hadona-Logo-1-300x300.png" alt="Hadona Logo" class="logo" style="width: 80px; height: 80px;">
+
+        <div style="text-align: center; max-width: 700px; margin: 120px auto 0;">
+            <h1 style="font-size: 48px; margin-bottom: 16px;">Thank You</h1>
+            <div class="divider" style="max-width: 200px; margin: 24px auto; border-top: 3px solid var(--primary-yellow);"></div>
+            <h2 style="font-size: 24px; color: var(--primary-blue); margin-bottom: 32px;">Hadona Digital Media</h2>
+
+            <div style="display: flex; justify-content: center; gap: 48px; margin-top: 40px;">
+                <div style="text-align: center;">
+                    <i class="bi bi-instagram" style="font-size: 32px; color: var(--primary-blue);"></i>
+                    <div style="margin-top: 8px; font-size: 14px; color: #64748b;">@hadona.id</div>
+                </div>
+                <div style="text-align: center;">
+                    <i class="bi bi-tiktok" style="font-size: 32px; color: var(--primary-blue);"></i>
+                    <div style="margin-top: 8px; font-size: 14px; color: #64748b;">@hadona.id</div>
+                </div>
+                <div style="text-align: center;">
+                    <i class="bi bi-globe" style="font-size: 32px; color: var(--primary-blue);"></i>
+                    <div style="margin-top: 8px; font-size: 14px; color: #64748b;">www.hadona.id</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 60px; padding: 20px; background: #f8fafc; border-radius: 12px;">
+                <p style="font-size: 13px; color: #64748b; margin: 0;">
+                    <strong>Monthly Meta Ads CPAS Performance Report</strong><br>
+                    Periode: 1-30 November 2025 vs 1-5 Oktober 2025<br>
+                    Prepared exclusively for Hadona × Ayyuwa Store
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 13;
+        let viewAllMode = false;
+
+        function toggleViewMode() {
+            viewAllMode = !viewAllMode;
+            const slides = document.querySelectorAll('.slide-content');
+            const btn = document.getElementById('viewModeBtn');
+
+            if (viewAllMode) {
+                // Show all slides
+                slides.forEach(slide => {
+                    slide.style.display = 'block';
+                });
+                btn.textContent = '📊';
+                btn.title = 'Slide View';
+                document.querySelector('.nav-controls').style.display = 'none';
+                document.querySelector('.slide-indicator').style.display = 'none';
+                window.scrollTo(0, 0);
+            } else {
+                // Show only active slide
+                slides.forEach((slide, index) => {
+                    if (index + 1 === currentSlide) {
+                        slide.style.display = 'block';
+                    } else {
+                        slide.style.display = 'none';
+                    }
+                });
+                btn.textContent = '📄';
+                btn.title = 'View All';
+                document.querySelector('.nav-controls').style.display = 'flex';
+                document.querySelector('.slide-indicator').style.display = 'block';
+            }
+        }
+
+        function updateSlide() {
+            if (viewAllMode) return;
+
+            const slides = document.querySelectorAll('.slide-content');
+            slides.forEach((slide, index) => {
+                if (index + 1 === currentSlide) {
+                    slide.classList.add('active');
+                    slide.style.display = 'block';
+                } else {
+                    slide.classList.remove('active');
+                    slide.style.display = 'none';
+                }
+            });
+
+            document.getElementById('currentSlide').textContent = currentSlide;
+            document.getElementById('prevBtn').disabled = currentSlide === 1;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides;
+
+            // Update progress bar
+            const progress = (currentSlide / totalSlides) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+
+            // Initialize charts when specific slides are active
+            if (currentSlide === 5 && !window.ageChartInitialized) {
+                initAgeChart();
+                window.ageChartInitialized = true;
+            }
+            if (currentSlide === 6 && !window.genderChartInitialized) {
+                initGenderCharts();
+                window.genderChartInitialized = true;
+            }
+            if (currentSlide === 7 && !window.regionChartInitialized) {
+                initRegionChart();
+                window.regionChartInitialized = true;
+            }
+            if (currentSlide === 9 && !window.placementChartInitialized) {
+                initPlacementChart();
+                window.placementChartInitialized = true;
+            }
+            if (currentSlide === 10 && !window.adChartInitialized) {
+                initAdChart();
+                window.adChartInitialized = true;
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                currentSlide++;
+                updateSlide();
+                window.scrollTo(0, 0);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                currentSlide--;
+                updateSlide();
+                window.scrollTo(0, 0);
+            }
+        }
+
+        function goToSlide(n) {
+            currentSlide = n + 1;
+            updateSlide();
+            window.scrollTo(0, 0);
+        }
+
+        function downloadPDF() {
+            // Switch to view all mode first
+            const slides = document.querySelectorAll('.slide-content');
+            const wasViewAllMode = viewAllMode;
+
+            // Show all slides for PDF export
+            slides.forEach(slide => {
+                slide.style.display = 'block';
+            });
+
+            // Hide navigation controls
+            document.querySelector('.nav-controls').style.display = 'none';
+            document.querySelector('.slide-indicator').style.display = 'none';
+
+            // Trigger print dialog
+            setTimeout(() => {
+                window.print();
+
+                // Restore original view mode after print dialog closes
+                setTimeout(() => {
+                    if (!wasViewAllMode) {
+                        slides.forEach((slide, index) => {
+                            if (index + 1 === currentSlide) {
+                                slide.style.display = 'block';
+                            } else {
+                                slide.style.display = 'none';
+                            }
+                        });
+                        document.querySelector('.nav-controls').style.display = 'flex';
+                        document.querySelector('.slide-indicator').style.display = 'block';
+                    }
+                }, 500);
+            }, 100);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                prevSlide();
+            }
+        });
+
+        // Chart initialization functions
+        function initAgeChart() {
+            const ctx = document.getElementById('ageChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['35-44 🥇', '25-34 🥈', '45-54 🥉', '55-64', '18-24', '65+'],
+                        datasets: [{
+                            label: 'Add to Cart',
+                            data: [24, 19, 20, 5, 2, 0],
+                            backgroundColor: [
+                                'rgba(16, 185, 129, 0.9)',
+                                'rgba(234, 179, 8, 0.9)',
+                                'rgba(251, 146, 60, 0.9)',
+                                'rgba(203, 213, 225, 0.6)',
+                                'rgba(203, 213, 225, 0.6)',
+                                'rgba(203, 213, 225, 0.6)'
+                            ],
+                            borderRadius: 4,
+                            borderWidth: 2,
+                            borderColor: [
+                                '#10b981',
+                                '#eab308',
+                                '#f97316',
+                                '#cbd5e1',
+                                '#cbd5e1',
+                                '#cbd5e1'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: '#f1f5f9' }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function initGenderCharts() {
+            const impressionsCtx = document.getElementById('genderImpressionsChart');
+            if (impressionsCtx) {
+                new Chart(impressionsCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Female', 'Male'],
+                        datasets: [{
+                            data: [75108, 55488],
+                            backgroundColor: ['rgba(43, 70, 187, 0.8)', 'rgba(236, 220, 67, 0.8)'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { font: { size: 11 } }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Impressions Distribution',
+                                font: { size: 13, weight: '600' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            const ctrCtx = document.getElementById('genderCTRChart');
+            if (ctrCtx) {
+                new Chart(ctrCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Female', 'Male'],
+                        datasets: [{
+                            label: 'CTR %',
+                            data: [1.48, 1.28],
+                            backgroundColor: ['rgba(43, 70, 187, 0.8)', 'rgba(236, 220, 67, 0.8)'],
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: {
+                                display: true,
+                                text: 'CTR Comparison',
+                                font: { size: 13, weight: '600' }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: '#f1f5f9' }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function initRegionChart() {
+            const ctx = document.getElementById('regionChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['West Java', 'Jakarta', 'East Java', 'Central Java', 'Banten'],
+                        datasets: [{
+                            label: 'Add to Cart',
+                            data: [30, 7, 9, 6, 6],
+                            backgroundColor: 'rgba(43, 70, 187, 0.8)',
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                grid: { color: '#f1f5f9' }
+                            },
+                            y: {
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function initPlacementChart() {
+            const ctx = document.getElementById('placementChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Feed', 'IG Reels', 'FB Reels', 'IG Stories'],
+                        datasets: [{
+                            label: 'ATC',
+                            data: [254, 312, 63, 15],
+                            backgroundColor: [
+                                'rgba(43, 70, 187, 0.8)',
+                                'rgba(236, 220, 67, 0.8)',
+                                'rgba(43, 70, 187, 0.6)',
+                                'rgba(236, 220, 67, 0.6)'
+                            ],
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: '#f1f5f9' }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function initAdChart() {
+            const ctx = document.getElementById('adPerformanceChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['#1 Ads 5', '#2 Ads 5', '#3 Ads 1', '#4 Ads 2', '#5 Ads 3'],
+                        datasets: [{
+                            label: 'Add to Cart',
+                            data: [310, 113, 60, 22, 61],
+                            backgroundColor: [
+                                'rgba(16, 185, 129, 0.8)',
+                                'rgba(234, 179, 8, 0.8)',
+                                'rgba(251, 146, 60, 0.8)',
+                                'rgba(99, 102, 241, 0.8)',
+                                'rgba(217, 70, 239, 0.8)'
+                            ],
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: '#f1f5f9' }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: {
+                                    font: { size: 10 }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSlide();
+        });
+    </script>
+
+</body>
+</html>

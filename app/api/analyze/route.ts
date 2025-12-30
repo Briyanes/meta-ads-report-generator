@@ -595,10 +595,10 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     let lastWeekResults = 0
     
     if (objectiveType === 'cpas') {
-      // CPAS: Use EXACT field name from objective.csv
-      // objective.csv has "Purchases with shared items" field
-      thisWeekResults = parseNum(thisWeekData['Purchases with shared items'])
-      lastWeekResults = parseNum(lastWeekData['Purchases with shared items'])
+      // CRITICAL FIX: For CPAS, "Results" = Add to Cart (NOT Purchases!)
+      // Report Manual uses ATC for CPR calculation: 2,130,319 / 653 = 3,262
+      thisWeekResults = parseNum(thisWeekData['Adds to cart with shared items'])
+      lastWeekResults = parseNum(lastWeekData['Adds to cart with shared items'])
     } else if (objectiveType === 'ctlptowa') {
       // CTLP to WA: Use checkouts initiated
       thisWeekResults = parseNum(thisWeekData['Checkouts initiated'] || 0)
@@ -608,7 +608,7 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       thisWeekResults = parseNum(thisWeekData['Messaging conversations started'] || 0)
       lastWeekResults = parseNum(lastWeekData['Messaging conversations started'] || 0)
     }
-    
+
     // Calculate CPR manually (matching Report Manual approach)
     // Report Manual: spentThis / atcThis = 2,130,319 / 653 = 3,262
     // Don't use CSV field because objective.csv may have blank/undefined Cost per result
