@@ -7,29 +7,37 @@ import { existsSync } from 'fs'
  * This produces HTML output matching the Report Manual style exactly
  */
 export async function generateReactTailwindReport(analysisData: any, reportName?: string, retentionType?: string, objectiveType?: string): Promise<string> {
-  console.log('[CPAS Template] Starting report generation...')
+  try {
+    console.log('[CPAS Template] Starting report generation...')
 
-  const { thisWeek, lastWeek, breakdown, config } = analysisData
+    const { thisWeek, lastWeek, breakdown, config } = analysisData
+    console.log('[CPAS Template] Data extracted:', {
+      hasThisWeek: !!thisWeek,
+      hasLastWeek: !!lastWeek,
+      hasBreakdown: !!breakdown,
+      thisWeekSpend: thisWeek?.amountSpent,
+      lastWeekSpend: lastWeek?.amountSpent
+    })
 
-  // Read the Report Manual reference template
-  const templatePath = join(process.cwd(), 'lib', 'cpas-reference-template.html')
-  console.log('[CPAS Template] Template path:', templatePath)
-  console.log('[CPAS Template] Working directory:', process.cwd())
+    // Read the Report Manual reference template
+    const templatePath = join(process.cwd(), 'lib', 'cpas-reference-template.html')
+    console.log('[CPAS Template] Template path:', templatePath)
+    console.log('[CPAS Template] Working directory:', process.cwd())
 
-  // Check if template file exists
-  if (!existsSync(templatePath)) {
-    console.error('[CPAS Template] File not found at:', templatePath)
-    throw new Error(`CPAS template file not found at: ${templatePath}`)
-  }
+    // Check if template file exists
+    if (!existsSync(templatePath)) {
+      console.error('[CPAS Template] File not found at:', templatePath)
+      throw new Error(`CPAS template file not found at: ${templatePath}`)
+    }
 
-  console.log('[CPAS Template] Template file exists, reading...')
-  let html = await readFile(templatePath, 'utf-8')
-  console.log('[CPAS Template] Template read successfully, length:', html.length)
+    console.log('[CPAS Template] Template file exists, reading...')
+    let html = await readFile(templatePath, 'utf-8')
+    console.log('[CPAS Template] Template read successfully, length:', html.length)
 
-  // Validate HTML was read
-  if (!html || html.length < 1000) {
-    throw new Error('CPAS template file is empty or too small')
-  }
+    // Validate HTML was read
+    if (!html || html.length < 1000) {
+      throw new Error('CPAS template file is empty or too small')
+    }
 
   // Extract data from analysis
   const thisMonth = thisWeek || {}
@@ -94,8 +102,13 @@ export async function generateReactTailwindReport(analysisData: any, reportName?
     retentionType === 'week' ? 'Minggu Lalu' : 'Bulan Lalu'
   )
 
-  // TODO: Add more replacements for all slides (3-13)
-  // This is the beginning - need to replace ALL hardcoded values
+    // TODO: Add more replacements for all slides (3-13)
+    // This is the beginning - need to replace ALL hardcoded values
 
-  return html
+    console.log('[CPAS Template] Report generated successfully, returning HTML...')
+    return html
+  } catch (error: any) {
+    console.error('[CPAS Template] ERROR generating report:', error)
+    throw new Error(`CPAS Template Error: ${error.message}`)
+  }
 }
