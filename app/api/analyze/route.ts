@@ -543,9 +543,10 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       return aggregated
     }
     
-    // Aggregate data from CSV (in case CSV has multiple rows/days)
-    const thisWeekData = aggregateCSVData(parsedDataThisWeek.data)
-    const lastWeekData = aggregateCSVData(parsedDataLastWeek.data)
+    // Extract first row from CSV (matching Report Manual approach)
+    // Report Manual uses data[0] directly without aggregation
+    const thisWeekData = parsedDataThisWeek.data[0] || {}
+    const lastWeekData = parsedDataLastWeek.data[0] || {}
 
     // DEBUG: Log aggregated data
     console.log('[DEBUG] thisWeekData keys:', Object.keys(thisWeekData))
@@ -579,8 +580,10 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       lastWeekResults = parseNum(lastWeekData['Messaging conversations started'] || 0)
     }
     
-    const thisWeekCPR = thisWeekResults > 0 ? thisWeekSpend / thisWeekResults : 0
-    const lastWeekCPR = lastWeekResults > 0 ? lastWeekSpend / lastWeekResults : 0
+    // Use CPR directly from CSV (matching Report Manual approach)
+    // Report Manual reads 'Cost per result' or 'CPR' field directly
+    const thisWeekCPR = parseNum(thisWeekData['Cost per result'] || thisWeekData['CPR'] || 0)
+    const lastWeekCPR = parseNum(lastWeekData['Cost per result'] || lastWeekData['CPR'] || 0)
     
     // Calculate growth
     const spendGrowth = lastWeekSpend > 0 ? ((thisWeekSpend - lastWeekSpend) / lastWeekSpend * 100) : 0

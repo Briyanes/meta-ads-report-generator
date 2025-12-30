@@ -96,9 +96,10 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
 
   const spendGrowth = calculateGrowth(thisWeek.amountSpent || 0, lastWeek.amountSpent || 0)
   const resultsGrowth = calculateGrowth(thisWeek.purchases || 0, lastWeek.purchases || 0)
+  // Use CPR directly from CSV (matching Report Manual approach)
   const cpaGrowth = calculateGrowth(
-    (thisWeek.purchases && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.purchases) : 0,
-    (lastWeek.purchases && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.purchases) : 0
+    thisWeek.cpr || 0,
+    lastWeek.cpr || 0
   )
 
   // Process breakdown data for slides
@@ -517,7 +518,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                         </div>
                                         <div className="flex justify-between">
                                             <span>Cost per Purchase</span>
-                                            <span className="font-bold">{formatCurrency((thisWeek.purchases && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.purchases) : 0)}</span>
+                                            <span className="font-bold">{formatCurrency(thisWeek.cpr || 0)}</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span>Growth %</span>
@@ -538,7 +539,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                         </div>
                                         <div className="flex justify-between">
                                             <span>Cost per Purchase</span>
-                                            <span className="font-bold">{formatCurrency((lastWeek.purchases && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.purchases) : 0)}</span>
+                                            <span className="font-bold">{formatCurrency(lastWeek.cpr || 0)}</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span>Growth %</span>
@@ -585,10 +586,10 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                         </tr>
                                         <tr>
                                             <td className="border border-gray-300 p-2 text-xs">Cost per Purchase</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((lastWeek.purchases && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.purchases) : 0)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((thisWeek.purchases && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.purchases) : 0)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(((thisWeek.purchases && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.purchases) : 0) - ((lastWeek.purchases && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.purchases) : 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${cpaGrowth.value <= 0 ? 'text-green-500' : 'text-red-500'}\`}>{cpaGrowth.value <= 0 ? '' : '+'}{cpaGrowth.percent}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(lastWeek.cpr || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(thisWeek.cpr || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((thisWeek.cpr || 0) - (lastWeek.cpr || 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${cpaGrowth.isPositive ? 'text-red-500' : 'text-green-500'}\`}>{cpaGrowth.isPositive ? '+' : ''}{cpaGrowth.percent}</td>
                                         </tr>
                                         <tr className="bg-gray-50">
                                             <td className="border border-gray-300 p-2 text-xs">ROAS</td>
