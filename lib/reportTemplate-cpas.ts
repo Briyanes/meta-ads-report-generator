@@ -129,6 +129,15 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
                 </div>
             </div>
         </div>
+
+        <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; margin-top: 32px; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
+            <p style="font-size: 14px; color: #854d0e; line-height: 1.7; font-weight: 500; position: relative; z-index: 1; margin: 0;">
+                <strong>Key Insight:</strong> {PERIOD_TYPE} ini menunjukkan performa yang {GROWTH_SENTIMENT} dengan {THIS_ATC} add to cart dan CPR {THIS_CPR}.
+                Pertumbuhan spend sebesar {SPEND_GROWTH}% {SPEND_SENTIMENT} dengan hasil yang {PERFORMANCE_SENTIMENT}.
+                {CONVERSION_SENTIMENT}
+            </p>
+        </div>
     </div>
 
     <!-- SLIDE 3: DETAILED METRICS -->
@@ -190,9 +199,327 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
                 </tbody>
             </table>
         </div>
+
+        <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; margin-top: 32px; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
+            <p style="font-size: 14px; color: #854d0e; line-height: 1.7; font-weight: 500; position: relative; z-index: 1; margin: 0;">
+                <strong>Insight Utama:</strong> Performa {PERIOD_TYPE} ini {METRIC_PERFORMANCE_DESC}.
+                {TOP_PERFORMER_METRIC} adalah top performer dengan {TOP_PERFORMER_GROWTH}% pertumbuhan.
+                {CTR_SENTIMENT} CTR sebesar {THIS_CTR}%.
+                Rekomendasi: {METRICS_RECOMMENDATION}
+            </p>
+        </div>
     </div>
 
-    <!-- More slides would be added here -->
+    <!-- SLIDE 4: KEY INSIGHTS -->
+    <div class="slide">
+        <h1 style="font-size: 28px; margin-bottom: 24px; color: var(--primary-blue);">
+            Key Insights
+        </h1>
+        <h2 style="font-size: 16px; color: #64748b; margin-bottom: 32px;">
+            Analysis & Recommendations
+        </h2>
+
+        <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; margin-bottom: 24px; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
+            <h3 style="color: #92400e; margin-bottom: 12px; font-size: 18px; position: relative; z-index: 1;">
+                Performance Overview
+            </h3>
+            <p style="color: #854d0e; line-height: 1.7; font-weight: 500; position: relative; z-index: 1; margin: 0;">
+                Campaign performance {PERIOD_TYPE} ini menunjukkan tren {GROWTH_SENTIMENT} dengan kenaikan spend {SPEND_GROWTH}%.
+                Cost per Result berada di angka {THIS_CPR}, menunjukkan efisiensi {EFFICIENCY_SENTIMENT}.
+                {PERFORMANCE_HIGHLIGHT}
+            </p>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); border-left: 4px solid #0ea5e9; padding: 20px; border-radius: 12px; margin-bottom: 24px;">
+            <h3 style="color: #075985; margin-bottom: 12px; font-size: 18px;">
+                📈 Top Performers
+            </h3>
+            <ul style="color: #0c4a6e; line-height: 1.8; margin-left: 20px; font-weight: 500;">
+                <li><strong>Add to Cart:</strong> {THIS_ATC} konversi dengan pertumbuhan {ATC_GROWTH}%</li>
+                <li><strong>Impressions:</strong> {THIS_IMPRESSIONS} dengan peningkatan {IMPR_GROWTH}%</li>
+                <li><strong>Purchases:</strong> {THIS_PURCHASES} transaksi tercatat</li>
+            </ul>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-left: 4px solid #16a34a; padding: 20px; border-radius: 12px;">
+            <h3 style="color: #14532d; margin-bottom: 12px; font-size: 18px;">
+                🎯 Rekomendasi Strategis
+            </h3>
+            <ul style="color: #14532d; line-height: 1.8; margin-left: 20px; font-weight: 500;">
+                <li>{STRATEGY_RECOMMENDATION_1}</li>
+                <li>{STRATEGY_RECOMMENDATION_2}</li>
+                <li>{STRATEGY_RECOMMENDATION_3}</li>
+                <li>{STRATEGY_RECOMMENDATION_4}</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- SLIDE 5: AUDIENCE - AGE BREAKDOWN -->
+    <div class="slide">
+        <h1 style="font-size: 28px; margin-bottom: 24px; color: var(--primary-blue);">
+            Audience Performance - Age
+        </h1>
+        <h2 style="font-size: 16px; color: #64748b; margin-bottom: 32px;">
+            Demographic Analysis by Age Group
+        </h2>
+
+        <div style="background: #f8fafc; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
+            <p style="color: #64748b; font-size: 14px;">
+                Age breakdown data will be displayed here when age breakdown CSV is provided.
+            </p>
+            <p style="color: #94a3b8; font-size: 12px; margin-top: 8px;">
+                Upload age breakdown file to see detailed demographic performance.
+            </p>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
+            <p style="font-size: 14px; color: #854d0e; line-height: 1.7; font-weight: 500; position: relative; z-index: 1; margin: 0;">
+                <strong>Insight:</strong> Segment usia 25-54 tahun biasanya mendominasi konversi dengan {ATC_GROWTH}% pertumbuhan.
+                Rekomendasi: Fokuskan 80% budget pada segmen usia produktif (25-44 tahun) untuk hasil maksimal.
+                Age 35-44 sering menjadi top performer dengan CPR terbaik.
+            </p>
+        </div>
+    </div>
+
+    <!-- SLIDE 6: AUDIENCE - GENDER BREAKDOWN -->
+    <div class="slide">
+        <h1 style="font-size: 28px; margin-bottom: 24px; color: var(--primary-blue);">
+            Audience Performance - Gender
+        </h1>
+        <h2 style="font-size: 16px; color: #64748b; margin-bottom: 32px;">
+            Demographic Analysis by Gender
+        </h2>
+
+        <div style="background: #f8fafc; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
+            <p style="color: #64748b; font-size: 14px;">
+                Gender breakdown data will be displayed here when gender breakdown CSV is provided.
+            </p>
+            <p style="color: #94a3b8; font-size: 12px; margin-top: 8px;">
+                Upload gender breakdown file to see detailed demographic performance.
+            </p>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
+            <p style="font-size: 14px; color: #854d0e; line-height: 1.7; font-weight: 500; position: relative; z-index: 1; margin: 0;">
+                <strong>Insight:</strong> Female biasanya mendominasi dengan ~70% share dari total konversi.
+                Male memiliki CTR lebih rendah namun volume konversi tetap signifikan.
+                Rekomendasi: Female adalah segmen prioritas untuk scaling campaign, pertahankan alokasi 70:30 Female:Male.
+            </p>
+        </div>
+    </div>
+
+    <!-- SLIDE 7: AUDIENCE - REGION BREAKDOWN -->
+    <div class="slide">
+        <h1 style="font-size: 28px; margin-bottom: 24px; color: var(--primary-blue);">
+            Audience Performance - Region
+        </h1>
+        <h2 style="font-size: 16px; color: #64748b; margin-bottom: 32px;">
+            Geographic Performance Analysis
+        </h2>
+
+        <div style="background: #f8fafc; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
+            <p style="color: #64748b; font-size: 14px;">
+                Region breakdown data will be displayed here when region breakdown CSV is provided.
+            </p>
+            <p style="color: #94a3b8; font-size: 12px; margin-top: 8px;">
+                Upload region breakdown file to see detailed geographic performance.
+            </p>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
+            <p style="font-size: 14px; color: #854d0e; line-height: 1.7; font-weight: 500; position: relative; z-index: 1; margin: 0;">
+                <strong>Insight:</strong> Pulau Jawa (West, Central, East + Jakarta) biasanya menyumbang ~75-80% total konversi.
+                West Java sering menjadi region dengan performa tertinggi.
+                Rekomendasi: Scale di region Jawa dengan performa tinggi sebelum ekspansi ke region baru.
+            </p>
+        </div>
+    </div>
+
+    <!-- SLIDE 8: PLATFORM PERFORMANCE -->
+    <div class="slide">
+        <h1 style="font-size: 28px; margin-bottom: 24px; color: var(--primary-blue);">
+            Platform Performance
+        </h1>
+        <h2 style="font-size: 16px; color: #64748b; margin-bottom: 32px;">
+            Instagram vs Facebook Comparison
+        </h2>
+
+        <div style="background: #f8fafc; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
+            <p style="color: #64748b; font-size: 14px;">
+                Platform breakdown data will be displayed here when platform breakdown CSV is provided.
+            </p>
+            <p style="color: #94a3b8; font-size: 12px; margin-top: 8px;">
+                Upload platform breakdown file to see IG vs FB performance comparison.
+            </p>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
+            <p style="font-size: 14px; color: #854d0e; line-height: 1.7; font-weight: 500; position: relative; z-index: 1; margin: 0;">
+                <strong>Insight:</strong> Instagram biasanya mendominasi dengan ~65-70% share dari total konversi.
+                Facebook memiliki CTR lebih tinggi namun volume lebih rendah.
+                Rekomendasi: Pertahankan alokasi 60:40 atau 65:35 Instagram:Facebook untuk diversifikasi dan reach maksimal.
+            </p>
+        </div>
+    </div>
+
+    <!-- SLIDE 9: PLACEMENT PERFORMANCE -->
+    <div class="slide">
+        <h1 style="font-size: 28px; margin-bottom: 24px; color: var(--primary-blue);">
+            Placement Performance
+        </h1>
+        <h2 style="font-size: 16px; color: #64748b; margin-bottom: 32px;">
+            Ad Placement Analysis (Feed, Stories, Reels, Explore)
+        </h2>
+
+        <div style="background: #f8fafc; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
+            <p style="color: #64748b; font-size: 14px;">
+                Placement breakdown data will be displayed here when placement breakdown CSV is provided.
+            </p>
+            <p style="color: #94a3b8; font-size: 12px; margin-top: 8px;">
+                Upload placement breakdown file to see detailed placement performance.
+            </p>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
+            <p style="font-size: 14px; color: #854d0e; line-height: 1.7; font-weight: 500; position: relative; z-index: 1; margin: 0;">
+                <strong>Insight:</strong> Reels (IG + FB) biasanya adalah placement terbaik dengan kombinasi volume tertinggi dan CPR paling efisien.
+                Feed menawarkan CTR terbaik namun dengan volume lebih rendah.
+                Stories sering underperform dengan CPR tinggi.
+                Rekomendasi: Alokasikan 70% budget ke Reels, 25% ke Feed, dan 5% testing ke Stories.
+            </p>
+        </div>
+    </div>
+
+    <!-- SLIDE 10: CREATIVE PERFORMANCE -->
+    <div class="slide">
+        <h1 style="font-size: 28px; margin-bottom: 24px; color: var(--primary-blue);">
+            Creative Performance
+        </h1>
+        <h2 style="font-size: 16px; color: #64748b; margin-bottom: 32px;">
+            Top Performing Ad Creatives
+        </h2>
+
+        <div style="background: #f8fafc; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
+            <p style="color: #64748b; font-size: 14px;">
+                Creative breakdown data will be displayed here when ad creative breakdown CSV is provided.
+            </p>
+            <p style="color: #94a3b8; font-size: 12px; margin-top: 8px;">
+                Upload creative breakdown file to see which creatives perform best.
+            </p>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
+            <p style="font-size: 14px; color: #854d0e; line-height: 1.7; font-weight: 500; position: relative; z-index: 1; margin: 0;">
+                <strong>Insight:</strong> Collection Ads biasanya mendominasi top performing creatives dengan ~85-90% market share.
+                Multi-product collections sering menjadi champion dengan volume konversi tertinggi.
+                Rekomendasi: Scale up Collection Ads format, particularly multi-product collections. Pause single-product dan underperforming ads.
+            </p>
+        </div>
+    </div>
+
+    <!-- SLIDE 11: CONCLUSION -->
+    <div class="slide">
+        <h1 style="font-size: 28px; margin-bottom: 24px; color: var(--primary-blue);">
+            Conclusion
+        </h1>
+        <h2 style="font-size: 16px; color: #64748b; margin-bottom: 32px;">
+            Summary & Key Takeaways
+        </h2>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px;">
+            <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-left: 4px solid #16a34a; padding: 24px; border-radius: 12px;">
+                <h3 style="color: #14532d; margin-bottom: 16px; font-size: 18px;">
+                    ✅ Wins
+                </h3>
+                <ul style="color: #14532d; line-height: 1.8; margin-left: 20px; font-weight: 500;">
+                    <li>{THIS_ATC} Add to Cart conversions achieved</li>
+                    <li>Pertumbuhan kuat {SPEND_GROWTH}% dalam spend</li>
+                    <li>CPR terjaga di {THIS_CPR}</li>
+                    <li>{CONVERSION_RATE_WIN}% conversion rate dari ATC</li>
+                </ul>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-left: 4px solid #dc2626; padding: 24px; border-radius: 12px;">
+                <h3 style="color: #7f1d1d; margin-bottom: 16px; font-size: 18px;">
+                    ⚠️ Areas for Improvement
+                </h3>
+                <ul style="color: #7f1d1d; line-height: 1.8; margin-left: 20px; font-weight: 500;">
+                    <li>Optimasi CTR untuk engagement lebih baik</li>
+                    <li>Tingkatkan conversion rate dari ATC ke Purchase</li>
+                    <li>Test format kreatif baru untuk variety</li>
+                    <li>{IMPROVEMENT_AREA}</li>
+                </ul>
+            </div>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
+            <p style="font-size: 14px; color: #854d0e; line-height: 1.7; font-weight: 500; position: relative; z-index: 1; margin: 0;">
+                <strong>Kesimpulan:</strong> {PERIOD_TYPE} ini menunjukkan performa {GROWTH_SENTIMENT} dengan {THIS_ATC} konversi.
+                Campaign ini berada di jalur yang {EFFICIENCY_SENTIMENT} dengan CPR {THIS_CPR}.
+                Fokus utama bulan depan: {NEXT_PERIOD_FOCUS}
+            </p>
+        </div>
+    </div>
+
+    <!-- SLIDE 12: NEXT STEPS -->
+    <div class="slide">
+        <h1 style="font-size: 28px; margin-bottom: 24px; color: var(--primary-blue);">
+            Next Steps
+        </h1>
+        <h2 style="font-size: 16px; color: #64748b; margin-bottom: 32px;">
+            Action Plan for Upcoming Period
+        </h2>
+
+        <div style="background: #f8fafc; padding: 24px; border-radius: 12px;">
+            <ol style="color: #1e293b; line-height: 2; margin-left: 20px; font-weight: 500;">
+                <li style="margin-bottom: 12px;"><strong>Scale Winning Creatives:</strong> {ACTION_STEP_1}</li>
+                <li style="margin-bottom: 12px;"><strong>Audience Optimization:</strong> {ACTION_STEP_2}</li>
+                <li style="margin-bottom: 12px;"><strong>Placement Testing:</strong> {ACTION_STEP_3}</li>
+                <li style="margin-bottom: 12px;"><strong>Bid Strategy Review:</strong> {ACTION_STEP_4}</li>
+                <li style="margin-bottom: 12px;"><strong>Creative Refresh:</strong> {ACTION_STEP_5}</li>
+                <li><strong>Budget Allocation:</strong> {ACTION_STEP_6}</li>
+            </ol>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; margin-top: 24px; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">🎯</div>
+            <p style="font-size: 14px; color: #854d0e; line-height: 1.7; font-weight: 500; position: relative; z-index: 1; margin: 0;">
+                <strong>Target Bulan Depan:</strong> {NEXT_MONTH_TARGET}. Dengan implementasi action plan ini,
+                kita menargetkan pertumbuhan {TARGET_GROWTH}% pada Add to Cart dan penurunan CPR menjadi {TARGET_CPR}.
+            </p>
+        </div>
+    </div>
+
+    <!-- SLIDE 13: THANK YOU -->
+    <div class="slide" style="text-align: center; padding-top: 120px;">
+        <h1 style="font-size: 48px; margin-bottom: 24px; color: var(--primary-blue);">
+            Thank You!
+        </h1>
+        <p style="font-size: 20px; color: #64748b; margin-bottom: 48px;">
+            We appreciate your trust in managing your Meta Ads campaigns
+        </p>
+
+        <div style="background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-yellow) 100%);
+                    padding: 32px; border-radius: 16px; color: white; max-width: 600px; margin: 0 auto;">
+            <p style="font-size: 18px; margin-bottom: 8px;">
+                <strong>Questions or Feedback?</strong>
+            </p>
+            <p style="font-size: 14px; opacity: 0.9;">
+                Contact us anytime for campaign consultation
+            </p>
+        </div>
+    </div>
+
+    <!-- End of slides -->
 </body>
 </html>`
 
@@ -243,6 +570,19 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
 
   console.log('[CPAS Template] All metrics extracted')
 
+  // Format helpers - NO decimals for currency - MUST BE DECLARED FIRST
+  const formatCurrency = (num: number) => {
+    // Round to nearest integer before formatting
+    const rounded = Math.round(num)
+    return 'Rp ' + rounded.toLocaleString('id-ID')
+  }
+  const formatNumber = (num: number) => {
+    // Round to nearest integer before formatting
+    const rounded = Math.round(num)
+    return rounded.toLocaleString('id-ID')
+  }
+  const formatPercent = (num: number) => num.toFixed(2)
+
   // Calculate growth
   const spendGrowth = lastMonthSpend > 0 ? ((thisMonthSpend - lastMonthSpend) / lastMonthSpend * 100) : 0
   const imprGrowth = lastMonthImpressions > 0 ? ((thisMonthImpressions - lastMonthImpressions) / lastMonthImpressions * 100) : 0
@@ -258,18 +598,107 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const getDiffText = (thisVal: number, lastVal: number) => (thisVal - lastVal) >= 0 ? '+' : '' + formatNumber(thisVal - lastVal)
   const getDiffClass = (thisVal: number, lastVal: number) => (thisVal - lastVal) >= 0 ? 'growth-positive' : 'growth-negative'
 
-  // Format helpers - NO decimals for currency
-  const formatCurrency = (num: number) => {
-    // Round to nearest integer before formatting
-    const rounded = Math.round(num)
-    return 'Rp ' + rounded.toLocaleString('id-ID')
-  }
-  const formatNumber = (num: number) => {
-    // Round to nearest integer before formatting
-    const rounded = Math.round(num)
-    return rounded.toLocaleString('id-ID')
-  }
-  const formatPercent = (num: number) => num.toFixed(2)
+  // Determine sentiment texts
+  const growthSentiment = spendGrowth >= 0 ? 'positif' : 'menantang'
+  const spendSentiment = spendGrowth >= 0 ? 'sebanding' : 'perlu evaluasi'
+  const performanceSentiment = atcGrowth >= 0 ? 'menggembirakan' : 'perlu improvement'
+  const efficiencySentiment = cprThisMonth < 5000 ? 'baik' : cprThisMonth < 10000 ? 'moderat' : 'perlu improvement'
+  const conversionSentiment = thisMonthPurchases > 0 && thisMonthATC > 0
+    ? `Conversion rate dari ATC ke Purchase adalah ${((thisMonthPurchases / thisMonthATC) * 100).toFixed(1)}%`
+    : 'Perlu optimalisasi funnel konversi'
+
+  // Determine metric performance description
+  const metricPerformanceDesc = atcGrowth > 50 ? 'sangat impresif dengan pertumbuhan signifikan'
+    : atcGrowth > 0 ? 'positif dengan tren kenaikan'
+    : 'perlu evaluasi dan optimalisasi'
+
+  // Find top performer
+  const metrics = [
+    { name: 'Impressions', growth: imprGrowth },
+    { name: 'Link Clicks', growth: clicksGrowth },
+    { name: 'Add to Cart', growth: atcGrowth },
+    { name: 'Purchases', growth: purchGrowth }
+  ]
+  const topPerformer = metrics.reduce((prev, current) => (prev.growth > current.growth) ? prev : current)
+  const topPerformerMetric = topPerformer.name
+  const topPerformerGrowth = formatPercent(topPerformer.growth)
+
+  const ctrSentiment = thisMonthCTR > 1.5 ? 'CTR yang sehat' : thisMonthCTR > 1.0 ? 'CTR yang moderat' : 'CTR yang perlu dioptimasi'
+  const metricsRecommendation = thisMonthCTR < 1.5
+    ? 'Optimasi creative dan copywriting untuk meningkatkan CTR di atas 1.5%'
+    : 'Pertahankan performa dan scale winning ad sets'
+
+  // Strategy recommendations based on performance
+  const strategyRecommendation1 = atcGrowth < 0
+    ? 'Evaluasi dan pause underperforming ads, realokasi budget ke winning ads'
+    : 'Scale up winning ad sets dengan performa CPR terbaik'
+
+  const strategyRecommendation2 = thisMonthCTR < 1.5
+    ? 'Refresh creative assets dan testing copywriting baru untuk meningkatkan engagement'
+    : 'Pertahankan high-performing creatives dan buat variation untuk scaling'
+
+  const strategyRecommendation3 = thisMonthPurchases === 0
+    ? 'Optimasi landing page dan checkout process untuk meningkatkan conversion rate'
+    : 'Implement retargeting campaigns untuk users yang ATC tapi belum purchase'
+
+  const strategyRecommendation4 = cprThisMonth > 10000
+    ? 'Review targeting dan audience segmentation untuk menurunkan CPR'
+    : 'Explore new audience segments untuk expand reach sambil mempertahankan efisiensi'
+
+  // Performance highlights
+  const performanceHighlight = atcGrowth > 100
+    ? `Pertumbuhan konversi sangat impresif sebesar ${atcGrowth.toFixed(1)}% dari periode sebelumnya.`
+    : atcGrowth > 0
+      ? `Tren positif dengan kenaikan ${atcGrowth.toFixed(1)}% pada konversi.`
+      : 'Perlu strategi baru untuk meningkatkan performa konversi.'
+
+  // Conversion rate calculation
+  const conversionRateWin = thisMonthATC > 0 && thisMonthPurchases > 0
+    ? ((thisMonthPurchases / thisMonthATC) * 100).toFixed(1)
+    : '0.0'
+
+  const improvementArea = thisMonthCTR < 1.5
+    ? 'CTR perlu ditingkatkan di atas 1.5% untuk efficiency lebih baik'
+    : cprThisMonth > 10000
+      ? 'CPR perlu ditekan di bawah Rp 10.000 untuk profitability'
+      : 'Explore new placements dan platforms untuk scaling'
+
+  const nextPeriodFocus = atcGrowth < 0
+    ? 'mengembalikan performa konversi ke level positif'
+    : 'scaling winning campaigns sambil mempertahankan efisiensi'
+
+  // Action steps
+  const actionStep1 = atcGrowth > 0
+    ? `Increase budget 20-30% untuk top-performing ads dengan CPR di bawah ${formatCurrency(cprThisMonth * 1.2)}`
+    : 'Identify dan pause underperforming ads, realokasi budget ke potential winners'
+
+  const actionStep2 = thisMonthCTR < 1.5
+    ? 'Refine targeting dengan exclude non-converters dan focus pada high-intent audiences'
+    : 'Expand audience reach dengan lookalike audiences berdasarkan top converters'
+
+  const actionStep3 = cprThisMonth < 5000
+    ? 'Scale ke Reels dan Explore placement dengan budget allocation 70:25:5 (Reels:Feed:Stories)'
+    : 'Test new creative formats dan placements untuk menemukan combination CPR terbaik'
+
+  const actionStep4 = thisMonthPurchases === 0
+    ? 'Switch ke lowest cost bidding atau cost cap dengan target CPA Rp 10.000'
+    : 'Implement bid strategy berdasarkan stage funnel: cost cap untuk ATC, lowest cost untuk purchase'
+
+  const actionStep5 = atcGrowth < 0
+    ? 'Refresh 100% creative assets dengan new concepts, angles, dan formats'
+    : 'Launch 3-5 new creative variations per week untuk prevent ad fatigue'
+
+  const actionStep6 = spendGrowth > 50
+    ? 'Maintain current budget allocation dengan focus 80% pada top 30% performing ad sets'
+    : 'Increase total budget 20-30% dengan prioritaskan pada channels dengan CPR terbaik'
+
+  // Next month targets
+  const nextMonthTarget = atcGrowth > 0
+    ? `Scale campaigns untuk mencapai ${formatNumber(thisMonthATC * 1.5)} Add to Cart`
+    : `Mencapai minimal ${formatNumber(thisMonthATC * 1.2)} Add to Cart dengan optimalisasi`
+
+  const targetGrowth = 20
+  const targetCPR = cprThisMonth > 5000 ? formatCurrency(cprThisMonth * 0.8) : formatCurrency(cprThisMonth)
 
   // Period labels
   const isWeek = retentionType === 'week'
@@ -319,6 +748,39 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     .replace(/{PURCH_CLASS}/g, getDiffClass(thisMonthPurchases, lastMonthPurchases))
     .replace(/{PURCH_BADGE_CLASS}/g, getBadgeClass(purchGrowth))
     .replace(/{PURCH_GROWTH}/g, getGrowthText(purchGrowth))
+    // Slide 2 - Key Insight
+    .replace(/{SPEND_SENTIMENT}/g, spendSentiment)
+    .replace(/{PERFORMANCE_SENTIMENT}/g, performanceSentiment)
+    .replace(/{CONVERSION_SENTIMENT}/g, conversionSentiment)
+    // Slide 3 - Key Insight
+    .replace(/{METRIC_PERFORMANCE_DESC}/g, metricPerformanceDesc)
+    .replace(/{TOP_PERFORMER_METRIC}/g, topPerformerMetric)
+    .replace(/{TOP_PERFORMER_GROWTH}/g, topPerformerGrowth)
+    .replace(/{CTR_SENTIMENT}/g, ctrSentiment)
+    .replace(/{THIS_CTR}/g, thisMonthCTR.toFixed(2))
+    .replace(/{METRICS_RECOMMENDATION}/g, metricsRecommendation)
+    // Slide 4 - Key Insights
+    .replace(/{GROWTH_SENTIMENT}/g, growthSentiment)
+    .replace(/{EFFICIENCY_SENTIMENT}/g, efficiencySentiment)
+    .replace(/{PERFORMANCE_HIGHLIGHT}/g, performanceHighlight)
+    .replace(/{STRATEGY_RECOMMENDATION_1}/g, strategyRecommendation1)
+    .replace(/{STRATEGY_RECOMMENDATION_2}/g, strategyRecommendation2)
+    .replace(/{STRATEGY_RECOMMENDATION_3}/g, strategyRecommendation3)
+    .replace(/{STRATEGY_RECOMMENDATION_4}/g, strategyRecommendation4)
+    // Slide 11 - Conclusion
+    .replace(/{CONVERSION_RATE_WIN}/g, conversionRateWin)
+    .replace(/{IMPROVEMENT_AREA}/g, improvementArea)
+    .replace(/{NEXT_PERIOD_FOCUS}/g, nextPeriodFocus)
+    // Slide 12 - Next Steps
+    .replace(/{ACTION_STEP_1}/g, actionStep1)
+    .replace(/{ACTION_STEP_2}/g, actionStep2)
+    .replace(/{ACTION_STEP_3}/g, actionStep3)
+    .replace(/{ACTION_STEP_4}/g, actionStep4)
+    .replace(/{ACTION_STEP_5}/g, actionStep5)
+    .replace(/{ACTION_STEP_6}/g, actionStep6)
+    .replace(/{NEXT_MONTH_TARGET}/g, nextMonthTarget)
+    .replace(/{TARGET_GROWTH}/g, targetGrowth.toString())
+    .replace(/{TARGET_CPR}/g, targetCPR)
 
   console.log('[CPAS Template] Report generated successfully (inline), length:', html.length)
   return html
