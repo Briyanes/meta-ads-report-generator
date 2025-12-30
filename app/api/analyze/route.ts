@@ -543,10 +543,11 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       return aggregated
     }
     
-    // Extract first row from CSV (matching Report Manual approach)
-    // Report Manual uses data[0] directly without aggregation
-    const thisWeekData = parsedDataThisWeek.data[0] || {}
-    const lastWeekData = parsedDataLastWeek.data[0] || {}
+    // Extract first row from OBJECTIVE breakdown (matching Report Manual approach)
+    // Report Manual uses objective.data[0] for CPAS metrics
+    // objective.csv contains AGGREGATED totals, not daily data like main CSV
+    const thisWeekData = breakdownDataThisWeek.objective?.[0] || parsedDataThisWeek.data[0] || {}
+    const lastWeekData = breakdownDataLastWeek.objective?.[0] || parsedDataLastWeek.data[0] || {}
 
     // DEBUG: Log aggregated data
     console.log('[DEBUG] thisWeekData keys:', Object.keys(thisWeekData))
@@ -580,10 +581,11 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       lastWeekResults = parseNum(lastWeekData['Messaging conversations started'] || 0)
     }
     
-    // Use CPR directly from CSV (matching Report Manual approach)
-    // Report Manual reads 'Cost per result' or 'CPR' field directly
-    const thisWeekCPR = parseNum(thisWeekData['Cost per result'] || thisWeekData['CPR'] || 0)
-    const lastWeekCPR = parseNum(lastWeekData['Cost per result'] || lastWeekData['CPR'] || 0)
+    // Calculate CPR manually (matching Report Manual approach)
+    // Report Manual: spentThis / atcThis = 2,130,319 / 653 = 3,262
+    // Don't use CSV field because objective.csv may have blank/undefined Cost per result
+    const thisWeekCPR = thisWeekResults > 0 ? thisWeekSpend / thisWeekResults : 0
+    const lastWeekCPR = lastWeekResults > 0 ? lastWeekSpend / lastWeekResults : 0
     
     // Calculate growth
     const spendGrowth = lastWeekSpend > 0 ? ((thisWeekSpend - lastWeekSpend) / lastWeekSpend * 100) : 0
