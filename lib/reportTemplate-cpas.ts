@@ -155,9 +155,17 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const cprThisMonth = thisMonthATC > 0 ? (thisMonthSpend / thisMonthATC) : 0
   const cprLastMonth = lastMonthATC > 0 ? (lastMonthSpend / lastMonthATC) : 0
 
-  // Format helpers
-  const formatCurrency = (num: number) => 'Rp ' + num.toLocaleString('id-ID')
-  const formatNumber = (num: number) => num.toLocaleString('id-ID')
+  // Format helpers - NO decimals for currency
+  const formatCurrency = (num: number) => {
+    // Round to nearest integer before formatting
+    const rounded = Math.round(num)
+    return 'Rp ' + rounded.toLocaleString('id-ID')
+  }
+  const formatNumber = (num: number) => {
+    // Round to nearest integer before formatting
+    const rounded = Math.round(num)
+    return rounded.toLocaleString('id-ID')
+  }
   const formatPercent = (num: number) => num.toFixed(2)
 
   // Period labels
