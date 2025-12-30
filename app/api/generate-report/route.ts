@@ -94,9 +94,6 @@ export async function POST(request: NextRequest) {
       if (objectiveType === 'ctwa') {
         const { generateReactTailwindReport: generateCTWA } = await import('@/lib/reportTemplate-ctwa')
         generateReport = generateCTWA
-      } else if (objectiveType === 'cpas') {
-        const { generateReactTailwindReport: generateCPAS } = await import('@/lib/reportTemplate-cpas')
-        generateReport = generateCPAS
       } else if (objectiveType === 'ctlptowa') {
         const { generateReactTailwindReport: generateCTLP } = await import('@/lib/reportTemplate-ctlptowa')
         generateReport = generateCTLP
