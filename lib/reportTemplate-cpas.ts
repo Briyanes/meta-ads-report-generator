@@ -115,22 +115,40 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
 export function generateReactTailwindReport(analysisData: any, reportName?: string, retentionType?: string, objectiveType?: string): string {
   console.log('[CPAS Template] Starting report generation (inline template)...')
 
-  const { thisWeek, lastWeek, breakdown, config } = analysisData
+  // Debug: Log full analysisData structure
+  console.log('[CPAS Template] Full analysisData keys:', Object.keys(analysisData || {}))
+
+  const { thisWeek, lastWeek, breakdown, config, performanceSummary } = analysisData
   console.log('[CPAS Template] Data extracted:', {
     hasThisWeek: !!thisWeek,
     hasLastWeek: !!lastWeek,
-    thisWeekSpend: thisWeek?.amountSpent,
-    lastWeekSpend: lastWeek?.amountSpent
+    hasPerformanceSummary: !!performanceSummary,
+    thisWeek: thisWeek,
+    lastWeek: lastWeek,
+    performanceSummary: performanceSummary
   })
 
-  // Extract data
-  const thisMonth = thisWeek || {}
-  const lastMonth = lastWeek || {}
+  // Try to get data from performanceSummary first (newer structure)
+  let thisMonthData = performanceSummary?.thisWeek || thisWeek || {}
+  let lastMonthData = performanceSummary?.lastWeek || lastWeek || {}
 
-  const thisMonthSpend = thisMonth.amountSpent || 0
-  const lastMonthSpend = lastMonth.amountSpent || 0
-  const thisMonthATC = thisMonth.addToCart || thisMonth.addsToCart || 0
-  const lastMonthATC = lastMonth.addToCart || lastMonth.addsToCart || 0
+  console.log('[CPAS Template] Month data:', {
+    thisMonth: thisMonthData,
+    lastMonth: lastMonthData
+  })
+
+  // Extract data with multiple fallback field names
+  const thisMonthSpend = thisMonthData.amountSpent || thisMonthData.spend || 0
+  const lastMonthSpend = lastMonthData.amountSpent || lastMonthData.spend || 0
+  const thisMonthATC = thisMonthData.addToCart || thisMonthData.addsToCart || thisMonthData.results || 0
+  const lastMonthATC = lastMonthData.addToCart || lastMonthData.addsToCart || lastMonthData.results || 0
+
+  console.log('[CPAS Template] Extracted values:', {
+    thisMonthSpend,
+    lastMonthSpend,
+    thisMonthATC,
+    lastMonthATC
+  })
 
   // Calculate growth
   const spendGrowth = lastMonthSpend > 0 ? ((thisMonthSpend - lastMonthSpend) / lastMonthSpend * 100) : 0
