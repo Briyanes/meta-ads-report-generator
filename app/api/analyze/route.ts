@@ -546,8 +546,17 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     // Extract first row from OBJECTIVE breakdown (matching Report Manual approach)
     // Report Manual uses objective.data[0] for CPAS metrics
     // objective.csv contains AGGREGATED totals, not daily data like main CSV
+
+    console.log('[DEBUG] breakdownDataThisWeek keys:', Object.keys(breakdownDataThisWeek))
+    console.log('[DEBUG] breakdownDataThisWeek.objective:', breakdownDataThisWeek.objective)
+    console.log('[DEBUG] breakdownDataLastWeek.objective:', breakdownDataLastWeek.objective)
+
     const thisWeekData = breakdownDataThisWeek.objective?.[0] || parsedDataThisWeek.data[0] || {}
     const lastWeekData = breakdownDataLastWeek.objective?.[0] || parsedDataLastWeek.data[0] || {}
+
+    console.log('[DEBUG] thisWeekData source:', breakdownDataThisWeek.objective?.[0] ? 'objective.csv' : 'main.csv')
+    console.log('[DEBUG] thisWeekData Amount Spent:', thisWeekData['Amount spent (IDR)'])
+    console.log('[DEBUG] lastWeekData Amount Spent:', lastWeekData['Amount spent (IDR)'])
 
     // DEBUG: Log aggregated data
     console.log('[DEBUG] thisWeekData keys:', Object.keys(thisWeekData))
