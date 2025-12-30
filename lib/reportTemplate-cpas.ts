@@ -513,11 +513,11 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                             <span className="font-bold">{formatCurrency(thisWeek.amountSpent || 0)}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span>Result (Purchases)</span>
+                                            <span>Results (Add to Cart)</span>
                                             <span className="font-bold">{formatNumber(thisWeek.purchases || 0)}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span>Cost per Purchase</span>
+                                            <span>Cost per Result</span>
                                             <span className="font-bold">{formatCurrency(thisWeek.cpr || 0)}</span>
                                         </div>
                                         <div className="flex justify-between">
@@ -534,11 +534,11 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                             <span className="font-bold">{formatCurrency(lastWeek.amountSpent || 0)}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span>Result (Purchases)</span>
+                                            <span>Results (Add to Cart)</span>
                                             <span className="font-bold">{formatNumber(lastWeek.purchases || 0)}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span>Cost per Purchase</span>
+                                            <span>Cost per Result</span>
                                             <span className="font-bold">{formatCurrency(lastWeek.cpr || 0)}</span>
                                         </div>
                                         <div className="flex justify-between">
