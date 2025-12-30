@@ -1273,7 +1273,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                                 </div>
                                                 <div className="bg-white p-3 rounded border">
                                                     <div className="text-xs text-gray-600 mb-1">ROAS Est.</div>
-                                                    <div className="text-sm font-bold text-pink-600">{purchases > 0 ? ((item['Purchases conversion value'] || 0) / (item['Amount spent (IDR)'] || item['Amount spent'] || 1)).toFixed(2) + 'x' : '0x'}</div>
+                                                    <div className="text-sm font-bold text-pink-600">${purchases > 0 ? ((item['Purchases conversion value'] || 0) / (item['Amount spent (IDR)'] || item['Amount spent'] || 1)).toFixed(2) + 'x' : '0x'}</div>
                                                 </div>
                                             </div>
                                             <div className="grid grid-cols-4 gap-3 mt-3 pt-3 border-t">
