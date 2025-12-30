@@ -411,9 +411,21 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             const lastWeek = perf.lastWeek || {};
             const breakdown = reportData.breakdown || {};
 
-            const spendGrowth = ${JSON.stringify(spendGrowth)};
-            const resultsGrowth = ${JSON.stringify(resultsGrowth)};
-            const cpaGrowth = ${JSON.stringify(cpaGrowth)};
+            const spendGrowth = {
+              value: ${spendGrowth.value},
+              percent: ${JSON.stringify(spendGrowth.percent)},
+              isPositive: ${spendGrowth.isPositive}
+            };
+            const resultsGrowth = {
+              value: ${resultsGrowth.value},
+              percent: ${JSON.stringify(resultsGrowth.percent)},
+              isPositive: ${resultsGrowth.isPositive}
+            };
+            const cpaGrowth = {
+              value: ${cpaGrowth.value},
+              percent: ${JSON.stringify(cpaGrowth.percent)},
+              isPositive: ${cpaGrowth.isPositive}
+            };
             const clientName = ${JSON.stringify(clientName)};
             const periodLabel = ${JSON.stringify(periodLabel)};
             const periodLabelId = ${JSON.stringify(periodLabelId)};
