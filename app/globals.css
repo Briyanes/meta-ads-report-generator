@@ -186,6 +186,15 @@ a {
   border: 1px solid #bee5eb;
 }
 
+/* Desktop Header Spacing */
+.responsive-header-title {
+  margin-bottom: 4px !important;
+}
+
+.responsive-header-subtitle {
+  margin-top: 0 !important;
+}
+
 /* Responsive Styles */
 @media (max-width: 1024px) {
   .responsive-container {
