@@ -375,14 +375,13 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                 if (!num && num !== 0) return 'Rp 0';
                 const n = typeof num === 'string' ? parseFloat(String(num).replace(/,/g, '')) : num;
                 if (isNaN(n)) return 'Rp 0';
-                // Round to integer (no decimals)
-                const rounded = Math.round(n);
-                return 'Rp ' + rounded.toLocaleString('id-ID');
+                // Don't round - preserve decimals from CSV for accuracy
+                return 'Rp ' + n.toLocaleString('id-ID');
             };
-            
+
             const formatPercent = (num) => {
                 if (!num && num !== 0) return '0%';
-                const n = typeof num === 'string' ? parseFloat(String(num)) : num;
+                const n = typeof num === 'string' ? parseFloat(String(num).replace(/,/g, '')) : num;
                 return isNaN(n) ? '0%' : n.toFixed(2) + '%';
             };
             
@@ -404,8 +403,25 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             const objectiveLabel = ${JSON.stringify(objectiveLabel)};
             
             function calculateGrowth(current, previous) {
-                if (!previous || previous === 0) return 0;
-                return ((current - previous) / previous) * 100;
+                const curr = typeof current === 'string' ? parseFloat(current.toString().replace(/,/g, '')) : (current || 0);
+                const prev = typeof previous === 'string' ? parseFloat(previous.toString().replace(/,/g, '')) : (previous || 0);
+
+                if (prev === 0) {
+                  return {
+                    value: curr,
+                    percent: 'N/A',
+                    isPositive: curr > 0
+                  };
+                }
+
+                const growth = curr - prev;
+                const percent = ((growth / prev) * 100).toFixed(2);
+
+                return {
+                  value: growth,
+                  percent: percent + '%',
+                  isPositive: growth > 0
+                };
             }
             
             // Age data
