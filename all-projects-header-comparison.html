@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Header Comparison - All Hadona Projects</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 36px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .project-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .project-header {
+            padding: 15px 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .project-header.qc-scanner {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+
+        .project-header.portofolio {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .project-header.meta-ads {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .project-icon {
+            font-size: 24px;
+        }
+
+        .header-preview {
+            padding: 30px 48px;
+            background: #f9fafb;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title-section {
+            border: 2px dashed #d1d5db;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .header-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #111827;
+            margin: 0;
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+
+        .header-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .logo-placeholder {
+            width: 200px;
+            height: 80px;
+            background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 600;
+            border: 2px solid #9ca3af;
+        }
+
+        .specs {
+            padding: 20px;
+        }
+
+        .spec-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            background: #f3f4f6;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .spec-label {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .spec-value {
+            color: #6b7280;
+            font-family: 'Monaco', 'Courier New', monospace;
+            background: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .spec-value.different {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+
+        .spec-value.same {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .analysis-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .analysis-section h2 {
+            color: #111827;
+            margin-bottom: 20px;
+            font-size: 24px;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 10px;
+        }
+
+        .analysis-item {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .analysis-item.identical {
+            background: #d1fae5;
+            border-left-color: #10b981;
+        }
+
+        .analysis-item.different {
+            background: #fef3c7;
+            border-left-color: #f59e0b;
+        }
+
+        .analysis-item.missing {
+            background: #fee2e2;
+            border-left-color: #ef4444;
+        }
+
+        .analysis-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .analysis-description {
+            font-size: 14px;
+            color: #4b5563;
+            line-height: 1.6;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .badge.same {
+            background: #10b981;
+            color: white;
+        }
+
+        .badge.different {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .recommendation {
+            background: #eff6ff;
+            border: 2px solid #3b82f6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .recommendation h3 {
+            color: #1e40af;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .recommendation ul {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        .recommendation li {
+            color: #1e40af;
+            font-size: 14px;
+        }
+
+        code {
+            background: #e5e7eb;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .measurements-overlay {
+            position: relative;
+        }
+
+        .measurement-line {
+            position: absolute;
+            background: #ef4444;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 2px;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-preview {
+                padding: 20px 24px;
+            }
+
+            .header-title {
+                font-size: 24px;
+            }
+
+            .logo-placeholder {
+                width: 150px;
+                height: 60px;
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Header Comparison Tool</h1>
+        <p class="subtitle">Membandingkan header dari 3 project Hadona Digital Media</p>
+
+        <!-- Project Cards -->
+        <div class="comparison-grid">
+
+            <!-- QC Scanner LP -->
+            <div class="project-card">
+                <div class="project-header qc-scanner">
+                    <span class="project-icon">🔬</span>
+                    QC Scanner LP
+                </div>
+                <div class="header-preview">
+                    <div class="header-content">
+                        <div class="title-section">
+                            <h1 class="header-title">QC Landing Page Scanner</h1>
+                            <p class="header-subtitle">Powered by <strong>Hadona Digital Media</strong></p>
+                        </div>
+                        <div class="logo-placeholder">LOGO</div>
+                    </div>
+                </div>
+                <div class="specs">
+                    <div class="spec-item">
+                        <span class="spec-label">Title font-size</span>
+                        <span class="spec-value same">32px</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Title margin-bottom</span>
+                        <span class="spec-value same">4px</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Title line-height</span>
+                        <span class="spec-value same">1.2 ✓</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Subtitle font-size</span>
+                        <span class="spec-value same">14px</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Subtitle margin</span>
+                        <span class="spec-value same">0</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Subtitle line-height</span>
+                        <span class="spec-value same">1.4 ✓</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">CSS Classes</span>
+                        <span class="spec-value">Yes ✓</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Link wrapper</span>
+                        <span class="spec-value">Yes ✓</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portofolio -->
+            <div class="project-card">
+                <div class="project-header portofolio">
+                    <span class="project-icon">💼</span>
+                    Portofolio Hadona
+                </div>
+                <div class="header-preview">
+                    <div class="header-content">
+                        <div class="title-section">
+                            <h1 class="header-title">Portofolio Hadona</h1>
+                            <p class="header-subtitle">Powered by <strong>Hadona Digital Media</strong></p>
+                        </div>
+                        <div class="logo-placeholder">LOGO</div>
+                    </div>
+                </div>
+                <div class="specs">
+                    <div class="spec-item">
+                        <span class="spec-label">Title font-size</span>
+                        <span class="spec-value same">32px</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Title margin-bottom</span>
+                        <span class="spec-value same">4px</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Title line-height</span>
+                        <span class="spec-value different">✗ TIDAK ADA</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Subtitle font-size</span>
+                        <span class="spec-value same">14px</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Subtitle margin</span>
+                        <span class="spec-value same">0</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Subtitle line-height</span>
+                        <span class="spec-value different">✗ TIDAK ADA</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">CSS Classes</span>
+                        <span class="spec-value different">TIDAK ADA</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Link wrapper</span>
+                        <span class="spec-value different">TIDAK ADA</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Meta Ads -->
+            <div class="project-card">
+                <div class="project-header meta-ads">
+                    <span class="project-icon">📊</span>
+                    Ads Report Generator
+                </div>
+                <div class="header-preview">
+                    <div class="header-content">
+                        <div class="title-section">
+                            <h1 class="header-title">Ads Report Generator</h1>
+                            <p class="header-subtitle">Powered by <strong>Hadona Digital Media</strong></p>
+                        </div>
+                        <div class="logo-placeholder">LOGO</div>
+                    </div>
+                </div>
+                <div class="specs">
+                    <div class="spec-item">
+                        <span class="spec-label">Title font-size</span>
+                        <span class="spec-value same">32px</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Title margin-bottom</span>
+                        <span class="spec-value same">4px</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Title line-height</span>
+                        <span class="spec-value same">1.2 ✓</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Subtitle font-size</span>
+                        <span class="spec-value same">14px</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Subtitle margin</span>
+                        <span class="spec-value same">0</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Subtitle line-height</span>
+                        <span class="spec-value same">1.4 ✓</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">CSS Classes</span>
+                        <span class="spec-value">Yes ✓</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Link wrapper</span>
+                        <span class="spec-value">Yes ✓</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Analysis Section -->
+        <div class="analysis-section">
+            <h2>📋 Analisis Perbedaan</h2>
+
+            <div class="analysis-item identical">
+                <div class="analysis-title">
+                    ✅ SAMA (Semua Project)
+                </div>
+                <div class="analysis-description">
+                    <strong>Properties yang identik di semua 3 project:</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Title font-size: <code>32px</code></li>
+                        <li>Title font-weight: <code>bold</code></li>
+                        <li>Title color: <code>#111827</code></li>
+                        <li>Title margin-bottom: <code>4px</code></li>
+                        <li>Subtitle font-size: <code>14px</code></li>
+                        <li>Subtitle color: <code>#6b7280</code></li>
+                        <li>Subtitle margin: <code>0</code></li>
+                        <li>Logo width: <code>200px</code></li>
+                        <li>Logo height: <code>80px</code></li>
+                        <li>Header padding: <code>24px 48px</code></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="analysis-item different">
+                <div class="analysis-title">
+                    ⚠️ BERBEDA (Portofolio vs Lainnya)
+                </div>
+                <div class="analysis-description">
+                    <strong>Portofolio project KEKURANGAN beberapa properties:</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>❌ <strong>Tidak ada line-height eksplisit</strong> pada title dan subtitle
+                            <br><small>Ini bisa menyebabkan perbedaan visual antar browser karena line-height default</small></li>
+                        <li>❌ <strong>Tidak ada CSS classes</strong> (responsive-header-title, responsive-header-subtitle)
+                            <br><small>QC Scanner dan Meta Ads pakai class untuk responsive styles</small></li>
+                        <li>❌ <strong>Tidak ada Link wrapper</strong> di sekitar title/subtitle
+                            <br><small>QC Scanner dan Meta Ads membungkus dengan <code>&lt;Link href="/home"&gt;</code></small></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="analysis-item identical">
+                <div class="analysis-title">
+                    ✅ QC SCANNER & META ADS (SAMA 100%)
+                </div>
+                <div class="analysis-description">
+                    Kedua project ini memiliki header yang <strong>100% identik</strong>:
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Sama-sama pakai <code>line-height: 1.2</code> untuk title</li>
+                        <li>Sama-sama pakai <code>line-height: 1.4</code> untuk subtitle</li>
+                        <li>Sama-sama punya CSS classes untuk responsive styles</li>
+                        <li>Sama-sama dibungkus dengan Link component</li>
+                        <li>Sama-sama menggunakan komponen terpisah (bukan inline di page)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Recommendation -->
+            <div class="recommendation">
+                <h3>💡 Rekomendasi untuk Portofolio Project</h3>
+                <p style="margin-bottom: 15px; color: #1e40af;">
+                    Agar Portofolio memiliki header yang konsisten dengan QC Scanner dan Meta Ads:
+                </p>
+                <ul>
+                    <li>Tambahkan <code>lineHeight: '1.2'</code> pada title</li>
+                    <li>Tambahkan <code>lineHeight: '1.4'</code> pada subtitle</li>
+                    <li>Tambahkan CSS classes: <code>className="responsive-header-title"</code> dan <code>className="responsive-header-subtitle"</code></li>
+                    <li>Bungkus title/subtitle dengan <code>&lt;Link href="/"&gt;</code></li>
+                    <li>Copy responsive styles dari globals.css project lain</li>
+                </ul>
+                <p style="margin-top: 15px; font-size: 13px; color: #6b7280;">
+                    <strong>Catatan:</strong> Perbedaan yang Anda lihat kemungkinan besar disebabkan oleh:
+                    <br>1. <strong>Browser default line-height</strong> - Portofolio tidak set line-height eksplisit
+                    <br>2. <strong>System font rendering</strong> - Bisa berbeda antar OS
+                    <br>3. <strong>Missing responsive CSS</strong> - Portofolio tidak punya CSS classes yang sama
+                </p>
+            </div>
+
+            <div class="recommendation" style="background: #fef3c7; border-color: #f59e0b; margin-top: 15px;">
+                <h3 style="color: #92400e;">🎯 Kesimpulan</h3>
+                <p style="color: #92400e; line-height: 1.7;">
+                    <strong>QC Scanner dan Meta Ads</strong> sudah 100% identik (termasuk line-height yang baru saja ditambahkan).<br><br>
+                    <strong>Portofolio</strong> perlu di-update untuk match dengan kedua project lainnya.<br><br>
+                    Perbedaan visual yang Anda lihat di Portofolio kemungkinan besar karena <strong>tidak adanya line-height eksplisit</strong>, yang menyebabkan browser menggunakan nilai default yang bisa bervariasi.
+                </p>
+            </div>
+        </div>
+
+        <!-- Console Log -->
+        <div style="background: #1f2937; color: #10b981; padding: 20px; border-radius: 8px; margin-top: 20px; font-family: 'Monaco', monospace; font-size: 12px; overflow-x: auto;">
+            <div style="color: #6b7280; margin-bottom: 10px;">// Open browser console (F12) untuk melihat detail computed styles</div>
+            <div id="console-output"></div>
+        </div>
+    </div>
+
+    <script>
+        // Log all computed styles to console
+        window.onload = function() {
+            console.clear();
+            console.log('%c🔍 HEADER COMPARISON - COMPUTED STYLES', 'font-size: 20px; font-weight: bold; color: #3b82f6;');
+            console.log('');
+
+            const titles = document.querySelectorAll('.header-title');
+            const subtitles = document.querySelectorAll('.header-subtitle');
+
+            const projects = ['QC Scanner LP', 'Portofolio Hadona', 'Ads Report Generator'];
+
+            titles.forEach((title, index) => {
+                const styles = window.getComputedStyle(title);
+                console.log(`%c${projects[index]} - TITLE:`, 'font-weight: bold; color: #3b82f6;');
+                console.log(`  font-size: ${styles.fontSize}`);
+                console.log(`  margin-bottom: ${styles.marginBottom}`);
+                console.log(`  line-height: ${styles.lineHeight}`);
+                console.log(`  height: ${styles.height}`);
+                console.log('');
+            });
+
+            subtitles.forEach((subtitle, index) => {
+                const styles = window.getComputedStyle(subtitle);
+                console.log(`%c${projects[index]} - SUBTITLE:`, 'font-weight: bold; color: #10b981;');
+                console.log(`  font-size: ${styles.fontSize}`);
+                console.log(`  margin: ${styles.margin}`);
+                console.log(`  line-height: ${styles.lineHeight}`);
+                console.log(`  height: ${styles.height}`);
+                console.log('');
+            });
+
+            // Update on-page console
+            const outputDiv = document.getElementById('console-output');
+            outputDiv.innerHTML = '<div style="color: #10b981;">✓ Computed styles logged to browser console</div><div style="color: #6b7280; margin-top: 5px;">Press F12 or Cmd+Option+I to view</div>';
+        };
+    </script>
+</body>
+</html>
