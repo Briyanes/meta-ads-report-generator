@@ -87,7 +87,14 @@ export function analyzeDataStructure(data: MetaAdsData[]): {
 }
 
 export function formatNumber(num: number | string): string {
-  const numValue = typeof num === 'string' ? parseFloat(num) : num
+  let numValue: number
+  if (typeof num === 'string') {
+    // Remove commas and whitespace before parsing
+    const cleanStr = num.replace(/,/g, '').replace(/\s+/g, '')
+    numValue = parseFloat(cleanStr)
+  } else {
+    numValue = num
+  }
   if (isNaN(numValue)) return '0'
   return numValue.toLocaleString('id-ID')
 }

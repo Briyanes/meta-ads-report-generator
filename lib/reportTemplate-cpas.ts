@@ -1,28 +1,18 @@
 /**
  * Complete HTML Report Template with React + Tailwind CSS for CPAS Objective
+ * Refactored to match CTWA structure - simple template strings
  * All 13 slides included
  */
 
 export function generateReactTailwindReport(analysisData: any, reportName?: string, retentionType: string = 'wow', objectiveType: string = 'cpas'): string {
-  // Handle both string and object formats
-  let data: any
-  if (typeof analysisData === 'string') {
-    try {
-      data = JSON.parse(analysisData)
-    } catch (e) {
-      console.error('Failed to parse analysisData as JSON:', e)
-      data = {}
-    }
-  } else {
-    data = analysisData || {}
-  }
-  
-  // Extract data with fallbacks
+  const data = typeof analysisData === 'string' ? JSON.parse(analysisData) : analysisData
+
+  // Extract data
   const perf = data?.performanceSummary || {}
   const thisWeek = perf.thisWeek || {}
   const lastWeek = perf.lastWeek || {}
   const breakdown = data?.breakdown || {}
-  
+
   // Determine period labels based on retention type
   const isMoM = retentionType === 'mom'
   const periodLabel = isMoM ? 'Month' : 'Week'
@@ -31,7 +21,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const thisPeriodLabel = isMoM ? 'Bulan Ini (This Month)' : 'Minggu Ini (This Week)'
   const lastPeriodLabel = isMoM ? 'Bulan Lalu (Last Month)' : 'Minggu Lalu (Last Week)'
   const comparisonLabel = isMoM ? 'Month-on-Month' : 'Week-on-Week'
-  
+
   // Determine objective label
   const objectiveLabels: Record<string, string> = {
     'ctwa': 'CTWA (Click to WhatsApp)',
@@ -39,7 +29,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     'ctlptowa': 'CTLP to WA (Click to Landing Page to WhatsApp)'
   }
   const objectiveLabel = objectiveLabels[objectiveType] || 'CPAS (Collaborative Performance Advertising Solution)'
-  
+
   // Extract client name from reportName or analysisData
   const extractClientName = (): string => {
     // Try to extract from reportName first
@@ -62,7 +52,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         return 'RMODA Studio'
       }
     }
-    
+
     // Try to extract from analysisData if it contains file names
     const fileNames = data?.fileNames || []
     for (const fileName of fileNames) {
@@ -74,26 +64,26 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         return 'RMODA Studio BSD'
       }
     }
-    
+
     // Default fallback
     return 'RMODA Studio'
   }
-  
+
   const clientName = extractClientName()
-  
+
   // Calculate growth percentage
   const calculateGrowth = (current: number, previous: number) => {
     if (!previous || previous === 0) return 0
     return ((current - previous) / previous) * 100
   }
-  
+
   const spendGrowth = calculateGrowth(thisWeek.amountSpent || 0, lastWeek.amountSpent || 0)
   const resultsGrowth = calculateGrowth(thisWeek.purchases || 0, lastWeek.purchases || 0)
   const cpaGrowth = calculateGrowth(
     (thisWeek.purchases && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.purchases) : 0,
     (lastWeek.purchases && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.purchases) : 0
   )
-  
+
   // Process breakdown data for slides
   const ageData = breakdown.thisWeek?.age || []
   const genderData = breakdown.thisWeek?.gender || []
@@ -102,16 +92,16 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const placementData = breakdown.thisWeek?.placement || []
   const objectiveData = breakdown.thisWeek?.objective || []
   const creativeData = breakdown.thisWeek?.['ad-creative'] || []
-  
+
   return `<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${comparisonLabel} Meta Ads Performance Report</title>
-    <script src="https://cdn.jsdelivr.net/npm/react@18.0.0/umd/react.development.js" crossorigin></script>
-    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.0.0/umd/react-dom.development.js" crossorigin></script>
-    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react@18.0.0/umd/react.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.0.0/umd/react-dom.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="/css/bootstrap-icons-custom.css">
@@ -124,16 +114,16 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         .text-hadona-yellow { color: #ECDC43; }
         .border-hadona-blue { border-color: #2B46BB; }
         .border-hadona-yellow { border-color: #ECDC43; }
-        
+
         @media print {
             * {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
                 color-adjust: exact !important;
             }
-            body { 
-                margin: 0; 
-                padding: 0; 
+            body {
+                margin: 0;
+                padding: 0;
                 background: white !important;
                 font-size: 16px !important;
                 width: 100% !important;
@@ -209,13 +199,13 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             .text-sm { font-size: 1rem !important; }
             .text-xs { font-size: 0.9rem !important; }
             /* Table optimization for landscape */
-            table { 
+            table {
                 font-size: 1rem !important;
                 width: 100% !important;
                 table-layout: auto !important;
             }
-            th, td { 
-                font-size: 1rem !important; 
+            th, td {
+                font-size: 1rem !important;
                 padding: 0.5rem !important;
                 word-wrap: break-word !important;
             }
@@ -257,38 +247,38 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             /* Enlarge icons */
             .fas, .fab { font-size: 1.25rem !important; }
             /* Enlarge borders */
-            .border-t-4 { 
-                border-top-width: 4px !important; 
+            .border-t-4 {
+                border-top-width: 4px !important;
             }
-            .border-r-2 { 
-                border-right-width: 2px !important; 
+            .border-r-2 {
+                border-right-width: 2px !important;
             }
-            .bg-white { 
-                background-color: white !important; 
+            .bg-white {
+                background-color: white !important;
             }
-            .bg-blue-50 { 
-                background-color: #eff6ff !important; 
+            .bg-blue-50 {
+                background-color: #eff6ff !important;
             }
-            .bg-gray-50 { 
-                background-color: #f9fafb !important; 
+            .bg-gray-50 {
+                background-color: #f9fafb !important;
             }
-            .bg-yellow-50 { 
-                background-color: #fefce8 !important; 
+            .bg-yellow-50 {
+                background-color: #fefce8 !important;
             }
-            .bg-green-50 { 
-                background-color: #f0fdf4 !important; 
+            .bg-green-50 {
+                background-color: #f0fdf4 !important;
             }
-            .bg-hadona-blue { 
-                background-color: #2B46BB !important; 
+            .bg-hadona-blue {
+                background-color: #2B46BB !important;
             }
-            .bg-hadona-yellow { 
-                background-color: #ECDC43 !important; 
+            .bg-hadona-yellow {
+                background-color: #ECDC43 !important;
             }
-            .text-hadona-blue { 
-                color: #2B46BB !important; 
+            .text-hadona-blue {
+                color: #2B46BB !important;
             }
-            .text-hadona-yellow { 
-                color: #ECDC43 !important; 
+            .text-hadona-yellow {
+                color: #ECDC43 !important;
             }
             /* Prevent breaking inside important elements */
             table, thead, tbody, tr {
@@ -362,9 +352,9 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
             }
-            @page { 
-                margin: 10mm; 
-                size: A4 landscape; 
+            @page {
+                margin: 10mm;
+                size: A4 landscape;
             }
         }
     </style>
@@ -373,28 +363,18 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     <div id="root"></div>
 
     <script type="text/babel">
-        // Ensure React and ReactDOM are loaded before rendering
-        const checkAndRender = () => {
-            if (typeof React !== 'undefined' && typeof ReactDOM !== 'undefined' && document.getElementById('root')) {
         const App = () => {
-                    // Safely stringify data with error handling
-                    let reportData;
-                    try {
-                        reportData = ${JSON.stringify(data)};
-                    } catch (e) {
-                        console.error('Error stringifying reportData:', e);
-                        reportData = {};
-                    }
-                    const isMoM = ${JSON.stringify(isMoM)};
-                    const defaultReportName = isMoM ? 'Month-on-Month Report' : 'Week-on-Week Report';
-                    const reportName = ${JSON.stringify(reportName || (isMoM ? 'Month-on-Month Report' : 'Week-on-Week Report'))};
-            
+            const reportData = ${JSON.stringify(data)};
+            const isMoM = ${JSON.stringify(isMoM)};
+            const defaultReportName = isMoM ? 'Month-on-Month Report' : 'Week-on-Week Report';
+            const reportName = ${JSON.stringify(reportName || (isMoM ? 'Month-on-Month Report' : 'Week-on-Week Report'))};
+
             const formatNumber = (num) => {
                 if (!num && num !== 0) return '0';
                 const n = typeof num === 'string' ? parseFloat(String(num).replace(/,/g, '')) : num;
                 return isNaN(n) ? '0' : n.toLocaleString('id-ID');
             };
-            
+
             const formatCurrency = (num) => {
                 if (!num && num !== 0) return 'Rp 0';
                 const n = typeof num === 'string' ? parseFloat(String(num).replace(/,/g, '')) : num;
@@ -403,21 +383,18 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                 const rounded = Math.round(n);
                 return 'Rp ' + rounded.toLocaleString('id-ID');
             };
-            
+
             const formatPercent = (num) => {
                 if (!num && num !== 0) return '0%';
                 const n = typeof num === 'string' ? parseFloat(String(num)) : num;
                 return isNaN(n) ? '0%' : n.toFixed(2) + '%';
             };
-            
-            // Safely extract data with multiple fallback levels
-            const perf = (reportData && reportData.performanceSummary) ? reportData.performanceSummary : {};
-            const thisWeek = (perf && perf.thisWeek) ? perf.thisWeek : {};
-            const lastWeek = (perf && perf.lastWeek) ? perf.lastWeek : {};
-            const breakdown = (reportData && reportData.breakdown) ? reportData.breakdown : {};
-            
-            // Debug: Log data structure
-            
+
+            const perf = reportData.performanceSummary || {};
+            const thisWeek = perf.thisWeek || {};
+            const lastWeek = perf.lastWeek || {};
+            const breakdown = reportData.breakdown || {};
+
             const spendGrowth = ${spendGrowth.toFixed(2)};
             const resultsGrowth = ${resultsGrowth.toFixed(2)};
             const cpaGrowth = ${cpaGrowth.toFixed(2)};
@@ -429,71 +406,26 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             const lastPeriodLabel = ${JSON.stringify(lastPeriodLabel)};
             const comparisonLabel = ${JSON.stringify(comparisonLabel)};
             const objectiveLabel = ${JSON.stringify(objectiveLabel)};
-            
+
             function calculateGrowth(current, previous) {
                 if (!previous || previous === 0) return 0;
                 return ((current - previous) / previous) * 100;
             }
-            
-            // Helper function to calculate cost per metric with fallback
-            function getCostPerMetric(week, metric, valueKey) {
-                const costKey = 'costPer' + metric;
-                if (week[costKey]) return week[costKey];
-                if (week[valueKey] && week.amountSpent) return week.amountSpent / week[valueKey];
-                return 0;
-            }
-            
+
             // Helper function to get ROAS with fallback
             function getROAS(week) {
                 if (week.purchaseROAS) return week.purchaseROAS;
                 if (week.purchasesConversionValue && week.amountSpent) return week.purchasesConversionValue / week.amountSpent;
                 return 0;
             }
-            
+
             // Helper function to get AOV with fallback
             function getAOV(week) {
                 if (week.aov) return week.aov;
                 if (week.purchases && week.purchasesConversionValue) return week.purchasesConversionValue / week.purchases;
                 return 0;
             }
-            
-            // Helper function to get trend icon JSX as string (for use in template strings)
-            const getTrendIconJSX = (isPositive) => {
-                return isPositive 
-                    ? '<i className="bi bi-arrow-up-circle-fill" style={{color: "#10b981", fontSize: "1.2em"}}></i>' 
-                    : '<i className="bi bi-arrow-down-circle-fill" style={{color: "#ef4444", fontSize: "1.2em"}}></i>'
-            }
-            
-            // Helper function to get field value with multiple variations
-            const getFieldValue = (item, fieldName, alternatives = []) => {
-                if (!item || typeof item !== 'object') return undefined
-                
-                const allFields = [fieldName, ...alternatives]
-                const itemKeys = Object.keys(item)
-                
-                for (const field of allFields) {
-                    // Try exact match first
-                    if (item[field] !== undefined && item[field] !== null && item[field] !== '') {
-                        return item[field]
-                    }
-                    // Try case-insensitive exact match
-                    const exactMatch = itemKeys.find(key => key.toLowerCase() === field.toLowerCase())
-                    if (exactMatch && item[exactMatch] !== undefined && item[exactMatch] !== null && item[exactMatch] !== '') {
-                        return item[exactMatch]
-                    }
-                    // Try partial match
-                    const partialMatch = itemKeys.find(key => {
-                        const keyLower = key.toLowerCase()
-                        const fieldLower = field.toLowerCase()
-                        return keyLower.includes(fieldLower) || fieldLower.includes(keyLower)
-                    })
-                    if (partialMatch && item[partialMatch] !== undefined && item[partialMatch] !== null && item[partialMatch] !== '') {
-                        return item[partialMatch]
-                    }
-                }
-                return undefined
-            }
-            
+
             // Age data
             const ageData = ${JSON.stringify(ageData)};
             const genderData = ${JSON.stringify(genderData)};
@@ -502,7 +434,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             const placementData = ${JSON.stringify(placementData)};
             const objectiveData = ${JSON.stringify(objectiveData)};
             const creativeData = ${JSON.stringify(creativeData)};
-            
+
             return (
                 <div className="min-h-screen bg-gray-50">
                     {/* SLIDE 1 - WELCOME */}
@@ -511,7 +443,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                             <img src="https://hadona.id/wp-content/uploads/2024/12/cropped-Hadona-Logo-1-300x300.png" alt="Hadona Logo" className="mx-auto mb-6" style={{width: '80px', height: '80px'}} />
                             <h1 className="text-4xl font-bold text-hadona-blue mb-3">{comparisonLabel} Reporting</h1>
                             <p className="text-2xl font-semibold text-hadona-blue mb-2">{objectiveLabel}</p>
-                            {reportName && reportName !== (isMoM ? 'Month-on-Month Report' : 'Week-on-Week Report') && reportName !== 'Month-on-Month Report' && reportName !== 'Week-on-Week Report' && (
+                            {reportName && reportName !== defaultReportName && (
                                 <p className="text-xl font-semibold text-hadona-blue mb-4">{reportName}</p>
                             )}
                             <p className="text-lg text-gray-500 mb-6">{periodLabel} vs {periodLabel}</p>
@@ -535,16 +467,16 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                             <span className="font-bold">{formatCurrency(thisWeek.amountSpent || 0)}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span>Result (Purchases with shared items)</span>
+                                            <span>Result (Purchases)</span>
                                             <span className="font-bold">{formatNumber(thisWeek.purchases || 0)}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span>Cost per purchases with shared items</span>
+                                            <span>Cost per Purchase</span>
                                             <span className="font-bold">{formatCurrency((thisWeek.purchases && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.purchases) : 0)}</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span>Growth %</span>
-                                            <span className={\`font-bold ${spendGrowth >= 0 ? 'text-green-500' : 'text-red-500'}\`}>{spendGrowth >= 0 ? '+' : ''}{formatPercent(spendGrowth)}</span>
+                                            <span className={\`font-bold \${spendGrowth >= 0 ? 'text-green-500' : 'text-red-500'}\`}>{spendGrowth >= 0 ? '+' : ''}{formatPercent(spendGrowth)}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -556,11 +488,11 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                             <span className="font-bold">{formatCurrency(lastWeek.amountSpent || 0)}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span>Result (Purchases with shared items)</span>
+                                            <span>Result (Purchases)</span>
                                             <span className="font-bold">{formatNumber(lastWeek.purchases || 0)}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span>Cost per purchases with shared items</span>
+                                            <span>Cost per Purchase</span>
                                             <span className="font-bold">{formatCurrency((lastWeek.purchases && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.purchases) : 0)}</span>
                                         </div>
                                         <div className="flex justify-between">
@@ -593,166 +525,99 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td className="border border-gray-300 p-2 text-xs">Amount spent</td>
+                                            <td className="border border-gray-300 p-2 text-xs">Amount Spent</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(lastWeek.amountSpent || 0)}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(thisWeek.amountSpent || 0)}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((thisWeek.amountSpent || 0) - (lastWeek.amountSpent || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${spendGrowth >= 0 ? 'text-green-500' : 'text-red-500'}\`}>{spendGrowth >= 0 ? '+' : ''}{formatPercent(spendGrowth)}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${spendGrowth >= 0 ? 'text-green-500' : 'text-red-500'}\`}>{spendGrowth >= 0 ? '+' : ''}{formatPercent(spendGrowth)}</td>
                                         </tr>
                                         <tr className="bg-gray-50">
-                                            <td className="border border-gray-300 p-2 text-xs">Reach</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(lastWeek.reach || 0)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(thisWeek.reach || 0)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((thisWeek.reach || 0) - (lastWeek.reach || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.reach || 0) >= (lastWeek.reach || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.reach || 0) >= (lastWeek.reach || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.reach || 0, lastWeek.reach || 0))}</td>
+                                            <td className="border border-gray-300 p-2 text-xs">Purchases</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(lastWeek.purchases || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(thisWeek.purchases || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((thisWeek.purchases || 0) - (lastWeek.purchases || 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${resultsGrowth >= 0 ? 'text-green-500' : 'text-red-500'}\`}>{resultsGrowth >= 0 ? '+' : ''}{formatPercent(resultsGrowth)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="border border-gray-300 p-2 text-xs">Cost per Purchase</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((lastWeek.purchases && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.purchases) : 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((thisWeek.purchases && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.purchases) : 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(((thisWeek.purchases && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.purchases) : 0) - ((lastWeek.purchases && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.purchases) : 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${cpaGrowth <= 0 ? 'text-green-500' : 'text-red-500'}\`}>{cpaGrowth <= 0 ? '' : '+'}{formatPercent(cpaGrowth)}</td>
+                                        </tr>
+                                        <tr className="bg-gray-50">
+                                            <td className="border border-gray-300 p-2 text-xs">ROAS</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{getROAS(lastWeek).toFixed(2)}x</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{getROAS(thisWeek).toFixed(2)}x</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{(getROAS(thisWeek) - getROAS(lastWeek)).toFixed(2)}x</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${getROAS(thisWeek) >= getROAS(lastWeek) ? 'text-green-500' : 'text-red-500'}\`}>{getROAS(thisWeek) >= getROAS(lastWeek) ? '+' : ''}{formatPercent(calculateGrowth(getROAS(thisWeek), getROAS(lastWeek)))}</td>
                                         </tr>
                                         <tr>
                                             <td className="border border-gray-300 p-2 text-xs">Impressions</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(lastWeek.impressions || 0)}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(thisWeek.impressions || 0)}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((thisWeek.impressions || 0) - (lastWeek.impressions || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.impressions || 0) >= (lastWeek.impressions || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.impressions || 0) >= (lastWeek.impressions || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.impressions || 0, lastWeek.impressions || 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.impressions || 0) >= (lastWeek.impressions || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.impressions || 0) >= (lastWeek.impressions || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.impressions || 0, lastWeek.impressions || 0))}</td>
+                                        </tr>
+                                        <tr className="bg-gray-50">
+                                            <td className="border border-gray-300 p-2 text-xs">Reach</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(lastWeek.reach || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(thisWeek.reach || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((thisWeek.reach || 0) - (lastWeek.reach || 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.reach || 0) >= (lastWeek.reach || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.reach || 0) >= (lastWeek.reach || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.reach || 0, lastWeek.reach || 0))}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="border border-gray-300 p-2 text-xs">Link Clicks</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(lastWeek.linkClicks || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(thisWeek.linkClicks || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((thisWeek.linkClicks || 0) - (lastWeek.linkClicks || 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.linkClicks || 0) >= (lastWeek.linkClicks || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.linkClicks || 0) >= (lastWeek.linkClicks || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.linkClicks || 0, lastWeek.linkClicks || 0))}</td>
+                                        </tr>
+                                        <tr className="bg-gray-50">
+                                            <td className="border border-gray-300 p-2 text-xs">CTR (Link)</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatPercent((lastWeek.ctr || 0) * 100)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatPercent((thisWeek.ctr || 0) * 100)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatPercent(((thisWeek.ctr || 0) - (lastWeek.ctr || 0)) * 100)}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.ctr || 0) >= (lastWeek.ctr || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.ctr || 0) >= (lastWeek.ctr || 0) ? '+' : ''}{formatPercent(calculateGrowth((thisWeek.ctr || 0) * 100, (lastWeek.ctr || 0) * 100))}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="border border-gray-300 p-2 text-xs">CPC (Link)</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(lastWeek.cpc || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(thisWeek.cpc || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((thisWeek.cpc || 0) - (lastWeek.cpc || 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.cpc || 0) <= (lastWeek.cpc || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.cpc || 0) <= (lastWeek.cpc || 0) ? '' : '+'}{formatPercent(calculateGrowth(thisWeek.cpc || 0, lastWeek.cpc || 0))}</td>
                                         </tr>
                                         <tr className="bg-gray-50">
                                             <td className="border border-gray-300 p-2 text-xs">CPM</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(lastWeek.cpm || 0)}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(thisWeek.cpm || 0)}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((thisWeek.cpm || 0) - (lastWeek.cpm || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.cpm || 0) <= (lastWeek.cpm || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.cpm || 0) <= (lastWeek.cpm || 0) ? '' : '+'}{formatPercent(calculateGrowth(thisWeek.cpm || 0, lastWeek.cpm || 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.cpm || 0) <= (lastWeek.cpm || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.cpm || 0) <= (lastWeek.cpm || 0) ? '' : '+'}{formatPercent(calculateGrowth(thisWeek.cpm || 0, lastWeek.cpm || 0))}</td>
                                         </tr>
                                         <tr>
                                             <td className="border border-gray-300 p-2 text-xs">Frequency</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(lastWeek.frequency || 0)}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(thisWeek.frequency || 0)}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((thisWeek.frequency || 0) - (lastWeek.frequency || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.frequency || 0) >= (lastWeek.frequency || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.frequency || 0) >= (lastWeek.frequency || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.frequency || 0, lastWeek.frequency || 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.frequency || 0) >= (lastWeek.frequency || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.frequency || 0) >= (lastWeek.frequency || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.frequency || 0, lastWeek.frequency || 0))}</td>
                                         </tr>
                                         <tr className="bg-gray-50">
-                                            <td className="border border-gray-300 p-2 text-xs">Link clicks</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(lastWeek.linkClicks || 0)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(thisWeek.linkClicks || 0)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((thisWeek.linkClicks || 0) - (lastWeek.linkClicks || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.linkClicks || 0) >= (lastWeek.linkClicks || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.linkClicks || 0) >= (lastWeek.linkClicks || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.linkClicks || 0, lastWeek.linkClicks || 0))}</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="border border-gray-300 p-2 text-xs">CTR (link click-through rate)</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatPercent((lastWeek.ctr || 0) * 100)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatPercent((thisWeek.ctr || 0) * 100)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatPercent(((thisWeek.ctr || 0) - (lastWeek.ctr || 0)) * 100)}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.ctr || 0) >= (lastWeek.ctr || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.ctr || 0) >= (lastWeek.ctr || 0) ? '+' : ''}{formatPercent(calculateGrowth((thisWeek.ctr || 0) * 100, (lastWeek.ctr || 0) * 100))}</td>
-                                        </tr>
-                                        <tr className="bg-gray-50">
-                                            <td className="border border-gray-300 p-2 text-xs">CPC (link)</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(lastWeek.cpc || 0)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(thisWeek.cpc || 0)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((thisWeek.cpc || 0) - (lastWeek.cpc || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.cpc || 0) <= (lastWeek.cpc || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.cpc || 0) <= (lastWeek.cpc || 0) ? '' : '+'}{formatPercent(calculateGrowth(thisWeek.cpc || 0, lastWeek.cpc || 0))}</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="border border-gray-300 p-2 text-xs">Content views with shared items</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(lastWeek.contentViews || 0)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(thisWeek.contentViews || 0)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((thisWeek.contentViews || 0) - (lastWeek.contentViews || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.contentViews || 0) >= (lastWeek.contentViews || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.contentViews || 0) >= (lastWeek.contentViews || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.contentViews || 0, lastWeek.contentViews || 0))}</td>
-                                        </tr>
-                                        <tr className="bg-gray-50">
-                                            <td className="border border-gray-300 p-2 text-xs">Cost per content view</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(lastWeek, 'CV', 'contentViews'))}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(thisWeek, 'CV', 'contentViews'))}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(thisWeek, 'CV', 'contentViews') - getCostPerMetric(lastWeek, 'CV', 'contentViews'))}</td>
-                                            <td className={"border border-gray-300 p-2 text-right text-xs " + (getCostPerMetric(thisWeek, 'CV', 'contentViews') <= getCostPerMetric(lastWeek, 'CV', 'contentViews') ? 'text-green-500' : 'text-red-500')}>{(getCostPerMetric(thisWeek, 'CV', 'contentViews') <= getCostPerMetric(lastWeek, 'CV', 'contentViews') ? '' : '+')}{formatPercent(calculateGrowth(getCostPerMetric(thisWeek, 'CV', 'contentViews'), getCostPerMetric(lastWeek, 'CV', 'contentViews')))}</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="border border-gray-300 p-2 text-xs">Adds to cart with shared items</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(lastWeek.addsToCart || 0)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(thisWeek.addsToCart || 0)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((thisWeek.addsToCart || 0) - (lastWeek.addsToCart || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.addsToCart || 0) >= (lastWeek.addsToCart || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.addsToCart || 0) >= (lastWeek.addsToCart || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.addsToCart || 0, lastWeek.addsToCart || 0))}</td>
-                                        </tr>
-                                        <tr className="bg-gray-50">
-                                            <td className="border border-gray-300 p-2 text-xs">Cost per add to cart with shared items</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(lastWeek, 'ATC', 'addsToCart'))}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(thisWeek, 'ATC', 'addsToCart'))}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(thisWeek, 'ATC', 'addsToCart') - getCostPerMetric(lastWeek, 'ATC', 'addsToCart'))}</td>
-                                            <td className={"border border-gray-300 p-2 text-right text-xs " + (getCostPerMetric(thisWeek, 'ATC', 'addsToCart') <= getCostPerMetric(lastWeek, 'ATC', 'addsToCart') ? 'text-green-500' : 'text-red-500')}>{(getCostPerMetric(thisWeek, 'ATC', 'addsToCart') <= getCostPerMetric(lastWeek, 'ATC', 'addsToCart') ? '' : '+')}{formatPercent(calculateGrowth(getCostPerMetric(thisWeek, 'ATC', 'addsToCart'), getCostPerMetric(lastWeek, 'ATC', 'addsToCart')))}</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="border border-gray-300 p-2 text-xs">ATC conversion value (shared only)</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(lastWeek.atcConversionValue || 0)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(thisWeek.atcConversionValue || 0)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((thisWeek.atcConversionValue || 0) - (lastWeek.atcConversionValue || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.atcConversionValue || 0) >= (lastWeek.atcConversionValue || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.atcConversionValue || 0) >= (lastWeek.atcConversionValue || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.atcConversionValue || 0, lastWeek.atcConversionValue || 0))}</td>
-                                        </tr>
-                                        <tr className="bg-gray-50">
-                                            <td className="border border-gray-300 p-2 text-xs">Purchases with shared items</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(lastWeek.purchases || 0)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(thisWeek.purchases || 0)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((thisWeek.purchases || 0) - (lastWeek.purchases || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.purchases || 0) >= (lastWeek.purchases || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.purchases || 0) >= (lastWeek.purchases || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.purchases || 0, lastWeek.purchases || 0))}</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="border border-gray-300 p-2 text-xs">Cost per purchases with shared items</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(lastWeek, 'Purchase', 'purchases'))}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(thisWeek, 'Purchase', 'purchases'))}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getCostPerMetric(thisWeek, 'Purchase', 'purchases') - getCostPerMetric(lastWeek, 'Purchase', 'purchases'))}</td>
-                                            <td className={"border border-gray-300 p-2 text-right text-xs " + (getCostPerMetric(thisWeek, 'Purchase', 'purchases') <= getCostPerMetric(lastWeek, 'Purchase', 'purchases') ? 'text-green-500' : 'text-red-500')}>{(getCostPerMetric(thisWeek, 'Purchase', 'purchases') <= getCostPerMetric(lastWeek, 'Purchase', 'purchases') ? '' : '+')}{formatPercent(calculateGrowth(getCostPerMetric(thisWeek, 'Purchase', 'purchases'), getCostPerMetric(lastWeek, 'Purchase', 'purchases')))}</td>
-                                        </tr>
-                                        <tr className="bg-gray-50">
-                                            <td className="border border-gray-300 p-2 text-xs">Purchases conversion value for shared items only</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(lastWeek.purchasesConversionValue || 0)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(thisWeek.purchasesConversionValue || 0)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((thisWeek.purchasesConversionValue || 0) - (lastWeek.purchasesConversionValue || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.purchasesConversionValue || 0) >= (lastWeek.purchasesConversionValue || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.purchasesConversionValue || 0) >= (lastWeek.purchasesConversionValue || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.purchasesConversionValue || 0, lastWeek.purchasesConversionValue || 0))}</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="border border-gray-300 p-2 text-xs">Conversion Rate (Purchase ÷ Click)</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatPercent((lastWeek.linkClicks && lastWeek.purchases) ? (lastWeek.purchases / lastWeek.linkClicks * 100) : 0)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatPercent((thisWeek.linkClicks && thisWeek.purchases) ? (thisWeek.purchases / thisWeek.linkClicks * 100) : 0)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatPercent(((thisWeek.linkClicks && thisWeek.purchases) ? (thisWeek.purchases / thisWeek.linkClicks * 100) : 0) - ((lastWeek.linkClicks && lastWeek.purchases) ? (lastWeek.purchases / lastWeek.linkClicks * 100) : 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${((thisWeek.linkClicks && thisWeek.purchases) ? (thisWeek.purchases / thisWeek.linkClicks * 100) : 0) >= ((lastWeek.linkClicks && lastWeek.purchases) ? (lastWeek.purchases / lastWeek.linkClicks * 100) : 0) ? 'text-green-500' : 'text-red-500'}\`}>{((thisWeek.linkClicks && thisWeek.purchases) ? (thisWeek.purchases / thisWeek.linkClicks * 100) : 0) >= ((lastWeek.linkClicks && lastWeek.purchases) ? (lastWeek.purchases / lastWeek.linkClicks * 100) : 0) ? '+' : ''}{formatPercent(calculateGrowth((thisWeek.linkClicks && thisWeek.purchases) ? (thisWeek.purchases / thisWeek.linkClicks * 100) : 0, (lastWeek.linkClicks && lastWeek.purchases) ? (lastWeek.purchases / lastWeek.linkClicks * 100) : 0))}</td>
-                                        </tr>
-                                        <tr className="bg-gray-50">
-                                            <td className="border border-gray-300 p-2 text-xs">Purchase ROAS (return on ad spend)</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(getROAS(lastWeek))}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(getROAS(thisWeek))}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(getROAS(thisWeek) - getROAS(lastWeek))}</td>
-                                            <td className={"border border-gray-300 p-2 text-right text-xs " + (getROAS(thisWeek) >= getROAS(lastWeek) ? 'text-green-500' : 'text-red-500')}>{(getROAS(thisWeek) >= getROAS(lastWeek) ? '+' : '')}{formatPercent(calculateGrowth(getROAS(thisWeek), getROAS(lastWeek)))}</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="border border-gray-300 p-2 text-xs">AOV (Average Order Value)</td>
+                                            <td className="border border-gray-300 p-2 text-xs">Avg Order Value</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getAOV(lastWeek))}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getAOV(thisWeek))}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(getAOV(thisWeek) - getAOV(lastWeek))}</td>
-                                            <td className={"border border-gray-300 p-2 text-right text-xs " + (getAOV(thisWeek) >= getAOV(lastWeek) ? 'text-green-500' : 'text-red-500')}>{(getAOV(thisWeek) >= getAOV(lastWeek) ? '+' : '')}{formatPercent(calculateGrowth(getAOV(thisWeek), getAOV(lastWeek)))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${getAOV(thisWeek) >= getAOV(lastWeek) ? 'text-green-500' : 'text-red-500'}\`}>{getAOV(thisWeek) >= getAOV(lastWeek) ? '+' : ''}{formatPercent(calculateGrowth(getAOV(thisWeek), getAOV(lastWeek)))}</td>
                                         </tr>
-                                        ${(thisWeek.clicksAll || lastWeek.clicksAll) ? `
-                                        <tr className="bg-gray-50">
-                                            <td className="border border-gray-300 p-2 text-xs">Clicks (all)</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(lastWeek.clicksAll || 0)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(thisWeek.clicksAll || 0)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((thisWeek.clicksAll || 0) - (lastWeek.clicksAll || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.clicksAll || 0) >= (lastWeek.clicksAll || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.clicksAll || 0) >= (lastWeek.clicksAll || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.clicksAll || 0, lastWeek.clicksAll || 0))}</td>
-                                        </tr>
-                                        ` : ''}
-                                        ${(thisWeek.ctrAll || lastWeek.ctrAll) ? `
-                                        <tr>
-                                            <td className="border border-gray-300 p-2 text-xs">CTR (all)</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatPercent((lastWeek.ctrAll || 0) * 100)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatPercent((thisWeek.ctrAll || 0) * 100)}</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatPercent(((thisWeek.ctrAll || 0) - (lastWeek.ctrAll || 0)) * 100)}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs ${(thisWeek.ctrAll || 0) >= (lastWeek.ctrAll || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.ctrAll || 0) >= (lastWeek.ctrAll || 0) ? '+' : ''}{formatPercent(calculateGrowth((thisWeek.ctrAll || 0) * 100, (lastWeek.ctrAll || 0) * 100))}</td>
-                                        </tr>
-                                        ` : ''}
                                     </tbody>
                                 </table>
                             </div>
                             <div className="mt-4 space-y-2">
-                                <div className="p-3 bg-yellow-50 rounded-lg">
+                                <div className="p-3 bg-blue-50 rounded-lg">
                                     <div className="flex items-start">
                                         <i className="fas fa-chart-line text-blue-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
                                             <p className="text-xs"><strong>Kesimpulan:</strong> {spendGrowth >= 0 ? 'Peningkatan' : 'Penurunan'} performa {Math.abs(spendGrowth).toFixed(1)}% di semua metrik.</p>
-                                            <p className="text-xs mt-1">{resultsGrowth >= 0 ? 'Engagement' : 'Cost efficiency'} menjadi {resultsGrowth >= 0 ? 'driver utama' : 'area perbaikan'} {isMoM ? 'bulan' : 'minggu'} ini.</p>
+                                            <p className="text-xs mt-1">{resultsGrowth >= 0 ? 'Purchases' : 'Cost efficiency'} menjadi {resultsGrowth >= 0 ? 'driver utama' : 'area perbaikan'} ${isMoM ? 'bulan' : 'minggu'} ini.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -779,15 +644,15 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                     <ul className="space-y-3">
                                         <li className="flex items-start">
                                             <i className="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                                            <span><strong>Purchases</strong> {resultsGrowth >= 0 ? 'meningkat' : 'menurun'} {Math.abs(resultsGrowth).toFixed(1)}% dengan {resultsGrowth >= 0 ? 'peningkatan' : 'penurunan'} conversion rate</span>
+                                            <span><strong>Purchases</strong> {resultsGrowth >= 0 ? 'meningkat' : 'menurun'} {Math.abs(resultsGrowth).toFixed(1)}% dengan {resultsGrowth >= 0 ? 'peningkatan' : 'penurunan'} konversi</span>
+                                        </li>
+                                        <li className="flex items-start">
+                                            <i className="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                                            <span><strong>ROAS</strong> {getROAS(thisWeek) >= getROAS(lastWeek) ? 'meningkat' : 'stabil'} di {getROAS(thisWeek).toFixed(2)}x dengan {resultsGrowth >= 0 ? 'scaling' : 'maintaining'} budget</span>
                                         </li>
                                         <li className="flex items-start">
                                             <i className="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
                                             <span><strong>Click-Through Rate</strong> {thisWeek.ctr >= lastWeek.ctr ? 'stabil' : 'meningkat'} di {formatPercent((thisWeek.ctr || 0) * 100)} meskipun impressions {thisWeek.impressions >= lastWeek.impressions ? 'meningkat' : 'menurun'}</span>
-                                        </li>
-                                        <li className="flex items-start">
-                                            <i className="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                                            <span><strong>Cost Efficiency</strong> {cpaGrowth <= 0 ? 'meningkat' : 'menurun'} dengan CPA {cpaGrowth <= 0 ? 'turun' : 'naik'} {Math.abs(cpaGrowth).toFixed(1)}%</span>
                                         </li>
                                         <li className="flex items-start">
                                             <i className="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
@@ -822,8 +687,8 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                     <div className="flex items-start">
                                         <i className="fas fa-lightbulb text-yellow-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
-                                            <p className="text-xs"><strong>Kesimpulan:</strong> Fokus optimasi {thisWeek.cpc > lastWeek.cpc ? 'CPC' : 'CTR'} untuk efisiensi sambil {thisWeek.impressions < lastWeek.impressions ? 'expand reach' : 'maintain reach'} dan meningkatkan conversion rate.</p>
-                                            <p className="text-xs mt-1">Growth berkelanjutan memerlukan monitoring metrik kunci (purchases, CPA, conversion rate) secara berkala dan penyesuaian strategi.</p>
+                                            <p className="text-xs"><strong>Kesimpulan:</strong> Fokus optimasi {thisWeek.cpc > lastWeek.cpc ? 'CPC' : 'CTR'} untuk efisiensi sambil {thisWeek.impressions < lastWeek.impressions ? 'expand reach' : 'maintain reach'}.</p>
+                                            <p className="text-xs mt-1">Growth berkelanjutan memerlukan monitoring metrik kunci secara berkala dan penyesuaian strategi.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -831,8 +696,8 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                     <div className="flex items-start">
                                         <i className="fas fa-lightbulb text-green-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
-                                            <p className="text-xs"><strong>Rekomendasi:</strong> {thisWeek.cpc > lastWeek.cpc ? 'Optimasi CPC dengan testing creative dan targeting untuk menurunkan cost per purchase.' : 'Tingkatkan CTR dengan testing creative dan optimasi placement untuk meningkatkan purchases.'}</p>
-                                            <p className="text-xs mt-1">{thisWeek.impressions < lastWeek.impressions ? 'Ekspansi reach dengan penambahan audience dan budget untuk meningkatkan exposure dan purchases.' : 'Pertahankan reach sambil fokus pada optimasi conversion rate (purchase/click) dan cost efficiency (CPA).'}</p>
+                                            <p className="text-xs"><strong>Rekomendasi:</strong> {thisWeek.cpc > lastWeek.cpc ? 'Optimasi CPC dengan testing creative dan targeting untuk menurunkan cost.' : 'Tingkatkan CTR dengan testing creative dan optimasi placement.'}</p>
+                                            <p className="text-xs mt-1">{thisWeek.impressions < lastWeek.impressions ? 'Ekspansi reach dengan penambahan audience dan budget untuk meningkatkan exposure.' : 'Pertahankan reach sambil fokus pada optimasi conversion rate dan cost efficiency.'}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -841,8 +706,6 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                     </div>
 
                     ${generateBreakdownSlides(breakdown, thisWeek, lastWeek, thisPeriodLabel, lastPeriodLabel)}
-
-                    ${generateEventAnalysisSlides(data, thisWeek, lastWeek, thisPeriodLabel, lastPeriodLabel, isMoM)}
 
                     {/* SLIDE 13 - THANK YOU */}
                     <div className="bg-white p-8 border-t-4 border-hadona-blue min-h-screen flex items-center">
@@ -863,30 +726,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             );
         };
 
-                // Use React 18 createRoot API instead of ReactDOM.render
-                const rootElement = document.getElementById('root');
-                // Check if createRoot is available (React 18+)
-                if (typeof ReactDOM !== 'undefined' && ReactDOM.createRoot) {
-                    const root = ReactDOM.createRoot(rootElement);
-                    root.render(<App />);
-                } else if (typeof ReactDOM !== 'undefined' && ReactDOM.render) {
-                    // Fallback for React 17
-                    ReactDOM.render(<App />, rootElement);
-                } else {
-                    console.error('ReactDOM is not available');
-                }
-            } else {
-                // Retry after a short delay
-                setTimeout(checkAndRender, 100);
-            }
-        };
-
-        // Start rendering when DOM is ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', checkAndRender);
-        } else {
-            checkAndRender();
-        }
+        ReactDOM.render(<App />, document.getElementById('root'));
     </script>
 </body>
 </html>`
@@ -894,41 +734,22 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
 
 function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, thisPeriodLabel: string, lastPeriodLabel: string): string {
   let slides = ''
-  
+
   // Slide 5: Age Performance
   const ageThisWeek = breakdown.thisWeek?.age || []
   const ageLastWeek = breakdown.lastWeek?.age || []
-  
+
   if (ageThisWeek.length > 0 || ageLastWeek.length > 0) {
     // Sort by purchases (highest first)
     const sortedAge = [...ageThisWeek]
       .filter((a: any) => a.Age && a.Age.trim())
       .sort((a: any, b: any) => {
-        // Try multiple field name variations for purchases
-        const getPurchases = (item: any) => {
-          let purchasesRaw = item['Purchases with shared items'] || 
-                              item['Purchases'] || 
-                              item['Purchases with shared items only'] ||
-                              item['Purchases (shared items)'] ||
-                              0
-          
-          // If purchases is empty/0, calculate from conversion value and AOV
-          if (!purchasesRaw || parseFloat(String(purchasesRaw).replace(/,/g, '')) === 0) {
-            const purchasesCV = parseFloat(String(item['Purchases conversion value for shared items only'] || item['Purchases conversion value'] || 0).replace(/,/g, '')) || 0
-            const aov = parseFloat(String(item['AOV (IDR)'] || item['AOV'] || 0).replace(/,/g, '')) || 0
-            if (purchasesCV > 0 && aov > 0) {
-              purchasesRaw = purchasesCV / aov
-            }
-          }
-          
-          return parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
-        }
-        const resultA = getPurchases(a)
-        const resultB = getPurchases(b)
+        const resultA = a['Purchases with shared items'] || a['Purchases'] || 0
+        const resultB = b['Purchases with shared items'] || b['Purchases'] || 0
         return resultB - resultA
       })
       .slice(0, 6)
-    
+
     slides += `
                     {/* SLIDE 5 - AUDIENCE PERFORMANCE: AGE */}
                     <div className="bg-white p-8 border-t-4 border-hadona-blue">
@@ -940,23 +761,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedAge.map((item: any) => {
           const age = item.Age || 'Unknown'
-          // Try multiple field name variations for purchases
-          let purchasesRaw = item['Purchases with shared items'] || 
-                              item['Purchases'] || 
-                              item['Purchases with shared items only'] ||
-                              item['Purchases (shared items)'] ||
-                              0
-          
-          // If purchases is empty/0, calculate from conversion value and AOV
-          if (!purchasesRaw || parseFloat(String(purchasesRaw).replace(/,/g, '')) === 0) {
-            const purchasesCV = parseFloat(String(item['Purchases conversion value for shared items only'] || item['Purchases conversion value'] || 0).replace(/,/g, '')) || 0
-            const aov = parseFloat(String(item['AOV (IDR)'] || item['AOV'] || 0).replace(/,/g, '')) || 0
-            if (purchasesCV > 0 && aov > 0) {
-              purchasesRaw = purchasesCV / aov
-            }
-          }
-          
-          const result = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
+          const result = item['Purchases with shared items'] || item['Purchases'] || 0
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${age}</span>
                                             <span className="font-bold text-xs">{formatNumber(${result})}</span>
@@ -969,25 +774,8 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedAge.map((item: any) => {
           const age = item.Age || 'Unknown'
-          // Try multiple field name variations for purchases
-          let purchasesRaw = item['Purchases with shared items'] || 
-                              item['Purchases'] || 
-                              item['Purchases with shared items only'] ||
-                              item['Purchases (shared items)'] ||
-                              0
-          
-          // If purchases is empty/0, calculate from conversion value and AOV
-          if (!purchasesRaw || parseFloat(String(purchasesRaw).replace(/,/g, '')) === 0) {
-            const purchasesCV = parseFloat(String(item['Purchases conversion value for shared items only'] || item['Purchases conversion value'] || 0).replace(/,/g, '')) || 0
-            const aov = parseFloat(String(item['AOV (IDR)'] || item['AOV'] || 0).replace(/,/g, '')) || 0
-            if (purchasesCV > 0 && aov > 0) {
-              purchasesRaw = purchasesCV / aov
-            }
-          }
-          
-          const purchases = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
-          const amountSpentRaw = item['Amount spent (IDR)'] || item['Amount spent'] || 0
-          const amountSpent = parseFloat(String(amountSpentRaw).replace(/,/g, '')) || 0
+          const purchases = item['Purchases with shared items'] || item['Purchases'] || 0
+          const amountSpent = item['Amount spent (IDR)'] || item['Amount spent'] || 0
           const cpa = purchases > 0 ? (amountSpent / purchases) : 0
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${age}</span>
@@ -998,29 +786,11 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                 </div>
                             </div>
                             <div className="mt-4 space-y-2">
-                                <div className="p-3 bg-yellow-50 rounded-lg">
+                                <div className="p-3 bg-blue-50 rounded-lg">
                                     <div className="flex items-start">
                                         <i className="fas fa-users text-blue-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
-                                            <p className="text-xs"><strong>Kesimpulan:</strong> ${sortedAge.length > 0 ? (() => {
-          const topAge = sortedAge[0]
-          let purchases = topAge['Purchases with shared items'] || 
-                           topAge['Purchases'] || 
-                           topAge['Purchases with shared items only'] ||
-                           topAge['Purchases (shared items)'] ||
-                           0
-          
-          // If purchases is empty/0, calculate from conversion value and AOV
-          if (!purchases || parseFloat(String(purchases).replace(/,/g, '')) === 0) {
-            const purchasesCV = parseFloat(String(topAge['Purchases conversion value for shared items only'] || topAge['Purchases conversion value'] || 0).replace(/,/g, '')) || 0
-            const aov = parseFloat(String(topAge['AOV (IDR)'] || topAge['AOV'] || 0).replace(/,/g, '')) || 0
-            if (purchasesCV > 0 && aov > 0) {
-              purchases = purchasesCV / aov
-            }
-          }
-          
-          return 'Demografi ' + topAge.Age + ' menghasilkan ' + Math.round(purchases) + ' purchases dengan CPA terendah.'
-        })() : 'Data age breakdown menunjukkan variasi performa signifikan.'}</p>
+                                            <p className="text-xs"><strong>Kesimpulan:</strong> ${sortedAge.length > 0 ? 'Demografi ' + sortedAge[0].Age + ' menghasilkan ' + (sortedAge[0]['Purchases with shared items'] || sortedAge[0]['Purchases'] || 0) + ' purchases dengan CPA terendah.' : 'Data age breakdown menunjukkan variasi performa signifikan.'}</p>
                                             <p className="text-xs mt-1">${sortedAge.length > 0 ? 'Segment ini menjadi pilihan terbaik untuk optimasi budget dan scaling.' : 'Perlu analisis lebih lanjut untuk identifikasi segment terbaik.'}</p>
                                         </div>
                                     </div>
@@ -1038,7 +808,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                         </div>
                     </div>`
   }
-  
+
   // Slide 6: Gender Performance
   const genderThisWeek = breakdown.thisWeek?.gender || []
   if (genderThisWeek.length > 0) {
@@ -1050,7 +820,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
         const impB = b.Impressions || 0
         return impB - impA
       })
-    
+
     slides += `
                     {/* SLIDE 6 - AUDIENCE PERFORMANCE: GENDER */}
                     <div className="bg-white p-8 border-t-4 border-hadona-blue">
@@ -1098,7 +868,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                 </div>
                             </div>
                             <div className="mt-4 space-y-2">
-                                <div className="p-3 bg-yellow-50 rounded-lg">
+                                <div className="p-3 bg-blue-50 rounded-lg">
                                     <div className="flex items-start">
                                         <i className="fas fa-venus-mars text-blue-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
@@ -1120,7 +890,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                         </div>
                     </div>`
   }
-  
+
   // Slide 7: Region Performance
   const regionThisWeek = breakdown.thisWeek?.region || []
   if (regionThisWeek.length > 0) {
@@ -1133,7 +903,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
         return impB - impA
       })
       .slice(0, 5)
-    
+
     slides += `
                     {/* SLIDE 7 - AUDIENCE PERFORMANCE: REGION */}
                     <div className="bg-white p-8 border-t-4 border-hadona-blue">
@@ -1181,7 +951,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                 </div>
                             </div>
                             <div className="mt-4 space-y-2">
-                                <div className="p-3 bg-yellow-50 rounded-lg">
+                                <div className="p-3 bg-blue-50 rounded-lg">
                                     <div className="flex items-start">
                                         <i className="fas fa-map-marker-alt text-blue-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
@@ -1203,7 +973,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                         </div>
                     </div>`
   }
-  
+
   // Slide 8: Platform Performance
   const platformThisWeek = breakdown.thisWeek?.platform || []
   if (platformThisWeek.length > 0) {
@@ -1211,77 +981,63 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
     const sortedPlatform = [...platformThisWeek]
       .filter((p: any) => p.Platform && p.Platform.trim())
       .sort((a: any, b: any) => {
-        const getPurchases = (item: any) => {
-          const purchasesRaw = item['Purchases with shared items'] || 
-                              item['Purchases'] || 
-                              item['Purchases with shared items only'] ||
-                              item['Purchases (shared items)'] ||
-                              0
-          return parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
-        }
-        return getPurchases(b) - getPurchases(a)
+        const convA = a['Purchases with shared items'] || a['Purchases'] || 0
+        const convB = b['Purchases with shared items'] || b['Purchases'] || 0
+        return convB - convA
       })
-    
+
     slides += `
                     {/* SLIDE 8 - PLATFORM PERFORMANCE */}
                     <div className="bg-white p-8 border-t-4 border-hadona-blue">
                         <div className="max-w-6xl mx-auto">
                             <h2 className="text-2xl font-bold text-hadona-blue mb-4">Platform Performance</h2>
-                            <div className="grid grid-cols-2 gap-0">
-                                <div className="border-r-2 border-gray-300 pr-6">
-                                    <h3 className="text-base font-semibold mb-3">Total Purchases</h3>
+                            <div className="grid grid-cols-3 gap-0">
+                                <div className="border-r-2 border-gray-300 pr-4">
+                                    <h3 className="text-base font-semibold mb-3">Purchases</h3>
                                     <div className="space-y-2">
                                         ${sortedPlatform.map((item: any) => {
           const platform = item.Platform || 'Unknown'
-          const purchasesRaw = item['Purchases with shared items'] || 
-                              item['Purchases'] || 
-                              item['Purchases with shared items only'] ||
-                              item['Purchases (shared items)'] ||
-                              0
-          const purchases = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
+          const conv = item['Purchases with shared items'] || item['Purchases'] || 0
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${platform}</span>
-                                            <span className="font-bold text-xs">{formatNumber(${purchases})}</span>
+                                            <span className="font-bold text-xs">{formatNumber(${conv})}</span>
                                         </div>`
         }).join('')}
                                     </div>
                                 </div>
-                                <div className="pl-6">
-                                    <h3 className="text-base font-semibold mb-3">CPA (Cost Per Purchase)</h3>
+                                <div className="border-r-2 border-gray-300 px-4">
+                                    <h3 className="text-base font-semibold mb-3">Impressions</h3>
                                     <div className="space-y-2">
                                         ${sortedPlatform.map((item: any) => {
           const platform = item.Platform || 'Unknown'
-          const purchasesRaw = item['Purchases with shared items'] || 
-                              item['Purchases'] || 
-                              item['Purchases with shared items only'] ||
-                              item['Purchases (shared items)'] ||
-                              0
-          const purchases = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
-          const amountSpentRaw = item['Amount spent (IDR)'] || item['Amount spent'] || 0
-          const amountSpent = parseFloat(String(amountSpentRaw).replace(/,/g, '')) || 0
-          const cpa = purchases > 0 ? (amountSpent / purchases) : 0
+          const impressions = item.Impressions || 0
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${platform}</span>
-                                            <span className="font-bold text-xs">{formatCurrency(${cpa})}</span>
+                                            <span className="font-bold text-xs">{formatNumber(${impressions})}</span>
+                                        </div>`
+        }).join('')}
+                                    </div>
+                                </div>
+                                <div className="pl-4">
+                                    <h3 className="text-base font-semibold mb-3">CTR (Link)</h3>
+                                    <div className="space-y-2">
+                                        ${sortedPlatform.map((item: any) => {
+          const platform = item.Platform || 'Unknown'
+          const ctr = (item['CTR (link click-through rate)'] || 0) * 100
+          return `<div className="flex justify-between items-center">
+                                            <span className="text-xs">${platform}</span>
+                                            <span className="font-bold text-xs">{formatPercent(${ctr})}</span>
                                         </div>`
         }).join('')}
                                     </div>
                                 </div>
                             </div>
                             <div className="mt-4 space-y-2">
-                                <div className="p-3 bg-yellow-50 rounded-lg">
+                                <div className="p-3 bg-blue-50 rounded-lg">
                                     <div className="flex items-start">
                                         <i className="fab fa-instagram text-purple-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
-                                            <p className="text-xs"><strong>Kesimpulan:</strong> ${sortedPlatform.length > 0 ? (() => {
-          const topPlatform = sortedPlatform[0]
-          const purchases = topPlatform['Purchases with shared items'] || 
-                           topPlatform['Purchases'] || 
-                           topPlatform['Purchases with shared items only'] ||
-                           topPlatform['Purchases (shared items)'] ||
-                           0
-          return topPlatform.Platform + ' menghasilkan ' + purchases + ' purchases dengan CPA terendah.'
-        })() : 'Platform breakdown menunjukkan variasi performa signifikan antar platform.'}</p>
+                                            <p className="text-xs"><strong>Kesimpulan:</strong> ${sortedPlatform.length > 0 ? sortedPlatform[0].Platform + ' menghasilkan purchases tertinggi dengan CTR ' + ((sortedPlatform[0]['CTR (link click-through rate)'] || 0) * 100).toFixed(2) + '%.' : 'Platform breakdown menunjukkan variasi performa signifikan antar platform.'}</p>
                                             <p className="text-xs mt-1">${sortedPlatform.length > 0 ? 'Platform ini menjadi pilihan terbaik untuk optimasi budget dan scaling campaign.' : 'Perlu analisis lebih lanjut untuk identifikasi platform terbaik.'}</p>
                                         </div>
                                     </div>
@@ -1291,7 +1047,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                         <i className="fas fa-lightbulb text-green-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
                                             <p className="text-xs"><strong>Rekomendasi:</strong> ${sortedPlatform.length > 0 ? 'Alokasikan lebih banyak budget ke platform ' + sortedPlatform[0].Platform + ' untuk hasil maksimal.' : 'Lakukan testing pada berbagai platform untuk menemukan performa terbaik.'}</p>
-                                            <p className="text-xs mt-1">Pertimbangkan ekspansi ke platform lain dengan performa baik untuk diversifikasi dan meningkatkan purchases.</p>
+                                            <p className="text-xs mt-1">Pertimbangkan ekspansi ke platform lain dengan performa baik untuk diversifikasi dan meningkatkan reach.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -1299,7 +1055,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                         </div>
                     </div>`
   }
-  
+
   // Slide 9: Placement Performance
   const placementThisWeek = breakdown.thisWeek?.placement || []
   if (placementThisWeek.length > 0) {
@@ -1307,78 +1063,64 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
     const sortedPlacement = [...placementThisWeek]
       .filter((p: any) => p.Placement && p.Placement.trim())
       .sort((a: any, b: any) => {
-        const getPurchases = (item: any) => {
-          const purchasesRaw = item['Purchases with shared items'] || 
-                              item['Purchases'] || 
-                              item['Purchases with shared items only'] ||
-                              item['Purchases (shared items)'] ||
-                              0
-          return parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
-        }
-        return getPurchases(b) - getPurchases(a)
+        const resultA = a['Purchases with shared items'] || a['Purchases'] || 0
+        const resultB = b['Purchases with shared items'] || b['Purchases'] || 0
+        return resultB - resultA
       })
       .slice(0, 5)
-    
+
     slides += `
                     {/* SLIDE 9 - CONTENT PERFORMANCE: PLACEMENT */}
                     <div className="bg-white p-8 border-t-4 border-hadona-blue">
                         <div className="max-w-6xl mx-auto">
                             <h2 className="text-2xl font-bold text-hadona-blue mb-4">Content Performance: Placement</h2>
-                            <div className="grid grid-cols-2 gap-0">
-                                <div className="border-r-2 border-gray-300 pr-6">
+                            <div className="grid grid-cols-3 gap-0">
+                                <div className="border-r-2 border-gray-300 pr-4">
                                     <h3 className="text-base font-semibold mb-3">Total Purchases</h3>
                                     <div className="space-y-2">
                                         ${sortedPlacement.map((item: any) => {
           const placement = item.Placement || 'Unknown'
-          const purchasesRaw = item['Purchases with shared items'] || 
-                              item['Purchases'] || 
-                              item['Purchases with shared items only'] ||
-                              item['Purchases (shared items)'] ||
-                              0
-          const purchases = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
+          const result = item['Purchases with shared items'] || item['Purchases'] || 0
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${placement}</span>
-                                            <span className="font-bold text-xs">{formatNumber(${purchases})}</span>
+                                            <span className="font-bold text-xs">{formatNumber(${result})}</span>
                                         </div>`
         }).join('')}
                                     </div>
                                 </div>
-                                <div className="pl-6">
-                                    <h3 className="text-base font-semibold mb-3">CPA (Cost Per Purchase)</h3>
+                                <div className="border-r-2 border-gray-300 px-4">
+                                    <h3 className="text-base font-semibold mb-3">Impressions</h3>
                                     <div className="space-y-2">
                                         ${sortedPlacement.map((item: any) => {
           const placement = item.Placement || 'Unknown'
-          const purchasesRaw = item['Purchases with shared items'] || 
-                              item['Purchases'] || 
-                              item['Purchases with shared items only'] ||
-                              item['Purchases (shared items)'] ||
-                              0
-          const purchases = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
-          const amountSpentRaw = item['Amount spent (IDR)'] || item['Amount spent'] || 0
-          const amountSpent = parseFloat(String(amountSpentRaw).replace(/,/g, '')) || 0
-          const cpa = purchases > 0 ? (amountSpent / purchases) : 0
+          const impressions = item.Impressions || 0
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${placement}</span>
-                                            <span className="font-bold text-xs">{formatCurrency(${cpa})}</span>
+                                            <span className="font-bold text-xs">{formatNumber(${impressions})}</span>
+                                        </div>`
+        }).join('')}
+                                    </div>
+                                </div>
+                                <div className="pl-4">
+                                    <h3 className="text-base font-semibold mb-3">CTR (Link)</h3>
+                                    <div className="space-y-2">
+                                        ${sortedPlacement.map((item: any) => {
+          const placement = item.Placement || 'Unknown'
+          const ctr = (item['CTR (link click-through rate)'] || 0) * 100
+          return `<div className="flex justify-between items-center">
+                                            <span className="text-xs">${placement}</span>
+                                            <span className="font-bold text-xs">{formatPercent(${ctr})}</span>
                                         </div>`
         }).join('')}
                                     </div>
                                 </div>
                             </div>
                             <div className="mt-4 space-y-2">
-                                <div className="p-3 bg-yellow-50 rounded-lg">
+                                <div className="p-3 bg-blue-50 rounded-lg">
                                     <div className="flex items-start">
                                         <i className="fas fa-photo-video text-blue-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
-                                            <p className="text-xs"><strong>Kesimpulan:</strong> ${sortedPlacement.length > 0 ? (() => {
-          const topPlacement = sortedPlacement[0]
-          const purchases = topPlacement['Purchases with shared items'] || 
-                           topPlacement['Purchases'] || 
-                           topPlacement['Purchases with shared items only'] ||
-                           topPlacement['Purchases (shared items)'] ||
-                           0
-          return topPlacement.Placement + ' menghasilkan ' + purchases + ' purchases dengan CPA terendah.'
-        })() : 'Placement breakdown menunjukkan variasi performa signifikan antar format.'}</p>
+                                            <p className="text-xs"><strong>Kesimpulan:</strong> ${sortedPlacement.length > 0 ? sortedPlacement[0].Placement + ' menghasilkan purchases tertinggi dengan CTR ' + ((sortedPlacement[0]['CTR (link click-through rate)'] || 0) * 100).toFixed(2) + '%.' : 'Placement breakdown menunjukkan variasi performa signifikan antar format.'}</p>
                                             <p className="text-xs mt-1">${sortedPlacement.length > 0 ? 'Format konten ini menjadi pilihan terbaik untuk optimasi dan scaling.' : 'Perlu analisis lebih lanjut untuk identifikasi format terbaik.'}</p>
                                         </div>
                                     </div>
@@ -1388,7 +1130,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                         <i className="fas fa-lightbulb text-green-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
                                             <p className="text-xs"><strong>Rekomendasi:</strong> ${sortedPlacement.length > 0 ? 'Buat lebih banyak konten dengan format ' + sortedPlacement[0].Placement + ' untuk hasil optimal.' : 'Lakukan testing pada berbagai format placement untuk menemukan performa terbaik.'}</p>
-                                            <p className="text-xs mt-1">Pertimbangkan ekspansi ke format placement lain dengan performa baik untuk diversifikasi konten dan meningkatkan purchases.</p>
+                                            <p className="text-xs mt-1">Pertimbangkan ekspansi ke format placement lain dengan performa baik untuk diversifikasi konten.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -1396,39 +1138,23 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                         </div>
                     </div>`
   }
-  
+
   // Slide 10: Creative Performance
   const creativeThisWeek = breakdown.thisWeek?.['ad-creative'] || []
   if (creativeThisWeek.length > 0) {
-    // Get top 5 performers based on: Purchases + Instagram Visits + Followers
+    // Get top 5 performers based on purchases
     const sortedCreative = [...creativeThisWeek]
       .filter((c: any) => {
-        const purchases = c['Purchases with shared items'] || 
-                         c['Purchases'] || 
-                         c['Purchases with shared items only'] ||
-                         c['Purchases (shared items)'] ||
-                         0
-        const instagramVisits = c['Instagram profile visits'] || 0
-        const instagramFollows = c['Instagram follows'] || 0
-        // Filter ads that have at least one of these metrics > 0
-        return purchases > 0 || instagramVisits > 0 || instagramFollows > 0
+        const purchases = c['Purchases with shared items'] || c['Purchases'] || 0
+        return purchases > 0
       })
-      .map((item: any) => {
-        const purchasesRaw = item['Purchases with shared items'] || 
-                            item['Purchases'] || 
-                            item['Purchases with shared items only'] ||
-                            item['Purchases (shared items)'] ||
-                            0
-        const purchases = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
-        const instagramVisits = parseFloat(String(item['Instagram profile visits'] || 0).replace(/,/g, '')) || 0
-        const instagramFollows = parseFloat(String(item['Instagram follows'] || 0).replace(/,/g, '')) || 0
-        // Calculate combined score (weighted)
-        const combinedScore = (purchases * 3) + (instagramVisits * 1) + (instagramFollows * 2)
-        return { ...item, _combinedScore: combinedScore }
+      .sort((a: any, b: any) => {
+        const purchasesA = a['Purchases with shared items'] || a['Purchases'] || 0
+        const purchasesB = b['Purchases with shared items'] || b['Purchases'] || 0
+        return purchasesB - purchasesA
       })
-      .sort((a: any, b: any) => b._combinedScore - a._combinedScore)
       .slice(0, 5)
-    
+
     slides += `
                     {/* SLIDE 10 - CREATIVE PERFORMANCE: AD ANALYSIS */}
                     <div className="bg-white p-8 border-t-4 border-hadona-blue">
@@ -1437,13 +1163,13 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                             <div className="mb-3">
                                 <p className="text-xs text-gray-600">
                                     <i className="fas fa-info-circle text-blue-500 mr-2"></i>
-                                    Top 5 Iklan berdasarkan kombinasi: Purchases, Instagram Profile Visits, dan Instagram Follows
+                                    Top 5 Iklan berdasarkan Purchases
                                 </p>
                             </div>
                             <div className="space-y-4">
                                 ${sortedCreative.map((item: any, index: number) => {
           const adNameRaw = item['Ads'] || item['Ad name'] || item['Ad Name'] || item['Campaign name'] || item['Campaign Name'] || item['Ad'] || item['Creative'] || item['Ad creative'] || (item['Campaign'] && item['Ad set'] ? item['Campaign'] + ' - ' + item['Ad set'] : null) || Object.values(item).find((v: any) => typeof v === 'string' && v.length > 0 && !v.match(/^[0-9.,]+$/)) || 'N/A'
-          
+
           // Parse ad names - split by semicolon and clean up
           let adNamesList: string[] = []
           if (adNameRaw && typeof adNameRaw === 'string') {
@@ -1458,26 +1184,17 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
           } else {
             adNamesList = [String(adNameRaw || 'N/A')]
           }
-          
+
           // Take first 3 ad names for display
           const displayAdNames = adNamesList.slice(0, 3)
           const hasMore = adNamesList.length > 3
-          
-          const purchasesRaw = item['Purchases with shared items'] || 
-                              item['Purchases'] || 
-                              item['Purchases with shared items only'] ||
-                              item['Purchases (shared items)'] ||
-                              0
-          const purchases = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
-          const instagramVisits = parseFloat(String(item['Instagram profile visits'] || 0).replace(/,/g, '')) || 0
-          const instagramFollows = parseFloat(String(item['Instagram follows'] || 0).replace(/,/g, '')) || 0
-          const amountSpentRaw = item['Amount spent (IDR)'] || item['Amount spent'] || 0
-          const amountSpent = parseFloat(String(amountSpentRaw).replace(/,/g, '')) || 0
-          const cpr = item['Cost per purchase'] || item['Cost per purchases with shared items'] || item['Cost /Purchase (IDR)'] || (amountSpent > 0 && purchases > 0 ? (amountSpent / purchases) : 0)
-          const ctr = (item['CTR (link click-through rate)'] || item['CTR (all)'] || 0) * 100
+
+          const purchases = item['Purchases with shared items'] || item['Purchases'] || 0
+          const cpa = purchases > 0 ? ((item['Amount spent (IDR)'] || item['Amount spent'] || 0) / purchases) : 0
+          const ctr = (item['CTR (link click-through rate)'] || 0) * 100
           const impressions = item['Impressions'] || 0
-          const outboundClicks = item['Outbound clicks'] || item['Clicks (all)'] || 0
-          
+          const outboundClicks = item['Outbound clicks'] || 0
+
           return `<div className="border-2 ${index === 0 ? 'border-yellow-400 bg-yellow-50' : index === 1 ? 'border-green-300 bg-green-50' : index === 2 ? 'border-blue-300 bg-blue-50' : 'border-gray-200 bg-gray-50'} p-3 rounded-lg">
                                             <div className="mb-3">
                                                 <div className="flex items-center gap-2 mb-2">
@@ -1506,18 +1223,18 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                                     <div className="text-sm font-bold text-green-600">{formatNumber(${purchases})}</div>
                                                 </div>
                                                 <div className="bg-white p-3 rounded border">
-                                                    <div className="text-xs text-gray-600 mb-1">Instagram Visits</div>
-                                                    <div className="text-sm font-bold text-purple-600">{formatNumber(${instagramVisits})}</div>
+                                                    <div className="text-xs text-gray-600 mb-1">CPA</div>
+                                                    <div className="text-sm font-bold text-purple-600">{formatCurrency(${cpa})}</div>
                                                 </div>
                                                 <div className="bg-white p-3 rounded border">
-                                                    <div className="text-xs text-gray-600 mb-1">Instagram Follows</div>
-                                                    <div className="text-sm font-bold text-pink-600">{formatNumber(${instagramFollows})}</div>
+                                                    <div className="text-xs text-gray-600 mb-1">ROAS Est.</div>
+                                                    <div className="text-sm font-bold text-pink-600">{purchases > 0 ? ((item['Purchases conversion value'] || 0) / (item['Amount spent (IDR)'] || item['Amount spent'] || 1)).toFixed(2) + 'x' : '0x'}</div>
                                                 </div>
                                             </div>
                                             <div className="grid grid-cols-4 gap-3 mt-3 pt-3 border-t">
                                                 <div>
-                                                    <div className="text-xs text-gray-600">CPR</div>
-                                                    <div className="text-sm font-semibold">{formatCurrency(${cpr})}</div>
+                                                    <div className="text-xs text-gray-600">CPA</div>
+                                                    <div className="text-sm font-semibold">{formatCurrency(${cpa})}</div>
                                                 </div>
                                                 <div>
                                                     <div className="text-xs text-gray-600">CTR</div>
@@ -1540,7 +1257,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="flex items-start">
                                         <i className="fas fa-palette text-yellow-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
-                                            <p className="text-xs"><strong>Kesimpulan:</strong> ${sortedCreative.length > 0 ? 'Top iklan menghasilkan ' + (sortedCreative[0]['Purchases'] || sortedCreative[0]['Purchases with shared items'] || 0) + ' Purchases dengan ' + (sortedCreative[0]['Instagram profile visits'] || 0) + ' Instagram visits.' : 'Creative breakdown menunjukkan variasi performa signifikan antar iklan.'}</p>
+                                            <p className="text-xs"><strong>Kesimpulan:</strong> ${sortedCreative.length > 0 ? 'Top iklan menghasilkan ' + (sortedCreative[0]['Purchases with shared items'] || sortedCreative[0]['Purchases'] || 0) + ' purchases dengan CPA ' + Math.round((sortedCreative[0]['Amount spent (IDR)'] || sortedCreative[0]['Amount spent'] || 0) / (sortedCreative[0]['Purchases with shared items'] || sortedCreative[0]['Purchases'] || 1)) + '.' : 'Creative breakdown menunjukkan variasi performa signifikan antar iklan.'}</p>
                                             <p className="text-xs mt-1">${sortedCreative.length > 0 ? 'Format dan strategi ini menunjukkan performa terbaik untuk scaling campaign.' : 'Perlu analisis lebih lanjut untuk identifikasi format creative terbaik.'}</p>
                                         </div>
                                     </div>
@@ -1558,20 +1275,20 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                         </div>
                     </div>`
   }
-  
+
   // Slide 11: Campaign Objective Performance
   const objectiveThisWeek = breakdown.thisWeek?.objective || []
   if (objectiveThisWeek.length > 0) {
     // Sort by purchases (highest first)
     const sortedObjective = [...objectiveThisWeek]
-      .filter((o: any) => (o['Objective'] || o['Campaign objective']) && (o['Objective'] || o['Campaign objective']).trim())
+      .filter((o: any) => o['Campaign objective'] && o['Campaign objective'].trim())
       .sort((a: any, b: any) => {
-        const purchasesA = a['Purchases'] || a['Purchases with shared items'] || 0
-        const purchasesB = b['Purchases'] || b['Purchases with shared items'] || 0
-        return purchasesB - purchasesA
+        const convA = a['Purchases with shared items'] || a['Purchases'] || 0
+        const convB = b['Purchases with shared items'] || b['Purchases'] || 0
+        return convB - convA
       })
       .slice(0, 4)
-    
+
     slides += `
                     {/* SLIDE 11 - CAMPAIGN OBJECTIVE PERFORMANCE */}
                     <div className="bg-white p-8 border-t-4 border-hadona-blue">
@@ -1579,22 +1296,17 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                             <h2 className="text-2xl font-bold text-hadona-blue mb-4">Campaign Objective Performance</h2>
                             <div className="grid grid-cols-4 gap-3">
                                 ${sortedObjective.map((item: any) => {
-          const objective = item['Objective'] || item['Campaign objective'] || 'Unknown'
-          const purchasesRaw = item['Purchases with shared items'] || 
-                              item['Purchases'] || 
-                              item['Purchases with shared items only'] ||
-                              item['Purchases (shared items)'] ||
-                              0
-          const purchases = parseFloat(String(purchasesRaw).replace(/,/g, '')) || 0
-          const impressions = parseFloat(String(item.Impressions || 0).replace(/,/g, '')) || 0
-          const clicks = parseFloat(String(item['Outbound clicks'] || item['Clicks (all)'] || 0).replace(/,/g, '')) || 0
-          const ctr = (item['CTR (link click-through rate)'] || item['CTR (all)'] || 0) * 100
+          const objective = item['Campaign objective'] || 'Unknown'
+          const conv = item['Purchases with shared items'] || item['Purchases'] || 0
+          const impressions = item.Impressions || 0
+          const clicks = item['Outbound clicks'] || 0
+          const ctr = (item['CTR (link click-through rate)'] || 0) * 100
           return `<div>
                                             <h3 className="text-base font-semibold mb-3">${objective}</h3>
                                             <div className="space-y-2">
                                                 <div className="flex justify-between">
                                                     <span>Purchases</span>
-                                                    <span className="font-bold">{formatNumber(${purchases})}</span>
+                                                    <span className="font-bold">{formatNumber(${conv})}</span>
                                                 </div>
                                                 <div className="flex justify-between">
                                                     <span>Impressions</span>
@@ -1613,11 +1325,11 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
         }).join('')}
                             </div>
                             <div className="mt-4 space-y-2">
-                                <div className="p-3 bg-yellow-50 rounded-lg">
+                                <div className="p-3 bg-blue-50 rounded-lg">
                                     <div className="flex items-start">
                                         <i className="fas fa-bullseye text-blue-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
-                                            <p className="text-xs"><strong>Kesimpulan:</strong> ${sortedObjective.length > 0 ? (sortedObjective[0]['Objective'] || sortedObjective[0]['Campaign objective'] || 'Unknown') + ' menghasilkan ' + (sortedObjective[0]['Purchases'] || sortedObjective[0]['Purchases with shared items'] || 0) + ' purchases dengan performa terbaik.' : 'Objective breakdown menunjukkan variasi performa signifikan antar objective.'}</p>
+                                            <p className="text-xs"><strong>Kesimpulan:</strong> ${sortedObjective.length > 0 ? sortedObjective[0]['Campaign objective'] + ' menghasilkan purchases tertinggi dengan CTR ' + ((sortedObjective[0]['CTR (link click-through rate)'] || 0) * 100).toFixed(2) + '%.' : 'Objective breakdown menunjukkan variasi performa signifikan antar objective.'}</p>
                                             <p className="text-xs mt-1">${sortedObjective.length > 0 ? 'Objective ini menjadi pilihan terbaik untuk optimasi dan scaling campaign.' : 'Perlu analisis lebih lanjut untuk identifikasi objective terbaik.'}</p>
                                         </div>
                                     </div>
@@ -1626,7 +1338,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="flex items-start">
                                         <i className="fas fa-lightbulb text-green-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
-                                            <p className="text-xs"><strong>Rekomendasi:</strong> ${sortedObjective.length > 0 ? 'Fokus pada objective ' + (sortedObjective[0]['Objective'] || sortedObjective[0]['Campaign objective'] || 'Unknown') + ' untuk hasil optimal dan scaling.' : 'Lakukan testing pada berbagai objective untuk menemukan performa terbaik.'}</p>
+                                            <p className="text-xs"><strong>Rekomendasi:</strong> ${sortedObjective.length > 0 ? 'Fokus pada objective ' + sortedObjective[0]['Campaign objective'] + ' untuk hasil optimal dan scaling.' : 'Lakukan testing pada berbagai objective untuk menemukan performa terbaik.'}</p>
                                             <p className="text-xs mt-1">Pertimbangkan kombinasi objective dengan performa baik untuk diversifikasi strategi campaign.</p>
                                         </div>
                                     </div>
@@ -1635,7 +1347,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                         </div>
                     </div>`
   }
-  
+
   // Slide 12: Overall Conclusion & Strategic Action Plan
   slides += `
                     {/* SLIDE 12 - OVERALL CONCLUSION & STRATEGIC ACTION PLAN */}
@@ -1648,7 +1360,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <ul className="space-y-2 text-sm">
                                         <li className="flex items-start">
                                             <i className="fas fa-check-circle text-green-500 mt-1 mr-2 text-xs"></i>
-                                            <span className="text-xs"><strong>Performa ${thisPeriodLabel}:</strong> ${thisWeek.amountSpent >= lastWeek.amountSpent ? 'Meningkat' : 'Menurun'} ${Math.abs(((thisWeek.amountSpent || 0) - (lastWeek.amountSpent || 0)) / (lastWeek.amountSpent || 1) * 100).toFixed(1)}% dengan spend ${((thisWeek.purchases && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.purchases) : 0) <= ((lastWeek.purchases && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.purchases) : 0) ? 'lebih efisien' : 'kurang efisien'}</span>
+                                            <span className="text-xs"><strong>Performa ${thisPeriodLabel}:</strong> ${thisWeek.amountSpent >= lastWeek.amountSpent ? 'Meningkat' : 'Menurun'} ${Math.abs(((thisWeek.amountSpent || 0) - (lastWeek.amountSpent || 0)) / (lastWeek.amountSpent || 1) * 100).toFixed(1)}% dengan spend ${thisWeek.purchases && lastWeek.purchases && (thisWeek.amountSpent / thisWeek.purchases) <= (lastWeek.amountSpent / lastWeek.purchases) ? 'lebih efisien' : 'kurang efisien'}</span>
                                         </li>
                                         <li className="flex items-start">
                                             <i className="fas fa-check-circle text-green-500 mt-1 mr-2 text-xs"></i>
@@ -1656,7 +1368,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                         </li>
                                         <li className="flex items-start">
                                             <i className="fas fa-check-circle text-green-500 mt-1 mr-2 text-xs"></i>
-                                            <span className="text-xs"><strong>Demografi Terbaik:</strong> ${ageThisWeek.length > 0 ? ageThisWeek.find((a: any) => a.Age && a.Age.trim())?.Age || '25-34 tahun' : '25-34 tahun'} dengan cost per result terendah</span>
+                                            <span className="text-xs"><strong>Demografi Terbaik:</strong> ${ageThisWeek.length > 0 ? ageThisWeek.find((a: any) => a.Age && a.Age.trim())?.Age || '25-34 tahun' : '25-34 tahun'} dengan cost per purchase terendah</span>
                                         </li>
                                         <li className="flex items-start">
                                             <i className="fas fa-check-circle text-green-500 mt-1 mr-2 text-xs"></i>
@@ -1673,7 +1385,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                         </li>
                                         <li className="flex items-start">
                                             <i className="fas fa-arrow-right text-blue-500 mt-1 mr-2 text-xs"></i>
-                                            <span className="text-xs"><strong>TARGETING:</strong> Fokus pada demografi yang memberikan cost per purchase (CPA) terendah</span>
+                                            <span className="text-xs"><strong>Targeting:</strong> Fokus pada demografi yang memberikan cost per purchase terendah</span>
                                         </li>
                                         <li className="flex items-start">
                                             <i className="fas fa-arrow-right text-blue-500 mt-1 mr-2 text-xs"></i>
@@ -1687,7 +1399,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                 </div>
                             </div>
                             <div className="mt-4 space-y-2">
-                                <div className="p-3 bg-yellow-50 rounded-lg">
+                                <div className="p-3 bg-blue-50 rounded-lg">
                                     <div className="flex items-start">
                                         <i className="fas fa-chart-line text-blue-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
@@ -1700,7 +1412,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="flex items-start">
                                         <i className="fas fa-lightbulb text-green-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
-                                            <p className="text-xs"><strong>Rekomendasi:</strong> Alokasikan budget ke performa terbaik dan fokus targeting pada demografi dengan cost per result terendah.</p>
+                                            <p className="text-xs"><strong>Rekomendasi:</strong> Alokasikan budget ke performa terbaik dan fokus targeting pada demografi dengan cost per purchase terendah.</p>
                                             <p className="text-xs mt-1">Lakukan A/B testing creative dan ekspansi ke segment serupa untuk meningkatkan reach dan diversifikasi.</p>
                                         </div>
                                     </div>
@@ -1708,484 +1420,6 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                             </div>
                         </div>
                     </div>`
-  
-  return slides
-}
 
-
-function generateEventAnalysisSlides(data: any, thisWeek: any, lastWeek: any, thisPeriodLabel: string, lastPeriodLabel: string, isMoM: boolean): string {
-  // Extract event data from analysisData
-  const eventData = data?.eventAnalysis || {}
-  const twindateThis = eventData.twindateThis || {}
-  const twindateLast = eventData.twindateLast || {}
-  const paydayThis = eventData.paydayThis || {}
-  const paydayLast = eventData.paydayLast || {}
-  
-  // Check if we have event data
-  // Since aggregateEventData always returns object with all fields (even if 0),
-  // we check if there's meaningful data (amountSpent > 0) in at least one period
-  // This ensures we only show slides when there's actual data to display
-  const hasTwindateData = (twindateThis.amountSpent !== undefined && twindateThis.amountSpent > 0) || 
-                          (twindateLast.amountSpent !== undefined && twindateLast.amountSpent > 0) ||
-                          (twindateThis.purchases !== undefined && twindateThis.purchases > 0) ||
-                          (twindateLast.purchases !== undefined && twindateLast.purchases > 0)
-  const hasPaydayData = (paydayThis.amountSpent !== undefined && paydayThis.amountSpent > 0) || 
-                        (paydayLast.amountSpent !== undefined && paydayLast.amountSpent > 0) ||
-                        (paydayThis.purchases !== undefined && paydayThis.purchases > 0) ||
-                        (paydayLast.purchases !== undefined && paydayLast.purchases > 0)
-  
-  if (!hasTwindateData && !hasPaydayData) {
-    // If no event data, return empty string (no slides)
-    return ''
-  }
-  
-  // Helper functions
-  const calculateGrowth = (current: number, previous: number) => {
-    if (!previous || previous === 0) return { value: 0, percentage: 0, isPositive: current >= 0 }
-    const growth = current - previous
-    const percentage = (growth / previous) * 100
-    return { value: growth, percentage: Math.round(percentage * 100) / 100, isPositive: growth >= 0 }
-  }
-  
-  const formatCurrency = (num: number) => {
-    if (!num || isNaN(num)) return 'Rp 0'
-    return 'Rp ' + num.toLocaleString('id-ID')
-  }
-  
-  const formatNumber = (num: number) => {
-    if (!num || isNaN(num)) return '0'
-    return num.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-  }
-  
-  const formatPercent = (num: number) => {
-    if (!num || isNaN(num)) return '0%'
-    return num.toFixed(2) + '%'
-  }
-  
-  // Helper function to get trend icon JSX as string (for use in template strings)
-  const getTrendIconJSX = (isPositive: boolean) => {
-    return isPositive 
-      ? '<i className="bi bi-arrow-up-circle-fill" style={{color: "#10b981", fontSize: "1.2em"}}></i>' 
-      : '<i className="bi bi-arrow-down-circle-fill" style={{color: "#ef4444", fontSize: "1.2em"}}></i>'
-  }
-  
-  let slides = ''
-  
-  // Calculate Twindate metrics
-  const twindateMetrics: any = {}
-  if (hasTwindateData) {
-    twindateMetrics.amountSpent = calculateGrowth(twindateThis.amountSpent || 0, twindateLast.amountSpent || 0)
-    twindateMetrics.purchases = calculateGrowth(twindateThis.purchases || 0, twindateLast.purchases || 0)
-    twindateMetrics.costPerPurchase = calculateGrowth(twindateThis.costPerPurchase || 0, twindateLast.costPerPurchase || 0)
-    twindateMetrics.purchasesConversionValue = calculateGrowth(twindateThis.purchasesConversionValue || 0, twindateLast.purchasesConversionValue || 0)
-    twindateMetrics.conversionRate = calculateGrowth((twindateThis.conversionRate || 0) * 100, (twindateLast.conversionRate || 0) * 100)
-    twindateMetrics.purchaseROAS = calculateGrowth(twindateThis.purchaseROAS || 0, twindateLast.purchaseROAS || 0)
-    twindateMetrics.avgPurchaseValue = calculateGrowth(twindateThis.avgPurchaseValue || 0, twindateLast.avgPurchaseValue || 0)
-    twindateMetrics.addsToCart = calculateGrowth(twindateThis.addsToCart || 0, twindateLast.addsToCart || 0)
-    twindateMetrics.costPerATC = calculateGrowth(twindateThis.costPerATC || 0, twindateLast.costPerATC || 0)
-    twindateMetrics.atcConversionValue = calculateGrowth(twindateThis.atcConversionValue || 0, twindateLast.atcConversionValue || 0)
-    twindateMetrics.ctr = calculateGrowth((twindateThis.ctr || 0) * 100, (twindateLast.ctr || 0) * 100)
-    twindateMetrics.cpc = calculateGrowth(twindateThis.cpc || 0, twindateLast.cpc || 0)
-    twindateMetrics.frequency = calculateGrowth(twindateThis.frequency || 0, twindateLast.frequency || 0)
-    twindateMetrics.cpm = calculateGrowth(twindateThis.cpm || 0, twindateLast.cpm || 0)
-  }
-  
-  // Calculate Payday metrics
-  const paydayMetrics: any = {}
-  if (hasPaydayData) {
-    paydayMetrics.amountSpent = calculateGrowth(paydayThis.amountSpent || 0, paydayLast.amountSpent || 0)
-    paydayMetrics.purchases = calculateGrowth(paydayThis.purchases || 0, paydayLast.purchases || 0)
-    paydayMetrics.costPerPurchase = calculateGrowth(paydayThis.costPerPurchase || 0, paydayLast.costPerPurchase || 0)
-    paydayMetrics.purchasesConversionValue = calculateGrowth(paydayThis.purchasesConversionValue || 0, paydayLast.purchasesConversionValue || 0)
-    paydayMetrics.conversionRate = calculateGrowth((paydayThis.conversionRate || 0) * 100, (paydayLast.conversionRate || 0) * 100)
-    paydayMetrics.purchaseROAS = calculateGrowth(paydayThis.purchaseROAS || 0, paydayLast.purchaseROAS || 0)
-    paydayMetrics.avgPurchaseValue = calculateGrowth(paydayThis.avgPurchaseValue || 0, paydayLast.avgPurchaseValue || 0)
-    paydayMetrics.addsToCart = calculateGrowth(paydayThis.addsToCart || 0, paydayLast.addsToCart || 0)
-    paydayMetrics.costPerATC = calculateGrowth(paydayThis.costPerATC || 0, paydayLast.costPerATC || 0)
-    paydayMetrics.atcConversionValue = calculateGrowth(paydayThis.atcConversionValue || 0, paydayLast.atcConversionValue || 0)
-    paydayMetrics.ctr = calculateGrowth((paydayThis.ctr || 0) * 100, (paydayLast.ctr || 0) * 100)
-    paydayMetrics.cpc = calculateGrowth(paydayThis.cpc || 0, paydayLast.cpc || 0)
-    paydayMetrics.frequency = calculateGrowth(paydayThis.frequency || 0, paydayLast.frequency || 0)
-    paydayMetrics.cpm = calculateGrowth(paydayThis.cpm || 0, paydayLast.cpm || 0)
-  }
-  
-  // Helper function to get metric value
-  const getMetricValue = (eventData: any, key: string) => {
-    switch(key) {
-      case 'amountSpent': return eventData.amountSpent || 0
-      case 'purchases': return eventData.purchases || 0
-      case 'costPerPurchase': return eventData.costPerPurchase || 0
-      case 'purchasesConversionValue': return eventData.purchasesConversionValue || 0
-      case 'conversionRate': return (eventData.conversionRate || 0) * 100
-      case 'purchaseROAS': return eventData.purchaseROAS || 0
-      case 'avgPurchaseValue': return eventData.avgPurchaseValue || 0
-      case 'addsToCart': return eventData.addsToCart || 0
-      case 'costPerATC': return eventData.costPerATC || 0
-      case 'atcConversionValue': return eventData.atcConversionValue || 0
-      case 'ctr': return (eventData.ctr || 0) * 100
-      case 'cpc': return eventData.cpc || 0
-      case 'frequency': return eventData.frequency || 0
-      case 'cpm': return eventData.cpm || 0
-      default: return 0
-    }
-  }
-  
-  // Helper function to format metric value
-  const formatMetricValue = (key: string, value: number) => {
-    const currencyKeys = ['amountSpent', 'costPerPurchase', 'costPerATC', 'cpc', 'cpm', 'purchasesConversionValue', 'atcConversionValue', 'avgPurchaseValue']
-    const percentKeys = ['ctr', 'conversionRate']
-    
-    if (currencyKeys.includes(key)) {
-      return formatCurrency(value)
-    } else if (percentKeys.includes(key)) {
-      return formatPercent(value)
-    } else {
-      return formatNumber(value)
-    }
-  }
-  
-  // Generate Twindate slides if data exists
-  if (hasTwindateData) {
-    // Get highlights and lowlights for Twindate
-    const twindateHighlights = Object.entries(twindateMetrics)
-      .filter(([_, metric]: [string, any]) => metric.isPositive && Math.abs(metric.percentage) >= 1)
-      .sort(([_, a]: [string, any], [__, b]: [string, any]) => Math.abs(b.percentage) - Math.abs(a.percentage))
-      .slice(0, 10)
-    
-    const twindateLowlights = Object.entries(twindateMetrics)
-      .filter(([_, metric]: [string, any]) => !metric.isPositive && Math.abs(metric.percentage) >= 1)
-      .sort(([_, a]: [string, any], [__, b]: [string, any]) => Math.abs(b.percentage) - Math.abs(a.percentage))
-      .slice(0, 5)
-    
-    const metricLabels: Record<string, string> = {
-      amountSpent: 'Amount spent',
-      purchases: 'Purchases with shared items',
-      costPerPurchase: 'Cost per purchases with shared items',
-      purchasesConversionValue: 'Purchases conversion value for shared items only',
-      conversionRate: 'Conversion Rate (Purchase ÷ Click)',
-      purchaseROAS: 'Purchase ROAS (return on ad spend)',
-      avgPurchaseValue: 'Average purchases conversion value',
-      addsToCart: 'Adds to cart with shared items',
-      costPerATC: 'Cost per add to cart with shared items',
-      atcConversionValue: 'ATC conversion value (shared only)',
-      ctr: 'CTR (link click-through rate)',
-      cpc: 'CPC (link)',
-      frequency: 'Frequency',
-      cpm: 'CPM'
-    }
-    
-    // Slide: Twindate Highlight (always show before Lowlight)
-    slides += `
-                    {/* EVENT ANALYSIS - TWINDATE HIGHLIGHT */}
-                    <div className="bg-white p-8 border-t-4 border-hadona-blue">
-                        <div className="max-w-6xl mx-auto">
-                            <h2 className="text-2xl font-bold text-hadona-blue mb-4">Highlight (Event MoM) — Twindate</h2>
-                            ${twindateHighlights.length > 0 ? `
-                            <ul className="space-y-2 text-sm">
-                                ${twindateHighlights.map(([key, metric]: [string, any]) => {
-      const label = metricLabels[key] || key
-      const thisValue = getMetricValue(twindateThis, key)
-      const lastValue = getMetricValue(twindateLast, key)
-      const formattedThis = formatMetricValue(key, thisValue)
-      const formattedLast = formatMetricValue(key, lastValue)
-      
-      const icon = getTrendIconJSX(metric.isPositive)
-      return '<li className="flex items-start"><span className="mr-2">' + icon + '</span><span className="text-xs"><strong>' + label + ':</strong> ' + (metric.percentage >= 0 ? '' : '') + Math.abs(metric.percentage).toFixed(2) + '% (' + formattedLast + ' → ' + formattedThis + ')</span></li>'
-    }).join('')}
-                            </ul>
-                            ` : `
-                            <p className="text-sm text-gray-500 italic">Tidak ada highlight untuk periode ini.</p>
-                            `}
-                        </div>
-                    </div>`
-    
-    // Slide: Twindate Lowlight (always show after Highlight)
-    slides += `
-                    {/* EVENT ANALYSIS - TWINDATE LOWLIGHT */}
-                    <div className="bg-white p-8 border-t-4 border-hadona-blue">
-                        <div className="max-w-6xl mx-auto">
-                            <h2 className="text-2xl font-bold text-hadona-blue mb-4">Lowlight (Event MoM) — Twindate</h2>
-                            ${twindateLowlights.length > 0 ? `
-                            <ul className="space-y-2 text-sm">
-                                ${twindateLowlights.map(([key, metric]: [string, any]) => {
-        const label = metricLabels[key] || key
-        const thisValue = getMetricValue(twindateThis, key)
-        const lastValue = getMetricValue(twindateLast, key)
-        const formattedThis = formatMetricValue(key, thisValue)
-        const formattedLast = formatMetricValue(key, lastValue)
-        
-        return `<li className="flex items-start">
-                                                <span className="mr-2">${getTrendIconJSX(metric.isPositive)}</span>
-                                                <span className="text-xs"><strong>${label}:</strong> ${metric.percentage >= 0 ? '' : ''}${Math.abs(metric.percentage).toFixed(2)}% (${formattedLast} → ${formattedThis})</span>
-                                            </li>`
-      }).join('')}
-                            </ul>
-                            ` : `
-                            <p className="text-sm text-gray-500 italic">Tidak ada lowlight untuk periode ini.</p>
-                            `}
-                        </div>
-                    </div>`
-    
-    // Slide: Twindate Table
-    slides += `
-                    {/* EVENT ANALYSIS - TWINDATE TABLE */}
-                    <div className="bg-white p-8 border-t-4 border-hadona-blue">
-                        <div className="max-w-6xl mx-auto">
-                            <h2 className="text-2xl font-bold text-hadona-blue mb-4">Tabel Metric (MoM — Twindate)</h2>
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-xs border-collapse">
-                                    <thead>
-                                        <tr className="bg-gray-100">
-                                            <th className="border p-2 text-left">Metric</th>
-                                            <th className="border p-2 text-right">${lastPeriodLabel}</th>
-                                            <th className="border p-2 text-right">${thisPeriodLabel}</th>
-                                            <th className="border p-2 text-right">∆%</th>
-                                            <th className="border p-2 text-center">Trend</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td className="border p-2">Amount spent</td>
-                                            <td className="border p-2 text-right">${formatCurrency(twindateLast.amountSpent || 0)}</td>
-                                            <td className="border p-2 text-right">${formatCurrency(twindateThis.amountSpent || 0)}</td>
-                                            <td className="border p-2 text-right">${twindateMetrics.amountSpent.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendIconJSX(twindateMetrics.amountSpent.isPositive)}</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="border p-2">Purchases with shared items</td>
-                                            <td className="border p-2 text-right">${formatNumber(twindateLast.purchases || 0)}</td>
-                                            <td className="border p-2 text-right">${formatNumber(twindateThis.purchases || 0)}</td>
-                                            <td className="border p-2 text-right">${twindateMetrics.purchases.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendIconJSX(twindateMetrics.purchases.isPositive)}</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="border p-2">Cost per purchases with shared items</td>
-                                            <td className="border p-2 text-right">${formatCurrency(twindateLast.costPerPurchase || 0)}</td>
-                                            <td className="border p-2 text-right">${formatCurrency(twindateThis.costPerPurchase || 0)}</td>
-                                            <td className="border p-2 text-right">${twindateMetrics.costPerPurchase.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendIconJSX(twindateMetrics.costPerPurchase.isPositive)}</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="border p-2">Purchases conversion value for shared items only</td>
-                                            <td className="border p-2 text-right">${formatCurrency(twindateLast.purchasesConversionValue || 0)}</td>
-                                            <td className="border p-2 text-right">${formatCurrency(twindateThis.purchasesConversionValue || 0)}</td>
-                                            <td className="border p-2 text-right">${twindateMetrics.purchasesConversionValue.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendIconJSX(twindateMetrics.purchasesConversionValue.isPositive)}</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="border p-2">Conversion Rate (Purchase ÷ Click)</td>
-                                            <td className="border p-2 text-right">${formatPercent((twindateLast.conversionRate || 0) * 100)}</td>
-                                            <td className="border p-2 text-right">${formatPercent((twindateThis.conversionRate || 0) * 100)}</td>
-                                            <td className="border p-2 text-right">${twindateMetrics.conversionRate.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendIconJSX(twindateMetrics.conversionRate.isPositive)}</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="border p-2">Purchase ROAS (return on ad spend)</td>
-                                            <td className="border p-2 text-right">${formatNumber(twindateLast.purchaseROAS || 0)}</td>
-                                            <td className="border p-2 text-right">${formatNumber(twindateThis.purchaseROAS || 0)}</td>
-                                            <td className="border p-2 text-right">${twindateMetrics.purchaseROAS.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendIconJSX(twindateMetrics.purchaseROAS.isPositive)}</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="border p-2">Average purchases conversion value</td>
-                                            <td className="border p-2 text-right">${formatCurrency(twindateLast.avgPurchaseValue || 0)}</td>
-                                            <td className="border p-2 text-right">${formatCurrency(twindateThis.avgPurchaseValue || 0)}</td>
-                                            <td className="border p-2 text-right">${twindateMetrics.avgPurchaseValue.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendIconJSX(twindateMetrics.avgPurchaseValue.isPositive)}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>`
-  }
-  
-  // Generate Payday slides if data exists
-  if (hasPaydayData) {
-    // Get highlights and lowlights for Payday
-    const paydayHighlights = Object.entries(paydayMetrics)
-      .filter(([_, metric]: [string, any]) => metric.isPositive && Math.abs(metric.percentage) >= 1)
-      .sort(([_, a]: [string, any], [__, b]: [string, any]) => Math.abs(b.percentage) - Math.abs(a.percentage))
-      .slice(0, 10)
-    
-    const paydayLowlights = Object.entries(paydayMetrics)
-      .filter(([_, metric]: [string, any]) => !metric.isPositive && Math.abs(metric.percentage) >= 1)
-      .sort(([_, a]: [string, any], [__, b]: [string, any]) => Math.abs(b.percentage) - Math.abs(a.percentage))
-      .slice(0, 5)
-    
-    const metricLabels: Record<string, string> = {
-      amountSpent: 'Amount spent',
-      purchases: 'Purchases with shared items',
-      costPerPurchase: 'Cost per purchases with shared items',
-      purchasesConversionValue: 'Purchases conversion value for shared items only',
-      conversionRate: 'Conversion Rate (Purchase ÷ Click)',
-      purchaseROAS: 'Purchase ROAS (return on ad spend)',
-      avgPurchaseValue: 'Average purchases conversion value',
-      addsToCart: 'Adds to cart with shared items',
-      costPerATC: 'Cost per add to cart with shared items',
-      atcConversionValue: 'ATC conversion value (shared only)',
-      ctr: 'CTR (link click-through rate)',
-      cpc: 'CPC (link)',
-      frequency: 'Frequency',
-      cpm: 'CPM'
-    }
-    
-    // Slide: Payday Highlight
-    if (paydayHighlights.length > 0) {
-      slides += `
-                    {/* EVENT ANALYSIS - PAYDAY HIGHLIGHT */}
-                    <div className="bg-white p-8 border-t-4 border-hadona-blue">
-                        <div className="max-w-6xl mx-auto">
-                            <h2 className="text-2xl font-bold text-hadona-blue mb-4">Highlight (Event MoM) — Payday (≥25)</h2>
-                            <ul className="space-y-2 text-sm">
-                                ${paydayHighlights.map(([key, metric]: [string, any]) => {
-      const label = metricLabels[key] || key
-      const thisValue = getMetricValue(paydayThis, key)
-      const lastValue = getMetricValue(paydayLast, key)
-      const formattedThis = formatMetricValue(key, thisValue)
-      const formattedLast = formatMetricValue(key, lastValue)
-      
-      return `<li className="flex items-start">
-                                            <span className="mr-2">${getTrendIconJSX(metric.isPositive)}</span>
-                                            <span className="text-xs"><strong>${label}:</strong> ${metric.percentage >= 0 ? '' : ''}${Math.abs(metric.percentage).toFixed(2)}% (${formattedLast} → ${formattedThis})</span>
-                                        </li>`
-    }).join('')}
-                            </ul>
-                        </div>
-                    </div>`
-    }
-    
-    // Slide: Payday Lowlight
-    if (paydayLowlights.length > 0) {
-      slides += `
-                    {/* EVENT ANALYSIS - PAYDAY LOWLIGHT */}
-                    <div className="bg-white p-8 border-t-4 border-hadona-blue">
-                        <div className="max-w-6xl mx-auto">
-                            <h2 className="text-2xl font-bold text-hadona-blue mb-4">Lowlight (Event MoM) — Payday (≥25)</h2>
-                            <ul className="space-y-2 text-sm">
-                                ${paydayLowlights.map(([key, metric]: [string, any]) => {
-        const label = metricLabels[key] || key
-        const thisValue = getMetricValue(paydayThis, key)
-        const lastValue = getMetricValue(paydayLast, key)
-        const formattedThis = formatMetricValue(key, thisValue)
-        const formattedLast = formatMetricValue(key, lastValue)
-        
-        return `<li className="flex items-start">
-                                                <span className="mr-2">${getTrendIconJSX(metric.isPositive)}</span>
-                                                <span className="text-xs"><strong>${label}:</strong> ${metric.percentage >= 0 ? '' : ''}${Math.abs(metric.percentage).toFixed(2)}% (${formattedLast} → ${formattedThis})</span>
-                                            </li>`
-      }).join('')}
-                            </ul>
-                        </div>
-                    </div>`
-    }
-    
-    // Slide: Payday Table
-    slides += `
-                    {/* EVENT ANALYSIS - PAYDAY TABLE */}
-                    <div className="bg-white p-8 border-t-4 border-hadona-blue">
-                        <div className="max-w-6xl mx-auto">
-                            <h2 className="text-2xl font-bold text-hadona-blue mb-4">Tabel Metric (MoM — Payday)</h2>
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-xs border-collapse">
-                                    <thead>
-                                        <tr className="bg-gray-100">
-                                            <th className="border p-2 text-left">Metric</th>
-                                            <th className="border p-2 text-right">Bulan-2 (≥25)</th>
-                                            <th className="border p-2 text-right">Bulan-1 (≥25)</th>
-                                            <th className="border p-2 text-right">∆%</th>
-                                            <th className="border p-2 text-center">Trend</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td className="border p-2">Amount spent</td>
-                                            <td className="border p-2 text-right">${formatCurrency(paydayLast.amountSpent || 0)}</td>
-                                            <td className="border p-2 text-right">${formatCurrency(paydayThis.amountSpent || 0)}</td>
-                                            <td className="border p-2 text-right">${paydayMetrics.amountSpent.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendIconJSX(paydayMetrics.amountSpent.isPositive)}</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="border p-2">Purchases with shared items</td>
-                                            <td className="border p-2 text-right">${formatNumber(paydayLast.purchases || 0)}</td>
-                                            <td className="border p-2 text-right">${formatNumber(paydayThis.purchases || 0)}</td>
-                                            <td className="border p-2 text-right">${paydayMetrics.purchases.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendIconJSX(paydayMetrics.purchases.isPositive)}</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="border p-2">Cost per purchases with shared items</td>
-                                            <td className="border p-2 text-right">${formatCurrency(paydayLast.costPerPurchase || 0)}</td>
-                                            <td className="border p-2 text-right">${formatCurrency(paydayThis.costPerPurchase || 0)}</td>
-                                            <td className="border p-2 text-right">${paydayMetrics.costPerPurchase.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendIconJSX(paydayMetrics.costPerPurchase.isPositive)}</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="border p-2">Purchases conversion value for shared items only</td>
-                                            <td className="border p-2 text-right">${formatCurrency(paydayLast.purchasesConversionValue || 0)}</td>
-                                            <td className="border p-2 text-right">${formatCurrency(paydayThis.purchasesConversionValue || 0)}</td>
-                                            <td className="border p-2 text-right">${paydayMetrics.purchasesConversionValue.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendIconJSX(paydayMetrics.purchasesConversionValue.isPositive)}</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="border p-2">Conversion Rate (Purchase ÷ Click)</td>
-                                            <td className="border p-2 text-right">${formatPercent((paydayLast.conversionRate || 0) * 100)}</td>
-                                            <td className="border p-2 text-right">${formatPercent((paydayThis.conversionRate || 0) * 100)}</td>
-                                            <td className="border p-2 text-right">${paydayMetrics.conversionRate.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendIconJSX(paydayMetrics.conversionRate.isPositive)}</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="border p-2">Purchase ROAS (return on ad spend)</td>
-                                            <td className="border p-2 text-right">${formatNumber(paydayLast.purchaseROAS || 0)}</td>
-                                            <td className="border p-2 text-right">${formatNumber(paydayThis.purchaseROAS || 0)}</td>
-                                            <td className="border p-2 text-right">${paydayMetrics.purchaseROAS.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendIconJSX(paydayMetrics.purchaseROAS.isPositive)}</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="border p-2">Average purchases conversion value</td>
-                                            <td className="border p-2 text-right">${formatCurrency(paydayLast.avgPurchaseValue || 0)}</td>
-                                            <td className="border p-2 text-right">${formatCurrency(paydayThis.avgPurchaseValue || 0)}</td>
-                                            <td className="border p-2 text-right">${paydayMetrics.avgPurchaseValue.percentage.toFixed(2)}%</td>
-                                            <td className="border p-2 text-center">${getTrendIconJSX(paydayMetrics.avgPurchaseValue.isPositive)}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>`
-  }
-  
-  // Slide: Next Action Plan (Event)
-  if (hasTwindateData || hasPaydayData) {
-    slides += `
-                    {/* EVENT ANALYSIS - NEXT ACTION PLAN */}
-                    <div className="bg-white p-8 border-t-4 border-hadona-blue">
-                        <div className="max-w-6xl mx-auto">
-                            <h2 className="text-2xl font-bold text-hadona-blue mb-4">Next Action Plan (Event)</h2>
-                            <ul className="space-y-2 text-sm">
-                                <li className="flex items-start">
-                                    <i className="fas fa-arrow-right text-blue-500 mt-1 mr-2 text-xs"></i>
-                                    <span className="text-xs">Pulihkan metrik yang turun pada window event; aktifkan pre-heat 3–5 hari sebelum puncak.</span>
-                                </li>
-                                <li className="flex items-start">
-                                    <i className="fas fa-arrow-right text-blue-500 mt-1 mr-2 text-xs"></i>
-                                    <span className="text-xs">Pakai countdown & scarcity copy spesifik (contoh: 'Hanya hari ini 9.9').</span>
-                                </li>
-                                <li className="flex items-start">
-                                    <i className="fas fa-arrow-right text-blue-500 mt-1 mr-2 text-xs"></i>
-                                    <span className="text-xs">Budget pacing: naikkan 20–30% H-1 s/d H+1 jika ROAS stabil; turunkan jika CPC/CPM naik.</span>
-                                </li>
-                                <li className="flex items-start">
-                                    <i className="fas fa-arrow-right text-blue-500 mt-1 mr-2 text-xs"></i>
-                                    <span className="text-xs">Bundling/upsell untuk dorong Average purchases conversion value.</span>
-                                </li>
-                                <li className="flex items-start">
-                                    <i className="fas fa-arrow-right text-blue-500 mt-1 mr-2 text-xs"></i>
-                                    <span className="text-xs">Aktifkan Advantage+ placement & optimasi katalog saat traffic puncak.</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>`
-  }
-  
   return slides
 }

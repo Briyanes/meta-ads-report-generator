@@ -99,25 +99,27 @@ export default function HomePage() {
           alignItems: 'center',
           justifyContent: 'space-between'
         }}>
-          <div>
-            <h1 style={{
-              fontSize: '32px',
-              fontWeight: 'bold',
-              color: '#111827',
-              margin: 0,
-              marginBottom: '4px'
-            }}>
-              Ads Report Generator
-            </h1>
-            <p style={{
-              fontSize: '14px',
-              color: '#6b7280',
-              margin: 0
-            }}>
-              Powered by <span style={{ fontWeight: '600' }}>Hadona Digital Media</span>
-            </p>
-          </div>
-          <div style={{
+          <Link href="/home" style={{ textDecoration: 'none', cursor: 'pointer' }}>
+            <div>
+              <h1 className="responsive-header-title" style={{
+                fontSize: '32px',
+                fontWeight: 'bold',
+                color: '#111827',
+                margin: 0,
+                marginBottom: '4px'
+              }}>
+                Ads Report Generator
+              </h1>
+              <p className="responsive-header-subtitle" style={{
+                fontSize: '14px',
+                color: '#6b7280',
+                margin: 0
+              }}>
+                Powered by <span style={{ fontWeight: '600' }}>Hadona Digital Media</span>
+              </p>
+            </div>
+          </Link>
+          <div className="responsive-header-logo-container" style={{
             display: 'flex',
             alignItems: 'center',
             gap: '8px'
@@ -143,6 +145,7 @@ export default function HomePage() {
               <Image
                 src="/logo/logo-hadona.png"
                 alt="Hadona Digital Media"
+                className="responsive-header-logo"
                 width={200}
                 height={80}
                 style={{

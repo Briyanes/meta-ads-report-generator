@@ -123,7 +123,9 @@ export async function POST(request: NextRequest) {
       
       const parseNum = (val: any): number => {
         if (!val && val !== 0) return 0
-        const str = String(val).replace(/,/g, '')
+        // Remove commas first, then remove ALL whitespace (including newlines, tabs, carriage returns)
+        let str = String(val).replace(/,/g, '')
+        str = str.replace(/\s+/g, '')  // KEY FIX: removes \n, \r, \t, spaces
         const num = parseFloat(str)
         return isNaN(num) ? 0 : num
       }
@@ -329,7 +331,9 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     // Helper to parse numbers
     const parseNum = (val: any): number => {
       if (!val && val !== 0) return 0
-      const str = String(val).replace(/,/g, '')
+      // Remove commas first, then remove ALL whitespace (including newlines, tabs, carriage returns)
+      let str = String(val).replace(/,/g, '')
+      str = str.replace(/\s+/g, '')  // KEY FIX: removes \n, \r, \t, spaces
       const num = parseFloat(str)
       return isNaN(num) ? 0 : num
     }
@@ -345,7 +349,7 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       
       // Debug: Log Reach-related keys
       const reachKeys = keys.filter(k => k.toLowerCase().includes('reach'))
-      
+
       // Helper to check if field should be summed (case-insensitive, partial match)
       const shouldSumField = (key: string): boolean => {
         const keyLower = key.toLowerCase()
@@ -542,9 +546,17 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     // Aggregate data from CSV (in case CSV has multiple rows/days)
     const thisWeekData = aggregateCSVData(parsedDataThisWeek.data)
     const lastWeekData = aggregateCSVData(parsedDataLastWeek.data)
-    
-    // Debug: Log aggregated Reach values
-    
+
+    // DEBUG: Log aggregated data
+    console.log('[DEBUG] thisWeekData keys:', Object.keys(thisWeekData))
+    console.log('[DEBUG] thisWeekData sample:', {
+      Reach: thisWeekData['Reach'],
+      reach: thisWeekData['reach'],
+      Frequency: thisWeekData['Frequency'],
+      'Link clicks': thisWeekData['Link clicks'],
+      'Clicks (all)': thisWeekData['Clicks (all)']
+    })
+
     // Calculate base metrics
     const thisWeekSpend = parseNum(thisWeekData['Amount spent (IDR)'])
     const lastWeekSpend = parseNum(lastWeekData['Amount spent (IDR)'])
@@ -585,32 +597,32 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     // Helper to get field value with case-insensitive matching
     const getFieldValue = (data: any, fieldName: string, alternatives: string[] = []): any => {
       if (!data || typeof data !== 'object') return undefined
-      
+
       const allFields = [fieldName, ...alternatives]
       const dataKeys = Object.keys(data)
-      
+
       for (const field of allFields) {
-        // Try exact match first
-        if (data[field] !== undefined && data[field] !== null && data[field] !== '') {
+        // Try exact match first - BUT allow 0 and empty string as valid values
+        if (data[field] !== undefined) {
           return data[field]
         }
-        // Try case-insensitive exact match
+        // Try case-insensitive exact match - BUT allow 0 and empty string as valid values
         const exactMatch = dataKeys.find(key => key.toLowerCase() === field.toLowerCase())
-        if (exactMatch && data[exactMatch] !== undefined && data[exactMatch] !== null && data[exactMatch] !== '') {
+        if (exactMatch && data[exactMatch] !== undefined) {
           return data[exactMatch]
         }
-        // Try partial match (for fields with variations)
+        // Try partial match (for fields with variations) - BUT allow 0 and empty string as valid values
         const partialMatch = dataKeys.find(key => {
           const keyLower = key.toLowerCase()
           const fieldLower = field.toLowerCase()
           return keyLower.includes(fieldLower) || fieldLower.includes(keyLower)
         })
-        if (partialMatch && data[partialMatch] !== undefined && data[partialMatch] !== null && data[partialMatch] !== '') {
+        if (partialMatch && data[partialMatch] !== undefined) {
           return data[partialMatch]
         }
       }
       // Final fallback: try direct access with original field name (for exact column names from CSV)
-      if (data[fieldName] !== undefined && data[fieldName] !== null && data[fieldName] !== '') {
+      if (data[fieldName] !== undefined) {
         return data[fieldName]
       }
       return undefined
@@ -618,6 +630,21 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     
     // Build performance summary with all fields
     const buildPerformanceData = (data: any, results: number, cpr: number) => {
+      // DEBUG: Log what getFieldValue returns for key metrics
+      const debugReach = getFieldValue(data, 'Reach', ['Reach', 'reach', 'Accounts Center accounts reached'])
+      const debugFreq = getFieldValue(data, 'Frequency')
+      const debugLinkClicks = getFieldValue(data, 'Link clicks')
+      const debugClicksAll = getFieldValue(data, 'Clicks (all)')
+      const debugCtrAll = getFieldValue(data, 'CTR (all)')
+
+      console.log('[DEBUG] buildPerformanceData inputs:', {
+        reach: debugReach,
+        frequency: debugFreq,
+        linkClicks: debugLinkClicks,
+        clicksAll: debugClicksAll,
+        ctrAll: debugCtrAll
+      })
+
       const base = {
         amountSpent: parseNum(getFieldValue(data, 'Amount spent (IDR)')),
         impressions: parseNum(getFieldValue(data, 'Impressions')),
@@ -635,6 +662,12 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         reach: parseNum(getFieldValue(data, 'Reach', ['Reach', 'reach', 'Accounts Center accounts reached'])),
         cpr: cpr
       }
+
+      console.log('[DEBUG] base after parseNum:', {
+        reach: base.reach,
+        frequency: base.frequency,
+        linkClicks: base.linkClicks
+      })
       
       // CTWA fields
       if (objectiveType === 'ctwa') {
@@ -667,7 +700,7 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       
       // CPAS fields
       if (objectiveType === 'cpas') {
-        return {
+        const cpasData = {
           ...base,
           purchases: results,
           addsToCart: parseNum(data['Adds to cart'] || data['Adds to cart with shared items']),
@@ -693,8 +726,17 @@ Return the analysis as structured JSON data that can be used to generate the HTM
           lcToCV: parseNum(getFieldValue(data, '* LC to CV', ['* LC to CV', 'LC to CV'])),
           cvToATC: parseNum(getFieldValue(data, '* CV to ATC', ['* CV to ATC', 'CV to ATC'])),
           atcToPurchase: parseNum(getFieldValue(data, 'ATC to Purchase', ['ATC to Purchase', 'ATC to Purchase conversion rate'])),
-          conversionRateRanking: data['Conversion rate ranking'] || ''
         }
+
+        console.log('[DEBUG] CPAS data:', {
+          reach: cpasData.reach,
+          frequency: cpasData.frequency,
+          linkClicks: cpasData.linkClicks,
+          clicksAll: cpasData.clicksAll,
+          ctrAll: cpasData.ctrAll
+        })
+
+        return cpasData
       }
       
       // Default (CTWA)
@@ -713,9 +755,9 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     
     const thisWeekPerf = buildPerformanceData(thisWeekData, thisWeekResults, thisWeekCPR)
     const lastWeekPerf = buildPerformanceData(lastWeekData, lastWeekResults, lastWeekCPR)
-    
+
     // Debug: Log performance data Reach values
-    
+
     const analysis = {
         performanceSummary: {
           thisWeek: thisWeekPerf,

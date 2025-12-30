@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import Link from 'next/link'
 import { parseCSV } from '@/lib/csvParser'
 import { generatePDFFromHTML, downloadPDF } from '@/lib/pdfGenerator'
 
@@ -723,31 +724,29 @@ export default function MetaAdsPage() {
           flexWrap: 'nowrap',
           width: '100%'
         }}>
-          <div style={{
-            flex: '1 1 0%',
-            minWidth: 0,
-            maxWidth: 'calc(100% - 100px)'
-          }}>
-            <h1 className="responsive-header-title" style={{
-              fontSize: '36px',
-              fontWeight: 'bold',
-              color: '#111827',
-              margin: 0,
-              marginBottom: '4px',
-              lineHeight: '1.2'
-            }}>
-              Meta Ads Report Generator
-            </h1>
-            <p className="responsive-header-subtitle" style={{
-              fontSize: '16px',
-              fontWeight: '400',
-              color: '#6b7280',
-              margin: 0,
-              lineHeight: '1.3'
-            }}>
-              Powered by <span style={{ fontWeight: '600' }}>Hadona Digital Media</span>
-            </p>
-          </div>
+          <Link href="/home" style={{ textDecoration: 'none', cursor: 'pointer', flex: '1 1 0%', minWidth: 0, maxWidth: 'calc(100% - 100px)' }}>
+            <div>
+              <h1 className="responsive-header-title" style={{
+                fontSize: '36px',
+                fontWeight: 'bold',
+                color: '#111827',
+                margin: 0,
+                marginBottom: '4px',
+                lineHeight: '1.2'
+              }}>
+                Meta Ads Report Generator
+              </h1>
+              <p className="responsive-header-subtitle" style={{
+                fontSize: '16px',
+                fontWeight: '400',
+                color: '#6b7280',
+                margin: 0,
+                lineHeight: '1.3'
+              }}>
+                Powered by <span style={{ fontWeight: '600' }}>Hadona Digital Media</span>
+              </p>
+            </div>
+          </Link>
           <div className="responsive-header-logo-container" style={{
             display: 'flex',
             alignItems: 'center',

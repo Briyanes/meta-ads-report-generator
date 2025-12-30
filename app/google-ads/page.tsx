@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 
 export default function GoogleAdsPage() {
   const router = useRouter()
@@ -71,24 +72,26 @@ export default function GoogleAdsPage() {
               <i className="bi bi-arrow-left" style={{ marginRight: '4px' }}></i>
               Back to Home
             </button>
-            <div>
-              <h1 style={{
-                fontSize: '28px',
-                fontWeight: 'bold',
-                color: '#111827',
-                margin: 0,
-                marginBottom: '4px'
-              }}>
-                Google Ads Report Generator
-              </h1>
-              <p style={{
-                fontSize: '14px',
-                color: '#6b7280',
-                margin: 0
-              }}>
-                Powered by <span style={{ fontWeight: '600' }}>Hadona Digital Media</span>
-              </p>
-            </div>
+            <Link href="/home" style={{ textDecoration: 'none', cursor: 'pointer' }}>
+              <div>
+                <h1 className="responsive-header-title" style={{
+                  fontSize: '28px',
+                  fontWeight: 'bold',
+                  color: '#111827',
+                  margin: 0,
+                  marginBottom: '4px'
+                }}>
+                  Google Ads Report Generator
+                </h1>
+                <p className="responsive-header-subtitle" style={{
+                  fontSize: '14px',
+                  color: '#6b7280',
+                  margin: 0
+                }}>
+                  Powered by <span style={{ fontWeight: '600' }}>Hadona Digital Media</span>
+                </p>
+              </div>
+            </Link>
           </div>
         </div>
       </header>
