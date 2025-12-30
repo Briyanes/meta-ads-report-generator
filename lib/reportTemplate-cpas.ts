@@ -1,17 +1,28 @@
 import { readFile } from 'fs/promises'
 import { join } from 'path'
+import { existsSync } from 'fs'
 
 /**
  * Generate CPAS Report using Report Manual template structure
  * This produces HTML output matching the Report Manual style exactly
  */
 export async function generateReactTailwindReport(analysisData: any, reportName?: string, retentionType?: string, objectiveType?: string): Promise<string> {
-  // This function returns Promise<string>, which is compatible with the expected type
   const { thisWeek, lastWeek, breakdown, config } = analysisData
 
   // Read the Report Manual reference template
   const templatePath = join(process.cwd(), 'lib', 'cpas-reference-template.html')
+
+  // Check if template file exists
+  if (!existsSync(templatePath)) {
+    throw new Error(`CPAS template file not found at: ${templatePath}`)
+  }
+
   let html = await readFile(templatePath, 'utf-8')
+
+  // Validate HTML was read
+  if (!html || html.length < 1000) {
+    throw new Error('CPAS template file is empty or too small')
+  }
 
   // Extract data from analysis
   const thisMonth = thisWeek || {}
