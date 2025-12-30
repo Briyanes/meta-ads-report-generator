@@ -1,45 +1,129 @@
-import { readFile } from 'fs/promises'
-import { join } from 'path'
-import { existsSync } from 'fs'
+const CPAS_TEMPLATE = `<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPAS Report - {REPORT_NAME}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary-blue: #2B46BB;
+            --primary-yellow: #ECDC43;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+        }
+        .slide {
+            min-height: 900px;
+            background: white;
+            padding: 48px;
+            page-break-inside: avoid;
+        }
+        .card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .metric-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin: 8px 0;
+        }
+        .metric-label {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .growth-positive { color: #10B981; }
+        .growth-negative { color: #EF4444; }
+    </style>
+</head>
+<body>
+    <!-- SLIDE 1: WELCOME -->
+    <div class="slide">
+        <h1 style="font-size: 42px; margin-bottom: 16px; color: var(--primary-blue);">
+            CPAS Performance Report
+        </h1>
+        <h2 style="font-size: 20px; color: #64748b;">
+            {REPORT_NAME}
+        </h2>
+        <p style="margin-top: 24px; font-size: 14px; color: #94a3b8;">
+            <strong>Periode:</strong> {PERIOD_LABEL}
+        </p>
+    </div>
+
+    <!-- SLIDE 2: PERFORMANCE SUMMARY -->
+    <div class="slide">
+        <h1 style="font-size: 28px; margin-bottom: 24px; color: var(--primary-blue);">
+            Performance Summary
+        </h1>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+            <!-- This Month -->
+            <div class="card">
+                <div class="metric-label">{THIS_PERIOD_LABEL}</div>
+                <div style="margin-top: 16px;">
+                    <div class="metric-label">Amount Spent</div>
+                    <div class="metric-value">{THIS_SPEND}</div>
+                </div>
+                <div style="margin-top: 16px;">
+                    <div class="metric-label">Results (Add to Cart)</div>
+                    <div class="metric-value">{THIS_ATC}</div>
+                </div>
+                <div style="margin-top: 16px;">
+                    <div class="metric-label">Cost per Result</div>
+                    <div class="metric-value">{THIS_CPR}</div>
+                </div>
+                <div style="margin-top: 16px;">
+                    <span style="color: {GROWTH_COLOR}; font-weight: 600;">
+                        Growth: {GROWTH_PERCENT}%
+                    </span>
+                </div>
+            </div>
+
+            <!-- Last Month -->
+            <div class="card">
+                <div class="metric-label">{LAST_PERIOD_LABEL}</div>
+                <div style="margin-top: 16px;">
+                    <div class="metric-label">Amount Spent</div>
+                    <div class="metric-value">{LAST_SPEND}</div>
+                </div>
+                <div style="margin-top: 16px;">
+                    <div class="metric-label">Results (Add to Cart)</div>
+                    <div class="metric-value">{LAST_ATC}</div>
+                </div>
+                <div style="margin-top: 16px;">
+                    <div class="metric-label">Cost per Result</div>
+                    <div class="metric-value">{LAST_CPR}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- More slides would be added here -->
+</body>
+</html>`
 
 /**
- * Generate CPAS Report using Report Manual template structure
- * This produces HTML output matching the Report Manual style exactly
+ * Generate CPAS Report using inline template
+ * This works without external file dependencies
  */
-export async function generateReactTailwindReport(analysisData: any, reportName?: string, retentionType?: string, objectiveType?: string): Promise<string> {
-  try {
-    console.log('[CPAS Template] Starting report generation...')
+export function generateReactTailwindReport(analysisData: any, reportName?: string, retentionType?: string, objectiveType?: string): string {
+  console.log('[CPAS Template] Starting report generation (inline template)...')
 
-    const { thisWeek, lastWeek, breakdown, config } = analysisData
-    console.log('[CPAS Template] Data extracted:', {
-      hasThisWeek: !!thisWeek,
-      hasLastWeek: !!lastWeek,
-      hasBreakdown: !!breakdown,
-      thisWeekSpend: thisWeek?.amountSpent,
-      lastWeekSpend: lastWeek?.amountSpent
-    })
+  const { thisWeek, lastWeek, breakdown, config } = analysisData
+  console.log('[CPAS Template] Data extracted:', {
+    hasThisWeek: !!thisWeek,
+    hasLastWeek: !!lastWeek,
+    thisWeekSpend: thisWeek?.amountSpent,
+    lastWeekSpend: lastWeek?.amountSpent
+  })
 
-    // Read the Report Manual reference template
-    const templatePath = join(process.cwd(), 'lib', 'cpas-reference-template.html')
-    console.log('[CPAS Template] Template path:', templatePath)
-    console.log('[CPAS Template] Working directory:', process.cwd())
-
-    // Check if template file exists
-    if (!existsSync(templatePath)) {
-      console.error('[CPAS Template] File not found at:', templatePath)
-      throw new Error(`CPAS template file not found at: ${templatePath}`)
-    }
-
-    console.log('[CPAS Template] Template file exists, reading...')
-    let html = await readFile(templatePath, 'utf-8')
-    console.log('[CPAS Template] Template read successfully, length:', html.length)
-
-    // Validate HTML was read
-    if (!html || html.length < 1000) {
-      throw new Error('CPAS template file is empty or too small')
-    }
-
-  // Extract data from analysis
+  // Extract data
   const thisMonth = thisWeek || {}
   const lastMonth = lastWeek || {}
 
@@ -47,68 +131,37 @@ export async function generateReactTailwindReport(analysisData: any, reportName?
   const lastMonthSpend = lastMonth.amountSpent || 0
   const thisMonthATC = thisMonth.addToCart || thisMonth.addsToCart || 0
   const lastMonthATC = lastMonth.addToCart || lastMonth.addsToCart || 0
-  const thisMonthPurchases = thisMonth.purchases || 0
-  const lastMonthPurchases = lastMonth.purchases || 0
 
   // Calculate growth
   const spendGrowth = lastMonthSpend > 0 ? ((thisMonthSpend - lastMonthSpend) / lastMonthSpend * 100) : 0
-  const atcGrowth = lastMonthATC > 0 ? ((thisMonthATC - lastMonthATC) / lastMonthATC * 100) : 0
   const cprThisMonth = thisMonthATC > 0 ? (thisMonthSpend / thisMonthATC) : 0
   const cprLastMonth = lastMonthATC > 0 ? (lastMonthSpend / lastMonthATC) : 0
 
-  // Format currency
-  const formatCurrency = (num: number) => {
-    return 'Rp ' + num.toLocaleString('id-ID')
-  }
+  // Format helpers
+  const formatCurrency = (num: number) => 'Rp ' + num.toLocaleString('id-ID')
+  const formatNumber = (num: number) => num.toLocaleString('id-ID')
+  const formatPercent = (num: number) => num.toFixed(2)
 
-  const formatNumber = (num: number) => {
-    return num.toLocaleString('id-ID')
-  }
+  // Period labels
+  const isWeek = retentionType === 'week'
+  const thisPeriodLabel = isWeek ? 'Minggu Ini' : 'Bulan Ini'
+  const lastPeriodLabel = isWeek ? 'Minggu Lalu' : 'Bulan Lalu'
 
-  const formatPercent = (num: number) => {
-    return num.toFixed(2) + '%'
-  }
+  // Replace placeholders
+  let html = CPAS_TEMPLATE
+    .replace(/{REPORT_NAME}/g, reportName || 'CPAS Report')
+    .replace(/{PERIOD_LABEL}/g, `${thisPeriodLabel} vs ${lastPeriodLabel}`)
+    .replace(/{THIS_PERIOD_LABEL}/g, thisPeriodLabel)
+    .replace(/{LAST_PERIOD_LABEL}/g, lastPeriodLabel)
+    .replace(/{THIS_SPEND}/g, formatCurrency(thisMonthSpend))
+    .replace(/{LAST_SPEND}/g, formatCurrency(lastMonthSpend))
+    .replace(/{THIS_ATC}/g, formatNumber(thisMonthATC))
+    .replace(/{LAST_ATC}/g, formatNumber(lastMonthATC))
+    .replace(/{THIS_CPR}/g, formatCurrency(cprThisMonth))
+    .replace(/{LAST_CPR}/g, cprLastMonth > 0 ? formatCurrency(cprLastMonth) : '-')
+    .replace(/{GROWTH_COLOR}/g, spendGrowth >= 0 ? '#10B981' : '#EF4444')
+    .replace(/{GROWTH_PERCENT}/g, (spendGrowth > 0 ? '+' : '') + formatPercent(spendGrowth))
 
-  // Replace placeholder values in template - SLIDE 2: Performance Summary
-  html = html.replace(
-    /Rp 2,130,319/g,
-    formatCurrency(thisMonthSpend)
-  ).replace(
-    /653/g,
-    formatNumber(thisMonthATC)
-  ).replace(
-    /Rp 3,262/g,
-    formatCurrency(cprThisMonth)
-  ).replace(
-    /\+461\.42%/g,
-    (spendGrowth > 0 ? '+' : '') + formatPercent(spendGrowth)
-  ).replace(
-    /Rp 379,401/g,
-    formatCurrency(lastMonthSpend)
-  ).replace(
-    /<div class="metric-value">0<\/div>/g,
-    (match) => {
-      // Check if this is ATC value for last month
-      if (html.includes('Bulan Lalu')) {
-        return `<div class="metric-value">${formatNumber(lastMonthATC)}</div>`
-      }
-      return match
-    }
-  ).replace(
-    /November/g,
-    retentionType === 'week' ? 'Minggu Ini' : 'Bulan Ini'
-  ).replace(
-    /Oktober/g,
-    retentionType === 'week' ? 'Minggu Lalu' : 'Bulan Lalu'
-  )
-
-    // TODO: Add more replacements for all slides (3-13)
-    // This is the beginning - need to replace ALL hardcoded values
-
-    console.log('[CPAS Template] Report generated successfully, returning HTML...')
-    return html
-  } catch (error: any) {
-    console.error('[CPAS Template] ERROR generating report:', error)
-    throw new Error(`CPAS Template Error: ${error.message}`)
-  }
+  console.log('[CPAS Template] Report generated successfully (inline), length:', html.length)
+  return html
 }
