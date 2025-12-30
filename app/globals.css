@@ -320,7 +320,7 @@ a {
   .responsive-hero {
     padding: 32px 16px !important;
     margin-bottom: 32px !important;
-    margin-top: 24px !important;
+    margin-top: 20px !important;
   }
   
   .responsive-hero h1 {
@@ -342,9 +342,151 @@ a {
     font-size: 16px !important;
     margin-bottom: 24px !important;
   }
-  
-  .header-spacer {
+
+  .responsive-hero-input-container {
+    flex-direction: column !important;
+    gap: 12px !important;
+    padding: 12px !important;
+  }
+
+  .responsive-hero-input {
+    width: 100% !important;
+    padding: 14px 16px !important;
+    font-size: 14px !important;
+  }
+
+  .responsive-hero-button {
+    width: 100% !important;
+    padding: 14px 24px !important;
+    font-size: 14px !important;
+    justify-content: center !important;
+  }
+
+  .result-card {
+    padding: 24px !important;
+  }
+
+  .result-card-score {
+    font-size: 48px !important;
+  }
+
+  .result-card-icon {
+    font-size: 36px !important;
+  }
+
+  .result-card h3 {
+    font-size: 18px !important;
+  }
+
+  .result-card p {
+    font-size: 13px !important;
+  }
+
+  /* Scan Result Responsive Styles */
+  .scan-result-content {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 20px !important;
+  }
+
+  .scan-result-content > div:first-child {
+    text-align: center !important;
+    width: 100% !important;
+  }
+
+  .scan-result-title {
+    font-size: 24px !important;
+    text-align: center !important;
+    margin-bottom: 4px !important;
+  }
+
+  .scan-result-url {
+    text-align: center !important;
+    font-size: 12px !important;
+    word-break: break-all !important;
+  }
+
+  .scan-result-stats {
+    gap: 12px !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+  }
+
+  .scan-result-score {
+    font-size: 36px !important;
+  }
+
+  .scan-result-grade {
+    width: 80px !important;
     height: 80px !important;
+  }
+
+  .scan-result-grade-letter {
+    font-size: 32px !important;
+  }
+
+  .scan-result-number {
+    font-size: 20px !important;
+  }
+
+  /* Category Header Tablet Styles */
+  .category-title {
+    font-size: 20px !important;
+  }
+
+  .category-score {
+    font-size: 13px !important;
+  }
+
+  .category-passed {
+    font-size: 13px !important;
+    padding: 5px 11px !important;
+  }
+
+  /* Scan History Tablet Styles */
+  .scan-history-title {
+    font-size: 20px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .scan-history-table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .scan-history-table {
+    min-width: 600px !important;
+  }
+
+  .scan-history-th {
+    font-size: 12px !important;
+    padding: 10px 8px !important;
+  }
+
+  .scan-history-td {
+    font-size: 12px !important;
+    padding: 10px 8px !important;
+  }
+
+  .scan-history-url {
+    max-width: 200px !important;
+  }
+
+  .scan-history-score {
+    font-size: 13px !important;
+  }
+
+  .scan-history-grade {
+    font-size: 11px !important;
+    padding: 3px 10px !important;
+  }
+
+  .scan-history-date {
+    font-size: 11px !important;
+  }
+
+  .header-spacer {
+    height: 100px !important;
   }
   
   .responsive-cta-section {
@@ -445,7 +587,12 @@ a {
     padding: 32px 16px !important;
     margin-bottom: 32px !important;
   }
-  
+
+  .responsive-section h2 {
+    font-size: 28px !important;
+    margin-bottom: 12px !important;
+  }
+
   .responsive-section h3 {
     font-size: 24px !important;
     margin-bottom: 24px !important;
@@ -707,7 +854,7 @@ a {
     padding: 12px 12px !important;
     padding-top: 12px !important;
   }
-  
+
   .responsive-header {
     padding: 10px 12px !important;
     flex-direction: row !important;
@@ -718,7 +865,7 @@ a {
     width: 100% !important;
     display: flex !important;
   }
-  
+
   .responsive-header > div:first-child {
     padding-right: 6px !important;
     flex: 1 1 0% !important;
@@ -726,7 +873,7 @@ a {
     max-width: calc(100% - 60px) !important;
     overflow: hidden !important;
   }
-  
+
   .responsive-header-title {
     font-size: 18px !important;
     line-height: 1.2 !important;
@@ -735,7 +882,7 @@ a {
     text-overflow: ellipsis !important;
     margin-bottom: 2px !important;
   }
-  
+
   .responsive-header-subtitle {
     font-size: 11px !important;
     margin-top: 0 !important;
@@ -743,7 +890,7 @@ a {
     overflow: hidden !important;
     text-overflow: ellipsis !important;
   }
-  
+
   .responsive-header-logo-container {
     align-self: center !important;
     display: flex !important;
@@ -754,7 +901,7 @@ a {
     width: auto !important;
     margin-left: auto !important;
   }
-  
+
   .responsive-header-logo {
     height: 35px !important;
     width: auto !important;
@@ -762,38 +909,38 @@ a {
     display: block !important;
     object-fit: contain !important;
   }
-  
+
   .responsive-statistics {
     grid-template-columns: repeat(4, 1fr) !important;
     gap: 6px !important;
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch !important;
   }
-  
+
   .responsive-statistics > div {
     padding: 10px 6px !important;
     min-width: 0 !important;
     flex-shrink: 0 !important;
   }
-  
+
   .responsive-statistics > div > div:first-child {
     font-size: 20px !important;
   }
-  
+
   .responsive-statistics > div > div:first-child i {
     font-size: 18px !important;
   }
-  
+
   .responsive-statistics > div > div:last-child {
     font-size: 10px !important;
     line-height: 1.2 !important;
   }
-  
+
   .responsive-hero {
     padding: 24px 12px !important;
     margin-top: 20px !important;
   }
-  
+
   .responsive-hero h1 {
     font-size: 28px !important;
     line-height: 1 !important;
@@ -808,7 +955,192 @@ a {
   .responsive-hero p {
     font-size: 14px !important;
   }
-  
+
+  .responsive-hero-input-container {
+    flex-direction: column !important;
+    gap: 10px !important;
+    padding: 10px !important;
+  }
+
+  .responsive-hero-input {
+    width: 100% !important;
+    padding: 12px 14px !important;
+    font-size: 13px !important;
+  }
+
+  .responsive-hero-button {
+    width: 100% !important;
+    padding: 12px 20px !important;
+    font-size: 13px !important;
+    justify-content: center !important;
+  }
+
+  .result-card {
+    padding: 20px !important;
+  }
+
+  .result-card-score {
+    font-size: 40px !important;
+  }
+
+  .result-card-icon {
+    font-size: 32px !important;
+  }
+
+  .result-card h3 {
+    font-size: 16px !important;
+  }
+
+  .result-card p {
+    font-size: 12px !important;
+  }
+
+  /* Scan Result Mobile Styles */
+  .scan-result-content {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 20px !important;
+  }
+
+  .scan-result-content > div:first-child {
+    text-align: center !important;
+    width: 100% !important;
+  }
+
+  .scan-result-title {
+    font-size: 20px !important;
+    text-align: center !important;
+    margin-bottom: 4px !important;
+  }
+
+  .scan-result-url {
+    font-size: 11px !important;
+    text-align: center !important;
+    word-break: break-all !important;
+  }
+
+  .scan-result-stats {
+    gap: 20px !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    width: 100% !important;
+  }
+
+  .scan-result-stats > div {
+    text-align: center !important;
+    min-width: 60px !important;
+  }
+
+  .scan-result-score {
+    font-size: 28px !important;
+  }
+
+  .scan-result-grade {
+    width: 70px !important;
+    height: 70px !important;
+  }
+
+  .scan-result-grade-letter {
+    font-size: 28px !important;
+  }
+
+  .scan-result-number {
+    font-size: 24px !important;
+    font-weight: 700 !important;
+  }
+
+  .scan-result-stats > div > div:last-child {
+    font-size: 11px !important;
+  }
+
+  /* Category Header Mobile Styles */
+  .category-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  .category-title {
+    font-size: 18px !important;
+  }
+
+  .category-stats {
+    gap: 8px !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+  }
+
+  .category-score {
+    font-size: 12px !important;
+  }
+
+  .category-passed {
+    font-size: 12px !important;
+    padding: 4px 10px !important;
+  }
+
+  /* Scan History Mobile Styles */
+  .scan-history-title {
+    font-size: 18px !important;
+    margin-bottom: 16px !important;
+  }
+
+  /* Hide desktop table on mobile */
+  .scan-history-desktop {
+    display: none !important;
+  }
+
+  /* Show mobile cards */
+  .scan-history-mobile {
+    display: block !important;
+  }
+
+  .scan-history-card {
+    padding: 14px !important;
+    margin-bottom: 10px !important;
+    border-radius: '8px' !important;
+    border: '1px solid #e5e7eb' !important;
+  }
+
+  .scan-history-card:hover {
+    border-color: '#d1d5db' !important;
+    box-shadow: '0 2px 4px rgba(0, 0, 0, 0.05)' !important;
+  }
+
+  .scan-history-card-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-bottom: 10px !important;
+    gap: 8px !important;
+  }
+
+  .scan-history-card-grade {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  .scan-history-card-grade span:first-child {
+    font-size: 14px !important;
+    padding: 4px 10px !important;
+  }
+
+  .scan-history-card-grade span:last-child {
+    font-size: 18px !important;
+  }
+
+  .scan-history-card-date {
+    font-size: 10px !important;
+    white-space: nowrap !important;
+  }
+
+  .scan-history-card-url {
+    font-size: 12px !important;
+    word-break: break-all !important;
+    line-height: 1.4 !important;
+  }
+
   .header-spacer {
     height: 70px !important;
   }
@@ -873,7 +1205,12 @@ a {
   .responsive-section {
     padding: 24px 16px !important;
   }
-  
+
+  .responsive-section h2 {
+    font-size: 24px !important;
+    margin-bottom: 10px !important;
+  }
+
   .responsive-section h3 {
     font-size: 18px !important;
   }
