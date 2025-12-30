@@ -7,17 +7,24 @@ import { existsSync } from 'fs'
  * This produces HTML output matching the Report Manual style exactly
  */
 export async function generateReactTailwindReport(analysisData: any, reportName?: string, retentionType?: string, objectiveType?: string): Promise<string> {
+  console.log('[CPAS Template] Starting report generation...')
+
   const { thisWeek, lastWeek, breakdown, config } = analysisData
 
   // Read the Report Manual reference template
   const templatePath = join(process.cwd(), 'lib', 'cpas-reference-template.html')
+  console.log('[CPAS Template] Template path:', templatePath)
+  console.log('[CPAS Template] Working directory:', process.cwd())
 
   // Check if template file exists
   if (!existsSync(templatePath)) {
+    console.error('[CPAS Template] File not found at:', templatePath)
     throw new Error(`CPAS template file not found at: ${templatePath}`)
   }
 
+  console.log('[CPAS Template] Template file exists, reading...')
   let html = await readFile(templatePath, 'utf-8')
+  console.log('[CPAS Template] Template read successfully, length:', html.length)
 
   // Validate HTML was read
   if (!html || html.length < 1000) {
