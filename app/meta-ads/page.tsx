@@ -702,8 +702,8 @@ export default function MetaAdsPage() {
         backgroundColor: isScrolled ? 'rgba(255, 255, 255, 0.98)' : 'rgba(255, 255, 255, 0.95)',
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)',
-        boxShadow: isScrolled 
-          ? '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' 
+        boxShadow: isScrolled
+          ? '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
           : '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
         borderBottom: '1px solid #e5e7eb',
         position: 'fixed',
@@ -720,28 +720,23 @@ export default function MetaAdsPage() {
           padding: '24px 48px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'nowrap',
-          width: '100%'
+          justifyContent: 'space-between'
         }}>
-          <Link href="/home" style={{ textDecoration: 'none', cursor: 'pointer', flex: '1 1 0%', minWidth: 0, maxWidth: 'calc(100% - 100px)' }}>
+          <Link href="/home" style={{ textDecoration: 'none', cursor: 'pointer' }}>
             <div>
               <h1 className="responsive-header-title" style={{
-                fontSize: '36px',
+                fontSize: '32px',
                 fontWeight: 'bold',
                 color: '#111827',
                 margin: 0,
-                marginBottom: '4px',
-                lineHeight: '1.2'
+                marginBottom: '4px'
               }}>
                 Meta Ads Report Generator
               </h1>
               <p className="responsive-header-subtitle" style={{
-                fontSize: '16px',
-                fontWeight: '400',
+                fontSize: '14px',
                 color: '#6b7280',
-                margin: 0,
-                lineHeight: '1.3'
+                margin: 0
               }}>
                 Powered by <span style={{ fontWeight: '600' }}>Hadona Digital Media</span>
               </p>
@@ -750,11 +745,7 @@ export default function MetaAdsPage() {
           <div className="responsive-header-logo-container" style={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'flex-end',
-            gap: '8px',
-            flexShrink: 0,
-            flexGrow: 0,
-            width: 'auto'
+            gap: '8px'
           }}>
             <a
               href="https://hadona.id"
@@ -783,8 +774,7 @@ export default function MetaAdsPage() {
                 style={{
                   height: '80px',
                   width: 'auto',
-                  objectFit: 'contain',
-                  display: 'block'
+                  objectFit: 'contain'
                 }}
               />
             </a>

@@ -75,7 +75,7 @@ export default function TikTokAdsPage() {
             <Link href="/home" style={{ textDecoration: 'none', cursor: 'pointer' }}>
               <div>
                 <h1 className="responsive-header-title" style={{
-                  fontSize: '28px',
+                  fontSize: '32px',
                   fontWeight: 'bold',
                   color: '#111827',
                   margin: 0,
