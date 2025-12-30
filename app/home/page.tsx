@@ -80,8 +80,8 @@ export default function HomePage() {
         backgroundColor: isScrolled ? 'rgba(255, 255, 255, 0.98)' : 'rgba(255, 255, 255, 0.95)',
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)',
-        boxShadow: isScrolled 
-          ? '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' 
+        boxShadow: isScrolled
+          ? '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
           : '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
         borderBottom: '1px solid #e5e7eb',
         position: 'fixed',
