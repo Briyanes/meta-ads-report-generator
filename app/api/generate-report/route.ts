@@ -88,10 +88,13 @@ export async function POST(request: NextRequest) {
     
 
     // Import template based on objective type
-    let generateReport: (analysisData: any, reportName?: string, retentionType?: string, objectiveType?: string) => string
+    let generateReport: (analysisData: any, reportName?: string, retentionType?: string, objectiveType?: string) => string | Promise<string>
     
     try {
-      if (objectiveType === 'ctwa') {
+      if (objectiveType === 'cpas') {
+        const { generateReactTailwindReport: generateCPAS } = await import('@/lib/reportTemplate-cpas')
+        generateReport = generateCPAS
+      } else if (objectiveType === 'ctwa') {
         const { generateReactTailwindReport: generateCTWA } = await import('@/lib/reportTemplate-ctwa')
         generateReport = generateCTWA
       } else if (objectiveType === 'ctlptowa') {
@@ -113,7 +116,7 @@ export async function POST(request: NextRequest) {
     // This ensures each objective type has its own isolated template and doesn't affect others
     let htmlReport: string
     try {
-      htmlReport = generateReport(analysisData, sanitizedName, retentionType, objectiveType)
+      htmlReport = await generateReport(analysisData, sanitizedName, retentionType, objectiveType)
       
       if (!htmlReport || htmlReport.length < 100) {
         throw new Error('Generated HTML report is too short or empty')
