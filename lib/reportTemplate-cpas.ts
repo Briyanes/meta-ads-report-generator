@@ -737,7 +737,151 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const breakdownThisWeek = (analysisData as any).breakdown?.thisWeek || {}
   const breakdownLastWeek = (analysisData as any).breakdown?.lastWeek || {}
 
-  // Helper to generate breakdown HTML for a dimension
+  // Helper to generate SPECIALIZED AGE BREAKDOWN with two-column layout
+  const generateAgeBreakdown = (breakdownData: any[]) => {
+    if (!breakdownData || breakdownData.length === 0) {
+      return `
+        <div style="background: #f8fafc; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
+          <p style="color: #64748b; font-size: 14px;">
+            Age breakdown data will be displayed here when age breakdown CSV is provided.
+          </p>
+          <p style="color: #94a3b8; font-size: 12px; margin-top: 8px;">
+            Upload age breakdown file to see detailed performance.
+          </p>
+        </div>
+      `
+    }
+
+    // Sort by ATC descending to find best age
+    const sortedByATC = [...breakdownData].sort((a, b) => {
+      const atcA = parseNum(a['Adds to cart with shared items'] || a.atc || a.results || 0)
+      const atcB = parseNum(b['Adds to cart with shared items'] || b.atc || b.results || 0)
+      return atcB - atcA
+    })
+
+    const bestAgeItem = sortedByATC[0]
+    const bestAge = bestAgeItem['Age'] || bestAgeItem.dimension || 'N/A'
+
+    // Find best CPR (lowest cost per result)
+    const itemsWithCPR = breakdownData.filter(item => {
+      const atc = parseNum(item['Adds to cart with shared items'] || item.atc || item.results || 0)
+      return atc > 0
+    })
+
+    let bestCPRItem = itemsWithCPR.reduce((best, current) => {
+      const spend = parseNum(current['Amount spent (IDR)'] || current.spend || 0)
+      const atc = parseNum(current['Adds to cart with shared items'] || current.atc || current.results || 0)
+      const cpr = spend / atc
+
+      const bestSpend = parseNum(best['Amount spent (IDR)'] || best.spend || 0)
+      const bestATC = parseNum(best['Adds to cart with shared items'] || best.atc || best.results || 0)
+      const bestCPRValue = bestSpend / bestATC
+
+      return cpr < bestCPRValue ? current : best
+    }, itemsWithCPR[0])
+
+    const bestCPRAge = bestCPRItem['Age'] || bestCPRItem.dimension || 'N/A'
+    const bestCPRSpend = parseNum(bestCPRItem['Amount spent (IDR)'] || bestCPRItem.spend || 0)
+    const bestCPRATC = parseNum(bestCPRItem['Adds to cart with shared items'] || bestCPRItem.atc || bestCPRItem.results || 0)
+    const bestCPRValue = bestCPRATC > 0 ? bestCPRSpend / bestCPRATC : 0
+
+    const bestATCTotal = parseNum(bestAgeItem['Adds to cart with shared items'] || bestAgeItem.atc || bestAgeItem.results || 0)
+
+    // Generate table rows
+    let tableRows = sortedByATC.map((item: any, idx: number) => {
+      const name = item['Age'] || item.dimension || `Item ${idx + 1}`
+      const spend = parseNum(item['Amount spent (IDR)'] || item.spend || 0)
+      const impressions = parseNum(item['Impressions'] || item.impressions || 0)
+      const atc = parseNum(item['Adds to cart with shared items'] || item.atc || item.results || 0)
+      const cpr = atc > 0 ? (spend / atc) : 0
+      const isBestAge = name === bestAge
+
+      const rowStyle = isBestAge
+        ? 'background: #f0fdf4; font-weight: 600;'
+        : idx % 2 === 0 ? 'background: #ffffff;' : 'background: #f9fafb;'
+
+      return `
+        <tr style="${rowStyle}">
+          <td style="font-size: 13px; padding: 12px;">
+            ${isBestAge ? '<span style="color: #fbbf24; margin-right: 4px;">🌟</span>' : ''}
+            <strong>${name}</strong>
+          </td>
+          <td class="text-right" style="font-size: 13px; padding: 12px;">${formatNumber(impressions)}</td>
+          <td class="text-right" style="font-size: 13px; padding: 12px; font-weight: 600;">${formatNumber(atc)}</td>
+          <td class="text-right" style="font-size: 13px; padding: 12px; font-weight: 600;">${formatCurrency(cpr)}</td>
+        </tr>
+      `
+    }).join('')
+
+    // Generate bar chart data
+    const maxATC = Math.max(...sortedByATC.map(item => parseNum(item['Adds to cart with shared items'] || item.atc || item.results || 0)))
+
+    const barChartHTML = sortedByATC.slice(0, 5).map((item: any) => {
+      const name = item['Age'] || item.dimension
+      const atc = parseNum(item['Adds to cart with shared items'] || item.atc || item.results || 0)
+      const barHeight = maxATC > 0 ? (atc / maxATC) * 100 : 0
+
+      return `
+        <div style="flex: 1; text-align: center; margin: 0 4px;">
+          <div style="height: 120px; display: flex; align-items: flex-end; justify-content: center;">
+            <div style="width: 40px; height: ${barHeight}%; background: #1e40af; border-radius: 4px 4px 0 0; min-height: ${atc > 0 ? '4px' : '0'};"></div>
+          </div>
+          <div style="font-size: 11px; color: #374151; margin-top: 8px; font-weight: 500;">${name}</div>
+          <div style="font-size: 10px; color: #6b7280;">${atc}</div>
+        </div>
+      `
+    }).join('')
+
+    return `
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px;">
+        <!-- LEFT COLUMN: Table + Bar Chart -->
+        <div>
+          <!-- Table -->
+          <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 16px;">
+            <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
+              <thead>
+                <tr style="background: #1e40af; color: white;">
+                  <th style="padding: 12px; text-align: left; font-weight: 600; font-size: 12px;">USIA</th>
+                  <th style="padding: 12px; text-align: right; font-weight: 600; font-size: 12px;">IMPRESSIONS</th>
+                  <th style="padding: 12px; text-align: right; font-weight: 600; font-size: 12px;">ATC</th>
+                  <th style="padding: 12px; text-align: right; font-weight: 600; font-size: 12px;">CPR (IDR)</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${tableRows}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Bar Chart -->
+          <div style="background: white; border-radius: 8px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="display: flex; align-items: flex-end; justify-content: space-around; height: 160px;">
+              ${barChartHTML}
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Summary Card -->
+        <div style="background: #f3f4f6; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; justify-content: center;">
+          <div style="color: #6b7280; font-size: 11px; font-weight: 600; letter-spacing: 1px; margin-bottom: 12px;">USIA TERBAIK</div>
+          <div style="color: #1e40af; font-size: 32px; font-weight: 700; margin-bottom: 24px;">${bestAge} Tahun</div>
+
+          <div style="margin-bottom: 20px;">
+            <div style="color: #6b7280; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 4px;">TOTAL ATC</div>
+            <div style="color: #1e40af; font-size: 28px; font-weight: 700;">${formatNumber(bestATCTotal)}</div>
+          </div>
+
+          <div>
+            <div style="color: #6b7280; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 4px;">CPR TERBAIK</div>
+            <div style="color: #1e40af; font-size: 28px; font-weight: 700;">${formatCurrency(bestCPRValue)}</div>
+            <div style="color: #9ca3af; font-size: 12px; margin-top: 2px;">(Usia ${bestCPRAge})</div>
+          </div>
+        </div>
+      </div>
+    `
+  }
+
+  // Helper to generate breakdown HTML for a dimension (non-age breakdowns)
   const generateBreakdownTable = (breakdownData: any[], dimensionName: string, dimensionKey: string) => {
     if (!breakdownData || breakdownData.length === 0) {
       return `
@@ -798,7 +942,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   }
 
   // Generate breakdown tables for each dimension
-  const ageBreakdownHTML = generateBreakdownTable(breakdownThisWeek.age || [], 'Age', 'Age')
+  const ageBreakdownHTML = generateAgeBreakdown(breakdownThisWeek.age || [])
   const genderBreakdownHTML = generateBreakdownTable(breakdownThisWeek.gender || [], 'Gender', 'Gender')
   const regionBreakdownHTML = generateBreakdownTable(breakdownThisWeek.region || [], 'Region', 'Region')
   const platformBreakdownHTML = generateBreakdownTable(breakdownThisWeek.platform || [], 'Platform', 'Platform')
