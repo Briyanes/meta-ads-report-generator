@@ -597,27 +597,27 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
 
       return `
         <tr>
-          <td><strong>${name}</strong></td>
-          <td class="text-right">${formatNumber(impressions)}</td>
-          <td class="text-right">${ctr}%</td>
-          <td class="text-right">${formatNumber(atc)}</td>
-          <td class="text-right">${formatCurrency(cpr)}</td>
-          <td class="text-right">${formatCurrency(spend)}</td>
+          <td style="font-size: 13px;"><strong>${name}</strong></td>
+          <td class="text-right" style="font-size: 13px;">${formatNumber(impressions)}</td>
+          <td class="text-right" style="font-size: 13px;">${ctr}%</td>
+          <td class="text-right" style="font-size: 13px; font-weight: 600;">${formatNumber(atc)}</td>
+          <td class="text-right" style="font-size: 13px; font-weight: 600;">${formatCurrency(cpr)}</td>
+          <td class="text-right" style="font-size: 13px;">${formatCurrency(spend)}</td>
         </tr>
       `
     }).join('')
 
     return `
       <div style="overflow-x: auto; margin-bottom: 24px;">
-        <table>
+        <table style="font-size: 13px;">
           <thead>
             <tr>
-              <th>${dimensionName}</th>
-              <th class="text-right">Impressions</th>
-              <th class="text-right">CTR</th>
-              <th class="text-right">Add to Cart</th>
-              <th class="text-right">CPR</th>
-              <th class="text-right">Amount Spent</th>
+              <th style="width: 25%;">${dimensionName}</th>
+              <th class="text-right" style="width: 15%;">Impressions</th>
+              <th class="text-right" style="width: 10%;">CTR</th>
+              <th class="text-right" style="width: 15%;">Add to Cart</th>
+              <th class="text-right" style="width: 15%;">CPR</th>
+              <th class="text-right" style="width: 20%;">Amount Spent (IDR)</th>
             </tr>
           </thead>
           <tbody>
