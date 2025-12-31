@@ -176,27 +176,6 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
                         <td class="text-right"><span class="badge {IMPR_BADGE_CLASS}">{IMPR_GROWTH}%</span></td>
                     </tr>
                     <tr>
-                        <td><strong>Link Clicks</strong></td>
-                        <td class="text-right">{LAST_CLICKS}</td>
-                        <td class="text-right">{THIS_CLICKS}</td>
-                        <td class="text-right {CLICKS_CLASS}">{CLICKS_DIFF}</td>
-                        <td class="text-right"><span class="badge {CLICKS_BADGE_CLASS}">{CLICKS_GROWTH}%</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>CTR (Link)</strong></td>
-                        <td class="text-right">{LAST_CTR}</td>
-                        <td class="text-right">{THIS_CTR}</td>
-                        <td class="text-right {CTR_CLASS}">{CTR_DIFF}</td>
-                        <td class="text-right"><span class="badge {CTR_BADGE_CLASS}">{CTR_GROWTH}%</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>CPC (Link)</strong></td>
-                        <td class="text-right">{LAST_CPC}</td>
-                        <td class="text-right">{THIS_CPC}</td>
-                        <td class="text-right {CPC_CLASS}">{CPC_DIFF}</td>
-                        <td class="text-right"><span class="badge {CPC_BADGE_CLASS}">{CPC_GROWTH}%</span></td>
-                    </tr>
-                    <tr>
                         <td><strong>CPM</strong></td>
                         <td class="text-right">{LAST_CPM}</td>
                         <td class="text-right">{THIS_CPM}</td>
@@ -204,46 +183,81 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
                         <td class="text-right"><span class="badge {CPM_BADGE_CLASS}">{CPM_GROWTH}%</span></td>
                     </tr>
                     <tr>
-                        <td><strong>Outbound Clicks</strong></td>
-                        <td class="text-right">{LAST_OUTBOUND_CLICKS}</td>
-                        <td class="text-right">{THIS_OUTBOUND_CLICKS}</td>
-                        <td class="text-right {OUTBOUND_CLICKS_CLASS}">{OUTBOUND_CLICKS_DIFF}</td>
-                        <td class="text-right"><span class="badge {OUTBOUND_CLICKS_BADGE_CLASS}">{OUTBOUND_CLICKS_GROWTH}%</span></td>
+                        <td><strong>Link Clicks</strong></td>
+                        <td class="text-right">{LAST_CLICKS}</td>
+                        <td class="text-right">{THIS_CLICKS}</td>
+                        <td class="text-right {CLICKS_CLASS}">{CLICKS_DIFF}</td>
+                        <td class="text-right"><span class="badge {CLICKS_BADGE_CLASS}">{CLICKS_GROWTH}%</span></td>
                     </tr>
                     <tr>
-                        <td><strong>Content Views</strong></td>
-                        <td class="text-right">{LAST_CONTENT_VIEWS}</td>
-                        <td class="text-right">{THIS_CONTENT_VIEWS}</td>
-                        <td class="text-right {CONTENT_VIEWS_CLASS}">{CONTENT_VIEWS_DIFF}</td>
-                        <td class="text-right"><span class="badge {CONTENT_VIEWS_BADGE_CLASS}">{CONTENT_VIEWS_GROWTH}%</span></td>
+                        <td><strong>CTR (link click-through rate)</strong></td>
+                        <td class="text-right">{LAST_CTR}</td>
+                        <td class="text-right">{THIS_CTR}</td>
+                        <td class="text-right {CTR_CLASS}">{CTR_DIFF}</td>
+                        <td class="text-right"><span class="badge {CTR_BADGE_CLASS}">{CTR_GROWTH}%</span></td>
                     </tr>
                     <tr>
-                        <td><strong>Add to Cart</strong></td>
+                        <td><strong>Adds to cart with shared items</strong></td>
                         <td class="text-right">{LAST_ATC}</td>
                         <td class="text-right">{THIS_ATC}</td>
                         <td class="text-right {ATC_CLASS}">{ATC_DIFF}</td>
                         <td class="text-right"><span class="badge {ATC_BADGE_CLASS}">{ATC_GROWTH}%</span></td>
                     </tr>
                     <tr>
-                        <td><strong>Purchases</strong></td>
+                        <td><strong>Cost per add to cart with shared items</strong></td>
+                        <td class="text-right">{LAST_COST_PER_ATC}</td>
+                        <td class="text-right">{THIS_COST_PER_ATC}</td>
+                        <td class="text-right {COST_PER_ATC_CLASS}">{COST_PER_ATC_DIFF}</td>
+                        <td class="text-right"><span class="badge {COST_PER_ATC_BADGE_CLASS}">{COST_PER_ATC_GROWTH}%</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>ATC conversion value (shared only)</strong></td>
+                        <td class="text-right">{LAST_ATC_CV}</td>
+                        <td class="text-right">{THIS_ATC_CV}</td>
+                        <td class="text-right {ATC_CV_CLASS}">{ATC_CV_DIFF}</td>
+                        <td class="text-right"><span class="badge {ATC_CV_BADGE_CLASS}">{ATC_CV_GROWTH}%</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Purchases with shared items</strong></td>
                         <td class="text-right">{LAST_PURCHASES}</td>
                         <td class="text-right">{THIS_PURCHASES}</td>
                         <td class="text-right {PURCH_CLASS}">{PURCH_DIFF}</td>
                         <td class="text-right"><span class="badge {PURCH_BADGE_CLASS}">{PURCH_GROWTH}%</span></td>
                     </tr>
                     <tr>
-                        <td><strong>Instagram Profile Visits</strong></td>
-                        <td class="text-right">{LAST_IG_PROFILE_VISITS}</td>
-                        <td class="text-right">{THIS_IG_PROFILE_VISITS}</td>
-                        <td class="text-right {IG_PROFILE_VISITS_CLASS}">{IG_PROFILE_VISITS_DIFF}</td>
-                        <td class="text-right"><span class="badge {IG_PROFILE_VISITS_BADGE_CLASS}">{IG_PROFILE_VISITS_GROWTH}%</span></td>
+                        <td><strong>Cost per purchases with shared items</strong></td>
+                        <td class="text-right">{LAST_COST_PER_PURCHASE}</td>
+                        <td class="text-right">{THIS_COST_PER_PURCHASE}</td>
+                        <td class="text-right {COST_PER_PURCHASE_CLASS}">{COST_PER_PURCHASE_DIFF}</td>
+                        <td class="text-right"><span class="badge {COST_PER_PURCHASE_BADGE_CLASS}">{COST_PER_PURCHASE_GROWTH}%</span></td>
                     </tr>
                     <tr>
-                        <td><strong>Instagram Followers</strong></td>
-                        <td class="text-right">{LAST_IG_FOLLOWS}</td>
-                        <td class="text-right">{THIS_IG_FOLLOWS}</td>
-                        <td class="text-right {IG_FOLLOWS_CLASS}">{IG_FOLLOWS_DIFF}</td>
-                        <td class="text-right"><span class="badge {IG_FOLLOWS_BADGE_CLASS}">{IG_FOLLOWS_GROWTH}%</span></td>
+                        <td><strong>Purchases conversion value for shared items only</strong></td>
+                        <td class="text-right">{LAST_PURCHASE_CV}</td>
+                        <td class="text-right">{THIS_PURCHASE_CV}</td>
+                        <td class="text-right {PURCHASE_CV_CLASS}">{PURCHASE_CV_DIFF}</td>
+                        <td class="text-right"><span class="badge {PURCHASE_CV_BADGE_CLASS}">{PURCHASE_CV_GROWTH}%</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Conversion Rate (Purchase ÷ Click)</strong></td>
+                        <td class="text-right">{LAST_CONVERSION_RATE}</td>
+                        <td class="text-right">{THIS_CONVERSION_RATE}</td>
+                        <td class="text-right {CONVERSION_RATE_CLASS}">{CONVERSION_RATE_DIFF}</td>
+                        <td class="text-right"><span class="badge {CONVERSION_RATE_BADGE_CLASS}">{CONVERSION_RATE_GROWTH}%</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Purchase ROAS (return on ad spend)</strong></td>
+                        <td class="text-right">{LAST_ROAS}</td>
+                        <td class="text-right">{THIS_ROAS}</td>
+                        <td class="text-right {ROAS_CLASS}">{ROAS_DIFF}</td>
+                        <td class="text-right"><span class="badge {ROAS_BADGE_CLASS}">{ROAS_GROWTH}%</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Average purchases conversion value</strong></td>
+                        <td class="text-right">{LAST_AOV}</td>
+                        <td class="text-right">{THIS_AOV}</td>
+                        <td class="text-right {AOV_CLASS}">{AOV_DIFF}</td>
+                        <td class="text-right"><span class="badge {AOV_BADGE_CLASS}">{AOV_GROWTH}%</span></td>
                     </tr>
                 </tbody>
             </table>
@@ -589,6 +603,24 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const thisMonthIGFollows = thisMonthData.igFollows || 0
   const lastMonthIGFollows = lastMonthData.igFollows || 0
 
+  // Extract cost metrics from API
+  const thisMonthCostPerATC = thisMonthData.costPerATC || 0
+  const lastMonthCostPerATC = lastMonthData.costPerATC || 0
+  const thisMonthATCCV = thisMonthData.atcConversionValue || 0
+  const lastMonthATCCV = lastMonthData.atcConversionValue || 0
+  const thisMonthCostPerPurchase = thisMonthData.costPerPurchase || 0
+  const lastMonthCostPerPurchase = lastMonthData.costPerPurchase || 0
+  const thisMonthPurchaseCV = thisMonthData.purchasesConversionValue || 0
+  const lastMonthPurchaseCV = lastMonthData.purchasesConversionValue || 0
+  const thisMonthROAS = thisMonthData.purchaseROAS || 0
+  const lastMonthROAS = lastMonthData.purchaseROAS || 0
+  const thisMonthAOV = thisMonthData.aov || 0
+  const lastMonthAOV = lastMonthData.aov || 0
+
+  // Calculate Conversion Rate (Purchase ÷ Link Clicks)
+  const thisMonthConversionRate = thisMonthClicks > 0 ? (thisMonthPurchases / thisMonthClicks) * 100 : 0
+  const lastMonthConversionRate = lastMonthClicks > 0 ? (lastMonthPurchases / lastMonthClicks) * 100 : 0
+
   console.log('[CPAS Template] All metrics extracted')
 
   // Format helpers - NO decimals for currency - MUST BE DECLARED FIRST
@@ -621,6 +653,15 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const contentViewsGrowth = lastMonthContentViews > 0 ? ((thisMonthContentViews - lastMonthContentViews) / lastMonthContentViews * 100) : 0
   const igProfileVisitsGrowth = lastMonthIGProfileVisits > 0 ? ((thisMonthIGProfileVisits - lastMonthIGProfileVisits) / lastMonthIGProfileVisits * 100) : 0
   const igFollowsGrowth = lastMonthIGFollows > 0 ? ((thisMonthIGFollows - lastMonthIGFollows) / lastMonthIGFollows * 100) : 0
+
+  // Calculate growth for new metrics
+  const costPerATCGrowth = lastMonthCostPerATC > 0 ? ((thisMonthCostPerATC - lastMonthCostPerATC) / lastMonthCostPerATC * 100) : 0
+  const atcCVGrowth = lastMonthATCCV > 0 ? ((thisMonthATCCV - lastMonthATCCV) / lastMonthATCCV * 100) : 0
+  const costPerPurchaseGrowth = lastMonthCostPerPurchase > 0 ? ((thisMonthCostPerPurchase - lastMonthCostPerPurchase) / lastMonthCostPerPurchase * 100) : 0
+  const purchaseCVGrowth = lastMonthPurchaseCV > 0 ? ((thisMonthPurchaseCV - lastMonthPurchaseCV) / lastMonthPurchaseCV * 100) : 0
+  const conversionRateGrowth = lastMonthConversionRate > 0 ? ((thisMonthConversionRate - lastMonthConversionRate) / lastMonthConversionRate * 100) : 0
+  const roasGrowth = lastMonthROAS > 0 ? ((thisMonthROAS - lastMonthROAS) / lastMonthROAS * 100) : 0
+  const aovGrowth = lastMonthAOV > 0 ? ((thisMonthAOV - lastMonthAOV) / lastMonthAOV * 100) : 0
 
   // Helper to determine badge class and growth text
   const getBadgeClass = (growth: number) => growth >= 0 ? 'badge-green' : 'badge-red'
@@ -901,6 +942,49 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     .replace(/{IG_FOLLOWS_CLASS}/g, getDiffClass(thisMonthIGFollows, lastMonthIGFollows))
     .replace(/{IG_FOLLOWS_BADGE_CLASS}/g, getBadgeClass(igFollowsGrowth))
     .replace(/{IG_FOLLOWS_GROWTH}/g, lastMonthIGFollows > 0 ? getGrowthText(igFollowsGrowth) : 'N/A')
+    // Additional metrics for Detailed Performance Metrics table
+    .replace(/{LAST_COST_PER_ATC}/g, formatCurrency(lastMonthCostPerATC))
+    .replace(/{THIS_COST_PER_ATC}/g, formatCurrency(thisMonthCostPerATC))
+    .replace(/{COST_PER_ATC_DIFF}/g, (thisMonthCostPerATC - lastMonthCostPerATC >= 0 ? '+' : '') + formatCurrency(Math.abs(thisMonthCostPerATC - lastMonthCostPerATC)))
+    .replace(/{COST_PER_ATC_CLASS}/g, getDiffClass(thisMonthCostPerATC, lastMonthCostPerATC))
+    .replace(/{COST_PER_ATC_BADGE_CLASS}/g, getBadgeClass(costPerATCGrowth))
+    .replace(/{COST_PER_ATC_GROWTH}/g, lastMonthCostPerATC > 0 ? getGrowthText(costPerATCGrowth) : 'N/A')
+    .replace(/{LAST_ATC_CV}/g, formatCurrency(lastMonthATCCV))
+    .replace(/{THIS_ATC_CV}/g, formatCurrency(thisMonthATCCV))
+    .replace(/{ATC_CV_DIFF}/g, (thisMonthATCCV - lastMonthATCCV >= 0 ? '+' : '') + formatCurrency(Math.abs(thisMonthATCCV - lastMonthATCCV)))
+    .replace(/{ATC_CV_CLASS}/g, getDiffClass(thisMonthATCCV, lastMonthATCCV))
+    .replace(/{ATC_CV_BADGE_CLASS}/g, getBadgeClass(atcCVGrowth))
+    .replace(/{ATC_CV_GROWTH}/g, lastMonthATCCV > 0 ? getGrowthText(atcCVGrowth) : 'N/A')
+    .replace(/{LAST_COST_PER_PURCHASE}/g, formatCurrency(lastMonthCostPerPurchase))
+    .replace(/{THIS_COST_PER_PURCHASE}/g, formatCurrency(thisMonthCostPerPurchase))
+    .replace(/{COST_PER_PURCHASE_DIFF}/g, (thisMonthCostPerPurchase - lastMonthCostPerPurchase >= 0 ? '+' : '') + formatCurrency(Math.abs(thisMonthCostPerPurchase - lastMonthCostPerPurchase)))
+    .replace(/{COST_PER_PURCHASE_CLASS}/g, getDiffClass(thisMonthCostPerPurchase, lastMonthCostPerPurchase))
+    .replace(/{COST_PER_PURCHASE_BADGE_CLASS}/g, getBadgeClass(costPerPurchaseGrowth))
+    .replace(/{COST_PER_PURCHASE_GROWTH}/g, lastMonthCostPerPurchase > 0 ? getGrowthText(costPerPurchaseGrowth) : 'N/A')
+    .replace(/{LAST_PURCHASE_CV}/g, formatCurrency(lastMonthPurchaseCV))
+    .replace(/{THIS_PURCHASE_CV}/g, formatCurrency(thisMonthPurchaseCV))
+    .replace(/{PURCHASE_CV_DIFF}/g, (thisMonthPurchaseCV - lastMonthPurchaseCV >= 0 ? '+' : '') + formatCurrency(Math.abs(thisMonthPurchaseCV - lastMonthPurchaseCV)))
+    .replace(/{PURCHASE_CV_CLASS}/g, getDiffClass(thisMonthPurchaseCV, lastMonthPurchaseCV))
+    .replace(/{PURCHASE_CV_BADGE_CLASS}/g, getBadgeClass(purchaseCVGrowth))
+    .replace(/{PURCHASE_CV_GROWTH}/g, lastMonthPurchaseCV > 0 ? getGrowthText(purchaseCVGrowth) : 'N/A')
+    .replace(/{LAST_CONVERSION_RATE}/g, lastMonthConversionRate.toFixed(2) + '%')
+    .replace(/{THIS_CONVERSION_RATE}/g, thisMonthConversionRate.toFixed(2) + '%')
+    .replace(/{CONVERSION_RATE_DIFF}/g, (thisMonthConversionRate - lastMonthConversionRate >= 0 ? '+' : '') + (thisMonthConversionRate - lastMonthConversionRate).toFixed(2) + '%')
+    .replace(/{CONVERSION_RATE_CLASS}/g, getDiffClass(thisMonthConversionRate, lastMonthConversionRate))
+    .replace(/{CONVERSION_RATE_BADGE_CLASS}/g, getBadgeClass(conversionRateGrowth))
+    .replace(/{CONVERSION_RATE_GROWTH}/g, lastMonthConversionRate > 0 ? getGrowthText(conversionRateGrowth) : 'N/A')
+    .replace(/{LAST_ROAS}/g, lastMonthROAS.toFixed(2))
+    .replace(/{THIS_ROAS}/g, thisMonthROAS.toFixed(2))
+    .replace(/{ROAS_DIFF}/g, (thisMonthROAS - lastMonthROAS >= 0 ? '+' : '') + (thisMonthROAS - lastMonthROAS).toFixed(2))
+    .replace(/{ROAS_CLASS}/g, getDiffClass(thisMonthROAS, lastMonthROAS))
+    .replace(/{ROAS_BADGE_CLASS}/g, getBadgeClass(roasGrowth))
+    .replace(/{ROAS_GROWTH}/g, lastMonthROAS > 0 ? getGrowthText(roasGrowth) : 'N/A')
+    .replace(/{LAST_AOV}/g, formatCurrency(lastMonthAOV))
+    .replace(/{THIS_AOV}/g, formatCurrency(thisMonthAOV))
+    .replace(/{AOV_DIFF}/g, (thisMonthAOV - lastMonthAOV >= 0 ? '+' : '') + formatCurrency(Math.abs(thisMonthAOV - lastMonthAOV)))
+    .replace(/{AOV_CLASS}/g, getDiffClass(thisMonthAOV, lastMonthAOV))
+    .replace(/{AOV_BADGE_CLASS}/g, getBadgeClass(aovGrowth))
+    .replace(/{AOV_GROWTH}/g, lastMonthAOV > 0 ? getGrowthText(aovGrowth) : 'N/A')
     // Slide 2 - Key Insight
     .replace(/{SPEND_SENTIMENT}/g, spendSentiment)
     .replace(/{PERFORMANCE_SENTIMENT}/g, performanceSentiment)
