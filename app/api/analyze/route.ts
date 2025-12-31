@@ -759,6 +759,9 @@ Return the analysis as structured JSON data that can be used to generate the HTM
           lcToCV: parseNum(getFieldValue(data, '* LC to CV', ['* LC to CV', 'LC to CV'])),
           cvToATC: parseNum(getFieldValue(data, '* CV to ATC', ['* CV to ATC', 'CV to ATC'])),
           atcToPurchase: parseNum(getFieldValue(data, 'ATC to Purchase', ['ATC to Purchase', 'ATC to Purchase conversion rate'])),
+          // Instagram metrics
+          igProfileVisits: parseNum(data['Instagram profile visits'] || 0),
+          igFollows: parseNum(data['Instagram follows'] || 0),
         }
 
         console.log('[DEBUG] CPAS data:', {

@@ -183,6 +183,41 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
                         <td class="text-right"><span class="badge {CLICKS_BADGE_CLASS}">{CLICKS_GROWTH}%</span></td>
                     </tr>
                     <tr>
+                        <td><strong>CTR (Link)</strong></td>
+                        <td class="text-right">{LAST_CTR}</td>
+                        <td class="text-right">{THIS_CTR}</td>
+                        <td class="text-right {CTR_CLASS}">{CTR_DIFF}</td>
+                        <td class="text-right"><span class="badge {CTR_BADGE_CLASS}">{CTR_GROWTH}%</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>CPC (Link)</strong></td>
+                        <td class="text-right">{LAST_CPC}</td>
+                        <td class="text-right">{THIS_CPC}</td>
+                        <td class="text-right {CPC_CLASS}">{CPC_DIFF}</td>
+                        <td class="text-right"><span class="badge {CPC_BADGE_CLASS}">{CPC_GROWTH}%</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>CPM</strong></td>
+                        <td class="text-right">{LAST_CPM}</td>
+                        <td class="text-right">{THIS_CPM}</td>
+                        <td class="text-right {CPM_CLASS}">{CPM_DIFF}</td>
+                        <td class="text-right"><span class="badge {CPM_BADGE_CLASS}">{CPM_GROWTH}%</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Outbound Clicks</strong></td>
+                        <td class="text-right">{LAST_OUTBOUND_CLICKS}</td>
+                        <td class="text-right">{THIS_OUTBOUND_CLICKS}</td>
+                        <td class="text-right {OUTBOUND_CLICKS_CLASS}">{OUTBOUND_CLICKS_DIFF}</td>
+                        <td class="text-right"><span class="badge {OUTBOUND_CLICKS_BADGE_CLASS}">{OUTBOUND_CLICKS_GROWTH}%</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Content Views</strong></td>
+                        <td class="text-right">{LAST_CONTENT_VIEWS}</td>
+                        <td class="text-right">{THIS_CONTENT_VIEWS}</td>
+                        <td class="text-right {CONTENT_VIEWS_CLASS}">{CONTENT_VIEWS_DIFF}</td>
+                        <td class="text-right"><span class="badge {CONTENT_VIEWS_BADGE_CLASS}">{CONTENT_VIEWS_GROWTH}%</span></td>
+                    </tr>
+                    <tr>
                         <td><strong>Add to Cart</strong></td>
                         <td class="text-right">{LAST_ATC}</td>
                         <td class="text-right">{THIS_ATC}</td>
@@ -195,6 +230,20 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
                         <td class="text-right">{THIS_PURCHASES}</td>
                         <td class="text-right {PURCH_CLASS}">{PURCH_DIFF}</td>
                         <td class="text-right"><span class="badge {PURCH_BADGE_CLASS}">{PURCH_GROWTH}%</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Instagram Profile Visits</strong></td>
+                        <td class="text-right">{LAST_IG_PROFILE_VISITS}</td>
+                        <td class="text-right">{THIS_IG_PROFILE_VISITS}</td>
+                        <td class="text-right {IG_PROFILE_VISITS_CLASS}">{IG_PROFILE_VISITS_DIFF}</td>
+                        <td class="text-right"><span class="badge {IG_PROFILE_VISITS_BADGE_CLASS}">{IG_PROFILE_VISITS_GROWTH}%</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Instagram Followers</strong></td>
+                        <td class="text-right">{LAST_IG_FOLLOWS}</td>
+                        <td class="text-right">{THIS_IG_FOLLOWS}</td>
+                        <td class="text-right {IG_FOLLOWS_CLASS}">{IG_FOLLOWS_DIFF}</td>
+                        <td class="text-right"><span class="badge {IG_FOLLOWS_BADGE_CLASS}">{IG_FOLLOWS_GROWTH}%</span></td>
                     </tr>
                 </tbody>
             </table>
@@ -526,6 +575,20 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const thisMonthPurchases = thisMonthData.purchases || 0
   const lastMonthPurchases = lastMonthData.purchases || 0
 
+  // Extract additional metrics for Detailed Performance Metrics table
+  const thisMonthCPC = thisMonthData.cpc || 0
+  const lastMonthCPC = lastMonthData.cpc || 0
+  const thisMonthCPM = thisMonthData.cpm || 0
+  const lastMonthCPM = lastMonthData.cpm || 0
+  const thisMonthOutboundClicks = thisMonthData.outboundClicks || 0
+  const lastMonthOutboundClicks = lastMonthData.outboundClicks || 0
+  const thisMonthContentViews = thisMonthData.contentViews || 0
+  const lastMonthContentViews = lastMonthData.contentViews || 0
+  const thisMonthIGProfileVisits = thisMonthData.igProfileVisits || 0
+  const lastMonthIGProfileVisits = lastMonthData.igProfileVisits || 0
+  const thisMonthIGFollows = thisMonthData.igFollows || 0
+  const lastMonthIGFollows = lastMonthData.igFollows || 0
+
   console.log('[CPAS Template] All metrics extracted')
 
   // Format helpers - NO decimals for currency - MUST BE DECLARED FIRST
@@ -549,6 +612,15 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const purchGrowth = lastMonthPurchases > 0 ? ((thisMonthPurchases - lastMonthPurchases) / lastMonthPurchases * 100) : 0
   const cprThisMonth = thisMonthATC > 0 ? (thisMonthSpend / thisMonthATC) : 0
   const cprLastMonth = lastMonthATC > 0 ? (lastMonthSpend / lastMonthATC) : 0
+
+  // Calculate growth for additional metrics
+  const ctrGrowth = lastMonthCTR > 0 ? ((thisMonthCTR - lastMonthCTR) / lastMonthCTR * 100) : 0
+  const cpcGrowth = lastMonthCPC > 0 ? ((thisMonthCPC - lastMonthCPC) / lastMonthCPC * 100) : 0
+  const cpmGrowth = lastMonthCPM > 0 ? ((thisMonthCPM - lastMonthCPM) / lastMonthCPM * 100) : 0
+  const outboundClicksGrowth = lastMonthOutboundClicks > 0 ? ((thisMonthOutboundClicks - lastMonthOutboundClicks) / lastMonthOutboundClicks * 100) : 0
+  const contentViewsGrowth = lastMonthContentViews > 0 ? ((thisMonthContentViews - lastMonthContentViews) / lastMonthContentViews * 100) : 0
+  const igProfileVisitsGrowth = lastMonthIGProfileVisits > 0 ? ((thisMonthIGProfileVisits - lastMonthIGProfileVisits) / lastMonthIGProfileVisits * 100) : 0
+  const igFollowsGrowth = lastMonthIGFollows > 0 ? ((thisMonthIGFollows - lastMonthIGFollows) / lastMonthIGFollows * 100) : 0
 
   // Helper to determine badge class and growth text
   const getBadgeClass = (growth: number) => growth >= 0 ? 'badge-green' : 'badge-red'
@@ -786,6 +858,49 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     .replace(/{PURCH_CLASS}/g, getDiffClass(thisMonthPurchases, lastMonthPurchases))
     .replace(/{PURCH_BADGE_CLASS}/g, getBadgeClass(purchGrowth))
     .replace(/{PURCH_GROWTH}/g, getGrowthText(purchGrowth))
+    // Additional metrics for Detailed Performance Metrics
+    .replace(/{LAST_CTR}/g, lastMonthCTR > 0 ? lastMonthCTR.toFixed(2) + '%' : '0.00%')
+    .replace(/{THIS_CTR}/g, thisMonthCTR.toFixed(2) + '%')
+    .replace(/{CTR_DIFF}/g, (thisMonthCTR - lastMonthCTR >= 0 ? '+' : '') + (thisMonthCTR - lastMonthCTR).toFixed(2) + '%')
+    .replace(/{CTR_CLASS}/g, getDiffClass(thisMonthCTR, lastMonthCTR))
+    .replace(/{CTR_BADGE_CLASS}/g, getBadgeClass(ctrGrowth))
+    .replace(/{CTR_GROWTH}/g, lastMonthCTR > 0 ? getGrowthText(ctrGrowth) : 'N/A')
+    .replace(/{LAST_CPC}/g, formatCurrency(lastMonthCPC))
+    .replace(/{THIS_CPC}/g, formatCurrency(thisMonthCPC))
+    .replace(/{CPC_DIFF}/g, (thisMonthCPC - lastMonthCPC >= 0 ? '+' : '') + formatCurrency(Math.abs(thisMonthCPC - lastMonthCPC)))
+    .replace(/{CPC_CLASS}/g, getDiffClass(thisMonthCPC, lastMonthCPC))
+    .replace(/{CPC_BADGE_CLASS}/g, getBadgeClass(cpcGrowth))
+    .replace(/{CPC_GROWTH}/g, lastMonthCPC > 0 ? getGrowthText(cpcGrowth) : 'N/A')
+    .replace(/{LAST_CPM}/g, formatCurrency(lastMonthCPM))
+    .replace(/{THIS_CPM}/g, formatCurrency(thisMonthCPM))
+    .replace(/{CPM_DIFF}/g, (thisMonthCPM - lastMonthCPM >= 0 ? '+' : '') + formatCurrency(Math.abs(thisMonthCPM - lastMonthCPM)))
+    .replace(/{CPM_CLASS}/g, getDiffClass(thisMonthCPM, lastMonthCPM))
+    .replace(/{CPM_BADGE_CLASS}/g, getBadgeClass(cpmGrowth))
+    .replace(/{CPM_GROWTH}/g, lastMonthCPM > 0 ? getGrowthText(cpmGrowth) : 'N/A')
+    .replace(/{LAST_OUTBOUND_CLICKS}/g, formatNumber(lastMonthOutboundClicks))
+    .replace(/{THIS_OUTBOUND_CLICKS}/g, formatNumber(thisMonthOutboundClicks))
+    .replace(/{OUTBOUND_CLICKS_DIFF}/g, getDiffText(thisMonthOutboundClicks, lastMonthOutboundClicks))
+    .replace(/{OUTBOUND_CLICKS_CLASS}/g, getDiffClass(thisMonthOutboundClicks, lastMonthOutboundClicks))
+    .replace(/{OUTBOUND_CLICKS_BADGE_CLASS}/g, getBadgeClass(outboundClicksGrowth))
+    .replace(/{OUTBOUND_CLICKS_GROWTH}/g, lastMonthOutboundClicks > 0 ? getGrowthText(outboundClicksGrowth) : 'N/A')
+    .replace(/{LAST_CONTENT_VIEWS}/g, formatNumber(lastMonthContentViews))
+    .replace(/{THIS_CONTENT_VIEWS}/g, formatNumber(thisMonthContentViews))
+    .replace(/{CONTENT_VIEWS_DIFF}/g, getDiffText(thisMonthContentViews, lastMonthContentViews))
+    .replace(/{CONTENT_VIEWS_CLASS}/g, getDiffClass(thisMonthContentViews, lastMonthContentViews))
+    .replace(/{CONTENT_VIEWS_BADGE_CLASS}/g, getBadgeClass(contentViewsGrowth))
+    .replace(/{CONTENT_VIEWS_GROWTH}/g, lastMonthContentViews > 0 ? getGrowthText(contentViewsGrowth) : 'N/A')
+    .replace(/{LAST_IG_PROFILE_VISITS}/g, formatNumber(lastMonthIGProfileVisits))
+    .replace(/{THIS_IG_PROFILE_VISITS}/g, formatNumber(thisMonthIGProfileVisits))
+    .replace(/{IG_PROFILE_VISITS_DIFF}/g, getDiffText(thisMonthIGProfileVisits, lastMonthIGProfileVisits))
+    .replace(/{IG_PROFILE_VISITS_CLASS}/g, getDiffClass(thisMonthIGProfileVisits, lastMonthIGProfileVisits))
+    .replace(/{IG_PROFILE_VISITS_BADGE_CLASS}/g, getBadgeClass(igProfileVisitsGrowth))
+    .replace(/{IG_PROFILE_VISITS_GROWTH}/g, lastMonthIGProfileVisits > 0 ? getGrowthText(igProfileVisitsGrowth) : 'N/A')
+    .replace(/{LAST_IG_FOLLOWS}/g, formatNumber(lastMonthIGFollows))
+    .replace(/{THIS_IG_FOLLOWS}/g, formatNumber(thisMonthIGFollows))
+    .replace(/{IG_FOLLOWS_DIFF}/g, getDiffText(thisMonthIGFollows, lastMonthIGFollows))
+    .replace(/{IG_FOLLOWS_CLASS}/g, getDiffClass(thisMonthIGFollows, lastMonthIGFollows))
+    .replace(/{IG_FOLLOWS_BADGE_CLASS}/g, getBadgeClass(igFollowsGrowth))
+    .replace(/{IG_FOLLOWS_GROWTH}/g, lastMonthIGFollows > 0 ? getGrowthText(igFollowsGrowth) : 'N/A')
     // Slide 2 - Key Insight
     .replace(/{SPEND_SENTIMENT}/g, spendSentiment)
     .replace(/{PERFORMANCE_SENTIMENT}/g, performanceSentiment)
