@@ -739,6 +739,9 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
 
   // Helper to generate SPECIALIZED AGE BREAKDOWN with two-column layout
   const generateAgeBreakdown = (breakdownData: any[]) => {
+    console.log('[DEBUG] generateAgeBreakdown received:', breakdownData?.length, 'items')
+    console.log('[DEBUG] breakdownData sample:', breakdownData?.[0])
+
     if (!breakdownData || breakdownData.length === 0) {
       return `
         <div style="background: #f8fafc; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
@@ -943,6 +946,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   }
 
   // Generate breakdown tables for each dimension
+  console.log('[DEBUG] breakdownThisWeek.age:', breakdownThisWeek.age)
   const ageBreakdownHTML = generateAgeBreakdown(breakdownThisWeek.age || [])
   const genderBreakdownHTML = generateBreakdownTable(breakdownThisWeek.gender || [], 'Gender', 'Gender')
   const regionBreakdownHTML = generateBreakdownTable(breakdownThisWeek.region || [], 'Region', 'Region')
