@@ -768,7 +768,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
       return atc > 0
     })
 
-    let bestCPRItem = itemsWithCPR.reduce((best, current) => {
+    let bestCPRItem = itemsWithCPR.length > 0 ? itemsWithCPR.reduce((best, current) => {
       const spend = parseNum(current['Amount spent (IDR)'] || current.spend || 0)
       const atc = parseNum(current['Adds to cart with shared items'] || current.atc || current.results || 0)
       const cpr = spend / atc
@@ -778,7 +778,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
       const bestCPRValue = bestSpend / bestATC
 
       return cpr < bestCPRValue ? current : best
-    }, itemsWithCPR[0])
+    }) : breakdownData[0]
 
     const bestCPRAge = bestCPRItem['Age'] || bestCPRItem.dimension || 'N/A'
     const bestCPRSpend = parseNum(bestCPRItem['Amount spent (IDR)'] || bestCPRItem.spend || 0)
@@ -814,7 +814,8 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     }).join('')
 
     // Generate bar chart data
-    const maxATC = Math.max(...sortedByATC.map(item => parseNum(item['Adds to cart with shared items'] || item.atc || item.results || 0)))
+    const atcValues = sortedByATC.map(item => parseNum(item['Adds to cart with shared items'] || item.atc || item.results || 0))
+    const maxATC = atcValues.length > 0 ? Math.max(...atcValues) : 0
 
     const barChartHTML = sortedByATC.slice(0, 5).map((item: any) => {
       const name = item['Age'] || item.dimension
