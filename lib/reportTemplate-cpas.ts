@@ -847,7 +847,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                 <tr style="background: #1e40af; color: white;">
                   <th style="padding: 12px; text-align: left; font-weight: 600; font-size: 12px;">USIA</th>
                   <th style="padding: 12px; text-align: right; font-weight: 600; font-size: 12px;">IMPRESSIONS</th>
-                  <th style="padding: 12px; text-align: right; font-weight: 600; font-size: 12px;">ATC</th>
+                  <th style="padding: 12px; text-align: right; font-weight: 600; font-size: 12px;">ADDS TO CART WITH SHARED ITEMS</th>
                   <th style="padding: 12px; text-align: right; font-weight: 600; font-size: 12px;">CPR (IDR)</th>
                 </tr>
               </thead>
