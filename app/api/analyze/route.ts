@@ -748,8 +748,10 @@ Return the analysis as structured JSON data that can be used to generate the HTM
           clicksAll: parseNum(data['Clicks (all)'] || 0),
           ctrAll: parseNum(getFieldValue(data, 'CTR (all)', ['CTR (all)'])),
           costPerCV: parseNum(getFieldValue(data, 'Cost /CV (IDR)', ['Cost /CV (IDR)', 'Cost per content view'])),
-          costPerATC: parseNum(getFieldValue(data, 'Cost /ATC (IDR)', ['Cost /ATC (IDR)', 'Cost per add to cart'])),
-          costPerPurchase: parseNum(getFieldValue(data, 'Cost /Purchase (IDR)', ['Cost /Purchase (IDR)', 'Cost per purchase'])),
+          // Calculate cost per ATC manually (not in CSV)
+          costPerATC: 0, // Will be calculated below
+          // Calculate cost per purchase manually (not in CSV)
+          costPerPurchase: 0, // Will be calculated below
           purchaseROAS: parseNum(getFieldValue(data, 'Purchase ROAS for shared items only', [
             'Purchase ROAS for shared items only',
             'Purchase ROAS',
@@ -763,6 +765,14 @@ Return the analysis as structured JSON data that can be used to generate the HTM
           igProfileVisits: parseNum(data['Instagram profile visits'] || 0),
           igFollows: parseNum(data['Instagram follows'] || 0),
         }
+
+        // Calculate cost metrics manually
+        const addsToCart = parseNum(data['Adds to cart with shared items'] || data['Adds to cart'] || 0)
+        const purchases = parseNum(data['Purchases with shared items'] || data['Purchases'] || 0)
+        const amountSpent = parseNum(data['Amount spent (IDR)'] || 0)
+
+        cpasData.costPerATC = addsToCart > 0 ? (amountSpent / addsToCart) : 0
+        cpasData.costPerPurchase = purchases > 0 ? (amountSpent / purchases) : 0
 
         console.log('[DEBUG] CPAS data:', {
           reach: cpasData.reach,
