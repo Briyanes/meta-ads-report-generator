@@ -283,39 +283,94 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
             Analysis & Recommendations
         </h2>
 
-        <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; margin-bottom: 24px; position: relative; overflow: hidden;">
+        <!-- Two Column Layout: Highlights and Lowlights -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+
+            <!-- HIGHLIGHTS COLUMN -->
+            <div>
+                <h3 style="color: #10b981; margin-bottom: 16px; font-size: 18px; font-weight: 600;">
+                    Highlights
+                </h3>
+                <div style="background: #e6f7f0; border-left: 3px solid #10b981; padding: 20px; border-radius: 8px;">
+                    <ul style="list-style: none; padding: 0; margin: 0; line-height: 2;">
+                        <li style="margin-bottom: 12px; color: #333333;">
+                            <span style="color: #10b981; font-weight: 600; margin-right: 8px;">☑</span>
+                            <strong>{THIS_ATC} Add to Cart</strong>
+                            <div style="font-size: 13px; color: #666666; margin-top: 4px; margin-left: 24px;">
+                                Konversi pertama tercapai dengan CPR {THIS_CPR}
+                            </div>
+                        </li>
+                        <li style="margin-bottom: 12px; color: #333333;">
+                            <span style="color: #10b981; font-weight: 600; margin-right: 8px;">☑</span>
+                            <strong>{THIS_PURCHASES} Purchases</strong>
+                            <div style="font-size: 13px; color: #666666; margin-top: 4px; margin-left: 24px;">
+                                ROAS {THIS_ROAS}, AOV {THIS_AOV}
+                            </div>
+                        </li>
+                        <li style="margin-bottom: 12px; color: #333333;">
+                            <span style="color: #10b981; font-weight: 600; margin-right: 8px;">☑</span>
+                            <strong>CPM {CPM_SENTIMENT} {CPM_CHANGE_ABS}%</strong>
+                            <div style="font-size: 13px; color: #666666; margin-top: 4px; margin-left: 24px;">
+                                {CPM_INSIGHT}
+                            </div>
+                        </li>
+                        <li style="margin-bottom: 12px; color: #333333;">
+                            <span style="color: #10b981; font-weight: 600; margin-right: 8px;">☑</span>
+                            <strong>{THIS_IG_FOLLOWS} New Followers</strong>
+                            <div style="font-size: 13px; color: #666666; margin-top: 4px; margin-left: 24px;">
+                                Instagram community growth
+                            </div>
+                        </li>
+                        <li style="color: #333333;">
+                            <span style="color: #10b981; font-weight: 600; margin-right: 8px;">☑</span>
+                            <strong>{THIS_IG_PROFILE_VISITS} Profile Visits</strong>
+                            <div style="font-size: 13px; color: #666666; margin-top: 4px; margin-left: 24px;">
+                                Significant brand awareness increase
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- LOWLIGHTS COLUMN -->
+            <div>
+                <h3 style="color: #ef4444; margin-bottom: 16px; font-size: 18px; font-weight: 600;">
+                    Lowlights
+                </h3>
+                <div style="background: #fce7e7; border-left: 3px solid #ef4444; padding: 20px; border-radius: 8px;">
+                    <ul style="list-style: none; padding: 0; margin: 0; line-height: 2;">
+                        <li style="margin-bottom: 12px; color: #333333;">
+                            <span style="color: #ef4444; font-weight: 600; margin-right: 8px;">☐</span>
+                            <strong>CTR {CTR_SENTIMENT_LOW} {CTR_CHANGE_ABS}%</strong>
+                            <div style="font-size: 13px; color: #666666; margin-top: 4px; margin-left: 24px;">
+                                {CTR_INSIGHT}
+                            </div>
+                        </li>
+                        <li style="margin-bottom: 12px; color: #333333;">
+                            <span style="color: #ef4444; font-weight: 600; margin-right: 8px;">☐</span>
+                            <strong>CPC {CPC_SENTIMENT} {CPC_CHANGE_ABS}%</strong>
+                            <div style="font-size: 13px; color: #666666; margin-top: 4px; margin-left: 24px;">
+                                {CPC_INSIGHT}
+                            </div>
+                        </li>
+                        <li style="color: #333333;">
+                            <span style="color: #ef4444; font-weight: 600; margin-right: 8px;">☐</span>
+                            <strong>{LOWLIGHT_THIRD_ITEM}</strong>
+                            <div style="font-size: 13px; color: #666666; margin-top: 4px; margin-left: 24px;">
+                                {LOWLIGHT_THIRD_DETAIL}
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- INSIGHT BOX -->
+        <div style="background: #fef3c7; border: 1px solid #fbbf24; padding: 16px; border-radius: 8px; position: relative; overflow: hidden;">
             <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
-            <h3 style="color: #92400e; margin-bottom: 12px; font-size: 18px; position: relative; z-index: 1;">
-                Performance Overview
-            </h3>
-            <p style="color: #854d0e; line-height: 1.7; font-weight: 500; position: relative; z-index: 1; margin: 0;">
-                Campaign performance {PERIOD_TYPE} ini menunjukkan tren {GROWTH_SENTIMENT} dengan kenaikan spend {SPEND_GROWTH}%.
-                Cost per Result berada di angka {THIS_CPR}, menunjukkan efisiensi {EFFICIENCY_SENTIMENT}.
-                {PERFORMANCE_HIGHLIGHT}
+            <p style="color: #92400e; line-height: 1.7; font-weight: 500; position: relative; z-index: 1; margin: 0; font-size: 14px;">
+                <strong>Insight:</strong> {INSIGHT_SUMMARY}
             </p>
-        </div>
-
-        <div style="background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); border-left: 4px solid #0ea5e9; padding: 20px; border-radius: 12px; margin-bottom: 24px;">
-            <h3 style="color: #075985; margin-bottom: 12px; font-size: 18px;">
-                📈 Top Performers
-            </h3>
-            <ul style="color: #0c4a6e; line-height: 1.8; margin-left: 20px; font-weight: 500;">
-                <li><strong>Add to Cart:</strong> {THIS_ATC} konversi dengan pertumbuhan {ATC_GROWTH}%</li>
-                <li><strong>Impressions:</strong> {THIS_IMPRESSIONS} dengan peningkatan {IMPR_GROWTH}%</li>
-                <li><strong>Purchases:</strong> {THIS_PURCHASES} transaksi tercatat</li>
-            </ul>
-        </div>
-
-        <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-left: 4px solid #16a34a; padding: 20px; border-radius: 12px;">
-            <h3 style="color: #14532d; margin-bottom: 12px; font-size: 18px;">
-                🎯 Rekomendasi Strategis
-            </h3>
-            <ul style="color: #14532d; line-height: 1.8; margin-left: 20px; font-weight: 500;">
-                <li>{STRATEGY_RECOMMENDATION_1}</li>
-                <li>{STRATEGY_RECOMMENDATION_2}</li>
-                <li>{STRATEGY_RECOMMENDATION_3}</li>
-                <li>{STRATEGY_RECOMMENDATION_4}</li>
-            </ul>
         </div>
     </div>
 
@@ -751,10 +806,9 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const creativeBreakdownHTML = generateBreakdownTable(breakdownThisWeek['ad-creative'] || breakdownThisWeek.creative || [], 'Creative', 'Ad name')
 
   // Determine sentiment texts
-  const growthSentiment = spendGrowth >= 0 ? 'positif' : 'menantang'
+  // Variables for Slide 4 - removed unused variables from old design
   const spendSentiment = spendGrowth >= 0 ? 'sebanding' : 'perlu evaluasi'
   const performanceSentiment = atcGrowth >= 0 ? 'menggembirakan' : 'perlu improvement'
-  const efficiencySentiment = cprThisMonth < 5000 ? 'baik' : cprThisMonth < 10000 ? 'moderat' : 'perlu improvement'
   const conversionSentiment = thisMonthPurchases > 0 && thisMonthATC > 0
     ? `Conversion rate dari ATC ke Purchase adalah ${((thisMonthPurchases / thisMonthATC) * 100).toFixed(1)}%`
     : 'Perlu optimalisasi funnel konversi'
@@ -779,30 +833,6 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const metricsRecommendation = thisMonthCTR < 1.5
     ? 'Optimasi creative dan copywriting untuk meningkatkan CTR di atas 1.5%'
     : 'Pertahankan performa dan scale winning ad sets'
-
-  // Strategy recommendations based on performance
-  const strategyRecommendation1 = atcGrowth < 0
-    ? 'Evaluasi dan pause underperforming ads, realokasi budget ke winning ads'
-    : 'Scale up winning ad sets dengan performa CPR terbaik'
-
-  const strategyRecommendation2 = thisMonthCTR < 1.5
-    ? 'Refresh creative assets dan testing copywriting baru untuk meningkatkan engagement'
-    : 'Pertahankan high-performing creatives dan buat variation untuk scaling'
-
-  const strategyRecommendation3 = thisMonthPurchases === 0
-    ? 'Optimasi landing page dan checkout process untuk meningkatkan conversion rate'
-    : 'Implement retargeting campaigns untuk users yang ATC tapi belum purchase'
-
-  const strategyRecommendation4 = cprThisMonth > 10000
-    ? 'Review targeting dan audience segmentation untuk menurunkan CPR'
-    : 'Explore new audience segments untuk expand reach sambil mempertahankan efisiensi'
-
-  // Performance highlights
-  const performanceHighlight = atcGrowth > 100
-    ? `Pertumbuhan konversi sangat impresif sebesar ${atcGrowth.toFixed(1)}% dari periode sebelumnya.`
-    : atcGrowth > 0
-      ? `Tren positif dengan kenaikan ${atcGrowth.toFixed(1)}% pada konversi.`
-      : 'Perlu strategi baru untuk meningkatkan performa konversi.'
 
   // Conversion rate calculation
   const conversionRateWin = thisMonthATC > 0 && thisMonthPurchases > 0
@@ -997,14 +1027,19 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     .replace(/{CTR_SENTIMENT}/g, ctrSentiment)
     .replace(/{THIS_CTR}/g, thisMonthCTR.toFixed(2))
     .replace(/{METRICS_RECOMMENDATION}/g, metricsRecommendation)
-    // Slide 4 - Key Insights
-    .replace(/{GROWTH_SENTIMENT}/g, growthSentiment)
-    .replace(/{EFFICIENCY_SENTIMENT}/g, efficiencySentiment)
-    .replace(/{PERFORMANCE_HIGHLIGHT}/g, performanceHighlight)
-    .replace(/{STRATEGY_RECOMMENDATION_1}/g, strategyRecommendation1)
-    .replace(/{STRATEGY_RECOMMENDATION_2}/g, strategyRecommendation2)
-    .replace(/{STRATEGY_RECOMMENDATION_3}/g, strategyRecommendation3)
-    .replace(/{STRATEGY_RECOMMENDATION_4}/g, strategyRecommendation4)
+    // Slide 4 - Highlights & Lowlights
+    .replace(/{CPM_SENTIMENT}/g, cpmGrowth >= 0 ? 'Naik' : 'Turun')
+    .replace(/{CPM_CHANGE_ABS}/g, formatNumber(Math.abs(cpmGrowth)))
+    .replace(/{CPM_INSIGHT}/g, `Impressions cost ${cpmGrowth >= 0 ? 'less' : 'more'} efficient at Rp ${formatNumber(thisMonthCPM)} per 1,000`)
+    .replace(/{CTR_SENTIMENT_LOW}/g, ctrGrowth >= 0 ? 'Naik' : 'Turun')
+    .replace(/{CTR_CHANGE_ABS}/g, formatNumber(Math.abs(ctrGrowth)))
+    .replace(/{CTR_INSIGHT}/g, lastMonthCTR > 0 ? `Dari ${lastMonthCTR.toFixed(2)}% ke ${thisMonthCTR.toFixed(2)}% karena ekspansi reach ke audiens baru` : `CTR mencapai ${thisMonthCTR.toFixed(2)}%`)
+    .replace(/{CPC_SENTIMENT}/g, cpcGrowth >= 0 ? 'Naik' : 'Turun')
+    .replace(/{CPC_CHANGE_ABS}/g, formatNumber(Math.abs(cpcGrowth)))
+    .replace(/{CPC_INSIGHT}/g, lastMonthCPC > 0 ? `Dari Rp ${formatNumber(lastMonthCPC)} ke Rp ${formatNumber(thisMonthCPC)} per click` : `CPC Rp ${formatNumber(thisMonthCPC)} per click`)
+    .replace(/{LOWLIGHT_THIRD_ITEM}/g, lastMonthATC === 0 && lastMonthPurchases === 0 ? `${lastPeriodLabel} Tanpa Konversi` : 'Perlu optimalisasi konversi')
+    .replace(/{LOWLIGHT_THIRD_DETAIL}/g, lastMonthATC === 0 && lastMonthPurchases === 0 ? `Campaign ${lastPeriodLabel} belum mencapai konversi ATC/purchases` : 'Tingkatkan conversion rate dari ATC ke Purchase')
+    .replace(/{INSIGHT_SUMMARY}/g, `Campaign performance ${thisPeriodLabel} menunjukkan ${atcGrowth >= 0 ? 'pertumbuhan positif' : 'tantangan'} dengan ${thisMonthATC} Add to Cart. ${thisMonthPurchases > 0 ? `ROAS ${thisMonthROAS} menunjukkan ${thisMonthROAS >= 1 ? 'profitabilitas baik' : 'perlu improvement'}.` : 'Perlu fokus pada peningkatan conversion rate.'} ${ctrGrowth < 0 ? 'CTR perlu dioptimasi untuk effectiveness lebih baik.' : 'Pertahankan momentum positif dan scale winning campaigns.'}`)
     // Slide 11 - Conclusion
     .replace(/{CONVERSION_RATE_WIN}/g, conversionRateWin)
     .replace(/{IMPROVEMENT_AREA}/g, improvementArea)
