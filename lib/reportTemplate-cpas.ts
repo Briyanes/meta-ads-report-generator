@@ -265,14 +265,7 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
             Demographic Analysis by Age Group
         </h2>
 
-        <div style="background: #f8fafc; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
-            <p style="color: #64748b; font-size: 14px;">
-                Age breakdown data will be displayed here when age breakdown CSV is provided.
-            </p>
-            <p style="color: #94a3b8; font-size: 12px; margin-top: 8px;">
-                Upload age breakdown file to see detailed demographic performance.
-            </p>
-        </div>
+        {AGE_BREAKDOWN_TABLE}
 
         <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; position: relative; overflow: hidden;">
             <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
@@ -293,14 +286,7 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
             Demographic Analysis by Gender
         </h2>
 
-        <div style="background: #f8fafc; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
-            <p style="color: #64748b; font-size: 14px;">
-                Gender breakdown data will be displayed here when gender breakdown CSV is provided.
-            </p>
-            <p style="color: #94a3b8; font-size: 12px; margin-top: 8px;">
-                Upload gender breakdown file to see detailed demographic performance.
-            </p>
-        </div>
+        {GENDER_BREAKDOWN_TABLE}
 
         <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; position: relative; overflow: hidden;">
             <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
@@ -321,14 +307,7 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
             Geographic Performance Analysis
         </h2>
 
-        <div style="background: #f8fafc; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
-            <p style="color: #64748b; font-size: 14px;">
-                Region breakdown data will be displayed here when region breakdown CSV is provided.
-            </p>
-            <p style="color: #94a3b8; font-size: 12px; margin-top: 8px;">
-                Upload region breakdown file to see detailed geographic performance.
-            </p>
-        </div>
+        {REGION_BREAKDOWN_TABLE}
 
         <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; position: relative; overflow: hidden;">
             <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
@@ -349,14 +328,7 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
             Instagram vs Facebook Comparison
         </h2>
 
-        <div style="background: #f8fafc; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
-            <p style="color: #64748b; font-size: 14px;">
-                Platform breakdown data will be displayed here when platform breakdown CSV is provided.
-            </p>
-            <p style="color: #94a3b8; font-size: 12px; margin-top: 8px;">
-                Upload platform breakdown file to see IG vs FB performance comparison.
-            </p>
-        </div>
+        {PLATFORM_BREAKDOWN_TABLE}
 
         <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; position: relative; overflow: hidden;">
             <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
@@ -377,14 +349,7 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
             Ad Placement Analysis (Feed, Stories, Reels, Explore)
         </h2>
 
-        <div style="background: #f8fafc; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
-            <p style="color: #64748b; font-size: 14px;">
-                Placement breakdown data will be displayed here when placement breakdown CSV is provided.
-            </p>
-            <p style="color: #94a3b8; font-size: 12px; margin-top: 8px;">
-                Upload placement breakdown file to see detailed placement performance.
-            </p>
-        </div>
+        {PLACEMENT_BREAKDOWN_TABLE}
 
         <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; position: relative; overflow: hidden;">
             <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
@@ -406,14 +371,7 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
             Top Performing Ad Creatives
         </h2>
 
-        <div style="background: #f8fafc; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
-            <p style="color: #64748b; font-size: 14px;">
-                Creative breakdown data will be displayed here when ad creative breakdown CSV is provided.
-            </p>
-            <p style="color: #94a3b8; font-size: 12px; margin-top: 8px;">
-                Upload creative breakdown file to see which creatives perform best.
-            </p>
-        </div>
+        {CREATIVE_BREAKDOWN_TABLE}
 
         <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; position: relative; overflow: hidden;">
             <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
@@ -598,6 +556,86 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const getDiffText = (thisVal: number, lastVal: number) => (thisVal - lastVal) >= 0 ? '+' : '' + formatNumber(thisVal - lastVal)
   const getDiffClass = (thisVal: number, lastVal: number) => (thisVal - lastVal) >= 0 ? 'growth-positive' : 'growth-negative'
 
+  // Parse helper
+  const parseNum = (val: any) => {
+    if (typeof val === 'number') return val
+    if (!val) return 0
+    const parsed = parseFloat(String(val).replace(/,/g, ''))
+    return isNaN(parsed) ? 0 : parsed
+  }
+
+  // Extract breakdown data
+  const breakdownThisWeek = (analysisData as any).breakdown?.thisWeek || {}
+  const breakdownLastWeek = (analysisData as any).breakdown?.lastWeek || {}
+
+  // Helper to generate breakdown HTML for a dimension
+  const generateBreakdownTable = (breakdownData: any[], dimensionName: string, dimensionKey: string) => {
+    if (!breakdownData || breakdownData.length === 0) {
+      return `
+        <div style="background: #f8fafc; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
+          <p style="color: #64748b; font-size: 14px;">
+            ${dimensionName} breakdown data will be displayed here when ${dimensionName.toLowerCase()} breakdown CSV is provided.
+          </p>
+          <p style="color: #94a3b8; font-size: 12px; margin-top: 8px;">
+            Upload ${dimensionName.toLowerCase()} breakdown file to see detailed performance.
+          </p>
+        </div>
+      `
+    }
+
+    // Get top 5 by Amount Spent
+    const top5 = breakdownData.slice(0, 5)
+
+    let tableRows = top5.map((item: any, idx: number) => {
+      const name = item[dimensionKey] || item.dimension || `Item ${idx + 1}`
+      const spend = parseNum(item['Amount spent (IDR)'] || item.spend || 0)
+      const impressions = parseNum(item['Impressions'] || item.impressions || 0)
+      const clicks = parseNum(item['Outbound clicks'] || item.clicks || 0)
+      const ctr = impressions > 0 ? (clicks / impressions * 100).toFixed(2) : '0.00'
+      const atc = parseNum(item['Adds to cart with shared items'] || item.atc || item.results || 0)
+      const cpr = atc > 0 ? (spend / atc) : 0
+
+      return `
+        <tr>
+          <td><strong>${name}</strong></td>
+          <td class="text-right">${formatNumber(impressions)}</td>
+          <td class="text-right">${ctr}%</td>
+          <td class="text-right">${formatNumber(atc)}</td>
+          <td class="text-right">${formatCurrency(cpr)}</td>
+          <td class="text-right">${formatCurrency(spend)}</td>
+        </tr>
+      `
+    }).join('')
+
+    return `
+      <div style="overflow-x: auto; margin-bottom: 24px;">
+        <table>
+          <thead>
+            <tr>
+              <th>${dimensionName}</th>
+              <th class="text-right">Impressions</th>
+              <th class="text-right">CTR</th>
+              <th class="text-right">Add to Cart</th>
+              <th class="text-right">CPR</th>
+              <th class="text-right">Amount Spent</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tableRows}
+          </tbody>
+        </table>
+      </div>
+    `
+  }
+
+  // Generate breakdown tables for each dimension
+  const ageBreakdownHTML = generateBreakdownTable(breakdownThisWeek.age || [], 'Age', 'Age')
+  const genderBreakdownHTML = generateBreakdownTable(breakdownThisWeek.gender || [], 'Gender', 'Gender')
+  const regionBreakdownHTML = generateBreakdownTable(breakdownThisWeek.region || [], 'Region', 'Region')
+  const platformBreakdownHTML = generateBreakdownTable(breakdownThisWeek.platform || [], 'Platform', 'Platform')
+  const placementBreakdownHTML = generateBreakdownTable(breakdownThisWeek.placement || [], 'Placement', 'Placement')
+  const creativeBreakdownHTML = generateBreakdownTable(breakdownThisWeek['ad-creative'] || breakdownThisWeek.creative || [], 'Creative', 'Ad name')
+
   // Determine sentiment texts
   const growthSentiment = spendGrowth >= 0 ? 'positif' : 'menantang'
   const spendSentiment = spendGrowth >= 0 ? 'sebanding' : 'perlu evaluasi'
@@ -781,6 +819,13 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     .replace(/{NEXT_MONTH_TARGET}/g, nextMonthTarget)
     .replace(/{TARGET_GROWTH}/g, targetGrowth.toString())
     .replace(/{TARGET_CPR}/g, targetCPR)
+    // Slides 5-10: Breakdown tables
+    .replace(/{AGE_BREAKDOWN_TABLE}/g, ageBreakdownHTML)
+    .replace(/{GENDER_BREAKDOWN_TABLE}/g, genderBreakdownHTML)
+    .replace(/{REGION_BREAKDOWN_TABLE}/g, regionBreakdownHTML)
+    .replace(/{PLATFORM_BREAKDOWN_TABLE}/g, platformBreakdownHTML)
+    .replace(/{PLACEMENT_BREAKDOWN_TABLE}/g, placementBreakdownHTML)
+    .replace(/{CREATIVE_BREAKDOWN_TABLE}/g, creativeBreakdownHTML)
 
   console.log('[CPAS Template] Report generated successfully (inline), length:', html.length)
   return html
