@@ -666,7 +666,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   // Helper to determine badge class and growth text
   const getBadgeClass = (growth: number) => growth >= 0 ? 'badge-green' : 'badge-red'
   const getGrowthText = (growth: number) => (growth > 0 ? '+' : '') + formatPercent(growth)
-  const getDiffText = (thisVal: number, lastVal: number) => (thisVal - lastVal) >= 0 ? '+' : '' + formatNumber(thisVal - lastVal)
+  const getDiffText = (thisVal: number, lastVal: number) => ((thisVal - lastVal) >= 0 ? '+' : '') + formatNumber(Math.abs(thisVal - lastVal))
   const getDiffClass = (thisVal: number, lastVal: number) => (thisVal - lastVal) >= 0 ? 'growth-positive' : 'growth-negative'
 
   // Parse helper

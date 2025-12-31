@@ -681,7 +681,7 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       const base = {
         amountSpent: parseNum(getFieldValue(data, 'Amount spent (IDR)')),
         impressions: parseNum(getFieldValue(data, 'Impressions')),
-        linkClicks: parseNum(getFieldValue(data, 'Link clicks')),
+        linkClicks: parseNum(getFieldValue(data, 'Outbound clicks')),
         ctr: (() => {
           const ctrValue = parseNum(getFieldValue(data, 'CTR (link click-through rate)'))
           // CTR in CSV is already in percentage format (e.g., 1.3 means 1.3%), convert to decimal (0.013)
