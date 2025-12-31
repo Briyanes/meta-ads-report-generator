@@ -183,11 +183,11 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
                         <td class="text-right"><span class="badge {CPM_BADGE_CLASS}">{CPM_GROWTH}%</span></td>
                     </tr>
                     <tr>
-                        <td><strong>Link Clicks</strong></td>
-                        <td class="text-right">{LAST_CLICKS}</td>
-                        <td class="text-right">{THIS_CLICKS}</td>
-                        <td class="text-right {CLICKS_CLASS}">{CLICKS_DIFF}</td>
-                        <td class="text-right"><span class="badge {CLICKS_BADGE_CLASS}">{CLICKS_GROWTH}%</span></td>
+                        <td><strong>Outbound Clicks</strong></td>
+                        <td class="text-right">{LAST_OUTBOUND_CLICKS}</td>
+                        <td class="text-right">{THIS_OUTBOUND_CLICKS}</td>
+                        <td class="text-right {OUTBOUND_CLICKS_CLASS}">{OUTBOUND_CLICKS_DIFF}</td>
+                        <td class="text-right"><span class="badge {OUTBOUND_CLICKS_BADGE_CLASS}">{OUTBOUND_CLICKS_GROWTH}%</span></td>
                     </tr>
                     <tr>
                         <td><strong>CTR (link click-through rate)</strong></td>
@@ -582,8 +582,8 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   // Extract more data for detailed metrics
   const thisMonthImpressions = thisMonthData.impressions || thisMonthData.impression || 0
   const lastMonthImpressions = lastMonthData.impressions || lastMonthData.impression || 0
-  const thisMonthClicks = thisMonthData.clicks || thisMonthData.linkClicks || 0
-  const lastMonthClicks = lastMonthData.clicks || lastMonthData.linkClicks || 0
+  const thisMonthClicks = thisMonthData.outboundClicks || thisMonthData.clicks || thisMonthData.linkClicks || 0
+  const lastMonthClicks = lastMonthData.outboundClicks || lastMonthData.clicks || lastMonthData.linkClicks || 0
   const thisMonthCTR = thisMonthData.ctr || (thisMonthClicks > 0 && thisMonthImpressions > 0 ? (thisMonthClicks / thisMonthImpressions * 100) : 0)
   const lastMonthCTR = lastMonthData.ctr || (lastMonthClicks > 0 && lastMonthImpressions > 0 ? (lastMonthClicks / lastMonthImpressions * 100) : 0)
   const thisMonthPurchases = thisMonthData.purchases || 0
@@ -594,8 +594,9 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const lastMonthCPC = lastMonthData.cpc || 0
   const thisMonthCPM = thisMonthData.cpm || 0
   const lastMonthCPM = lastMonthData.cpm || 0
-  const thisMonthOutboundClicks = thisMonthData.outboundClicks || 0
-  const lastMonthOutboundClicks = lastMonthData.outboundClicks || 0
+  // Use thisMonthClicks/lastMonthClicks for outbound clicks (defined above)
+  const thisMonthOutboundClicks = thisMonthClicks
+  const lastMonthOutboundClicks = lastMonthClicks
   const thisMonthContentViews = thisMonthData.contentViews || 0
   const lastMonthContentViews = lastMonthData.contentViews || 0
   const thisMonthIGProfileVisits = thisMonthData.igProfileVisits || 0
