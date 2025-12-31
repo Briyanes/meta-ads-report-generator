@@ -736,8 +736,8 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         const cpasData = {
           ...base,
           purchases: results,
-          addsToCart: parseNum(data['Adds to cart'] || data['Adds to cart with shared items']),
-          contentViews: parseNum(data['Content views'] || data['Content views with shared items']),
+          addsToCart: parseNum(data['Adds to cart with shared items'] || data['Adds to cart'] || 0),
+          contentViews: parseNum(data['Content views with shared items'] || data['Content views'] || 0),
           atcConversionValue: parseNum(getFieldValue(data, 'Adds to cart conversion value for shared items only', [
             'ATC conversion value (shared only)',
             'ATC conversion value',
