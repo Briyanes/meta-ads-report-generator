@@ -470,7 +470,25 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             const thisWeek = perf.thisWeek || {};
             const lastWeek = perf.lastWeek || {};
             const breakdown = reportData.breakdown || {};
-            
+
+            // Check if this is a new client (no last period data)
+            const parseNum = (val) => {
+                if (typeof val === 'number') return val;
+                if (!val) return 0;
+                const parsed = parseFloat(String(val).replace(/,/g, ''));
+                return isNaN(parsed) ? 0 : parsed;
+            };
+
+            const rawLastPeriodSpend = parseNum(lastWeek.amountSpent);
+            const rawLastPeriodImpr = parseNum(lastWeek.impressions);
+            const rawLastPeriodConversations = parseNum(lastWeek.messagingConversations);
+            const isNewClient = rawLastPeriodSpend === 0 && rawLastPeriodImpr === 0 && rawLastPeriodConversations === 0;
+
+            // Helper functions to format last period values (show "-" for new clients)
+            const formatLastPeriod = (value) => isNewClient && value === 0 ? '-' : formatNumber(value);
+            const formatLastPeriodCurrency = (value) => isNewClient && value === 0 ? '-' : formatCurrency(value);
+            const formatLastPeriodPercent = (value) => isNewClient && value === 0 ? '-' : value.toFixed(2) + '%';
+
             const spendGrowth = ${spendGrowth.toFixed(2)};
             const resultsGrowth = ${resultsGrowth.toFixed(2)};
             const cprGrowth = ${cprGrowth.toFixed(2)};
@@ -482,7 +500,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             const lastPeriodLabel = ${JSON.stringify(lastPeriodLabel)};
             const comparisonLabel = ${JSON.stringify(comparisonLabel)};
             const objectiveLabel = ${JSON.stringify(objectiveLabel)};
-            
+
             function calculateGrowth(current, previous) {
                 const curr = typeof current === 'string' ? parseFloat(current.toString().replace(/,/g, '')) : (current || 0);
                 const prev = typeof previous === 'string' ? parseFloat(previous.toString().replace(/,/g, '')) : (previous || 0);
@@ -578,15 +596,15 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                     <div className="space-y-4">
                                         <div className="flex justify-between">
                                             <span>Spend</span>
-                                            <span className="font-bold">{formatCurrency(lastWeek.amountSpent || 0)}</span>
+                                            <span className="font-bold">{formatLastPeriodCurrency(parseNum(lastWeek.amountSpent))}</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span>Result (WA Started)</span>
-                                            <span className="font-bold">{formatNumber(lastWeek.messagingConversations || 0)}</span>
+                                            <span className="font-bold">{formatLastPeriod(parseNum(lastWeek.messagingConversations))}</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span>CPR</span>
-                                            <span className="font-bold">{formatCurrency(lastWeek.cpr || 0)}</span>
+                                            <span className="font-bold">{formatLastPeriodCurrency(parseNum(lastWeek.cpr))}</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span>Growth %</span>
@@ -632,21 +650,21 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                     <tbody>
                                         <tr>
                                             <td className="border border-gray-300 p-2 text-xs">Amount Spent</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(lastWeek.amountSpent || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatLastPeriodCurrency(parseNum(lastWeek.amountSpent))}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(thisWeek.amountSpent || 0)}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((thisWeek.amountSpent || 0) - (lastWeek.amountSpent || 0))}</td>
                                             <td className={\`border border-gray-300 p-2 text-right text-xs \${spendGrowth.isPositive ? 'text-green-500' : 'text-red-500'}\`}>{spendGrowth.isPositive ? '+' : ''}{spendGrowth.percent}</td>
                                         </tr>
                                         <tr className="bg-gray-50">
                                             <td className="border border-gray-300 p-2 text-xs">Impressions</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(lastWeek.impressions || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatLastPeriod(parseNum(lastWeek.impressions))}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(thisWeek.impressions || 0)}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((thisWeek.impressions || 0) - (lastWeek.impressions || 0))}</td>
                                             <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.impressions || 0) >= (lastWeek.impressions || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.impressions || 0) >= (lastWeek.impressions || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.impressions || 0, lastWeek.impressions || 0))}</td>
                                         </tr>
                                         <tr>
                                             <td className="border border-gray-300 p-2 text-xs">Link Clicks</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(lastWeek.linkClicks || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatLastPeriod(parseNum(lastWeek.linkClicks))}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(thisWeek.linkClicks || 0)}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((thisWeek.linkClicks || 0) - (lastWeek.linkClicks || 0))}</td>
                                             <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.linkClicks || 0) >= (lastWeek.linkClicks || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.linkClicks || 0) >= (lastWeek.linkClicks || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.linkClicks || 0, lastWeek.linkClicks || 0))}</td>
@@ -660,42 +678,42 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                         </tr>
                                         <tr>
                                             <td className="border border-gray-300 p-2 text-xs">CPC (Link)</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(lastWeek.cpc || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatLastPeriodCurrency(parseNum(lastWeek.cpc))}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(thisWeek.cpc || 0)}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((thisWeek.cpc || 0) - (lastWeek.cpc || 0))}</td>
                                             <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.cpc || 0) <= (lastWeek.cpc || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.cpc || 0) <= (lastWeek.cpc || 0) ? '' : '+'}{formatPercent(calculateGrowth(thisWeek.cpc || 0, lastWeek.cpc || 0))}</td>
                                         </tr>
                                         <tr className="bg-gray-50">
                                             <td className="border border-gray-300 p-2 text-xs">CPM</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(lastWeek.cpm || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatLastPeriodCurrency(parseNum(lastWeek.cpm))}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(thisWeek.cpm || 0)}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((thisWeek.cpm || 0) - (lastWeek.cpm || 0))}</td>
                                             <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.cpm || 0) <= (lastWeek.cpm || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.cpm || 0) <= (lastWeek.cpm || 0) ? '' : '+'}{formatPercent(calculateGrowth(thisWeek.cpm || 0, lastWeek.cpm || 0))}</td>
                                         </tr>
                                         <tr>
                                             <td className="border border-gray-300 p-2 text-xs">Outbound Clicks</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(lastWeek.outboundClicks || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatLastPeriod(parseNum(lastWeek.outboundClicks))}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(thisWeek.outboundClicks || 0)}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((thisWeek.outboundClicks || 0) - (lastWeek.outboundClicks || 0))}</td>
                                             <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.outboundClicks || 0) >= (lastWeek.outboundClicks || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.outboundClicks || 0) >= (lastWeek.outboundClicks || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.outboundClicks || 0, lastWeek.outboundClicks || 0))}</td>
                                         </tr>
                                         <tr className="bg-gray-50">
                                             <td className="border border-gray-300 p-2 text-xs">Messaging Conversations Started (WA)</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(lastWeek.messagingConversations || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatLastPeriod(parseNum(lastWeek.messagingConversations))}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(thisWeek.messagingConversations || 0)}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((thisWeek.messagingConversations || 0) - (lastWeek.messagingConversations || 0))}</td>
                                             <td className={\`border border-gray-300 p-2 text-right text-xs \${resultsGrowth.isPositive ? 'text-green-500' : 'text-red-500'}\`}>{resultsGrowth.isPositive ? '+' : ''}{resultsGrowth.percent}</td>
                                         </tr>
                                         <tr>
                                             <td className="border border-gray-300 p-2 text-xs">Cost per WA</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(lastWeek.costPerWA || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatLastPeriodCurrency(parseNum(lastWeek.costPerWA))}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency(thisWeek.costPerWA || 0)}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatCurrency((thisWeek.costPerWA || 0) - (lastWeek.costPerWA || 0))}</td>
                                             <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.costPerWA || 0) <= (lastWeek.costPerWA || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.costPerWA || 0) <= (lastWeek.costPerWA || 0) ? '' : '+'}{formatPercent(calculateGrowth(thisWeek.costPerWA || 0, lastWeek.costPerWA || 0))}</td>
                                         </tr>
                                         <tr className="bg-gray-50">
                                             <td className="border border-gray-300 p-2 text-xs">Frequency (Weighted Avg)</td>
-                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(lastWeek.frequency || 0)}</td>
+                                            <td className="border border-gray-300 p-2 text-right text-xs">{formatLastPeriod(parseNum(lastWeek.frequency))}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber(thisWeek.frequency || 0)}</td>
                                             <td className="border border-gray-300 p-2 text-right text-xs">{formatNumber((thisWeek.frequency || 0) - (lastWeek.frequency || 0))}</td>
                                             <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.frequency || 0) >= (lastWeek.frequency || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.frequency || 0) >= (lastWeek.frequency || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.frequency || 0, lastWeek.frequency || 0))}</td>
