@@ -186,6 +186,8 @@ export async function POST(request: NextRequest) {
     const breakdownDataThisWeek: Record<string, any> = {}
     const breakdownDataLastWeek: Record<string, any> = {}
 
+    console.log('[DEBUG] breakdownThisWeek files:', breakdownThisWeek.map(f => f.name))
+
     for (const file of breakdownThisWeek) {
       const parsed = await parseCSV(file)
       const fileName = file.name.toLowerCase()
@@ -196,6 +198,8 @@ export async function POST(request: NextRequest) {
                       fileName.startsWith('placement-') || fileName.includes('-placement') ? 'placement' :
                       fileName.startsWith('objective-') || fileName.includes('-objective') ? 'objective' :
                       fileName.includes('ad-creative') || fileName.includes('creative') ? 'ad-creative' : 'other'
+
+      console.log('[DEBUG] File:', fileName, '→ Detected as:', fileType)
 
       // Aggregate breakdown data by dimension
       let aggregatedData = parsed.data
@@ -216,6 +220,8 @@ export async function POST(request: NextRequest) {
       breakdownDataThisWeek[fileType] = aggregatedData
     }
     
+    console.log('[DEBUG] breakdownLastWeek files:', breakdownLastWeek.map(f => f.name))
+
     for (const file of breakdownLastWeek) {
       const parsed = await parseCSV(file)
       const fileName = file.name.toLowerCase()
@@ -226,6 +232,8 @@ export async function POST(request: NextRequest) {
                       fileName.startsWith('placement-') || fileName.includes('-placement') ? 'placement' :
                       fileName.startsWith('objective-') || fileName.includes('-objective') ? 'objective' :
                       fileName.includes('ad-creative') || fileName.includes('creative') ? 'ad-creative' : 'other'
+
+      console.log('[DEBUG] File:', fileName, '→ Detected as:', fileType)
 
       // Aggregate breakdown data by dimension
       let aggregatedData = parsed.data
