@@ -49,8 +49,11 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const lastSpent = parseNum(lastWeekData.amountSpent)
   const thisResults = parseNum(thisWeekData.messagingConversations || thisWeekData.results)
   const lastResults = parseNum(lastWeekData.messagingConversations || lastWeekData.results)
-  const thisCPR = parseNum(thisWeekData.costPerWA || thisWeekData.costPerMessagingConversation)
-  const lastCPR = parseNum(lastWeekData.costPerWA || lastWeekData.costPerMessagingConversation)
+
+  // Calculate CPR manually: Amount Spent / Messaging Conversations
+  const thisCPR = thisResults > 0 ? thisSpent / thisResults : 0
+  const lastCPR = lastResults > 0 ? lastSpent / lastResults : 0
+
   const thisImpr = parseNum(thisWeekData.impressions)
   const lastImpr = parseNum(lastWeekData.impressions)
   const thisCTR = parseNum(thisWeekData.ctr || thisWeekData.ctrAll || 0)
