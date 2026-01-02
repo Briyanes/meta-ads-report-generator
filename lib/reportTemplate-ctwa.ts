@@ -871,6 +871,19 @@ function generateBreakdownSlide(
     })
     .slice(0, 6)
 
+  // Calculate insights
+  const topPerformer = sortedData[0]
+  const topPerformerName = topPerformer ? topPerformer[labelKey] : 'N/A'
+  const topPerformerValue = topPerformer ? topPerformer[metricKey] || 0 : 0
+  const totalValue = sortedData.reduce((sum, item) => sum + (item[metricKey] || 0), 0)
+  const topPerformerPercentage = totalValue > 0 ? ((topPerformerValue / totalValue) * 100).toFixed(1) : '0'
+
+  // Calculate average CTR
+  const avgCTR = sortedData.reduce((sum, item) => {
+    const ctr = item['CTR (link click-through rate)'] || 0
+    return sum + ctr
+  }, 0) / Math.max(sortedData.length, 1)
+
   const tableRows = sortedData.map(item => {
     const label = item[labelKey] || 'Unknown'
     const value = item[metricKey] || 0
@@ -934,6 +947,10 @@ function generateBreakdownSlide(
 ${tableRows}
             </tbody>
         </table>
+
+        <div class="insight-box">
+            <p><strong>Key Insight:</strong> Top performer <strong>${topPerformerName}</strong> contributes <strong>${topPerformerPercentage}%</strong> of total messaging conversations with ${formatFn(topPerformerValue)} results. Average CTR across all segments is <strong>${avgCTR.toFixed(2)}%</strong>, indicating ${avgCTR > 0.5 ? 'strong' : avgCTR > 0.3 ? 'moderate' : 'lower'} engagement levels.</p>
+        </div>
 
         <div class="slide-footer">
             <span>Hadona Digital Media • CTWA Performance Report</span>
