@@ -875,9 +875,28 @@ function generateBreakdownSlide(
     const label = item[labelKey] || 'Unknown'
     const value = item[metricKey] || 0
     const formattedValue = formatFn(value)
+
+    // Extract additional metrics
+    const impressions = item['Impressions'] || 0
+    const linkClicks = item['Outbound clicks'] || 0
+    const ctrLinkClick = item['CTR (link click-through rate)'] || 0
+
+    // Format additional metrics
+    const formatNum = (val: number): string => {
+      if (val === null || val === undefined || isNaN(val)) return '0'
+      return Math.round(val).toLocaleString('id-ID')
+    }
+    const formatPercentVal = (val: number): string => {
+      if (val === null || val === undefined || isNaN(val)) return '0%'
+      return val.toFixed(2) + '%'
+    }
+
     return `                <tr>
                     <td><strong>${label}</strong></td>
                     <td class="text-right">${formattedValue}</td>
+                    <td class="text-right">${formatNum(impressions)}</td>
+                    <td class="text-right">${formatNum(linkClicks)}</td>
+                    <td class="text-right">${formatPercentVal(ctrLinkClick)}</td>
                 </tr>`
   }).join('\n')
 
@@ -906,6 +925,9 @@ function generateBreakdownSlide(
                 <tr>
                     <th>${labelKey}</th>
                     <th class="text-right">Messaging Conversations</th>
+                    <th class="text-right">Impressions</th>
+                    <th class="text-right">Link Click</th>
+                    <th class="text-right">CTR Link Click</th>
                 </tr>
             </thead>
             <tbody>
