@@ -1,13 +1,21 @@
-interface CTWAData {
-  thisWeek: any
-  lastWeek: any
-  breakdown: any
-  reportName?: string
-  retentionType?: string
-}
+export function generateReactTailwindReport(analysisData: any, reportName?: string, retentionType?: string, objectiveType?: string): string {
+  console.log('[CTWA Template] Starting report generation...')
 
-export function generateReactTailwindReport(data: CTWAData, reportName?: string, retentionType?: string): string {
-  const { thisWeek, lastWeek, breakdown } = data
+  const { thisWeek, lastWeek, breakdown, performanceSummary } = analysisData || {}
+
+  // Get data from performanceSummary or fallback to direct properties
+  const thisWeekData = performanceSummary?.thisWeek || thisWeek || {}
+  const lastWeekData = performanceSummary?.lastWeek || lastWeek || {}
+  const breakdownThisWeek = breakdown?.thisWeek || {}
+  const breakdownLastWeek = breakdown?.lastWeek || {}
+
+  // Parse numbers safely
+  const parseNum = (val: any): number => {
+    if (typeof val === 'number') return val
+    if (!val) return 0
+    const parsed = parseFloat(String(val).replace(/,/g, ''))
+    return isNaN(parsed) ? 0 : parsed
+  }
 
   // Helper functions
   const formatNumber = (num: number): string => {
@@ -37,27 +45,32 @@ export function generateReactTailwindReport(data: CTWAData, reportName?: string,
   const defaultReportName = 'Meta Ads Performance Report'
   const objectiveLabel = 'CTWA (Click to WhatsApp)'
 
-  // Calculate all growth metrics
-  const spendGrowth = calculateGrowth(thisWeek.amountSpent || 0, lastWeek.amountSpent || 0)
-  const resultsGrowth = calculateGrowth(thisWeek.messagingConversations || 0, lastWeek.messagingConversations || 0)
-  const cprGrowth = calculateGrowth(thisWeek.costPerMessagingConversation || 0, lastWeek.costPerMessagingConversation || 0)
+  // Extract metrics
+  const thisSpent = parseNum(thisWeekData.amountSpent)
+  const lastSpent = parseNum(lastWeekData.amountSpent)
+  const thisResults = parseNum(thisWeekData.messagingConversations)
+  const lastResults = parseNum(lastWeekData.messagingConversations)
+  const thisCPR = parseNum(thisWeekData.costPerMessagingConversation)
+  const lastCPR = parseNum(lastWeekData.costPerMessagingConversation)
+  const thisImpr = parseNum(thisWeekData.impressions)
+  const lastImpr = parseNum(lastWeekData.impressions)
+  const thisCTR = parseNum(thisWeekData.ctr || 0)
+  const lastCTR = parseNum(lastWeekData.ctr || 0)
+  const thisCPC = parseNum(thisWeekData.cpc || 0)
+  const lastCPC = parseNum(lastWeekData.cpc || 0)
 
-  // Prepare data for slides
-  const ageData = breakdown.thisWeek?.age || []
-  const genderData = breakdown.thisWeek?.gender || []
-  const regionData = breakdown.thisWeek?.region || []
-  const platformData = breakdown.thisWeek?.platform || []
-  const placementData = breakdown.thisWeek?.placement || []
-  const objectiveData = breakdown.thisWeek?.objective || []
-  const creativeData = breakdown.thisWeek?.['ad-creative'] || []
+  // Calculate growth
+  const spendGrowth = calculateGrowth(thisSpent, lastSpent)
+  const resultsGrowth = calculateGrowth(thisResults, lastResults)
+  const cprGrowth = calculateGrowth(thisCPR, lastCPR)
 
   // Format all values
-  const thisWeekSpent = formatCurrency(thisWeek.amountSpent || 0)
-  const lastWeekSpent = formatCurrency(lastWeek.amountSpent || 0)
-  const thisWeekResults = formatNumber(thisWeek.messagingConversations || 0)
-  const lastWeekResults = formatNumber(lastWeek.messagingConversations || 0)
-  const thisWeekCPR = formatCurrency(thisWeek.costPerMessagingConversation || 0)
-  const lastWeekCPR = formatCurrency(lastWeek.costPerMessagingConversation || 0)
+  const thisWeekSpent = formatCurrency(thisSpent)
+  const lastWeekSpent = formatCurrency(lastSpent)
+  const thisWeekResults = formatNumber(thisResults)
+  const lastWeekResults = formatNumber(lastResults)
+  const thisWeekCPR = formatCurrency(thisCPR)
+  const lastWeekCPR = formatCurrency(lastCPR)
 
   // Generate HTML string directly (no nested template literals)
   let html = `<!DOCTYPE html>
@@ -517,43 +530,43 @@ export function generateReactTailwindReport(data: CTWAData, reportName?: string,
                     <td><strong>Amount Spent</strong></td>
                     <td class="text-right">${lastWeekSpent}</td>
                     <td class="text-right">${thisWeekSpent}</td>
-                    <td class="text-right">${formatCurrency((thisWeek.amountSpent || 0) - (lastWeek.amountSpent || 0))}</td>
+                    <td class="text-right">${formatCurrency(thisSpent - lastSpent)}</td>
                     <td class="text-right"><span class="badge ${spendGrowth >= 0 ? 'badge-green' : 'badge-red'}">${spendGrowth >= 0 ? '+' : ''}${formatPercent(spendGrowth)}</span></td>
                 </tr>
                 <tr>
                     <td><strong>Messaging Conversations Started</strong></td>
                     <td class="text-right">${lastWeekResults}</td>
                     <td class="text-right">${thisWeekResults}</td>
-                    <td class="text-right">${formatNumber((thisWeek.messagingConversations || 0) - (lastWeek.messagingConversations || 0))}</td>
+                    <td class="text-right">${formatNumber(thisResults - lastResults)}</td>
                     <td class="text-right"><span class="badge ${resultsGrowth >= 0 ? 'badge-green' : 'badge-red'}">${resultsGrowth >= 0 ? '+' : ''}${formatPercent(resultsGrowth)}</span></td>
                 </tr>
                 <tr>
                     <td><strong>Cost per Messaging Conversation</strong></td>
                     <td class="text-right">${lastWeekCPR}</td>
                     <td class="text-right">${thisWeekCPR}</td>
-                    <td class="text-right">${formatCurrency((thisWeek.costPerMessagingConversation || 0) - (lastWeek.costPerMessagingConversation || 0))}</td>
+                    <td class="text-right">${formatCurrency(thisCPR - lastCPR)}</td>
                     <td class="text-right"><span class="badge ${cprGrowth <= 0 ? 'badge-green' : 'badge-red'}">${cprGrowth <= 0 ? '' : '+'}${formatPercent(cprGrowth)}</span></td>
                 </tr>
                 <tr>
                     <td><strong>Impressions</strong></td>
-                    <td class="text-right">${formatNumber(lastWeek.impressions || 0)}</td>
-                    <td class="text-right">${formatNumber(thisWeek.impressions || 0)}</td>
-                    <td class="text-right">${formatNumber((thisWeek.impressions || 0) - (lastWeek.impressions || 0))}</td>
-                    <td class="text-right"><span class="badge ${calculateGrowth(thisWeek.impressions || 0, lastWeek.impressions || 0) >= 0 ? 'badge-green' : 'badge-red'}">${calculateGrowth(thisWeek.impressions || 0, lastWeek.impressions || 0) >= 0 ? '+' : ''}${formatPercent(calculateGrowth(thisWeek.impressions || 0, lastWeek.impressions || 0))}</span></td>
+                    <td class="text-right">${formatNumber(lastImpr)}</td>
+                    <td class="text-right">${formatNumber(thisImpr)}</td>
+                    <td class="text-right">${formatNumber(thisImpr - lastImpr)}</td>
+                    <td class="text-right"><span class="badge ${calculateGrowth(thisImpr, lastImpr) >= 0 ? 'badge-green' : 'badge-red'}">${calculateGrowth(thisImpr, lastImpr) >= 0 ? '+' : ''}${formatPercent(calculateGrowth(thisImpr, lastImpr))}</span></td>
                 </tr>
                 <tr>
                     <td><strong>Click-Through Rate</strong></td>
-                    <td class="text-right">${formatPercent((lastWeek.ctr || 0) * 100)}</td>
-                    <td class="text-right">${formatPercent((thisWeek.ctr || 0) * 100)}</td>
-                    <td class="text-right">${formatPercent(((thisWeek.ctr || 0) - (lastWeek.ctr || 0)) * 100)}</td>
-                    <td class="text-right"><span class="badge ${calculateGrowth(thisWeek.ctr || 0, lastWeek.ctr || 0) >= 0 ? 'badge-green' : 'badge-red'}">${calculateGrowth(thisWeek.ctr || 0, lastWeek.ctr || 0) >= 0 ? '+' : ''}${formatPercent(calculateGrowth(thisWeek.ctr || 0, lastWeek.ctr || 0))}</span></td>
+                    <td class="text-right">${formatPercent(lastCTR * 100)}</td>
+                    <td class="text-right">${formatPercent(thisCTR * 100)}</td>
+                    <td class="text-right">${formatPercent((thisCTR - lastCTR) * 100)}</td>
+                    <td class="text-right"><span class="badge ${calculateGrowth(thisCTR, lastCTR) >= 0 ? 'badge-green' : 'badge-red'}">${calculateGrowth(thisCTR, lastCTR) >= 0 ? '+' : ''}${formatPercent(calculateGrowth(thisCTR, lastCTR))}</span></td>
                 </tr>
                 <tr>
                     <td><strong>Cost per Click (CPC)</strong></td>
-                    <td class="text-right">${formatCurrency(lastWeek.cpc || 0)}</td>
-                    <td class="text-right">${formatCurrency(thisWeek.cpc || 0)}</td>
-                    <td class="text-right">${formatCurrency((thisWeek.cpc || 0) - (lastWeek.cpc || 0))}</td>
-                    <td class="text-right"><span class="badge ${calculateGrowth(thisWeek.cpc || 0, lastWeek.cpc || 0) <= 0 ? 'badge-green' : 'badge-red'}">${calculateGrowth(thisWeek.cpc || 0, lastWeek.cpc || 0) <= 0 ? '' : '+'}${formatPercent(calculateGrowth(thisWeek.cpc || 0, lastWeek.cpc || 0))}</span></td>
+                    <td class="text-right">${formatCurrency(lastCPC)}</td>
+                    <td class="text-right">${formatCurrency(thisCPC)}</td>
+                    <td class="text-right">${formatCurrency(thisCPC - lastCPC)}</td>
+                    <td class="text-right"><span class="badge ${calculateGrowth(thisCPC, lastCPC) <= 0 ? 'badge-green' : 'badge-red'}">${calculateGrowth(thisCPC, lastCPC) <= 0 ? '' : '+'}${formatPercent(calculateGrowth(thisCPC, lastCPC))}</span></td>
                 </tr>
             </tbody>
         </table>
