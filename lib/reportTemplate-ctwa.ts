@@ -955,39 +955,39 @@ ${creativeRows}
             </div>
         </div>
 
-        <h1>Conclusion & Strategic Action Plan</h1>
-        <h2>Recommendations for Next Period</h2>
+        <h1>Kesimpulan & Rencana Aksi Strategis</h1>
+        <h2>Rekomendasi untuk Periode Berikutnya</h2>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
             <div>
-                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--success-green);">✓ What's Working</h3>
+                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--success-green);">✓ Yang Berfungsi Baik</h3>
                 <div style="background: var(--neutral-50); padding: 20px; border-radius: 12px; border-left: 4px solid var(--success-green);">
                     <ul style="list-style: none; padding: 0; margin: 0; space-y: 12px;">
                         <li style="padding: 8px 0; border-bottom: 1px solid var(--neutral-200); font-size: 13px;">
-                            <strong>Spend Efficiency:</strong> CPR ${cprGrowth <= 0 ? 'improved by' : 'is'} ${Math.abs(cprGrowth).toFixed(1)}%
+                            <strong>Efisiensi Spend:</strong> CPR ${cprGrowth <= 0 ? 'meningkat sebesar' : 'sebesar'} ${Math.abs(cprGrowth).toFixed(1)}%
                         </li>
                         <li style="padding: 8px 0; border-bottom: 1px solid var(--neutral-200); font-size: 13px;">
-                            <strong>Engagement:</strong> ${resultsGrowth >= 0 ? 'Increased' : 'Stable'} messaging conversations
+                            <strong>Engagement:</strong> Messaging conversations ${resultsGrowth >= 0 ? 'meningkat' : 'stabil'}
                         </li>
                         <li style="padding: 8px 0; font-size: 13px;">
-                            <strong>Top Platform:</strong> ${platformData.length > 0 ? platformData[0].Platform || platformData[0].platform || 'Facebook' : 'Facebook'} leading performance
+                            <strong>Platform Terbaik:</strong> ${platformData.length > 0 ? platformData[0].Platform || platformData[0].platform || 'Facebook' : 'Facebook'} memimpin performa
                         </li>
                     </ul>
                 </div>
             </div>
 
             <div>
-                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--warning-amber);">⚡ Action Items</h3>
+                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--warning-amber);">⚡ Item Aksi</h3>
                 <div style="background: var(--neutral-50); padding: 20px; border-radius: 12px; border-left: 4px solid var(--warning-amber);">
                     <ul style="list-style: none; padding: 0; margin: 0;">
                         <li style="padding: 8px 0; border-bottom: 1px solid var(--neutral-200); font-size: 13px;">
-                            <strong>1. Budget Optimization:</strong> Allocate 60-70% budget to top 3 performing ads
+                            <strong>1. Optimasi Budget:</strong> Alokasikan 60-70% budget ke 3 iklan dengan performa terbaik
                         </li>
                         <li style="padding: 8px 0; border-bottom: 1px solid var(--neutral-200); font-size: 13px;">
-                            <strong>2. Creative Testing:</strong> Test 3-5 new ad variations based on top performers
+                            <strong>2. Testing Creative:</strong> Tes 3-5 variasi iklan baru berdasarkan top performers
                         </li>
                         <li style="padding: 8px 0; font-size: 13px;">
-                            <strong>3. Audience Expansion:</strong> Scale winning audiences to similar segments
+                            <strong>3. Ekspansi Audience:</strong> Scale audience yang menang ke segmen serupa
                         </li>
                     </ul>
                 </div>
