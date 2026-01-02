@@ -385,6 +385,22 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             border: 1px solid #fecaca;
         }
 
+        .slide-cover {
+            text-align: center;
+            padding: 120px 64px;
+            background: linear-gradient(135deg, white 0%, var(--neutral-50) 100%);
+        }
+
+        .slide-cover h1 {
+            font-size: 56px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #3d5ee0 50%, var(--primary-yellow) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 24px;
+            letter-spacing: -0.04em;
+        }
+
         .insight-box {
             background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%);
             border-left: 5px solid var(--primary-yellow);
