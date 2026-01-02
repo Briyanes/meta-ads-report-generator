@@ -146,7 +146,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         }
 
         .agency-logo-icon {
-            width: 80px;
+            width: 65px;
             height: auto;
             object-fit: contain;
             max-width: 100%;

@@ -79,7 +79,7 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
         }
 
         .agency-logo-icon {
-            width: 80px;
+            width: 65px;
             height: auto;
             object-fit: contain;
             max-width: 100%;
