@@ -1,4 +1,4 @@
-export function generateReactTailwindReport(analysisData: any, reportName?: string, retentionType?: string, objectiveType?: string): string {
+export function generateReactTailwindReport(analysisData: any, reportName?: string, retentionType?: string): string {
   console.log('[CTWA Template] Starting report generation...')
 
   const { thisWeek, lastWeek, breakdown, performanceSummary } = analysisData || {}
@@ -43,7 +43,6 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const thisPeriodLabel = retentionType === 'mom' ? 'This Month' : 'This Week'
   const lastPeriodLabel = retentionType === 'mom' ? 'Last Month' : 'Last Week'
   const defaultReportName = 'Meta Ads Performance Report'
-  const objectiveLabel = 'CTWA (Click to WhatsApp)'
 
   // Extract metrics - match API field names
   const thisSpent = parseNum(thisWeekData.amountSpent)
@@ -303,6 +302,19 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             color: #991b1b;
         }
 
+        .period-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #3d5ee0 100%);
+            color: white;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(43, 70, 187, 0.25);
+        }
+
         table {
             width: 100%;
             border-collapse: separate;
@@ -407,19 +419,33 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
 </head>
 <body>
     <!-- SLIDE 1: COVER -->
-    <div class="slide" style="display: flex; align-items: center; justify-content: center; text-align: center;">
-        <div style="max-width: 800px;">
-            <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Logo" style="width: 100px; height: auto; margin-bottom: 40px;" />
-            <h1 style="font-size: 48px; margin-bottom: 16px;">${comparisonLabel} Reporting</h1>
-            <p style="font-size: 24px; color: var(--primary-blue); font-weight: 600; margin-bottom: 16px;">${objectiveLabel}</p>
-            ${reportName && reportName !== defaultReportName ? `<p style="font-size: 20px; color: var(--neutral-700); font-weight: 600; margin-bottom: 24px;">${reportName}</p>` : ''}
-            <div style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; background: linear-gradient(135deg, var(--primary-blue) 0%, #3d5ee0 100%); color: white; border-radius: 24px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(43, 70, 187, 0.25);">
-                <span>📅</span>
-                <span>${retentionType === 'mom' ? 'Month-over-Month Comparison' : 'Week-over-Week Comparison'}</span>
+    <div class="slide slide-cover">
+        <div class="agency-logo" style="justify-content: center; margin-bottom: 48px;">
+            <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" class="agency-logo-icon">
+        </div>
+
+        <h1>CTWA Performance Report</h1>
+
+        <p style="font-size: 24px; color: var(--neutral-600); font-weight: 600; margin-bottom: 32px;">
+            ${reportName || defaultReportName}
+        </p>
+
+        <div class="period-badge">
+            <span>📅</span>
+            <span>${retentionType === 'mom' ? 'Month-over-Month Comparison' : 'Week-over-Week Comparison'}</span>
+        </div>
+
+        <div style="margin-top: 64px;">
+            <div class="confidential-badge">
+                <span>🔒</span>
+                <span>Confidential Report</span>
             </div>
-            <div style="margin-top: 48px; padding: 24px; background: var(--neutral-50); border-radius: 12px; border: 1px solid var(--neutral-200);">
-                <p style="font-size: 14px; color: var(--neutral-700); font-weight: 600; margin-bottom: 8px;">🔒 Private & Confidential</p>
-                <p style="font-size: 13px; color: var(--neutral-600); line-height: 1.6;">This report contains proprietary insights prepared exclusively for our valued client. Redistribution or disclosure is not permitted.</p>
+        </div>
+
+        <div style="position: absolute; bottom: 56px; left: 64px; right: 64px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--neutral-500);">
+                <span>© 2026 Hadona Digital Media. All rights reserved.</span>
+                <span>Generated: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
             </div>
         </div>
     </div>
@@ -964,22 +990,28 @@ ${creativeRows}
 
     <!-- SLIDE: THANK YOU -->
     <div class="slide" style="text-align: center; padding: 120px 64px; background: linear-gradient(135deg, white 0%, var(--neutral-50) 100%);">
-        <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Logo" style="width: 100px; height: auto; margin-bottom: 48px;" />
-        <h1 style="font-size: 56px; background: linear-gradient(135deg, var(--primary-blue) 0%, #3d5ee0 50%, var(--primary-yellow) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 24px; letter-spacing: -0.04em;">Thank You</h1>
-        <p style="font-size: 20px; color: var(--neutral-600); font-weight: 600; margin-bottom: 48px;">Terima Kasih</p>
-        <div style="display: flex; justify-content: center; gap: 32px; margin-top: 64px;">
-            <div style="font-size: 16px; color: var(--neutral-700);">
-                <strong>Instagram:</strong> @hadona.id
-            </div>
-            <div style="font-size: 16px; color: var(--neutral-700);">
-                <strong>TikTok:</strong> @hadona.id
-            </div>
-            <div style="font-size: 16px; color: var(--neutral-700);">
-                <strong>Website:</strong> www.hadona.id
-            </div>
+        <div class="agency-logo" style="justify-content: center; margin-bottom: 48px;">
+            <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" class="agency-logo-icon" style="width: 200px;">
         </div>
-        <div style="margin-top: 64px; font-size: 14px; color: var(--neutral-500);">
-            Powered by <strong style="color: var(--primary-blue);">Hadona Digital Media</strong>
+
+        <h1 style="font-size: 64px; margin-bottom: 24px; background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-yellow) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+            Thank You!
+        </h1>
+        <p style="font-size: 20px; color: var(--neutral-600); margin-bottom: 56px; font-weight: 500;">
+            We appreciate your trust in managing your Meta Ads campaigns
+        </p>
+
+        <div style="background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-yellow) 100%);
+                    padding: 40px; border-radius: 20px; color: white; max-width: 640px; margin: 0 auto; box-shadow: 0 8px 24px rgba(43, 70, 187, 0.25);">
+            <p style="font-size: 20px; margin-bottom: 12px; font-weight: 700;">
+                Questions or Feedback?
+            </p>
+            <p style="font-size: 15px; opacity: 0.95; line-height: 1.7;">
+                Contact us anytime for campaign consultation
+            </p>
+            <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.3); font-size: 13px; opacity: 0.9;">
+                © 2026 Hadona Digital Media. All rights reserved.
+            </div>
         </div>
     </div>
 </body>
