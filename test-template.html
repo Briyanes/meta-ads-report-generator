@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Template Test</title>
+    <style>
+        :root {
+            --primary-blue: #2B46BB;
+            --primary-yellow: #ECDC43;
+            --neutral-50: #f8fafc;
+            --neutral-200: #e2e8f0;
+            --neutral-500: #64748b;
+        }
+        
+        .slide {
+            min-height: 900px;
+            background: white;
+            padding: 56px 64px;
+            margin: 0 auto 24px;
+            page-break-inside: avoid;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+            position: relative;
+        }
+
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary-blue) 0%, var(--primary-yellow) 100%);
+        }
+
+        .card {
+            background: var(--neutral-50);
+            border: 1px solid var(--neutral-200);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+
+        .metric-value {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin: 12px 0;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: var(--neutral-500);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <h1>Test Page</h1>
+        <div class="card">
+            <div class="metric-label">Amount Spent</div>
+            <div class="metric-value">Rp 1.000.000</div>
+        </div>
+    </div>
+    <script>
+        console.log('Template loaded successfully!');
+        console.log('CSS variables:', {
+            primary: getComputedStyle(document.documentElement).getPropertyValue('--primary-blue'),
+            yellow: getComputedStyle(document.documentElement).getPropertyValue('--primary-yellow')
+        });
+    </script>
+</body>
+</html>

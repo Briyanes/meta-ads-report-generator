@@ -79,6 +79,8 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const spendGrowth = calculateGrowth(thisWeek.amountSpent || 0, lastWeek.amountSpent || 0)
   const resultsGrowth = calculateGrowth(thisWeek.messagingConversations || 0, lastWeek.messagingConversations || 0)
   const cprGrowth = calculateGrowth(thisWeek.cpr || 0, lastWeek.cpr || 0)
+  const messagingFromAdsGrowth = calculateGrowth(thisWeek.messagingConversationsFromAds || 0, lastWeek.messagingConversationsFromAds || 0)
+  const costPerMessagingConvGrowth = calculateGrowth(thisWeek.costPerMessagingConversation || 0, lastWeek.costPerMessagingConversation || 0)
   
   // Process breakdown data for slides
   const ageData = breakdown.thisWeek?.age || []
@@ -862,8 +864,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                         </div>
 
                         <h1>Performance Summary</h1>
-                        <h2>Key Metrics Overview</h1>
-                            <h2>Key Metrics Overview</h2>
+                        <h2>Key Metrics Overview</h2>
 
                         <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px'}}>
                             {/* This Month */}
@@ -883,6 +884,14 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                 <div style={{marginTop: '20px'}}>
                                     <div className="metric-label">Cost per Result</div>
                                     <div className="metric-value">{formatCurrency(thisWeek.cpr || 0)}</div>
+                                </div>
+                                <div style={{marginTop: '20px'}}>
+                                    <div className="metric-label">Messaging Conversations Started (from Ads)</div>
+                                    <div className="metric-value">{formatNumber(thisWeek.messagingConversationsFromAds || 0)}</div>
+                                </div>
+                                <div style={{marginTop: '20px'}}>
+                                    <div className="metric-label">Cost per Messaging Conversation</div>
+                                    <div className="metric-value">{formatCurrency(thisWeek.costPerMessagingConversation || 0)}</div>
                                 </div>
                                 <div style={{marginTop: '24px'}}>
                                     <div className={\`growth-indicator \${spendGrowth.isPositive ? 'positive' : 'negative'}\`}>
@@ -909,6 +918,14 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                 <div style={{marginTop: '20px'}}>
                                     <div className="metric-label">Cost per Result</div>
                                     <div className="metric-value">{formatLastPeriodCurrency(parseNum(lastWeek.cpr))}</div>
+                                </div>
+                                <div style={{marginTop: '20px'}}>
+                                    <div className="metric-label">Messaging Conversations Started (from Ads)</div>
+                                    <div className="metric-value">{formatLastPeriod(parseNum(lastWeek.messagingConversationsFromAds))}</div>
+                                </div>
+                                <div style={{marginTop: '20px'}}>
+                                    <div className="metric-label">Cost per Messaging Conversation</div>
+                                    <div className="metric-value">{formatLastPeriodCurrency(parseNum(lastWeek.costPerMessagingConversation))}</div>
                                 </div>
                                 <div style={{marginTop: '24px'}}>
                                     <div className="metric-sublabel">No growth data available</div>
@@ -1014,6 +1031,20 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                             <td className="text-right">{formatNumber(thisWeek.messagingConversations || 0)}</td>
                                             <td className="text-right">{formatNumber((thisWeek.messagingConversations || 0) - (lastWeek.messagingConversations || 0))}</td>
                                             <td className={\`border border-gray-300 p-2 text-right text-xs \${resultsGrowth.isPositive ? 'text-green-500' : 'text-red-500'}\`}>{resultsGrowth.isPositive ? '+' : ''}{resultsGrowth.percent}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Messaging Conversations Started (from Ads)</td>
+                                            <td className="text-right">{formatLastPeriod(parseNum(lastWeek.messagingConversationsFromAds))}</td>
+                                            <td className="text-right">{formatNumber(thisWeek.messagingConversationsFromAds || 0)}</td>
+                                            <td className="text-right">{formatNumber((thisWeek.messagingConversationsFromAds || 0) - (lastWeek.messagingConversationsFromAds || 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${messagingFromAdsGrowth.isPositive ? 'text-green-500' : 'text-red-500'}\`}>{messagingFromAdsGrowth.isPositive ? '+' : ''}{formatPercent(messagingFromAdsGrowth.percent)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Cost per Messaging Conversation</td>
+                                            <td className="text-right">{formatLastPeriodCurrency(parseNum(lastWeek.costPerMessagingConversation))}</td>
+                                            <td className="text-right">{formatCurrency(thisWeek.costPerMessagingConversation || 0)}</td>
+                                            <td className="text-right">{formatCurrency((thisWeek.costPerMessagingConversation || 0) - (lastWeek.costPerMessagingConversation || 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.costPerMessagingConversation || 0) <= (lastWeek.costPerMessagingConversation || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.costPerMessagingConversation || 0) <= (lastWeek.costPerMessagingConversation || 0) ? '' : '+'}{formatPercent(costPerMessagingConvGrowth.percent)}</td>
                                         </tr>
                                         <tr>
                                             <td>Cost per WA</td>
