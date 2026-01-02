@@ -147,7 +147,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
 
         .agency-logo-icon {
             width: 80px;
-            height: 80px;
+            height: auto;
             object-fit: contain;
             max-width: 100%;
         }
@@ -519,7 +519,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                     {/* SLIDE 1 - WELCOME */}
                     <div className="bg-white p-8 min-h-screen flex items-center border-t-4 border-hadona-blue">
                         <div className="max-w-6xl mx-auto w-full text-center">
-                            <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Logo" className="mx-auto mb-6" style={{width: '80px', height: '80px'}} />
+                            <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Logo" className="mx-auto mb-6" style={{width: '80px', height: 'auto'}} />
                             <h1 className="text-4xl font-bold text-hadona-blue mb-3">{comparisonLabel} Reporting</h1>
                             <p className="text-2xl font-semibold text-hadona-blue mb-2">{objectiveLabel}</p>
                             {reportName && reportName !== defaultReportName && (
@@ -539,7 +539,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                             {/* Agency Header */}
                             <div className="agency-header">
                                 <div className="agency-logo">
-                                    <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" className="agency-logo-icon" />
+                                    <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
                                     <div>
                                         <div className="agency-name">Hadona Digital Media</div>
                                         <div className="agency-tagline">Performance Marketing</div>
@@ -607,7 +607,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                             {/* Agency Header */}
                             <div className="agency-header">
                                 <div className="agency-logo">
-                                    <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" className="agency-logo-icon" />
+                                    <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
                                     <div>
                                         <div className="agency-name">Hadona Digital Media</div>
                                         <div className="agency-tagline">Performance Marketing</div>
@@ -746,7 +746,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                             {/* Agency Header */}
                             <div className="agency-header">
                                 <div className="agency-logo">
-                                    <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" className="agency-logo-icon" />
+                                    <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
                                     <div>
                                         <div className="agency-name">Hadona Digital Media</div>
                                         <div className="agency-tagline">Performance Marketing</div>
@@ -829,7 +829,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                     {/* SLIDE 13 - THANK YOU */}
                     <div className="bg-white p-8 border-t-4 border-hadona-blue min-h-screen flex items-center">
                         <div className="max-w-6xl mx-auto w-full text-center">
-                            <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Logo" className="mx-auto mb-6" style={{width: '100px', height: '100px'}} />
+                            <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Logo" className="mx-auto mb-6" style={{width: '100px', height: 'auto'}} />
                             <h2 className="text-4xl font-bold text-hadona-blue mb-6">Terima Kasih</h2>
                             <div className="space-y-3 mb-6">
                                 <p className="text-xl"><i className="fab fa-instagram text-purple-500 mr-2"></i> Instagram: @hadona.id</p>
@@ -876,7 +876,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                             {/* Agency Header */}
                             <div className="agency-header">
                                 <div className="agency-logo">
-                                    <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" className="agency-logo-icon" />
+                                    <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
                                     <div>
                                         <div className="agency-name">Hadona Digital Media</div>
                                         <div className="agency-tagline">Performance Marketing</div>
@@ -958,7 +958,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                             {/* Agency Header */}
                             <div className="agency-header">
                                 <div className="agency-logo">
-                                    <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" className="agency-logo-icon" />
+                                    <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
                                     <div>
                                         <div className="agency-name">Hadona Digital Media</div>
                                         <div className="agency-tagline">Performance Marketing</div>
@@ -1054,7 +1054,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                             {/* Agency Header */}
                             <div className="agency-header">
                                 <div className="agency-logo">
-                                    <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" className="agency-logo-icon" />
+                                    <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
                                     <div>
                                         <div className="agency-name">Hadona Digital Media</div>
                                         <div className="agency-tagline">Performance Marketing</div>
@@ -1149,7 +1149,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                             {/* Agency Header */}
                             <div className="agency-header">
                                 <div className="agency-logo">
-                                    <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" className="agency-logo-icon" />
+                                    <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
                                     <div>
                                         <div className="agency-name">Hadona Digital Media</div>
                                         <div className="agency-tagline">Performance Marketing</div>
@@ -1245,7 +1245,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                             {/* Agency Header */}
                             <div className="agency-header">
                                 <div className="agency-logo">
-                                    <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" className="agency-logo-icon" />
+                                    <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
                                     <div>
                                         <div className="agency-name">Hadona Digital Media</div>
                                         <div className="agency-tagline">Performance Marketing</div>
@@ -1351,7 +1351,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                             {/* Agency Header */}
                             <div className="agency-header">
                                 <div className="agency-logo">
-                                    <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" className="agency-logo-icon" />
+                                    <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
                                     <div>
                                         <div className="agency-name">Hadona Digital Media</div>
                                         <div className="agency-tagline">Performance Marketing</div>
@@ -1500,7 +1500,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                             {/* Agency Header */}
                             <div className="agency-header">
                                 <div className="agency-logo">
-                                    <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" className="agency-logo-icon" />
+                                    <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
                                     <div>
                                         <div className="agency-name">Hadona Digital Media</div>
                                         <div className="agency-tagline">Performance Marketing</div>
@@ -1573,7 +1573,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                             {/* Agency Header */}
                             <div className="agency-header">
                                 <div className="agency-logo">
-                                    <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" className="agency-logo-icon" />
+                                    <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
                                     <div>
                                         <div className="agency-name">Hadona Digital Media</div>
                                         <div className="agency-tagline">Performance Marketing</div>

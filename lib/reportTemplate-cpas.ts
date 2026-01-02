@@ -80,7 +80,7 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
 
         .agency-logo-icon {
             width: 80px;
-            height: 80px;
+            height: auto;
             object-fit: contain;
             max-width: 100%;
         }
@@ -522,7 +522,7 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
     <!-- SLIDE 1: WELCOME -->
     <div class="slide slide-cover">
         <div class="agency-logo" style="justify-content: center; margin-bottom: 48px;">
-            <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+            <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" class="agency-logo-icon">
         </div>
 
         <h1>CPAS Performance Report</h1>
@@ -556,7 +556,7 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
         <!-- Agency Header -->
         <div class="agency-header">
             <div class="agency-logo">
-                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" class="agency-logo-icon">
                 <div>
                     <div class="agency-name">Hadona Digital Media</div>
                     <div class="agency-tagline">Performance Marketing</div>
@@ -638,7 +638,7 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
     <div class="slide">
         <div class="agency-header">
             <div class="agency-logo">
-                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" class="agency-logo-icon">
                 <div>
                     <div class="agency-name">Hadona Digital Media</div>
                     <div class="agency-tagline">Performance Marketing</div>
@@ -785,7 +785,7 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
     <div class="slide">
         <div class="agency-header">
             <div class="agency-logo">
-                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" class="agency-logo-icon">
                 <div>
                     <div class="agency-name">Hadona Digital Media</div>
                     <div class="agency-tagline">Performance Marketing</div>
@@ -899,7 +899,7 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
         <!-- Agency Header -->
         <div class="agency-header">
             <div class="agency-logo">
-                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" class="agency-logo-icon">
                 <div>
                     <div class="agency-name">Hadona Digital Media</div>
                     <div class="agency-tagline">Performance Marketing</div>
@@ -933,7 +933,7 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
         <!-- Agency Header -->
         <div class="agency-header">
             <div class="agency-logo">
-                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" class="agency-logo-icon">
                 <div>
                     <div class="agency-name">Hadona Digital Media</div>
                     <div class="agency-tagline">Performance Marketing</div>
@@ -967,7 +967,7 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
         <!-- Agency Header -->
         <div class="agency-header">
             <div class="agency-logo">
-                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" class="agency-logo-icon">
                 <div>
                     <div class="agency-name">Hadona Digital Media</div>
                     <div class="agency-tagline">Performance Marketing</div>
@@ -1001,7 +1001,7 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
         <!-- Agency Header -->
         <div class="agency-header">
             <div class="agency-logo">
-                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" class="agency-logo-icon">
                 <div>
                     <div class="agency-name">Hadona Digital Media</div>
                     <div class="agency-tagline">Performance Marketing</div>
@@ -1035,7 +1035,7 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
         <!-- Agency Header -->
         <div class="agency-header">
             <div class="agency-logo">
-                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" class="agency-logo-icon">
                 <div>
                     <div class="agency-name">Hadona Digital Media</div>
                     <div class="agency-tagline">Performance Marketing</div>
@@ -1069,7 +1069,7 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
         <!-- Agency Header -->
         <div class="agency-header">
             <div class="agency-logo">
-                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" class="agency-logo-icon">
                 <div>
                     <div class="agency-name">Hadona Digital Media</div>
                     <div class="agency-tagline">Performance Marketing</div>
@@ -1103,7 +1103,7 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
         <!-- Agency Header -->
         <div class="agency-header">
             <div class="agency-logo">
-                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" class="agency-logo-icon">
                 <div>
                     <div class="agency-name">Hadona Digital Media</div>
                     <div class="agency-tagline">Performance Marketing</div>
@@ -1137,7 +1137,7 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
         <!-- Agency Header -->
         <div class="agency-header">
             <div class="agency-logo">
-                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" class="agency-logo-icon">
                 <div>
                     <div class="agency-name">Hadona Digital Media</div>
                     <div class="agency-tagline">Performance Marketing</div>
@@ -1197,7 +1197,7 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
         <!-- Agency Header -->
         <div class="agency-header">
             <div class="agency-logo">
-                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" class="agency-logo-icon">
                 <div>
                     <div class="agency-name">Hadona Digital Media</div>
                     <div class="agency-tagline">Performance Marketing</div>
@@ -1256,7 +1256,7 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
     <div class="slide">
         <div class="agency-header">
             <div class="agency-logo">
-                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" class="agency-logo-icon">
                 <div>
                     <div class="agency-name">Hadona Digital Media</div>
                     <div class="agency-tagline">Performance Marketing</div>
@@ -1314,7 +1314,7 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
     <div class="slide">
         <div class="agency-header">
             <div class="agency-logo">
-                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" class="agency-logo-icon">
                 <div>
                     <div class="agency-name">Hadona Digital Media</div>
                     <div class="agency-tagline">Performance Marketing</div>
@@ -1355,7 +1355,7 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
     <!-- SLIDE 16: THANK YOU -->
     <div class="slide" style="text-align: center; padding: 120px 64px; background: linear-gradient(135deg, white 0%, var(--neutral-50) 100%);">
         <div class="agency-logo" style="justify-content: center; margin-bottom: 48px;">
-            <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon" style="width: 200px;">
+            <img src="http://localhost:3001/logo/logo-header-pdf.webp" alt="Hadona Digital Media" class="agency-logo-icon" style="width: 200px;">
         </div>
 
         <h1 style="font-size: 64px; margin-bottom: 24px; background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-yellow) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
