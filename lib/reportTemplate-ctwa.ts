@@ -564,7 +564,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                     <td class="text-right"><span class="badge ${calculateGrowth(thisImpr, lastImpr) >= 0 ? 'badge-green' : 'badge-red'}">${calculateGrowth(thisImpr, lastImpr) >= 0 ? '+' : ''}${formatPercent(calculateGrowth(thisImpr, lastImpr))}</span></td>
                 </tr>
                 <tr>
-                    <td><strong>Click-Through Rate</strong></td>
+                    <td><strong>Click-Through Rate (CTR)</strong></td>
                     <td class="text-right">${formatPercent(lastCTR * 100)}</td>
                     <td class="text-right">${formatPercent(thisCTR * 100)}</td>
                     <td class="text-right">${formatPercent((thisCTR - lastCTR) * 100)}</td>
@@ -576,6 +576,13 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                     <td class="text-right">${formatCurrency(thisCPC)}</td>
                     <td class="text-right">${formatCurrency(thisCPC - lastCPC)}</td>
                     <td class="text-right"><span class="badge ${calculateGrowth(thisCPC, lastCPC) <= 0 ? 'badge-green' : 'badge-red'}">${calculateGrowth(thisCPC, lastCPC) <= 0 ? '' : '+'}${formatPercent(calculateGrowth(thisCPC, lastCPC))}</span></td>
+                </tr>
+                <tr>
+                    <td><strong>OC → WA Landing Ratio</strong></td>
+                    <td class="text-right">${formatPercent((lastOutboundClicks && lastResults) ? (lastResults / lastOutboundClicks * 100) : 0)}</td>
+                    <td class="text-right">${formatPercent((thisOutboundClicks && thisResults) ? (thisResults / thisOutboundClicks * 100) : 0)}</td>
+                    <td class="text-right">${formatPercent(((thisOutboundClicks && thisResults) ? (thisResults / thisOutboundClicks * 100) : 0) - ((lastOutboundClicks && lastResults) ? (lastResults / lastOutboundClicks * 100) : 0))}</td>
+                    <td class="text-right"><span class="badge ${((thisOutboundClicks && thisResults) ? (thisResults / thisOutboundClicks) : 0) >= ((lastOutboundClicks && lastResults) ? (lastResults / lastOutboundClicks) : 0) ? 'badge-green' : 'badge-red'}">${((thisOutboundClicks && thisResults) ? (thisResults / thisOutboundClicks) : 0) >= ((lastOutboundClicks && lastResults) ? (lastResults / lastOutboundClicks) : 0) ? '+' : ''}${formatPercent(calculateGrowth((thisOutboundClicks && thisResults) ? (thisResults / thisOutboundClicks) : 0, (lastOutboundClicks && lastResults) ? (lastResults / lastOutboundClicks) : 0))}</span></td>
                 </tr>
             </tbody>
         </table>
