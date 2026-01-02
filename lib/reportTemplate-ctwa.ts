@@ -843,15 +843,84 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
 
   // Campaign Objective Performance Slide
   if (objectiveData.length > 0) {
-    html += generateBreakdownSlide(
-      'Campaign Objective Performance',
-      objectiveData,
-      breakdownLastWeek.objective || [],
-      'Messaging conversations started',
-      'Objective',
-      formatNumber,
-      slideNumber++
-    )
+    const sortedObjectives = [...objectiveData]
+      .filter(item => item['Objective'] || item['objective'] || item['Campaign objective'])
+      .sort((a, b) => {
+        const spendA = a['Amount spent (IDR)'] || a['Amount Spent'] || 0
+        const spendB = b['Amount spent (IDR)'] || b['Amount Spent'] || 0
+        return spendB - spendA
+      })
+      .slice(0, 6)
+
+    const objectiveRows = sortedObjectives.map((item) => {
+      const objective = item['Objective'] || item['objective'] || item['Campaign objective'] || 'Unknown'
+      const results = item['Messaging conversations started'] || item['Results'] || 0
+      const spend = item['Amount spent (IDR)'] || item['Amount Spent'] || 0
+      const impressions = item['Impressions'] || 0
+      const outboundClicks = item['Outbound clicks'] || 0
+      const cpr = results > 0 ? spend / results : 0
+
+      // Format outbound clicks as "Traffic"
+      const formatTraffic = (val: number): string => {
+        if (val === null || val === undefined || isNaN(val)) return '0'
+        return Math.round(val).toLocaleString('id-ID')
+      }
+
+      return `                <tr>
+                    <td><strong>${objective}</strong></td>
+                    <td class="text-right">${formatNumber(results)}</td>
+                    <td class="text-right">${formatCurrency(cpr)}</td>
+                    <td class="text-right">${formatCurrency(spend)}</td>
+                    <td class="text-right">${formatNumber(impressions)}</td>
+                    <td class="text-right">${formatTraffic(outboundClicks)}</td>
+                </tr>`
+    }).join('\n')
+
+    html += `
+    <!-- SLIDE: CAMPAIGN OBJECTIVE PERFORMANCE -->
+    <div class="slide">
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona" class="agency-logo-icon" />
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                <div class="confidential-badge">🔒 Confidential</div>
+            </div>
+        </div>
+
+        <h1>Campaign Objective Performance</h1>
+        <h2>Performance by Campaign Objective</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Objective</th>
+                    <th class="text-right">Results</th>
+                    <th class="text-right">CPR</th>
+                    <th class="text-right">Amount Spent</th>
+                    <th class="text-right">Impressions</th>
+                    <th class="text-right">Traffic</th>
+                </tr>
+            </thead>
+            <tbody>
+${objectiveRows}
+            </tbody>
+        </table>
+
+        <div class="insight-box">
+            <p><strong>Insight Utama:</strong> Top objective <strong>${sortedObjectives[0] ? (sortedObjectives[0]['Objective'] || sortedObjectives[0]['objective'] || 'N/A') : 'N/A'}</strong> menghasilkan ${formatNumber(sortedObjectives[0] ? (sortedObjectives[0]['Messaging conversations started'] || sortedObjectives[0]['Results'] || 0) : 0)} hasil dengan CPR ${formatCurrency(sortedObjectives[0] && sortedObjectives[0]['Messaging conversations started'] > 0 ? (sortedObjectives[0]['Amount spent (IDR)'] || 0) / (sortedObjectives[0]['Messaging conversations started'] || 1) : 0)}.</p>
+        </div>
+
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CTWA Performance Report</span>
+            <span class="slide-number">Page ${slideNumber++}</span>
+        </div>
+    </div>`
   }
 
   // Creative Performance Slide (Top Ads)
