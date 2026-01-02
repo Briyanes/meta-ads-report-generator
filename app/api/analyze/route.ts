@@ -583,7 +583,7 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     const thisWeekData = breakdownDataThisWeek.objective?.[0]
     const lastWeekData = breakdownDataLastWeek.objective?.[0]
 
-    // Validate objective data exists
+    // Validate objective data exists for this week
     if (!thisWeekData || Object.keys(thisWeekData).length === 0) {
       console.error('[ERROR] Objective breakdown file not found for thisWeek!')
       return NextResponse.json(
@@ -592,17 +592,19 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       )
     }
 
+    // For last week, allow missing objective data (for new clients with no historical data)
     if (!lastWeekData || Object.keys(lastWeekData).length === 0) {
-      console.error('[ERROR] Objective breakdown file not found for lastWeek!')
-      return NextResponse.json(
-        { error: 'Objective breakdown file is required for CPAS reports. Please upload the -objective.csv file for last week.' },
-        { status: 400 }
-      )
+      console.warn('[WARN] Objective breakdown file not found for lastWeek - this is expected for new clients')
+      console.log('[DEBUG] ✓ Using objective.csv for this week only (new client)')
+    } else {
+      console.log('[DEBUG] ✓ Using objective.csv for both weeks')
     }
-
-    console.log('[DEBUG] ✓ Using objective.csv for both weeks')
     console.log('[DEBUG] thisWeekData Amount Spent:', thisWeekData['Amount spent (IDR)'])
-    console.log('[DEBUG] lastWeekData Amount Spent:', lastWeekData['Amount spent (IDR)'])
+    if (lastWeekData) {
+      console.log('[DEBUG] lastWeekData Amount Spent:', lastWeekData['Amount spent (IDR)'])
+    } else {
+      console.log('[DEBUG] lastWeekData Amount Spent: N/A (new client)')
+    }
 
     // DEBUG: Log aggregated data
     console.log('[DEBUG] thisWeekData keys:', Object.keys(thisWeekData))
@@ -616,25 +618,25 @@ Return the analysis as structured JSON data that can be used to generate the HTM
 
     // Calculate base metrics
     const thisWeekSpend = parseNum(thisWeekData['Amount spent (IDR)'])
-    const lastWeekSpend = parseNum(lastWeekData['Amount spent (IDR)'])
-    
+    const lastWeekSpend = lastWeekData ? parseNum(lastWeekData['Amount spent (IDR)']) : 0
+
     // Extract results based on objective type
     let thisWeekResults = 0
     let lastWeekResults = 0
-    
+
     if (objectiveType === 'cpas') {
       // CRITICAL FIX: For CPAS, "Results" = Add to Cart (NOT Purchases!)
       // Report Manual uses ATC for CPR calculation: 2,130,319 / 653 = 3,262
       thisWeekResults = parseNum(thisWeekData['Adds to cart with shared items'])
-      lastWeekResults = parseNum(lastWeekData['Adds to cart with shared items'])
+      lastWeekResults = lastWeekData ? parseNum(lastWeekData['Adds to cart with shared items']) : 0
     } else if (objectiveType === 'ctlptowa') {
       // CTLP to WA: Use checkouts initiated
       thisWeekResults = parseNum(thisWeekData['Checkouts initiated'] || 0)
-      lastWeekResults = parseNum(lastWeekData['Checkouts initiated'] || 0)
+      lastWeekResults = lastWeekData ? parseNum(lastWeekData['Checkouts initiated'] || 0) : 0
     } else {
       // CTWA: Use messaging conversations
       thisWeekResults = parseNum(thisWeekData['Messaging conversations started'] || 0)
-      lastWeekResults = parseNum(lastWeekData['Messaging conversations started'] || 0)
+      lastWeekResults = lastWeekData ? parseNum(lastWeekData['Messaging conversations started'] || 0) : 0
     }
 
     // Calculate CPR manually (matching Report Manual approach)
