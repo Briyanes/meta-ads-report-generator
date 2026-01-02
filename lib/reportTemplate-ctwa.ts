@@ -812,7 +812,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   // Creative Performance Slide (Top Ads)
   if (creativeData.length > 0) {
     const sortedCreative = [...creativeData]
-      .filter(item => item['Ad name'] || item['Ad Name'] || item['ad_name'])
+      .filter(item => item['Ads'] || item['Ad name'] || item['Ad Name'] || item['ad_name'])
       .sort((a, b) => {
         const resultA = a['Messaging conversations started'] || 0
         const resultB = b['Messaging conversations started'] || 0
@@ -821,7 +821,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
       .slice(0, 5)
 
     const creativeRows = sortedCreative.map((item, index) => {
-      const adName = item['Ad name'] || item['Ad Name'] || item['ad_name'] || 'Unknown'
+      const adName = item['Ads'] || item['Ad name'] || item['Ad Name'] || item['ad_name'] || 'Unknown'
       const results = item['Messaging conversations started'] || 0
       const impressions = item['Impressions'] || 0
       const ctr = item['CTR (link click-through rate)'] || 0
