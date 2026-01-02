@@ -597,6 +597,129 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         </div>
     </div>`
 
+  // Analysis & Recommendations Slide
+  html += `
+    <!-- SLIDE: ANALYSIS & RECOMMENDATIONS -->
+    <div class="slide">
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona" class="agency-logo-icon" />
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                <div class="confidential-badge">🔒 Confidential</div>
+            </div>
+        </div>
+
+        <h1>Analysis & Recommendations</h1>
+        <h2>Performance Evaluation</h2>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+            <!-- Highlights -->
+            <div>
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                    <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #10B981 0%, #059669 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">✓</div>
+                    <h3 style="font-size: 18px; font-weight: 700; color: var(--success-green); margin: 0;">Highlights</h3>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 24px; border-radius: 16px; border-left: 5px solid var(--success-green);">
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        ${resultsGrowth > 0 ? `
+                        <div style="padding-bottom: 12px; border-bottom: 1px solid #bbf7d0;">
+                            <div style="font-size: 13px; color: #166534; font-weight: 600; margin-bottom: 4px;">Messaging Conversations Growth</div>
+                            <div style="font-size: 11px; color: #15803d;">Increased by ${resultsGrowth.toFixed(1)}% compared to ${lastPeriodLabel}, showing strong user engagement.</div>
+                        </div>
+                        ` : ''}
+
+                        ${cprGrowth < 0 ? `
+                        <div style="padding-bottom: 12px; border-bottom: 1px solid #bbf7d0;">
+                            <div style="font-size: 13px; color: #166534; font-weight: 600; margin-bottom: 4px;">Improved Cost Efficiency</div>
+                            <div style="font-size: 11px; color: #15803d;">CPR decreased by ${Math.abs(cprGrowth).toFixed(1)}%, resulting in better ROI and optimized ad spend.</div>
+                        </div>
+                        ` : ''}
+
+                        ${thisCTR > 0.4 ? `
+                        <div style="padding-bottom: 12px; border-bottom: 1px solid #bbf7d0;">
+                            <div style="font-size: 13px; color: #166534; font-weight: 600; margin-bottom: 4px;">Strong Click-Through Rate</div>
+                            <div style="font-size: 11px; color: #15803d;">CTR at ${(thisCTR * 100).toFixed(2)}% indicates compelling ad creative and effective targeting.</div>
+                        </div>
+                        ` : ''}
+
+                        ${thisOutboundClicks > lastOutboundClicks ? `
+                        <div style="padding-bottom: 12px; border-bottom: 1px solid #bbf7d0;">
+                            <div style="font-size: 13px; color: #166534; font-weight: 600; margin-bottom: 4px;">Higher Outbound Clicks</div>
+                            <div style="font-size: 11px; color: #15803d;">Outbound clicks increased by ${calculateGrowth(thisOutboundClicks, lastOutboundClicks).toFixed(1)}%, driving more traffic to WhatsApp.</div>
+                        </div>
+                        ` : ''}
+
+                        <div style="${resultsGrowth <= 0 && cprGrowth >= 0 && thisCTR <= 0.4 && thisOutboundClicks <= lastOutboundClicks ? '' : 'padding-bottom: 12px; border-bottom: 1px solid #bbf7d0;'}">
+                            <div style="font-size: 13px; color: #166534; font-weight: 600; margin-bottom: 4px;">Consistent Performance</div>
+                            <div style="font-size: 11px; color: #15803d;">Maintained stable messaging conversations with ${formatNumber(thisResults)} total results this ${retentionType === 'mom' ? 'month' : 'week'}.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lowlights -->
+            <div>
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                    <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">⚠</div>
+                    <h3 style="font-size: 18px; font-weight: 700; color: var(--danger-red); margin: 0;">Lowlights</h3>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); padding: 24px; border-radius: 16px; border-left: 5px solid var(--danger-red);">
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        ${cprGrowth > 0 ? `
+                        <div style="padding-bottom: 12px; border-bottom: 1px solid #fecaca;">
+                            <div style="font-size: 13px; color: #991b1b; font-weight: 600; margin-bottom: 4px;">Rising Cost per Result</div>
+                            <div style="font-size: 11px; color: #b91c1c;">CPR increased by ${cprGrowth.toFixed(1)}%, requiring optimization to maintain profitability.</div>
+                        </div>
+                        ` : ''}
+
+                        ${resultsGrowth < 0 ? `
+                        <div style="padding-bottom: 12px; border-bottom: 1px solid #fecaca;">
+                            <div style="font-size: 13px; color: #991b1b; font-weight: 600; margin-bottom: 4px;">Declining Messaging Conversations</div>
+                            <div style="font-size: 11px; color: #b91c1c;">Results decreased by ${Math.abs(resultsGrowth).toFixed(1)}%, indicating potential audience fatigue or creative fatigue.</div>
+                        </div>
+                        ` : ''}
+
+                        ${thisCTR < 0.3 ? `
+                        <div style="padding-bottom: 12px; border-bottom: 1px solid #fecaca;">
+                            <div style="font-size: 13px; color: #991b1b; font-weight: 600; margin-bottom: 4px;">Below-Average CTR</div>
+                            <div style="font-size: 11px; color: #b91c1c;">CTR at ${(thisCTR * 100).toFixed(2)}% is below industry benchmark. Consider refreshing ad creative and testing new formats.</div>
+                        </div>
+                        ` : ''}
+
+                        ${spendGrowth > resultsGrowth && resultsGrowth > 0 ? `
+                        <div style="padding-bottom: 12px; border-bottom: 1px solid #fecaca;">
+                            <div style="font-size: 13px; color: #991b1b; font-weight: 600; margin-bottom: 4px;">Diminishing Returns</div>
+                            <div style="font-size: 11px; color: #b91c1c;">Spend growth (${spendGrowth.toFixed(1)}%) outpaces results growth (${resultsGrowth.toFixed(1)}%). Need to improve conversion efficiency.</div>
+                        </div>
+                        ` : ''}
+
+                        <div style="${cprGrowth <= 0 && resultsGrowth >= 0 && thisCTR >= 0.3 && !(spendGrowth > resultsGrowth && resultsGrowth > 0) ? '' : 'padding-bottom: 12px; border-bottom: 1px solid #fecaca;'}">
+                            <div style="font-size: 13px; color: #991b1b; font-weight: 600; margin-bottom: 4px;">Optimization Opportunity</div>
+                            <div style="font-size: 11px; color: #b91c1c;">Focus on top-performing segments identified in breakdown analysis to maximize ROI.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="insight-box" style="margin-top: 32px;">
+            <p><strong>Strategic Recommendations:</strong> ${spendGrowth >= 0 && resultsGrowth >= 0 && cprGrowth <= 0 ? 'Strong performance with improving efficiency. Continue scaling top-performing audiences and creatives while maintaining current optimization strategy.' : spendGrowth >= 0 && resultsGrowth >= 0 ? 'Growth trajectory is positive but costs are rising. Optimize ad spend by reallocating budget to best-performing segments and testing new creative variations.' : resultsGrowth < 0 ? 'Results are declining. Immediate action needed: refresh ad creative, review audience targeting, and pause underperforming ad sets.' : 'Performance is stable. Focus on incremental improvements through A/B testing and gradual audience expansion.'}</p>
+        </div>
+
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CTWA Performance Report</span>
+            <span class="slide-number">Page 4</span>
+        </div>
+    </div>`
+
   // Generate breakdown slides
   const ageData = breakdownThisWeek.age || []
   const genderData = breakdownThisWeek.gender || []
@@ -606,7 +729,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const objectiveData = breakdownThisWeek.objective || []
   const creativeData = breakdownThisWeek['ad-creative'] || []
 
-  let slideNumber = 4
+  let slideNumber = 5
 
   // Age Breakdown Slide
   if (ageData.length > 0) {
