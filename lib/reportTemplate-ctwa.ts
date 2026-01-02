@@ -579,9 +579,235 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             <span>Hadona Digital Media • CTWA Performance Report</span>
             <span class="slide-number">Page 3</span>
         </div>
+    </div>`
+
+  // Generate breakdown slides
+  const ageData = breakdownThisWeek.age || []
+  const genderData = breakdownThisWeek.gender || []
+  const regionData = breakdownThisWeek.region || []
+  const platformData = breakdownThisWeek.platform || []
+  const placementData = breakdownThisWeek.placement || []
+  const objectiveData = breakdownThisWeek.objective || []
+  const creativeData = breakdownThisWeek['ad-creative'] || []
+
+  let slideNumber = 4
+
+  // Age Breakdown Slide
+  if (ageData.length > 0) {
+    html += generateBreakdownSlide(
+      'Audience Performance: Age',
+      ageData,
+      breakdownLastWeek.age || [],
+      'Messaging conversations started',
+      'Age',
+      formatNumber,
+      slideNumber++
+    )
+  }
+
+  // Gender Breakdown Slide
+  if (genderData.length > 0) {
+    html += generateBreakdownSlide(
+      'Audience Performance: Gender',
+      genderData,
+      breakdownLastWeek.gender || [],
+      'Messaging conversations started',
+      'Gender',
+      formatNumber,
+      slideNumber++
+    )
+  }
+
+  // Region Breakdown Slide
+  if (regionData.length > 0) {
+    html += generateBreakdownSlide(
+      'Audience Performance: Region',
+      regionData,
+      breakdownLastWeek.region || [],
+      'Messaging conversations started',
+      'Region',
+      formatNumber,
+      slideNumber++
+    )
+  }
+
+  // Platform Performance Slide
+  if (platformData.length > 0) {
+    html += generateBreakdownSlide(
+      'Platform Performance',
+      platformData,
+      breakdownLastWeek.platform || [],
+      'Messaging conversations started',
+      'Platform',
+      formatNumber,
+      slideNumber++
+    )
+  }
+
+  // Placement Performance Slide
+  if (placementData.length > 0) {
+    html += generateBreakdownSlide(
+      'Placement Performance',
+      placementData,
+      breakdownLastWeek.placement || [],
+      'Messaging conversations started',
+      'Placement',
+      formatNumber,
+      slideNumber++
+    )
+  }
+
+  // Creative Performance Slide (Top Ads)
+  if (creativeData.length > 0) {
+    const sortedCreative = [...creativeData]
+      .filter(item => item['Ad name'] || item['Ad Name'] || item['ad_name'])
+      .sort((a, b) => {
+        const resultA = a['Messaging conversations started'] || 0
+        const resultB = b['Messaging conversations started'] || 0
+        return resultB - resultA
+      })
+      .slice(0, 5)
+
+    const creativeRows = sortedCreative.map((item, index) => {
+      const adName = item['Ad name'] || item['Ad Name'] || item['ad_name'] || 'Unknown'
+      const results = item['Messaging conversations started'] || 0
+      const impressions = item['Impressions'] || 0
+      const ctr = item['CTR (link click-through rate)'] || 0
+      const spend = item['Amount spent (IDR)'] || item['Amount Spent'] || 0
+
+      const badgeClass = index === 0 ? 'background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #92400e;' :
+                        index === 1 ? 'background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); color: #065f46;' :
+                        index === 2 ? 'background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); color: #1e40af;' :
+                        'background: var(--neutral-50); color: var(--neutral-700);'
+
+      return `                <tr style="${index === 0 ? 'background: #fef9c3;' : ''}">
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; font-size: 11px; font-weight: 700; ${badgeClass}">#${index + 1}</span>
+                            <span style="font-size: 11px; font-weight: 600;">${adName.length > 50 ? adName.substring(0, 47) + '...' : adName}</span>
+                        </div>
+                    </td>
+                    <td class="text-right">${formatNumber(results)}</td>
+                    <td class="text-right">${formatNumber(impressions)}</td>
+                    <td class="text-right">${formatPercent(ctr * 100)}</td>
+                    <td class="text-right">${formatCurrency(spend)}</td>
+                </tr>`
+    }).join('\n')
+
+    html += `
+    <!-- SLIDE: CREATIVE PERFORMANCE -->
+    <div class="slide">
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona" class="agency-logo-icon" />
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                <div class="confidential-badge">🔒 Confidential</div>
+            </div>
+        </div>
+
+        <h1>Creative Performance</h1>
+        <h2>Top Performing Ads</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Ad Name</th>
+                    <th class="text-right">Results</th>
+                    <th class="text-right">Impressions</th>
+                    <th class="text-right">CTR</th>
+                    <th class="text-right">Spend</th>
+                </tr>
+            </thead>
+            <tbody>
+${creativeRows}
+            </tbody>
+        </table>
+
+        <div class="insight-box">
+            <p><strong>Key Insight:</strong> Top 3 ads contribute ${Math.round(sortedCreative.slice(0, 3).reduce((sum, item) => sum + (item['Messaging conversations started'] || 0), 0) / Math.max(thisResults, 1) * 100)}% of total messaging conversations. Focus budget on top performers and A/B test similar creative formats.</p>
+        </div>
+
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CTWA Performance Report</span>
+            <span class="slide-number">Page ${slideNumber++}</span>
+        </div>
+    </div>`
+  }
+
+  // Conclusion & Action Plan Slide
+  html += `
+    <!-- SLIDE: CONCLUSION & STRATEGIC ACTION PLAN -->
+    <div class="slide">
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona" class="agency-logo-icon" />
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                <div class="confidential-badge">🔒 Confidential</div>
+            </div>
+        </div>
+
+        <h1>Conclusion & Strategic Action Plan</h1>
+        <h2>Recommendations for Next Period</h2>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+            <div>
+                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--success-green);">✓ What's Working</h3>
+                <div style="background: var(--neutral-50); padding: 20px; border-radius: 12px; border-left: 4px solid var(--success-green);">
+                    <ul style="list-style: none; padding: 0; margin: 0; space-y: 12px;">
+                        <li style="padding: 8px 0; border-bottom: 1px solid var(--neutral-200); font-size: 13px;">
+                            <strong>Spend Efficiency:</strong> CPR ${cprGrowth <= 0 ? 'improved by' : 'is'} ${Math.abs(cprGrowth).toFixed(1)}%
+                        </li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid var(--neutral-200); font-size: 13px;">
+                            <strong>Engagement:</strong> ${resultsGrowth >= 0 ? 'Increased' : 'Stable'} messaging conversations
+                        </li>
+                        <li style="padding: 8px 0; font-size: 13px;">
+                            <strong>Top Platform:</strong> ${platformData.length > 0 ? platformData[0].Platform || platformData[0].platform || 'Facebook' : 'Facebook'} leading performance
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div>
+                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--warning-amber);">⚡ Action Items</h3>
+                <div style="background: var(--neutral-50); padding: 20px; border-radius: 12px; border-left: 4px solid var(--warning-amber);">
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="padding: 8px 0; border-bottom: 1px solid var(--neutral-200); font-size: 13px;">
+                            <strong>1. Budget Optimization:</strong> Allocate 60-70% budget to top 3 performing ads
+                        </li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid var(--neutral-200); font-size: 13px;">
+                            <strong>2. Creative Testing:</strong> Test 3-5 new ad variations based on top performers
+                        </li>
+                        <li style="padding: 8px 0; font-size: 13px;">
+                            <strong>3. Audience Expansion:</strong> Scale winning audiences to similar segments
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="insight-box">
+            <p><strong>Strategic Recommendation:</strong> ${spendGrowth >= 0 && resultsGrowth >= 0 ? 'Continue scaling with current strategy. Maintain 70/30 split between proven winners and new tests.' : 'Optimize underperforming ads. Focus on lowering CPR while maintaining message volume. Review targeting parameters.'}</p>
+        </div>
+
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CTWA Performance Report</span>
+            <span class="slide-number">Page ${slideNumber++}</span>
+        </div>
     </div>
 
-    <!-- SLIDE 13: THANK YOU -->
+    <!-- SLIDE: THANK YOU -->
     <div class="slide" style="text-align: center; padding: 120px 64px; background: linear-gradient(135deg, white 0%, var(--neutral-50) 100%);">
         <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Logo" style="width: 100px; height: auto; margin-bottom: 48px;" />
         <h1 style="font-size: 56px; background: linear-gradient(135deg, var(--primary-blue) 0%, #3d5ee0 50%, var(--primary-yellow) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 24px; letter-spacing: -0.04em;">Thank You</h1>
@@ -605,4 +831,75 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
 </html>`
 
   return html
+}
+
+function generateBreakdownSlide(
+  title: string,
+  thisWeekData: any[],
+  lastWeekData: any[],
+  metricKey: string,
+  labelKey: string,
+  formatFn: (val: number) => string,
+  slideNumber: number
+): string {
+  if (thisWeekData.length === 0 && lastWeekData.length === 0) {
+    return '' // Skip slide if no data
+  }
+
+  const sortedData = [...thisWeekData]
+    .filter(item => item[labelKey] && item[labelKey].trim())
+    .sort((a, b) => {
+      const resultA = a[metricKey] || 0
+      const resultB = b[metricKey] || 0
+      return resultB - resultA
+    })
+    .slice(0, 6)
+
+  const tableRows = sortedData.map(item => {
+    const label = item[labelKey] || 'Unknown'
+    const value = item[metricKey] || 0
+    const formattedValue = formatFn(value)
+    return `                <tr>
+                    <td><strong>${label}</strong></td>
+                    <td class="text-right">${formattedValue}</td>
+                </tr>`
+  }).join('\n')
+
+  return `
+    <!-- SLIDE: ${title} -->
+    <div class="slide">
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona" class="agency-logo-icon" />
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                <div class="confidential-badge">🔒 Confidential</div>
+            </div>
+        </div>
+
+        <h1>${title}</h1>
+        <h2>Performance by ${title.split(':').pop()}</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>${labelKey}</th>
+                    <th class="text-right">Messaging Conversations</th>
+                </tr>
+            </thead>
+            <tbody>
+${tableRows}
+            </tbody>
+        </table>
+
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CTWA Performance Report</span>
+            <span class="slide-number">Page ${slideNumber}</span>
+        </div>
+    </div>`
 }
