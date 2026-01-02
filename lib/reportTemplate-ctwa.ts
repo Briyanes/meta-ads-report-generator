@@ -588,7 +588,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         </table>
 
         <div class="insight-box">
-            <p><strong>Key Insight:</strong> ${spendGrowth >= 0 ? 'Peningkatan' : 'Penurunan'} performa sebesar ${Math.abs(spendGrowth).toFixed(1)}% dengan ${resultsGrowth >= 0 ? 'peningkatan' : 'penurunan'} messaging conversations. CPR ${cprGrowth <= 0 ? 'turun' : 'naik'} ${Math.abs(cprGrowth).toFixed(1)}% menunjukkan efisiensi biola yang ${cprGrowth <= 0 ? 'lebih baik' : 'perlu diperbaiki'}.</p>
+            <p><strong>Insight Utama:</strong> ${spendGrowth >= 0 ? 'Peningkatan' : 'Penurunan'} performa sebesar ${Math.abs(spendGrowth).toFixed(1)}% dengan ${resultsGrowth >= 0 ? 'peningkatan' : 'penurunan'} messaging conversations. CPR ${cprGrowth <= 0 ? 'turun' : 'naik'} ${Math.abs(cprGrowth).toFixed(1)}% menunjukkan efisiensi biaya yang ${cprGrowth <= 0 ? 'lebih baik' : 'perlu diperbaiki'}.</p>
         </div>
 
         <div class="slide-footer">
@@ -630,35 +630,35 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                     <div style="display: flex; flex-direction: column; gap: 16px;">
                         ${resultsGrowth > 0 ? `
                         <div style="padding-bottom: 12px; border-bottom: 1px solid #bbf7d0;">
-                            <div style="font-size: 13px; color: #166534; font-weight: 600; margin-bottom: 4px;">Messaging Conversations Growth</div>
-                            <div style="font-size: 11px; color: #15803d;">Increased by ${resultsGrowth.toFixed(1)}% compared to ${lastPeriodLabel}, showing strong user engagement.</div>
+                            <div style="font-size: 13px; color: #166534; font-weight: 600; margin-bottom: 4px;">Pertumbuhan Messaging Conversations</div>
+                            <div style="font-size: 11px; color: #15803d;">Meningkat sebesar ${resultsGrowth.toFixed(1)}% dibanding ${lastPeriodLabel === 'Last Month' ? 'bulan lalu' : 'minggu lalu'}, menunjukkan engagement pengguna yang kuat.</div>
                         </div>
                         ` : ''}
 
                         ${cprGrowth < 0 ? `
                         <div style="padding-bottom: 12px; border-bottom: 1px solid #bbf7d0;">
-                            <div style="font-size: 13px; color: #166534; font-weight: 600; margin-bottom: 4px;">Improved Cost Efficiency</div>
-                            <div style="font-size: 11px; color: #15803d;">CPR decreased by ${Math.abs(cprGrowth).toFixed(1)}%, resulting in better ROI and optimized ad spend.</div>
+                            <div style="font-size: 13px; color: #166534; font-weight: 600; margin-bottom: 4px;">Efisiensi Biaya Meningkat</div>
+                            <div style="font-size: 11px; color: #15803d;">CPR turun sebesar ${Math.abs(cprGrowth).toFixed(1)}%, menghasilkan ROI yang lebih baik dan pengeluaran iklan yang optimal.</div>
                         </div>
                         ` : ''}
 
                         ${thisCTR > 0.4 ? `
                         <div style="padding-bottom: 12px; border-bottom: 1px solid #bbf7d0;">
-                            <div style="font-size: 13px; color: #166534; font-weight: 600; margin-bottom: 4px;">Strong Click-Through Rate</div>
-                            <div style="font-size: 11px; color: #15803d;">CTR at ${(thisCTR * 100).toFixed(2)}% indicates compelling ad creative and effective targeting.</div>
+                            <div style="font-size: 13px; color: #166534; font-weight: 600; margin-bottom: 4px;">Click-Through Rate Kuat</div>
+                            <div style="font-size: 11px; color: #15803d;">CTR sebesar ${(thisCTR * 100).toFixed(2)}% menunjukkan creative iklan yang menarik dan targeting yang efektif.</div>
                         </div>
                         ` : ''}
 
                         ${thisOutboundClicks > lastOutboundClicks ? `
                         <div style="padding-bottom: 12px; border-bottom: 1px solid #bbf7d0;">
-                            <div style="font-size: 13px; color: #166534; font-weight: 600; margin-bottom: 4px;">Higher Outbound Clicks</div>
-                            <div style="font-size: 11px; color: #15803d;">Outbound clicks increased by ${calculateGrowth(thisOutboundClicks, lastOutboundClicks).toFixed(1)}%, driving more traffic to WhatsApp.</div>
+                            <div style="font-size: 13px; color: #166534; font-weight: 600; margin-bottom: 4px;">Outbound Clicks Lebih Tinggi</div>
+                            <div style="font-size: 11px; color: #15803d;">Outbound clicks meningkat sebesar ${calculateGrowth(thisOutboundClicks, lastOutboundClicks).toFixed(1)}%, mengarahkan lebih banyak trafik ke WhatsApp.</div>
                         </div>
                         ` : ''}
 
                         <div style="${resultsGrowth <= 0 && cprGrowth >= 0 && thisCTR <= 0.4 && thisOutboundClicks <= lastOutboundClicks ? '' : 'padding-bottom: 12px; border-bottom: 1px solid #bbf7d0;'}">
-                            <div style="font-size: 13px; color: #166534; font-weight: 600; margin-bottom: 4px;">Consistent Performance</div>
-                            <div style="font-size: 11px; color: #15803d;">Maintained stable messaging conversations with ${formatNumber(thisResults)} total results this ${retentionType === 'mom' ? 'month' : 'week'}.</div>
+                            <div style="font-size: 13px; color: #166534; font-weight: 600; margin-bottom: 4px;">Performa Konsisten</div>
+                            <div style="font-size: 11px; color: #15803d;">Mempertahankan messaging conversations stabil dengan total ${formatNumber(thisResults)} hasil ${retentionType === 'mom' ? 'bulan ini' : 'minggu ini'}.</div>
                         </div>
                     </div>
                 </div>
@@ -675,35 +675,35 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                     <div style="display: flex; flex-direction: column; gap: 16px;">
                         ${cprGrowth > 0 ? `
                         <div style="padding-bottom: 12px; border-bottom: 1px solid #fecaca;">
-                            <div style="font-size: 13px; color: #991b1b; font-weight: 600; margin-bottom: 4px;">Rising Cost per Result</div>
-                            <div style="font-size: 11px; color: #b91c1c;">CPR increased by ${cprGrowth.toFixed(1)}%, requiring optimization to maintain profitability.</div>
+                            <div style="font-size: 13px; color: #991b1b; font-weight: 600; margin-bottom: 4px;">Biaya per Hasil Meningkat</div>
+                            <div style="font-size: 11px; color: #b91c1c;">CPR naik sebesar ${cprGrowth.toFixed(1)}%, perlu optimasi untuk mempertahankan profitabilitas.</div>
                         </div>
                         ` : ''}
 
                         ${resultsGrowth < 0 ? `
                         <div style="padding-bottom: 12px; border-bottom: 1px solid #fecaca;">
-                            <div style="font-size: 13px; color: #991b1b; font-weight: 600; margin-bottom: 4px;">Declining Messaging Conversations</div>
-                            <div style="font-size: 11px; color: #b91c1c;">Results decreased by ${Math.abs(resultsGrowth).toFixed(1)}%, indicating potential audience fatigue or creative fatigue.</div>
+                            <div style="font-size: 13px; color: #991b1b; font-weight: 600; margin-bottom: 4px;">Penurunan Messaging Conversations</div>
+                            <div style="font-size: 11px; color: #b91c1c;">Hasil menurun sebesar ${Math.abs(resultsGrowth).toFixed(1)}%, mengindikasikan kemungkinan audience fatigue atau creative fatigue.</div>
                         </div>
                         ` : ''}
 
                         ${thisCTR < 0.3 ? `
                         <div style="padding-bottom: 12px; border-bottom: 1px solid #fecaca;">
-                            <div style="font-size: 13px; color: #991b1b; font-weight: 600; margin-bottom: 4px;">Below-Average CTR</div>
-                            <div style="font-size: 11px; color: #b91c1c;">CTR at ${(thisCTR * 100).toFixed(2)}% is below industry benchmark. Consider refreshing ad creative and testing new formats.</div>
+                            <div style="font-size: 13px; color: #991b1b; font-weight: 600; margin-bottom: 4px;">CTR Di Bawah Rata-Rata</div>
+                            <div style="font-size: 11px; color: #b91c1c;">CTR sebesar ${(thisCTR * 100).toFixed(2)}% di bawah benchmark industri. Pertimbangkan untuk refresh creative iklan dan testing format baru.</div>
                         </div>
                         ` : ''}
 
                         ${spendGrowth > resultsGrowth && resultsGrowth > 0 ? `
                         <div style="padding-bottom: 12px; border-bottom: 1px solid #fecaca;">
-                            <div style="font-size: 13px; color: #991b1b; font-weight: 600; margin-bottom: 4px;">Diminishing Returns</div>
-                            <div style="font-size: 11px; color: #b91c1c;">Spend growth (${spendGrowth.toFixed(1)}%) outpaces results growth (${resultsGrowth.toFixed(1)}%). Need to improve conversion efficiency.</div>
+                            <div style="font-size: 13px; color: #991b1b; font-weight: 600; margin-bottom: 4px;">Pengembalian yang Menurun</div>
+                            <div style="font-size: 11px; color: #b91c1c;">Pertumbuhan spend (${spendGrowth.toFixed(1)}%) melebihi pertumbuhan hasil (${resultsGrowth.toFixed(1)}%). Perlu peningkatan efisiensi konversi.</div>
                         </div>
                         ` : ''}
 
                         <div style="${cprGrowth <= 0 && resultsGrowth >= 0 && thisCTR >= 0.3 && !(spendGrowth > resultsGrowth && resultsGrowth > 0) ? '' : 'padding-bottom: 12px; border-bottom: 1px solid #fecaca;'}">
-                            <div style="font-size: 13px; color: #991b1b; font-weight: 600; margin-bottom: 4px;">Optimization Opportunity</div>
-                            <div style="font-size: 11px; color: #b91c1c;">Focus on top-performing segments identified in breakdown analysis to maximize ROI.</div>
+                            <div style="font-size: 13px; color: #991b1b; font-weight: 600; margin-bottom: 4px;">Peluang Optimasi</div>
+                            <div style="font-size: 11px; color: #b91c1c;">Fokus pada segmen dengan performa terbaik yang teridentifikasi dalam analisis breakdown untuk memaksimalkan ROI.</div>
                         </div>
                     </div>
                 </div>
@@ -711,7 +711,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         </div>
 
         <div class="insight-box" style="margin-top: 32px;">
-            <p><strong>Strategic Recommendations:</strong> ${spendGrowth >= 0 && resultsGrowth >= 0 && cprGrowth <= 0 ? 'Strong performance with improving efficiency. Continue scaling top-performing audiences and creatives while maintaining current optimization strategy.' : spendGrowth >= 0 && resultsGrowth >= 0 ? 'Growth trajectory is positive but costs are rising. Optimize ad spend by reallocating budget to best-performing segments and testing new creative variations.' : resultsGrowth < 0 ? 'Results are declining. Immediate action needed: refresh ad creative, review audience targeting, and pause underperforming ad sets.' : 'Performance is stable. Focus on incremental improvements through A/B testing and gradual audience expansion.'}</p>
+            <p><strong>Rekomendasi Strategis:</strong> ${spendGrowth >= 0 && resultsGrowth >= 0 && cprGrowth <= 0 ? 'Performa kuat dengan efisiensi yang meningkat. Lanjutkan scaling audience dan creative terbaik sambil mempertahankan strategi optimasi saat ini.' : spendGrowth >= 0 && resultsGrowth >= 0 ? 'Trah pertumbuhan positif namun biaya meningkat. Optimalkan pengeluaran iklan dengan mengalokasikan ulang budget ke segmen terbaik dan testing variasi creative baru.' : resultsGrowth < 0 ? 'Hasil menurun. Perlu tindakan segera: refresh creative iklan, tinjau audience targeting, dan pause ad set yang underperform.' : 'Performa stabil. Fokus pada peningkatan bertahap melalui A/B testing dan ekspansi audience bertahap.'}</p>
         </div>
 
         <div class="slide-footer">
@@ -869,7 +869,7 @@ ${creativeRows}
         </table>
 
         <div class="insight-box">
-            <p><strong>Key Insight:</strong> Top 3 ads contribute ${Math.round(sortedCreative.slice(0, 3).reduce((sum, item) => sum + (item['Messaging conversations started'] || 0), 0) / Math.max(thisResults, 1) * 100)}% of total messaging conversations. Focus budget on top performers and A/B test similar creative formats.</p>
+            <p><strong>Insight Utama:</strong> Top 3 iklan berkontribusi ${Math.round(sortedCreative.slice(0, 3).reduce((sum, item) => sum + (item['Messaging conversations started'] || 0), 0) / Math.max(thisResults, 1) * 100)}% dari total messaging conversations. Fokuskan budget pada top performers dan lakukan A/B test untuk format creative yang serupa.</p>
         </div>
 
         <div class="slide-footer">
@@ -937,7 +937,7 @@ ${creativeRows}
         </div>
 
         <div class="insight-box">
-            <p><strong>Strategic Recommendation:</strong> ${spendGrowth >= 0 && resultsGrowth >= 0 ? 'Continue scaling with current strategy. Maintain 70/30 split between proven winners and new tests.' : 'Optimize underperforming ads. Focus on lowering CPR while maintaining message volume. Review targeting parameters.'}</p>
+            <p><strong>Rekomendasi Strategis:</strong> ${spendGrowth >= 0 && resultsGrowth >= 0 ? 'Lanjutkan scaling dengan strategi saat ini. Pertahankan pembagian 70/30 antara proven winners dan tes baru.' : 'Optimalkan iklan yang underperform. Fokus pada penurunan CPR sambil mempertahankan volume percakapan. Tinjau parameter targeting.'}</p>
         </div>
 
         <div class="slide-footer">
@@ -1072,7 +1072,7 @@ ${tableRows}
         </table>
 
         <div class="insight-box">
-            <p><strong>Key Insight:</strong> Top performer <strong>${topPerformerName}</strong> contributes <strong>${topPerformerPercentage}%</strong> of total messaging conversations with ${formatFn(topPerformerValue)} results. Average CTR across all segments is <strong>${avgCTR.toFixed(2)}%</strong>, indicating ${avgCTR > 0.5 ? 'strong' : avgCTR > 0.3 ? 'moderate' : 'lower'} engagement levels.</p>
+            <p><strong>Insight Utama:</strong> Top performer <strong>${topPerformerName}</strong> berkontribusi <strong>${topPerformerPercentage}%</strong> dari total messaging conversations dengan ${formatFn(topPerformerValue)} hasil. Rata-rata CTR di semua segmen adalah <strong>${avgCTR.toFixed(2)}%</strong>, menunjukkan tingkat engagement ${avgCTR > 0.5 ? 'kuat' : avgCTR > 0.3 ? 'sedang' : 'rendah'}.</p>
         </div>
 
         <div class="slide-footer">
