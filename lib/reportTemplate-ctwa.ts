@@ -796,6 +796,19 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     )
   }
 
+  // Campaign Objective Performance Slide
+  if (objectiveData.length > 0) {
+    html += generateBreakdownSlide(
+      'Campaign Objective Performance',
+      objectiveData,
+      breakdownLastWeek.objective || [],
+      'Messaging conversations started',
+      'Objective',
+      formatNumber,
+      slideNumber++
+    )
+  }
+
   // Creative Performance Slide (Top Ads)
   if (creativeData.length > 0) {
     const sortedCreative = [...creativeData]
@@ -813,6 +826,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
       const impressions = item['Impressions'] || 0
       const ctr = item['CTR (link click-through rate)'] || 0
       const spend = item['Amount spent (IDR)'] || item['Amount Spent'] || 0
+      const cpr = results > 0 ? spend / results : 0
 
       const badgeClass = index === 0 ? 'background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #92400e;' :
                         index === 1 ? 'background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); color: #065f46;' :
@@ -830,6 +844,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                     <td class="text-right">${formatNumber(impressions)}</td>
                     <td class="text-right">${formatPercent(ctr * 100)}</td>
                     <td class="text-right">${formatCurrency(spend)}</td>
+                    <td class="text-right">${formatCurrency(cpr)}</td>
                 </tr>`
     }).join('\n')
 
@@ -861,6 +876,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                     <th class="text-right">Impressions</th>
                     <th class="text-right">CTR</th>
                     <th class="text-right">Spend</th>
+                    <th class="text-right">CPR</th>
                 </tr>
             </thead>
             <tbody>
