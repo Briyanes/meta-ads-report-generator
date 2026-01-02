@@ -6,13 +6,20 @@ import { NextRequest, NextResponse } from 'next/server'
 // Security: Check origin
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS?.split(',') || [
   'http://localhost:3000',
+  'http://localhost:3001',
   'https://meta-ads-report-generator.vercel.app',
   'https://hadona.id'
 ]
 
 function isValidOrigin(origin: string | null): boolean {
   if (!origin) return false
-  return ALLOWED_ORIGINS.some(allowed => origin === allowed || origin.endsWith(allowed.replace('https://', '.')))
+  return ALLOWED_ORIGINS.some(allowed => {
+    // Exact match
+    if (origin === allowed) return true
+    // Subdomain match (for production)
+    const allowedDomain = allowed.replace('https://', '').replace('http://', '')
+    return origin.endsWith('.' + allowedDomain) || origin === `https://${allowedDomain}` || origin === `http://${allowedDomain}`
+  })
 }
 
 // Security: Validate retention and objective types

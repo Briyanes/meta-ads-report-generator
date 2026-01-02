@@ -103,6 +103,24 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     <link rel="stylesheet" href="/css/bootstrap-icons-custom.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-blue: #2B46BB;
+            --primary-yellow: #ECDC43;
+            --success-green: #10B981;
+            --warning-amber: #F59E0B;
+            --danger-red: #EF4444;
+            --neutral-50: #f8fafc;
+            --neutral-100: #f1f5f9;
+            --neutral-200: #e2e8f0;
+            --neutral-300: #cbd5e1;
+            --neutral-400: #94a3b8;
+            --neutral-500: #64748b;
+            --neutral-600: #475569;
+            --neutral-700: #334155;
+            --neutral-800: #1e293b;
+            --neutral-900: #0f172a;
+        }
+
         body { font-family: 'Inter', sans-serif; }
         .bg-hadona-blue { background-color: #2B46BB; }
         .text-hadona-blue { color: #2B46BB; }
@@ -110,6 +128,69 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         .text-hadona-yellow { color: #ECDC43; }
         .border-hadona-blue { border-color: #2B46BB; }
         .border-hadona-yellow { border-color: #ECDC43; }
+
+        /* Agency Header Styles */
+        .agency-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--neutral-100);
+        }
+
+        .agency-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .agency-logo-icon {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            max-width: 100%;
+        }
+
+        .agency-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--neutral-900);
+            letter-spacing: -0.02em;
+        }
+
+        .agency-tagline {
+            font-size: 11px;
+            color: var(--neutral-500);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .report-meta {
+            text-align: right;
+        }
+
+        .report-date {
+            font-size: 10px;
+            color: var(--neutral-500);
+            font-weight: 500;
+        }
+
+        .confidential-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+            font-size: 9px;
+            font-weight: 700;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 6px;
+        }
         
         @media print {
             * {
@@ -438,7 +519,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                     {/* SLIDE 1 - WELCOME */}
                     <div className="bg-white p-8 min-h-screen flex items-center border-t-4 border-hadona-blue">
                         <div className="max-w-6xl mx-auto w-full text-center">
-                            <img src="https://hadona.id/wp-content/uploads/2024/12/cropped-Hadona-Logo-1-300x300.png" alt="Hadona Logo" className="mx-auto mb-6" style={{width: '80px', height: '80px'}} />
+                            <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Logo" className="mx-auto mb-6" style={{width: '80px', height: '80px'}} />
                             <h1 className="text-4xl font-bold text-hadona-blue mb-3">{comparisonLabel} Reporting</h1>
                             <p className="text-2xl font-semibold text-hadona-blue mb-2">{objectiveLabel}</p>
                             {reportName && reportName !== defaultReportName && (
@@ -455,6 +536,20 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                     {/* SLIDE 2 - PERFORMANCE SUMMARY */}
                     <div className="bg-white p-8 border-t-4 border-hadona-blue">
                         <div className="max-w-6xl mx-auto">
+                            {/* Agency Header */}
+                            <div className="agency-header">
+                                <div className="agency-logo">
+                                    <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" className="agency-logo-icon" />
+                                    <div>
+                                        <div className="agency-name">Hadona Digital Media</div>
+                                        <div className="agency-tagline">Performance Marketing</div>
+                                    </div>
+                                </div>
+                                <div className="report-meta">
+                                    <div className="report-date">Generated: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                                    <div className="confidential-badge">🔒 Confidential</div>
+                                </div>
+                            </div>
                             <h2 className="text-2xl font-bold text-hadona-blue mb-4">Performance Summary</h2>
                             <div className="grid grid-cols-2 gap-8">
                                 <div className="bg-blue-50 p-6 rounded-lg border-2 border-hadona-blue">
@@ -509,6 +604,19 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                     {/* SLIDE 3 - TABEL RINGKASAN METRIK */}
                     <div className="bg-white p-8 border-t-4 border-hadona-blue">
                         <div className="max-w-6xl mx-auto">
+                            {/* Agency Header */}
+                            <div className="agency-header">
+                                <div className="agency-logo">
+                                    <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" className="agency-logo-icon" />
+                                    <div>
+                                        <div className="agency-name">Hadona Digital Media</div>
+                                        <div className="agency-tagline">Performance Marketing</div>
+                                    </div>
+                                </div>
+                                <div className="report-meta">
+                                    <div className="report-date">Generated: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                                </div>
+                            </div>
                             <h2 className="text-2xl font-bold text-hadona-blue mb-4">Tabel Ringkasan Metrik</h2>
                             <div className="overflow-x-auto">
                                 <table className="w-full border-collapse border border-gray-300 text-sm">
@@ -635,6 +743,19 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                     {/* SLIDE 4 - WEEK-ON-WEEK ANALYSIS */}
                     <div className="bg-white p-8 border-t-4 border-hadona-blue">
                         <div className="max-w-6xl mx-auto">
+                            {/* Agency Header */}
+                            <div className="agency-header">
+                                <div className="agency-logo">
+                                    <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" className="agency-logo-icon" />
+                                    <div>
+                                        <div className="agency-name">Hadona Digital Media</div>
+                                        <div className="agency-tagline">Performance Marketing</div>
+                                    </div>
+                                </div>
+                                <div className="report-meta">
+                                    <div className="report-date">Generated: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                                </div>
+                            </div>
                             <h2 className="text-2xl font-bold text-hadona-blue mb-4">{comparisonLabel} Analysis</h2>
                             <div className="grid grid-cols-2 gap-0">
                                 <div className="border-r-2 border-gray-300 pr-6">
@@ -708,7 +829,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                     {/* SLIDE 13 - THANK YOU */}
                     <div className="bg-white p-8 border-t-4 border-hadona-blue min-h-screen flex items-center">
                         <div className="max-w-6xl mx-auto w-full text-center">
-                            <img src="https://hadona.id/wp-content/uploads/2024/12/cropped-Hadona-Logo-1-300x300.png" alt="Hadona Logo" className="mx-auto mb-6" style={{width: '100px', height: '100px'}} />
+                            <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Logo" className="mx-auto mb-6" style={{width: '100px', height: '100px'}} />
                             <h2 className="text-4xl font-bold text-hadona-blue mb-6">Terima Kasih</h2>
                             <div className="space-y-3 mb-6">
                                 <p className="text-xl"><i className="fab fa-instagram text-purple-500 mr-2"></i> Instagram: @hadona.id</p>
@@ -752,6 +873,19 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                     {/* SLIDE 5 - AUDIENCE PERFORMANCE: AGE */}
                     <div className="bg-white p-8 border-t-4 border-hadona-blue">
                         <div className="max-w-6xl mx-auto">
+                            {/* Agency Header */}
+                            <div className="agency-header">
+                                <div className="agency-logo">
+                                    <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" className="agency-logo-icon" />
+                                    <div>
+                                        <div className="agency-name">Hadona Digital Media</div>
+                                        <div className="agency-tagline">Performance Marketing</div>
+                                    </div>
+                                </div>
+                                <div className="report-meta">
+                                    <div className="report-date">Generated: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                                </div>
+                            </div>
                             <h2 className="text-2xl font-bold text-hadona-blue mb-4">Audience Performance: Age</h2>
                             <div className="grid grid-cols-2 gap-0">
                                 <div className="border-r-2 border-gray-300 pr-6">
@@ -821,6 +955,19 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                     {/* SLIDE 6 - AUDIENCE PERFORMANCE: GENDER */}
                     <div className="bg-white p-8 border-t-4 border-hadona-blue">
                         <div className="max-w-6xl mx-auto">
+                            {/* Agency Header */}
+                            <div className="agency-header">
+                                <div className="agency-logo">
+                                    <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" className="agency-logo-icon" />
+                                    <div>
+                                        <div className="agency-name">Hadona Digital Media</div>
+                                        <div className="agency-tagline">Performance Marketing</div>
+                                    </div>
+                                </div>
+                                <div className="report-meta">
+                                    <div className="report-date">Generated: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                                </div>
+                            </div>
                             <h2 className="text-2xl font-bold text-hadona-blue mb-4">Audience Performance: Gender</h2>
                             <div className="grid grid-cols-3 gap-0">
                                 <div className="border-r-2 border-gray-300 pr-4">
@@ -904,6 +1051,19 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                     {/* SLIDE 7 - AUDIENCE PERFORMANCE: REGION */}
                     <div className="bg-white p-8 border-t-4 border-hadona-blue">
                         <div className="max-w-6xl mx-auto">
+                            {/* Agency Header */}
+                            <div className="agency-header">
+                                <div className="agency-logo">
+                                    <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" className="agency-logo-icon" />
+                                    <div>
+                                        <div className="agency-name">Hadona Digital Media</div>
+                                        <div className="agency-tagline">Performance Marketing</div>
+                                    </div>
+                                </div>
+                                <div className="report-meta">
+                                    <div className="report-date">Generated: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                                </div>
+                            </div>
                             <h2 className="text-2xl font-bold text-hadona-blue mb-4">Audience Performance: Region</h2>
                             <div className="grid grid-cols-3 gap-0">
                                 <div className="border-r-2 border-gray-300 pr-4">
@@ -986,6 +1146,19 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                     {/* SLIDE 8 - PLATFORM PERFORMANCE */}
                     <div className="bg-white p-8 border-t-4 border-hadona-blue">
                         <div className="max-w-6xl mx-auto">
+                            {/* Agency Header */}
+                            <div className="agency-header">
+                                <div className="agency-logo">
+                                    <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" className="agency-logo-icon" />
+                                    <div>
+                                        <div className="agency-name">Hadona Digital Media</div>
+                                        <div className="agency-tagline">Performance Marketing</div>
+                                    </div>
+                                </div>
+                                <div className="report-meta">
+                                    <div className="report-date">Generated: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                                </div>
+                            </div>
                             <h2 className="text-2xl font-bold text-hadona-blue mb-4">Platform Performance</h2>
                             <div className="grid grid-cols-3 gap-0">
                                 <div className="border-r-2 border-gray-300 pr-4">
@@ -1069,6 +1242,19 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                     {/* SLIDE 9 - CONTENT PERFORMANCE: PLACEMENT */}
                     <div className="bg-white p-8 border-t-4 border-hadona-blue">
                         <div className="max-w-6xl mx-auto">
+                            {/* Agency Header */}
+                            <div className="agency-header">
+                                <div className="agency-logo">
+                                    <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" className="agency-logo-icon" />
+                                    <div>
+                                        <div className="agency-name">Hadona Digital Media</div>
+                                        <div className="agency-tagline">Performance Marketing</div>
+                                    </div>
+                                </div>
+                                <div className="report-meta">
+                                    <div className="report-date">Generated: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                                </div>
+                            </div>
                             <h2 className="text-2xl font-bold text-hadona-blue mb-4">Content Performance: Placement</h2>
                             <div className="grid grid-cols-3 gap-0">
                                 <div className="border-r-2 border-gray-300 pr-4">
@@ -1162,6 +1348,19 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                     {/* SLIDE 10 - CREATIVE PERFORMANCE: AD ANALYSIS */}
                     <div className="bg-white p-8 border-t-4 border-hadona-blue">
                         <div className="max-w-6xl mx-auto">
+                            {/* Agency Header */}
+                            <div className="agency-header">
+                                <div className="agency-logo">
+                                    <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" className="agency-logo-icon" />
+                                    <div>
+                                        <div className="agency-name">Hadona Digital Media</div>
+                                        <div className="agency-tagline">Performance Marketing</div>
+                                    </div>
+                                </div>
+                                <div className="report-meta">
+                                    <div className="report-date">Generated: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                                </div>
+                            </div>
                             <h2 className="text-2xl font-bold text-hadona-blue mb-4">Creative Performance: Ad Analysis</h2>
                             <div className="mb-3">
                                 <p className="text-xs text-gray-600">
@@ -1298,6 +1497,19 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                     {/* SLIDE 11 - CAMPAIGN OBJECTIVE PERFORMANCE */}
                     <div className="bg-white p-8 border-t-4 border-hadona-blue">
                         <div className="max-w-6xl mx-auto">
+                            {/* Agency Header */}
+                            <div className="agency-header">
+                                <div className="agency-logo">
+                                    <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" className="agency-logo-icon" />
+                                    <div>
+                                        <div className="agency-name">Hadona Digital Media</div>
+                                        <div className="agency-tagline">Performance Marketing</div>
+                                    </div>
+                                </div>
+                                <div className="report-meta">
+                                    <div className="report-date">Generated: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                                </div>
+                            </div>
                             <h2 className="text-2xl font-bold text-hadona-blue mb-4">Campaign Objective Performance</h2>
                             <div className="grid grid-cols-4 gap-3">
                                 ${sortedObjective.map((item: any) => {
@@ -1358,6 +1570,19 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                     {/* SLIDE 12 - OVERALL CONCLUSION & STRATEGIC ACTION PLAN */}
                     <div className="bg-white p-8 border-t-4 border-hadona-blue">
                         <div className="max-w-6xl mx-auto">
+                            {/* Agency Header */}
+                            <div className="agency-header">
+                                <div className="agency-logo">
+                                    <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" className="agency-logo-icon" />
+                                    <div>
+                                        <div className="agency-name">Hadona Digital Media</div>
+                                        <div className="agency-tagline">Performance Marketing</div>
+                                    </div>
+                                </div>
+                                <div className="report-meta">
+                                    <div className="report-date">Generated: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                                </div>
+                            </div>
                             <h2 className="text-2xl font-bold text-hadona-blue mb-4">Overall Conclusion & Strategic Action Plan</h2>
                             <div className="grid grid-cols-2 gap-0">
                                 <div className="border-r-2 border-gray-300 pr-6">

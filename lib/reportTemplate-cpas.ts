@@ -3,151 +3,654 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPAS Report - {REPORT_NAME}</title>
+    <title>CPAS Report - {REPORT_NAME} | Hadona Digital Media</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-blue: #2B46BB;
             --primary-yellow: #ECDC43;
+            --success-green: #10B981;
+            --warning-amber: #F59E0B;
+            --danger-red: #EF4444;
+            --neutral-50: #f8fafc;
+            --neutral-100: #f1f5f9;
+            --neutral-200: #e2e8f0;
+            --neutral-300: #cbd5e1;
+            --neutral-400: #94a3b8;
+            --neutral-500: #64748b;
+            --neutral-600: #475569;
+            --neutral-700: #334155;
+            --neutral-800: #1e293b;
+            --neutral-900: #0f172a;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background: #f8fafc;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Display', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            color: var(--neutral-800);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
+
         .slide {
             min-height: 900px;
             background: white;
-            padding: 48px;
+            padding: 56px 64px;
+            margin: 0 auto 24px;
             page-break-inside: avoid;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+            position: relative;
         }
-        .card {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 20px;
+
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary-blue) 0%, var(--primary-yellow) 100%);
         }
-        .metric-value {
-            font-size: 36px;
+
+        /* Agency Header */
+        .agency-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--neutral-100);
+        }
+
+        .agency-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .agency-logo-icon {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            max-width: 100%;
+        }
+
+        .agency-name {
+            font-size: 20px;
             font-weight: 700;
-            color: var(--primary-blue);
-            margin: 8px 0;
+            color: var(--neutral-900);
+            letter-spacing: -0.02em;
         }
-        .metric-label {
+
+        .agency-tagline {
             font-size: 12px;
-            color: #64748b;
+            color: var(--neutral-500);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .report-meta {
+            text-align: right;
+        }
+
+        .report-date {
+            font-size: 11px;
+            color: var(--neutral-500);
             font-weight: 500;
         }
-        .growth-positive { color: #10B981; }
-        .growth-negative { color: #EF4444; }
+
+        .confidential-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+            font-size: 10px;
+            font-weight: 700;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 8px;
+        }
+
+        /* Slide Footer */
+        .slide-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--neutral-200);
+            font-size: 10px;
+            color: var(--neutral-500);
+        }
+
+        .slide-number {
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            letter-spacing: -0.03em;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 14px;
+            color: var(--neutral-500);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 32px;
+        }
+
+        h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--neutral-50);
+            border: 1px solid var(--neutral-200);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-color: var(--neutral-300);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 11px;
+            color: var(--neutral-500);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .card-badge {
+            padding: 4px 10px;
+            background: var(--primary-blue);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        /* Metric Styles */
+        .metric-value {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin: 12px 0;
+            letter-spacing: -0.04em;
+            line-height: 1;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: var(--neutral-500);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .metric-sublabel {
+            font-size: 11px;
+            color: var(--neutral-400);
+            margin-top: 4px;
+        }
+
+        /* Growth Indicators */
+        .growth-positive {
+            color: var(--success-green);
+            font-weight: 700;
+        }
+
+        .growth-negative {
+            color: var(--danger-red);
+            font-weight: 700;
+        }
+
+        .growth-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .growth-indicator.positive {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+        }
+
+        .growth-indicator.negative {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+        }
+
+        /* Table Styles */
         table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
             background: white;
             border-radius: 12px;
             overflow: hidden;
-        }
-        th {
-            background: var(--primary-blue);
-            color: white;
-            padding: 16px;
-            text-align: left;
-            font-weight: 600;
-        }
-        .text-right { text-align: right; }
-        td {
-            padding: 16px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             font-size: 12px;
         }
-        .badge-green { background: #d1fae5; color: #065f46; }
-        .badge-red { background: #fee2e2; color: #991b1b; }
+
+        thead {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #3d5ee0 100%);
+        }
+
+        th {
+            color: white;
+            padding: 14px 12px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+
+        th:first-child {
+            border-top-left-radius: 12px;
+        }
+
+        th:last-child {
+            border-top-right-radius: 12px;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--neutral-100);
+            transition: background-color 0.15s ease;
+        }
+
+        tbody tr:hover {
+            background: var(--neutral-50);
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        td {
+            padding: 12px;
+            font-size: 11px;
+            color: var(--neutral-700);
+        }
+
+        tbody tr:nth-child(even) {
+            background: #fafbfc;
+        }
+
+        tbody tr:nth-child(even):hover {
+            background: var(--neutral-50);
+        }
+
+        /* Compact Table */
+        .compact-table td,
+        .compact-table th {
+            padding: 10px 10px;
+            font-size: 11px;
+        }
+
+        /* Badge Styles */
+        .badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 10px;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .badge-green {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .badge-red {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .badge-yellow {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        .badge-blue {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+
+        /* Insight Box */
+        .insight-box {
+            background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%);
+            border-left: 5px solid var(--primary-yellow);
+            padding: 24px;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(236, 220, 67, 0.2);
+        }
+
+        .insight-box::before {
+            content: '💡';
+            position: absolute;
+            top: -15px;
+            right: -10px;
+            font-size: 80px;
+            opacity: 0.15;
+        }
+
+        .insight-box p {
+            font-size: 14px;
+            color: #854d0e;
+            line-height: 1.8;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+            margin: 0;
+        }
+
+        .insight-box strong {
+            color: #713f12;
+            font-weight: 700;
+        }
+
+        /* Highlight/Lowlight Boxes - Consistent colors */
+        .highlight-box {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-left: 4px solid var(--success-green);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .lowlight-box {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border-left: 4px solid var(--danger-red);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(239, 68, 68, 0.1);
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--neutral-200);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-blue) 0%, var(--primary-yellow) 100%);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        /* Icon Badge */
+        .icon-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-right: 8px;
+        }
+
+        .icon-badge-success {
+            background: var(--success-green);
+            color: white;
+        }
+
+        .icon-badge-danger {
+            background: var(--danger-red);
+            color: white;
+        }
+
+        /* Separator */
+        .separator {
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, var(--neutral-200) 50%, transparent 100%);
+            margin: 24px 0;
+        }
+
+        /* Period Badge */
+        .period-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #3d5ee0 100%);
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 24px;
+            box-shadow: 0 4px 12px rgba(43, 70, 187, 0.25);
+        }
+
+        /* Cover Slide Special */
+        .slide-cover {
+            text-align: center;
+            padding: 120px 64px;
+            background: linear-gradient(135deg, white 0%, var(--neutral-50) 100%);
+        }
+
+        .slide-cover h1 {
+            font-size: 56px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #3d5ee0 50%, var(--primary-yellow) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 24px;
+            letter-spacing: -0.04em;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+
+            .slide {
+                box-shadow: none;
+                margin: 0;
+                page-break-after: always;
+            }
+
+            .slide:last-child {
+                page-break-after: auto;
+            }
+        }
     </style>
 </head>
 <body>
     <!-- SLIDE 1: WELCOME -->
-    <div class="slide">
-        <h1 style="font-size: 42px; margin-bottom: 16px; color: var(--primary-blue);">
-            CPAS Performance Report
-        </h1>
-        <h2 style="font-size: 20px; color: #64748b;">
+    <div class="slide slide-cover">
+        <div class="agency-logo" style="justify-content: center; margin-bottom: 48px;">
+            <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+        </div>
+
+        <h1>CPAS Performance Report</h1>
+
+        <p style="font-size: 24px; color: var(--neutral-600); font-weight: 600; margin-bottom: 32px;">
             {REPORT_NAME}
-        </h2>
-        <p style="margin-top: 24px; font-size: 14px; color: #94a3b8;">
-            <strong>Periode:</strong> {PERIOD_LABEL}
         </p>
+
+        <div class="period-badge">
+            <span>📅</span>
+            <span>{PERIOD_LABEL}</span>
+        </div>
+
+        <div style="margin-top: 64px;">
+            <div class="confidential-badge">
+                <span>🔒</span>
+                <span>Confidential Report</span>
+            </div>
+        </div>
+
+        <div style="position: absolute; bottom: 56px; left: 64px; right: 64px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--neutral-500);">
+                <span>© 2026 Hadona Digital Media. All rights reserved.</span>
+                <span>Generated: {REPORT_DATE}</span>
+            </div>
+        </div>
     </div>
 
     <!-- SLIDE 2: PERFORMANCE SUMMARY -->
     <div class="slide">
-        <h1 style="font-size: 28px; margin-bottom: 24px; color: var(--primary-blue);">
-            Performance Summary
-        </h1>
+        <!-- Agency Header -->
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: {REPORT_DATE}</div>
+                <div class="confidential-badge">🔒 Confidential</div>
+            </div>
+        </div>
+
+        <h1>Performance Summary</h1>
+        <h2>Key Metrics Overview</h2>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
             <!-- This Month -->
             <div class="card">
-                <div class="metric-label">{THIS_PERIOD_LABEL}</div>
-                <div style="margin-top: 16px;">
+                <div class="card-header">
+                    <div class="card-title">{THIS_PERIOD_LABEL}</div>
+                    <div class="card-badge">Current</div>
+                </div>
+                <div style="margin-top: 20px;">
                     <div class="metric-label">Amount Spent</div>
                     <div class="metric-value">{THIS_SPEND}</div>
                 </div>
-                <div style="margin-top: 16px;">
+                <div style="margin-top: 20px;">
                     <div class="metric-label">Results (Add to Cart)</div>
                     <div class="metric-value">{THIS_ATC}</div>
                 </div>
-                <div style="margin-top: 16px;">
+                <div style="margin-top: 20px;">
                     <div class="metric-label">Cost per Result</div>
                     <div class="metric-value">{THIS_CPR}</div>
                 </div>
-                <div style="margin-top: 16px;">
-                    <span style="color: {GROWTH_COLOR}; font-weight: 600;">
-                        Growth: {GROWTH_PERCENT}%
-                    </span>
+                <div style="margin-top: 24px;">
+                    <div class="growth-indicator {GROWTH_INDICATOR_CLASS}">
+                        <span>{GROWTH_ARROW}</span>
+                        <span>Growth: {GROWTH_PERCENT}%</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Last Month -->
             <div class="card">
-                <div class="metric-label">{LAST_PERIOD_LABEL}</div>
-                <div style="margin-top: 16px;">
+                <div class="card-header">
+                    <div class="card-title">{LAST_PERIOD_LABEL}</div>
+                    <div class="card-badge" style="background: var(--neutral-400);">Previous</div>
+                </div>
+                <div style="margin-top: 20px;">
                     <div class="metric-label">Amount Spent</div>
-                    <div class="metric-value">{LAST_SPEND}</div>
+                    <div class="metric-value" style="color: var(--neutral-700);">{LAST_SPEND}</div>
                 </div>
-                <div style="margin-top: 16px;">
+                <div style="margin-top: 20px;">
                     <div class="metric-label">Results (Add to Cart)</div>
-                    <div class="metric-value">{LAST_ATC}</div>
+                    <div class="metric-value" style="color: var(--neutral-700);">{LAST_ATC}</div>
                 </div>
-                <div style="margin-top: 16px;">
+                <div style="margin-top: 20px;">
                     <div class="metric-label">Cost per Result</div>
-                    <div class="metric-value">{LAST_CPR}</div>
+                    <div class="metric-value" style="color: var(--neutral-700);">{LAST_CPR}</div>
                 </div>
             </div>
         </div>
 
-        <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; margin-top: 32px; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
-            <p style="font-size: 14px; color: #854d0e; line-height: 1.7; font-weight: 500; position: relative; z-index: 1; margin: 0;">
+        <div class="insight-box" style="margin-top: 32px;">
+            <p>
                 <strong>Key Insight:</strong> {PERIOD_TYPE} ini menunjukkan performa yang {GROWTH_SENTIMENT} dengan {THIS_ATC} add to cart dan CPR {THIS_CPR}.
                 Pertumbuhan spend sebesar {SPEND_GROWTH}% {SPEND_SENTIMENT} dengan hasil yang {PERFORMANCE_SENTIMENT}.
                 {CONVERSION_SENTIMENT}
             </p>
         </div>
+
+        <!-- Slide Footer -->
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CPAS Performance Report</span>
+            <span class="slide-number">Page 2</span>
+        </div>
     </div>
 
     <!-- SLIDE 3: DETAILED METRICS -->
     <div class="slide">
-        <h1 style="font-size: 28px; margin-bottom: 24px; color: var(--primary-blue);">
-            Detailed Performance Metrics
-        </h1>
-        <h2 style="font-size: 16px; color: #64748b; margin-bottom: 32px;">
-            Complete {PERIOD_TYPE} Comparison
-        </h2>
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: {REPORT_DATE}</div>
+            </div>
+        </div>
+
+        <h1>Detailed Performance Metrics</h1>
+        <h2>Complete {PERIOD_TYPE} Comparison</h2>
 
         <div style="overflow-x: auto;">
             <table>
@@ -246,7 +749,7 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
                         <td class="text-right"><span class="badge {CONVERSION_RATE_BADGE_CLASS}">{CONVERSION_RATE_GROWTH}%</span></td>
                     </tr>
                     <tr>
-                        <td><strong>Purchase ROAS (return on ad spend)</strong></td>
+                        <td><strong>ROAS (return on ad spend)</strong></td>
                         <td class="text-right">{LAST_ROAS}</td>
                         <td class="text-right">{THIS_ROAS}</td>
                         <td class="text-right {ROAS_CLASS}">{ROAS_DIFF}</td>
@@ -263,68 +766,81 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
             </table>
         </div>
 
-        <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; margin-top: 32px; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
-            <p style="font-size: 14px; color: #854d0e; line-height: 1.7; font-weight: 500; position: relative; z-index: 1; margin: 0;">
+        <div class="insight-box" style="margin-top: 32px;">
+            <p>
                 <strong>Insight Utama:</strong> Performa {PERIOD_TYPE} ini {METRIC_PERFORMANCE_DESC}.
                 {TOP_PERFORMER_METRIC} adalah top performer dengan {TOP_PERFORMER_GROWTH}% pertumbuhan.
                 {CTR_SENTIMENT} CTR sebesar {THIS_CTR}%.
                 Rekomendasi: {METRICS_RECOMMENDATION}
             </p>
         </div>
+
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CPAS Performance Report</span>
+            <span class="slide-number">Page 3</span>
+        </div>
     </div>
 
     <!-- SLIDE 4: KEY INSIGHTS -->
     <div class="slide">
-        <h1 style="font-size: 28px; margin-bottom: 24px; color: var(--primary-blue);">
-            Key Insights
-        </h1>
-        <h2 style="font-size: 16px; color: #64748b; margin-bottom: 32px;">
-            Analysis & Recommendations
-        </h2>
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: {REPORT_DATE}</div>
+            </div>
+        </div>
+
+        <h1>Key Insights</h1>
+        <h2>Analysis & Recommendations</h2>
 
         <!-- Two Column Layout: Highlights and Lowlights -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-bottom: 28px;">
 
             <!-- HIGHLIGHTS COLUMN -->
             <div>
-                <h3 style="color: #10b981; margin-bottom: 16px; font-size: 18px; font-weight: 600;">
+                <h3 style="color: var(--success-green); margin-bottom: 16px; font-size: 18px; font-weight: 700;">
                     Highlights
                 </h3>
-                <div style="background: #e6f7f0; border-left: 3px solid #10b981; padding: 20px; border-radius: 8px;">
+                <div class="highlight-box">
                     <ul style="list-style: none; padding: 0; margin: 0; line-height: 2;">
-                        <li style="margin-bottom: 12px; color: #333333;">
-                            <span style="color: #10b981; font-weight: 600; margin-right: 8px;">☑</span>
+                        <li style="margin-bottom: 12px; color: var(--neutral-800);">
+                            <span class="icon-badge icon-badge-success">✓</span>
                             <strong>{THIS_ATC} Add to Cart</strong>
-                            <div style="font-size: 13px; color: #666666; margin-top: 4px; margin-left: 24px;">
+                            <div style="font-size: 13px; color: var(--neutral-600); margin-top: 4px; margin-left: 36px;">
                                 Konversi pertama tercapai dengan CPR {THIS_CPR}
                             </div>
                         </li>
-                        <li style="margin-bottom: 12px; color: #333333;">
-                            <span style="color: #10b981; font-weight: 600; margin-right: 8px;">☑</span>
+                        <li style="margin-bottom: 12px; color: var(--neutral-800);">
+                            <span class="icon-badge icon-badge-success">✓</span>
                             <strong>{THIS_PURCHASES} Purchases</strong>
-                            <div style="font-size: 13px; color: #666666; margin-top: 4px; margin-left: 24px;">
+                            <div style="font-size: 13px; color: var(--neutral-600); margin-top: 4px; margin-left: 36px;">
                                 ROAS {THIS_ROAS}, AOV {THIS_AOV}
                             </div>
                         </li>
-                        <li style="margin-bottom: 12px; color: #333333;">
-                            <span style="color: #10b981; font-weight: 600; margin-right: 8px;">☑</span>
+                        <li style="margin-bottom: 12px; color: var(--neutral-800);">
+                            <span class="icon-badge icon-badge-success">✓</span>
                             <strong>CPM {CPM_SENTIMENT} {CPM_CHANGE_ABS}%</strong>
-                            <div style="font-size: 13px; color: #666666; margin-top: 4px; margin-left: 24px;">
+                            <div style="font-size: 13px; color: var(--neutral-600); margin-top: 4px; margin-left: 36px;">
                                 {CPM_INSIGHT}
                             </div>
                         </li>
-                        <li style="margin-bottom: 12px; color: #333333;">
-                            <span style="color: #10b981; font-weight: 600; margin-right: 8px;">☑</span>
+                        <li style="margin-bottom: 12px; color: var(--neutral-800);">
+                            <span class="icon-badge icon-badge-success">✓</span>
                             <strong>{THIS_IG_FOLLOWS} New Followers</strong>
-                            <div style="font-size: 13px; color: #666666; margin-top: 4px; margin-left: 24px;">
+                            <div style="font-size: 13px; color: var(--neutral-600); margin-top: 4px; margin-left: 36px;">
                                 Instagram community growth
                             </div>
                         </li>
-                        <li style="color: #333333;">
-                            <span style="color: #10b981; font-weight: 600; margin-right: 8px;">☑</span>
+                        <li style="color: var(--neutral-800);">
+                            <span class="icon-badge icon-badge-success">✓</span>
                             <strong>{THIS_IG_PROFILE_VISITS} Profile Visits</strong>
-                            <div style="font-size: 13px; color: #666666; margin-top: 4px; margin-left: 24px;">
+                            <div style="font-size: 13px; color: var(--neutral-600); margin-top: 4px; margin-left: 36px;">
                                 Significant brand awareness increase
                             </div>
                         </li>
@@ -334,29 +850,29 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
 
             <!-- LOWLIGHTS COLUMN -->
             <div>
-                <h3 style="color: #ef4444; margin-bottom: 16px; font-size: 18px; font-weight: 600;">
+                <h3 style="color: var(--danger-red); margin-bottom: 16px; font-size: 18px; font-weight: 700;">
                     Lowlights
                 </h3>
-                <div style="background: #fce7e7; border-left: 3px solid #ef4444; padding: 20px; border-radius: 8px;">
+                <div class="lowlight-box">
                     <ul style="list-style: none; padding: 0; margin: 0; line-height: 2;">
-                        <li style="margin-bottom: 12px; color: #333333;">
-                            <span style="color: #ef4444; font-weight: 600; margin-right: 8px;">☐</span>
+                        <li style="margin-bottom: 12px; color: var(--neutral-800);">
+                            <span class="icon-badge icon-badge-danger">!</span>
                             <strong>CTR {CTR_SENTIMENT_LOW} {CTR_CHANGE_ABS}%</strong>
-                            <div style="font-size: 13px; color: #666666; margin-top: 4px; margin-left: 24px;">
+                            <div style="font-size: 13px; color: var(--neutral-600); margin-top: 4px; margin-left: 36px;">
                                 {CTR_INSIGHT}
                             </div>
                         </li>
-                        <li style="margin-bottom: 12px; color: #333333;">
-                            <span style="color: #ef4444; font-weight: 600; margin-right: 8px;">☐</span>
+                        <li style="margin-bottom: 12px; color: var(--neutral-800);">
+                            <span class="icon-badge icon-badge-danger">!</span>
                             <strong>CPC {CPC_SENTIMENT} {CPC_CHANGE_ABS}%</strong>
-                            <div style="font-size: 13px; color: #666666; margin-top: 4px; margin-left: 24px;">
+                            <div style="font-size: 13px; color: var(--neutral-600); margin-top: 4px; margin-left: 36px;">
                                 {CPC_INSIGHT}
                             </div>
                         </li>
-                        <li style="color: #333333;">
-                            <span style="color: #ef4444; font-weight: 600; margin-right: 8px;">☐</span>
+                        <li style="color: var(--neutral-800);">
+                            <span class="icon-badge icon-badge-danger">!</span>
                             <strong>{LOWLIGHT_THIRD_ITEM}</strong>
-                            <div style="font-size: 13px; color: #666666; margin-top: 4px; margin-left: 24px;">
+                            <div style="font-size: 13px; color: var(--neutral-600); margin-top: 4px; margin-left: 36px;">
                                 {LOWLIGHT_THIRD_DETAIL}
                             </div>
                         </li>
@@ -366,156 +882,400 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
         </div>
 
         <!-- INSIGHT BOX -->
-        <div style="background: #fef3c7; border: 1px solid #fbbf24; padding: 16px; border-radius: 8px; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
-            <p style="color: #92400e; line-height: 1.7; font-weight: 500; position: relative; z-index: 1; margin: 0; font-size: 14px;">
+        <div class="insight-box">
+            <p>
                 <strong>Insight:</strong> {INSIGHT_SUMMARY}
             </p>
+        </div>
+
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CPAS Performance Report</span>
+            <span class="slide-number">Page 4</span>
         </div>
     </div>
 
     <!-- SLIDE 5: AUDIENCE - AGE BREAKDOWN -->
     <div class="slide">
-        <h1 style="font-size: 28px; margin-bottom: 24px; color: var(--primary-blue);">
-            Audience Performance - Age
-        </h1>
-        <h2 style="font-size: 16px; color: #64748b; margin-bottom: 32px;">
-            Demographic Analysis by Age Group
-        </h2>
+        <!-- Agency Header -->
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: {REPORT_DATE}</div>
+            </div>
+        </div>
+
+        <h1>Audience Performance - Age</h1>
+        <h2>Demographic Analysis by Age Group (Sorted by Amount Spent)</h2>
 
         {AGE_BREAKDOWN_TABLE}
 
-        <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
-            <p style="font-size: 14px; color: #854d0e; line-height: 1.7; font-weight: 500; position: relative; z-index: 1; margin: 0;">
-                <strong>Insight:</strong> Segment usia 25-54 tahun biasanya mendominasi konversi dengan {ATC_GROWTH}% pertumbuhan.
-                Rekomendasi: Fokuskan 80% budget pada segmen usia produktif (25-44 tahun) untuk hasil maksimal.
-                Age 35-44 sering menjadi top performer dengan CPR terbaik.
+        <div class="insight-box" style="margin-top: 24px;">
+            <p>
+                <strong>Insight:</strong> {AGE_INSIGHT}
             </p>
+        </div>
+
+        <!-- Slide Footer -->
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CPAS Performance Report</span>
+            <span class="slide-number">Page 5</span>
         </div>
     </div>
 
     <!-- SLIDE 6: AUDIENCE - GENDER BREAKDOWN -->
     <div class="slide">
-        <h1 style="font-size: 28px; margin-bottom: 24px; color: var(--primary-blue);">
-            Audience Performance - Gender
-        </h1>
-        <h2 style="font-size: 16px; color: #64748b; margin-bottom: 32px;">
-            Demographic Analysis by Gender
-        </h2>
+        <!-- Agency Header -->
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: {REPORT_DATE}</div>
+            </div>
+        </div>
+
+        <h1>Audience Performance - Gender</h1>
+        <h2>Demographic Analysis by Gender (Sorted by Amount Spent)</h2>
 
         {GENDER_BREAKDOWN_TABLE}
 
-        <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
-            <p style="font-size: 14px; color: #854d0e; line-height: 1.7; font-weight: 500; position: relative; z-index: 1; margin: 0;">
-                <strong>Insight:</strong> Female biasanya mendominasi dengan ~70% share dari total konversi.
-                Male memiliki CTR lebih rendah namun volume konversi tetap signifikan.
-                Rekomendasi: Female adalah segmen prioritas untuk scaling campaign, pertahankan alokasi 70:30 Female:Male.
+        <div class="insight-box" style="margin-top: 24px;">
+            <p>
+                <strong>Insight:</strong> {GENDER_INSIGHT}
             </p>
+        </div>
+
+        <!-- Slide Footer -->
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CPAS Performance Report</span>
+            <span class="slide-number">Page 6</span>
         </div>
     </div>
 
     <!-- SLIDE 7: AUDIENCE - REGION BREAKDOWN -->
     <div class="slide">
-        <h1 style="font-size: 28px; margin-bottom: 24px; color: var(--primary-blue);">
-            Audience Performance - Region
-        </h1>
-        <h2 style="font-size: 16px; color: #64748b; margin-bottom: 32px;">
-            Geographic Performance Analysis
-        </h2>
+        <!-- Agency Header -->
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: {REPORT_DATE}</div>
+            </div>
+        </div>
+
+        <h1>Audience Performance - Region</h1>
+        <h2>Geographic Performance Analysis (Top 10 by Amount Spent)</h2>
 
         {REGION_BREAKDOWN_TABLE}
 
-        <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
-            <p style="font-size: 14px; color: #854d0e; line-height: 1.7; font-weight: 500; position: relative; z-index: 1; margin: 0;">
-                <strong>Insight:</strong> Pulau Jawa (West, Central, East + Jakarta) biasanya menyumbang ~75-80% total konversi.
-                West Java sering menjadi region dengan performa tertinggi.
-                Rekomendasi: Scale di region Jawa dengan performa tinggi sebelum ekspansi ke region baru.
+        <div class="insight-box" style="margin-top: 24px;">
+            <p>
+                <strong>Insight:</strong> {REGION_INSIGHT}
             </p>
+        </div>
+
+        <!-- Slide Footer -->
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CPAS Performance Report</span>
+            <span class="slide-number">Page 7</span>
         </div>
     </div>
 
     <!-- SLIDE 8: PLATFORM PERFORMANCE -->
     <div class="slide">
-        <h1 style="font-size: 28px; margin-bottom: 24px; color: var(--primary-blue);">
-            Platform Performance
-        </h1>
-        <h2 style="font-size: 16px; color: #64748b; margin-bottom: 32px;">
-            Instagram vs Facebook Comparison
-        </h2>
+        <!-- Agency Header -->
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: {REPORT_DATE}</div>
+            </div>
+        </div>
+
+        <h1>Platform Performance</h1>
+        <h2>Instagram vs Facebook vs Others (Sorted by Amount Spent)</h2>
 
         {PLATFORM_BREAKDOWN_TABLE}
 
-        <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
-            <p style="font-size: 14px; color: #854d0e; line-height: 1.7; font-weight: 500; position: relative; z-index: 1; margin: 0;">
-                <strong>Insight:</strong> Instagram biasanya mendominasi dengan ~65-70% share dari total konversi.
-                Facebook memiliki CTR lebih tinggi namun volume lebih rendah.
-                Rekomendasi: Pertahankan alokasi 60:40 atau 65:35 Instagram:Facebook untuk diversifikasi dan reach maksimal.
+        <div class="insight-box" style="margin-top: 24px;">
+            <p>
+                <strong>Insight:</strong> {PLATFORM_INSIGHT}
             </p>
+        </div>
+
+        <!-- Slide Footer -->
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CPAS Performance Report</span>
+            <span class="slide-number">Page 8</span>
         </div>
     </div>
 
     <!-- SLIDE 9: PLACEMENT PERFORMANCE -->
     <div class="slide">
-        <h1 style="font-size: 28px; margin-bottom: 24px; color: var(--primary-blue);">
-            Placement Performance
-        </h1>
-        <h2 style="font-size: 16px; color: #64748b; margin-bottom: 32px;">
-            Ad Placement Analysis (Feed, Stories, Reels, Explore)
-        </h2>
+        <!-- Agency Header -->
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: {REPORT_DATE}</div>
+            </div>
+        </div>
+
+        <h1>Placement Performance</h1>
+        <h2>Ad Placement Analysis - Top 10 (Feed, Stories, Reels, Explore, etc.)</h2>
 
         {PLACEMENT_BREAKDOWN_TABLE}
 
-        <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
-            <p style="font-size: 14px; color: #854d0e; line-height: 1.7; font-weight: 500; position: relative; z-index: 1; margin: 0;">
-                <strong>Insight:</strong> Reels (IG + FB) biasanya adalah placement terbaik dengan kombinasi volume tertinggi dan CPR paling efisien.
-                Feed menawarkan CTR terbaik namun dengan volume lebih rendah.
-                Stories sering underperform dengan CPR tinggi.
-                Rekomendasi: Alokasikan 70% budget ke Reels, 25% ke Feed, dan 5% testing ke Stories.
+        <div class="insight-box" style="margin-top: 24px;">
+            <p>
+                <strong>Insight:</strong> {PLACEMENT_INSIGHT}
             </p>
+        </div>
+
+        <!-- Slide Footer -->
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CPAS Performance Report</span>
+            <span class="slide-number">Page 9</span>
         </div>
     </div>
 
-    <!-- SLIDE 10: CREATIVE PERFORMANCE -->
+    <!-- SLIDE 10: CAMPAIGN OBJECTIVE PERFORMANCE -->
     <div class="slide">
-        <h1 style="font-size: 28px; margin-bottom: 24px; color: var(--primary-blue);">
-            Creative Performance
-        </h1>
-        <h2 style="font-size: 16px; color: #64748b; margin-bottom: 32px;">
-            Top Performing Ad Creatives
-        </h2>
+        <!-- Agency Header -->
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: {REPORT_DATE}</div>
+            </div>
+        </div>
+
+        <h1>Campaign Objective Performance</h1>
+        <h2>Performance by Campaign Objective (Sorted by Amount Spent)</h2>
+
+        {OBJECTIVE_BREAKDOWN_TABLE}
+
+        <div class="insight-box" style="margin-top: 24px;">
+            <p>
+                <strong>Insight:</strong> {OBJECTIVE_INSIGHT}
+            </p>
+        </div>
+
+        <!-- Slide Footer -->
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CPAS Performance Report</span>
+            <span class="slide-number">Page 10</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 11: CREATIVE PERFORMANCE -->
+    <div class="slide">
+        <!-- Agency Header -->
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: {REPORT_DATE}</div>
+            </div>
+        </div>
+
+        <h1>Creative Performance</h1>
+        <h2>Top 10 Performing Ad Creatives (Sorted by Purchases CV)</h2>
 
         {CREATIVE_BREAKDOWN_TABLE}
 
-        <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
-            <p style="font-size: 14px; color: #854d0e; line-height: 1.7; font-weight: 500; position: relative; z-index: 1; margin: 0;">
-                <strong>Insight:</strong> Collection Ads biasanya mendominasi top performing creatives dengan ~85-90% market share.
-                Multi-product collections sering menjadi champion dengan volume konversi tertinggi.
-                Rekomendasi: Scale up Collection Ads format, particularly multi-product collections. Pause single-product dan underperforming ads.
+        <div class="insight-box" style="margin-top: 24px;">
+            <p>
+                <strong>Insight:</strong> {CREATIVE_INSIGHT}
             </p>
+        </div>
+
+        <!-- Slide Footer -->
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CPAS Performance Report</span>
+            <span class="slide-number">Page 11</span>
         </div>
     </div>
 
-    <!-- SLIDE 11: CONCLUSION -->
+    <!-- SLIDE 12: TWINDATE EVENT HIGHLIGHTS -->
     <div class="slide">
-        <h1 style="font-size: 28px; margin-bottom: 24px; color: var(--primary-blue);">
-            Conclusion
-        </h1>
-        <h2 style="font-size: 16px; color: #64748b; margin-bottom: 32px;">
-            Summary & Key Takeaways
-        </h2>
+        <!-- Agency Header -->
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: {REPORT_DATE}</div>
+            </div>
+        </div>
+
+        <h1>Event MoM Analysis - Twindate</h1>
+        <h2>Performance During Twin Date Period (H-4 to H)</h2>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <!-- HIGHLIGHTS -->
+            <div>
+                <h3 style="color: var(--success-green); margin-bottom: 16px; font-size: 18px; font-weight: 700;">
+                    Highlights (Best Performing)
+                </h3>
+                <div class="highlight-box">
+                    <ul style="list-style: none; padding: 0; margin: 0; line-height: 1.8;">
+                        {TWINDATE_HIGHLIGHTS}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- LOWLIGHTS -->
+            <div>
+                <h3 style="color: var(--danger-red); margin-bottom: 16px; font-size: 18px; font-weight: 700;">
+                    Lowlights (Needs Improvement)
+                </h3>
+                <div class="lowlight-box">
+                    <ul style="list-style: none; padding: 0; margin: 0; line-height: 1.8;">
+                        {TWINDATE_LOWLIGHTS}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        {TWINDATE_COMPARISON_TABLE}
+
+        <div class="insight-box" style="margin-top: 24px;">
+            <p>
+                <strong>Action Plan:</strong> {TWINDATE_ACTION_PLAN}
+            </p>
+        </div>
+
+        <!-- Slide Footer -->
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CPAS Performance Report</span>
+            <span class="slide-number">Page 12</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 13: PAYDAY EVENT HIGHLIGHTS -->
+    <div class="slide">
+        <!-- Agency Header -->
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: {REPORT_DATE}</div>
+            </div>
+        </div>
+
+        <h1>Event MoM Analysis - Payday (≥25)</h1>
+        <h2>Performance During Payday Period (Dates 21-31 and 1-5)</h2>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <!-- HIGHLIGHTS -->
+            <div>
+                <h3 style="color: var(--success-green); margin-bottom: 16px; font-size: 18px; font-weight: 700;">
+                    Highlights (Best Performing)
+                </h3>
+                <div class="highlight-box">
+                    <ul style="list-style: none; padding: 0; margin: 0; line-height: 1.8;">
+                        {PAYDAY_HIGHLIGHTS}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- LOWLIGHTS -->
+            <div>
+                <h3 style="color: var(--danger-red); margin-bottom: 16px; font-size: 18px; font-weight: 700;">
+                    Lowlights (Needs Improvement)
+                </h3>
+                <div class="lowlight-box">
+                    <ul style="list-style: none; padding: 0; margin: 0; line-height: 1.8;">
+                        {PAYDAY_LOWLIGHTS}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        {PAYDAY_COMPARISON_TABLE}
+
+        <div class="insight-box" style="margin-top: 24px;">
+            <p>
+                <strong>Action Plan:</strong> {PAYDAY_ACTION_PLAN}
+            </p>
+        </div>
+
+        <!-- Slide Footer -->
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CPAS Performance Report</span>
+            <span class="slide-number">Page 13</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 14: CONCLUSION -->
+    <div class="slide">
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: {REPORT_DATE}</div>
+            </div>
+        </div>
+
+        <h1>Conclusion</h1>
+        <h2>Summary & Key Takeaways</h2>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px;">
-            <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-left: 4px solid #16a34a; padding: 24px; border-radius: 12px;">
-                <h3 style="color: #14532d; margin-bottom: 16px; font-size: 18px;">
-                    ✅ Wins
+            <div class="highlight-box" style="padding: 28px;">
+                <h3 style="color: #14532d; margin-bottom: 20px; font-size: 20px; font-weight: 700;">
+                    Wins
                 </h3>
-                <ul style="color: #14532d; line-height: 1.8; margin-left: 20px; font-weight: 500;">
+                <ul style="color: #14532d; line-height: 2; margin-left: 20px; font-weight: 600;">
                     <li>{THIS_ATC} Add to Cart conversions achieved</li>
                     <li>Pertumbuhan kuat {SPEND_GROWTH}% dalam spend</li>
                     <li>CPR terjaga di {THIS_CPR}</li>
@@ -523,11 +1283,11 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
                 </ul>
             </div>
 
-            <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-left: 4px solid #dc2626; padding: 24px; border-radius: 12px;">
-                <h3 style="color: #7f1d1d; margin-bottom: 16px; font-size: 18px;">
-                    ⚠️ Areas for Improvement
+            <div class="lowlight-box" style="padding: 28px;">
+                <h3 style="color: #7f1d1d; margin-bottom: 20px; font-size: 20px; font-weight: 700;">
+                    Areas for Improvement
                 </h3>
-                <ul style="color: #7f1d1d; line-height: 1.8; margin-left: 20px; font-weight: 500;">
+                <ul style="color: #7f1d1d; line-height: 2; margin-left: 20px; font-weight: 600;">
                     <li>Optimasi CTR untuk engagement lebih baik</li>
                     <li>Tingkatkan conversion rate dari ATC ke Purchase</li>
                     <li>Test format kreatif baru untuk variety</li>
@@ -536,62 +1296,86 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
             </div>
         </div>
 
-        <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">💡</div>
-            <p style="font-size: 14px; color: #854d0e; line-height: 1.7; font-weight: 500; position: relative; z-index: 1; margin: 0;">
+        <div class="insight-box">
+            <p>
                 <strong>Kesimpulan:</strong> {PERIOD_TYPE} ini menunjukkan performa {GROWTH_SENTIMENT} dengan {THIS_ATC} konversi.
                 Campaign ini berada di jalur yang {EFFICIENCY_SENTIMENT} dengan CPR {THIS_CPR}.
                 Fokus utama bulan depan: {NEXT_PERIOD_FOCUS}
             </p>
         </div>
+
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CPAS Performance Report</span>
+            <span class="slide-number">Page 14</span>
+        </div>
     </div>
 
-    <!-- SLIDE 12: NEXT STEPS -->
+    <!-- SLIDE 15: NEXT STEPS -->
     <div class="slide">
-        <h1 style="font-size: 28px; margin-bottom: 24px; color: var(--primary-blue);">
-            Next Steps
-        </h1>
-        <h2 style="font-size: 16px; color: #64748b; margin-bottom: 32px;">
-            Action Plan for Upcoming Period
-        </h2>
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon">
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: {REPORT_DATE}</div>
+            </div>
+        </div>
 
-        <div style="background: #f8fafc; padding: 24px; border-radius: 12px;">
-            <ol style="color: #1e293b; line-height: 2; margin-left: 20px; font-weight: 500;">
-                <li style="margin-bottom: 12px;"><strong>Scale Winning Creatives:</strong> {ACTION_STEP_1}</li>
-                <li style="margin-bottom: 12px;"><strong>Audience Optimization:</strong> {ACTION_STEP_2}</li>
-                <li style="margin-bottom: 12px;"><strong>Placement Testing:</strong> {ACTION_STEP_3}</li>
-                <li style="margin-bottom: 12px;"><strong>Bid Strategy Review:</strong> {ACTION_STEP_4}</li>
-                <li style="margin-bottom: 12px;"><strong>Creative Refresh:</strong> {ACTION_STEP_5}</li>
-                <li><strong>Budget Allocation:</strong> {ACTION_STEP_6}</li>
+        <h1>Next Steps</h1>
+        <h2>Action Plan for Upcoming Period</h2>
+
+        <div class="card" style="padding: 32px;">
+            <ol style="color: var(--neutral-800); line-height: 2.2; margin-left: 20px; font-weight: 600;">
+                <li style="margin-bottom: 16px;"><strong style="color: var(--primary-blue);">Scale Winning Creatives:</strong> {ACTION_STEP_1}</li>
+                <li style="margin-bottom: 16px;"><strong style="color: var(--primary-blue);">Audience Optimization:</strong> {ACTION_STEP_2}</li>
+                <li style="margin-bottom: 16px;"><strong style="color: var(--primary-blue);">Placement Testing:</strong> {ACTION_STEP_3}</li>
+                <li style="margin-bottom: 16px;"><strong style="color: var(--primary-blue);">Bid Strategy Review:</strong> {ACTION_STEP_4}</li>
+                <li style="margin-bottom: 16px;"><strong style="color: var(--primary-blue);">Creative Refresh:</strong> {ACTION_STEP_5}</li>
+                <li><strong style="color: var(--primary-blue);">Budget Allocation:</strong> {ACTION_STEP_6}</li>
             </ol>
         </div>
 
-        <div style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 4px solid var(--primary-yellow); padding: 20px; border-radius: 12px; margin-top: 24px; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.1;">🎯</div>
-            <p style="font-size: 14px; color: #854d0e; line-height: 1.7; font-weight: 500; position: relative; z-index: 1; margin: 0;">
+        <div class="insight-box" style="margin-top: 32px;">
+            <p>
                 <strong>Target Bulan Depan:</strong> {NEXT_MONTH_TARGET}. Dengan implementasi action plan ini,
                 kita menargetkan pertumbuhan {TARGET_GROWTH}% pada Add to Cart dan penurunan CPR menjadi {TARGET_CPR}.
             </p>
         </div>
+
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CPAS Performance Report</span>
+            <span class="slide-number">Page 15</span>
+        </div>
     </div>
 
-    <!-- SLIDE 13: THANK YOU -->
-    <div class="slide" style="text-align: center; padding-top: 120px;">
-        <h1 style="font-size: 48px; margin-bottom: 24px; color: var(--primary-blue);">
+    <!-- SLIDE 16: THANK YOU -->
+    <div class="slide" style="text-align: center; padding: 120px 64px; background: linear-gradient(135deg, white 0%, var(--neutral-50) 100%);">
+        <div class="agency-logo" style="justify-content: center; margin-bottom: 48px;">
+            <img src="http://localhost:3001/logo/logo-hadona.png" alt="Hadona Digital Media" class="agency-logo-icon" style="width: 200px;">
+        </div>
+
+        <h1 style="font-size: 64px; margin-bottom: 24px; background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-yellow) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
             Thank You!
         </h1>
-        <p style="font-size: 20px; color: #64748b; margin-bottom: 48px;">
+        <p style="font-size: 20px; color: var(--neutral-600); margin-bottom: 56px; font-weight: 500;">
             We appreciate your trust in managing your Meta Ads campaigns
         </p>
 
         <div style="background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-yellow) 100%);
-                    padding: 32px; border-radius: 16px; color: white; max-width: 600px; margin: 0 auto;">
-            <p style="font-size: 18px; margin-bottom: 8px;">
-                <strong>Questions or Feedback?</strong>
+                    padding: 40px; border-radius: 20px; color: white; max-width: 640px; margin: 0 auto; box-shadow: 0 8px 24px rgba(43, 70, 187, 0.25);">
+            <p style="font-size: 20px; margin-bottom: 12px; font-weight: 700;">
+                Questions or Feedback?
             </p>
-            <p style="font-size: 14px; opacity: 0.9;">
+            <p style="font-size: 15px; opacity: 0.95; line-height: 1.7;">
                 Contact us anytime for campaign consultation
             </p>
+            <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.3); font-size: 13px; opacity: 0.9;">
+                © 2026 Hadona Digital Media. All rights reserved.
+            </div>
         </div>
     </div>
 
@@ -600,374 +1384,497 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
 </html>`
 
 /**
- * Generate CPAS Report using inline template
- * This works without external file dependencies
+ * Generate comprehensive CPAS breakdown table with all metrics
  */
-export function generateReactTailwindReport(analysisData: any, reportName?: string, retentionType?: string, objectiveType?: string): string {
-  console.log('[CPAS Template] Starting report generation (inline template)...')
-
-  // Debug: Log full analysisData structure
-  console.log('[CPAS Template] Full analysisData keys:', Object.keys(analysisData || {}))
-
-  const { thisWeek, lastWeek, breakdown, config, performanceSummary } = analysisData
-  console.log('[CPAS Template] Data extracted:', {
-    hasThisWeek: !!thisWeek,
-    hasLastWeek: !!lastWeek,
-    hasPerformanceSummary: !!performanceSummary,
-    thisWeek: thisWeek,
-    lastWeek: lastWeek,
-    performanceSummary: performanceSummary
-  })
-
-  // Try to get data from performanceSummary first (newer structure)
-  let thisMonthData = performanceSummary?.thisWeek || thisWeek || {}
-  let lastMonthData = performanceSummary?.lastWeek || lastWeek || {}
-
-  console.log('[CPAS Template] Month data:', {
-    thisMonth: thisMonthData,
-    lastMonth: lastMonthData
-  })
-
-  // Extract basic data
-  const thisMonthSpend = thisMonthData.amountSpent || thisMonthData.spend || 0
-  const lastMonthSpend = lastMonthData.amountSpent || lastMonthData.spend || 0
-  const thisMonthATC = thisMonthData.addToCart || thisMonthData.addsToCart || thisMonthData.results || 0
-  const lastMonthATC = lastMonthData.addToCart || lastMonthData.addsToCart || lastMonthData.results || 0
-
-  // Extract more data for detailed metrics
-  const thisMonthImpressions = thisMonthData.impressions || thisMonthData.impression || 0
-  const lastMonthImpressions = lastMonthData.impressions || lastMonthData.impression || 0
-  const thisMonthClicks = thisMonthData.outboundClicks || thisMonthData.clicks || thisMonthData.linkClicks || 0
-  const lastMonthClicks = lastMonthData.outboundClicks || lastMonthData.clicks || lastMonthData.linkClicks || 0
-  const thisMonthCTR = thisMonthData.ctr || (thisMonthClicks > 0 && thisMonthImpressions > 0 ? (thisMonthClicks / thisMonthImpressions * 100) : 0)
-  const lastMonthCTR = lastMonthData.ctr || (lastMonthClicks > 0 && lastMonthImpressions > 0 ? (lastMonthClicks / lastMonthImpressions * 100) : 0)
-  const thisMonthPurchases = thisMonthData.purchases || 0
-  const lastMonthPurchases = lastMonthData.purchases || 0
-
-  // Extract additional metrics for Detailed Performance Metrics table
-  const thisMonthCPC = thisMonthData.cpc || 0
-  const lastMonthCPC = lastMonthData.cpc || 0
-  const thisMonthCPM = thisMonthData.cpm || 0
-  const lastMonthCPM = lastMonthData.cpm || 0
-  // Use thisMonthClicks/lastMonthClicks for outbound clicks (defined above)
-  const thisMonthOutboundClicks = thisMonthClicks
-  const lastMonthOutboundClicks = lastMonthClicks
-  const thisMonthContentViews = thisMonthData.contentViews || 0
-  const lastMonthContentViews = lastMonthData.contentViews || 0
-  const thisMonthIGProfileVisits = thisMonthData.igProfileVisits || 0
-  const lastMonthIGProfileVisits = lastMonthData.igProfileVisits || 0
-  const thisMonthIGFollows = thisMonthData.igFollows || 0
-  const lastMonthIGFollows = lastMonthData.igFollows || 0
-
-  // Extract cost metrics from API
-  const thisMonthCostPerATC = thisMonthData.costPerATC || 0
-  const lastMonthCostPerATC = lastMonthData.costPerATC || 0
-  const thisMonthATCCV = thisMonthData.atcConversionValue || 0
-  const lastMonthATCCV = lastMonthData.atcConversionValue || 0
-  const thisMonthCostPerPurchase = thisMonthData.costPerPurchase || 0
-  const lastMonthCostPerPurchase = lastMonthData.costPerPurchase || 0
-  const thisMonthPurchaseCV = thisMonthData.purchasesConversionValue || 0
-  const lastMonthPurchaseCV = lastMonthData.purchasesConversionValue || 0
-  const thisMonthROAS = thisMonthData.purchaseROAS || 0
-  const lastMonthROAS = lastMonthData.purchaseROAS || 0
-  const thisMonthAOV = thisMonthData.aov || 0
-  const lastMonthAOV = lastMonthData.aov || 0
-
-  // Calculate Conversion Rate (Purchase ÷ Link Clicks)
-  const thisMonthConversionRate = thisMonthClicks > 0 ? (thisMonthPurchases / thisMonthClicks) * 100 : 0
-  const lastMonthConversionRate = lastMonthClicks > 0 ? (lastMonthPurchases / lastMonthClicks) * 100 : 0
-
-  console.log('[CPAS Template] All metrics extracted')
-
-  // Format helpers - NO decimals for currency - MUST BE DECLARED FIRST
-  const formatCurrency = (num: number) => {
-    // Round to nearest integer before formatting
-    const rounded = Math.round(num)
-    return 'Rp ' + rounded.toLocaleString('id-ID')
-  }
-  const formatNumber = (num: number) => {
-    // Round to nearest integer before formatting
-    const rounded = Math.round(num)
-    return rounded.toLocaleString('id-ID')
-  }
-  const formatPercent = (num: number) => num.toFixed(2)
-
-  // Calculate growth
-  const spendGrowth = lastMonthSpend > 0 ? ((thisMonthSpend - lastMonthSpend) / lastMonthSpend * 100) : 0
-  const imprGrowth = lastMonthImpressions > 0 ? ((thisMonthImpressions - lastMonthImpressions) / lastMonthImpressions * 100) : 0
-  const clicksGrowth = lastMonthClicks > 0 ? ((thisMonthClicks - lastMonthClicks) / lastMonthClicks * 100) : 0
-  const atcGrowth = lastMonthATC > 0 ? ((thisMonthATC - lastMonthATC) / lastMonthATC * 100) : 0
-  const purchGrowth = lastMonthPurchases > 0 ? ((thisMonthPurchases - lastMonthPurchases) / lastMonthPurchases * 100) : 0
-  const cprThisMonth = thisMonthATC > 0 ? (thisMonthSpend / thisMonthATC) : 0
-  const cprLastMonth = lastMonthATC > 0 ? (lastMonthSpend / lastMonthATC) : 0
-
-  // Calculate growth for additional metrics
-  const ctrGrowth = lastMonthCTR > 0 ? ((thisMonthCTR - lastMonthCTR) / lastMonthCTR * 100) : 0
-  const cpcGrowth = lastMonthCPC > 0 ? ((thisMonthCPC - lastMonthCPC) / lastMonthCPC * 100) : 0
-  const cpmGrowth = lastMonthCPM > 0 ? ((thisMonthCPM - lastMonthCPM) / lastMonthCPM * 100) : 0
-  const outboundClicksGrowth = lastMonthOutboundClicks > 0 ? ((thisMonthOutboundClicks - lastMonthOutboundClicks) / lastMonthOutboundClicks * 100) : 0
-  const contentViewsGrowth = lastMonthContentViews > 0 ? ((thisMonthContentViews - lastMonthContentViews) / lastMonthContentViews * 100) : 0
-  const igProfileVisitsGrowth = lastMonthIGProfileVisits > 0 ? ((thisMonthIGProfileVisits - lastMonthIGProfileVisits) / lastMonthIGProfileVisits * 100) : 0
-  const igFollowsGrowth = lastMonthIGFollows > 0 ? ((thisMonthIGFollows - lastMonthIGFollows) / lastMonthIGFollows * 100) : 0
-
-  // Calculate growth for new metrics
-  const costPerATCGrowth = lastMonthCostPerATC > 0 ? ((thisMonthCostPerATC - lastMonthCostPerATC) / lastMonthCostPerATC * 100) : 0
-  const atcCVGrowth = lastMonthATCCV > 0 ? ((thisMonthATCCV - lastMonthATCCV) / lastMonthATCCV * 100) : 0
-  const costPerPurchaseGrowth = lastMonthCostPerPurchase > 0 ? ((thisMonthCostPerPurchase - lastMonthCostPerPurchase) / lastMonthCostPerPurchase * 100) : 0
-  const purchaseCVGrowth = lastMonthPurchaseCV > 0 ? ((thisMonthPurchaseCV - lastMonthPurchaseCV) / lastMonthPurchaseCV * 100) : 0
-  const conversionRateGrowth = lastMonthConversionRate > 0 ? ((thisMonthConversionRate - lastMonthConversionRate) / lastMonthConversionRate * 100) : 0
-  const roasGrowth = lastMonthROAS > 0 ? ((thisMonthROAS - lastMonthROAS) / lastMonthROAS * 100) : 0
-  const aovGrowth = lastMonthAOV > 0 ? ((thisMonthAOV - lastMonthAOV) / lastMonthAOV * 100) : 0
-
-  // Helper to determine badge class and growth text
-  const getBadgeClass = (growth: number) => growth >= 0 ? 'badge-green' : 'badge-red'
-  const getGrowthText = (growth: number) => (growth > 0 ? '+' : '') + formatPercent(growth)
-  const getDiffText = (thisVal: number, lastVal: number) => ((thisVal - lastVal) >= 0 ? '+' : '') + formatNumber(Math.abs(thisVal - lastVal))
-  const getDiffClass = (thisVal: number, lastVal: number) => (thisVal - lastVal) >= 0 ? 'growth-positive' : 'growth-negative'
-
-  // Parse helper
-  const parseNum = (val: any) => {
+const generateComprehensiveBreakdown = (
+  breakdownData: any[],
+  dimensionName: string,
+  dimensionKey: string,
+  sortBy: 'spend' | 'purchasesCV' = 'spend',
+  topN: number = 10,
+  includeCreativeName: boolean = false
+): string => {
+  const parseNum = (val: any): number => {
     if (typeof val === 'number') return val
     if (!val) return 0
     const parsed = parseFloat(String(val).replace(/,/g, ''))
     return isNaN(parsed) ? 0 : parsed
   }
 
-  // Extract breakdown data
-  const breakdownThisWeek = (analysisData as any).breakdown?.thisWeek || {}
-  const breakdownLastWeek = (analysisData as any).breakdown?.lastWeek || {}
-
-  // Helper to generate SPECIALIZED AGE BREAKDOWN with two-column layout
-  const generateAgeBreakdown = (breakdownData: any[]) => {
-    console.log('[DEBUG] generateAgeBreakdown received:', breakdownData?.length, 'items')
-    console.log('[DEBUG] breakdownData sample:', breakdownData?.[0])
-
-    if (!breakdownData || breakdownData.length === 0) {
-      return `
-        <div style="background: #f8fafc; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
-          <p style="color: #64748b; font-size: 14px;">
-            Age breakdown data will be displayed here when age breakdown CSV is provided.
-          </p>
-          <p style="color: #94a3b8; font-size: 12px; margin-top: 8px;">
-            Upload age breakdown file to see detailed performance.
-          </p>
-        </div>
-      `
-    }
-
-    // Sort by ATC descending to find best age
-    const sortedByATC = [...breakdownData].sort((a, b) => {
-      const atcA = parseNum(a['Adds to cart with shared items'] || a.atc || a.results || 0)
-      const atcB = parseNum(b['Adds to cart with shared items'] || b.atc || b.results || 0)
-      return atcB - atcA
-    })
-
-    const bestAgeItem = sortedByATC[0]
-    const bestAge = bestAgeItem['Age'] || bestAgeItem.dimension || 'N/A'
-
-    // Find best CPR (lowest cost per result)
-    const itemsWithCPR = breakdownData.filter(item => {
-      const atc = parseNum(item['Adds to cart with shared items'] || item.atc || item.results || 0)
-      return atc > 0
-    })
-
-    let bestCPRItem = itemsWithCPR.length > 0 ? itemsWithCPR.reduce((best, current) => {
-      const spend = parseNum(current['Amount spent (IDR)'] || current.spend || 0)
-      const atc = parseNum(current['Adds to cart with shared items'] || current.atc || current.results || 0)
-      const cpr = spend / atc
-
-      const bestSpend = parseNum(best['Amount spent (IDR)'] || best.spend || 0)
-      const bestATC = parseNum(best['Adds to cart with shared items'] || best.atc || best.results || 0)
-      const bestCPRValue = bestSpend / bestATC
-
-      return cpr < bestCPRValue ? current : best
-    }) : breakdownData[0]
-
-    const bestCPRAge = bestCPRItem['Age'] || bestCPRItem.dimension || 'N/A'
-    const bestCPRSpend = parseNum(bestCPRItem['Amount spent (IDR)'] || bestCPRItem.spend || 0)
-    const bestCPRATC = parseNum(bestCPRItem['Adds to cart with shared items'] || bestCPRItem.atc || bestCPRItem.results || 0)
-    const bestCPRValue = bestCPRATC > 0 ? bestCPRSpend / bestCPRATC : 0
-
-    const bestATCTotal = parseNum(bestAgeItem['Adds to cart with shared items'] || bestAgeItem.atc || bestAgeItem.results || 0)
-
-    // Generate table rows
-    let tableRows = sortedByATC.map((item: any, idx: number) => {
-      const name = item['Age'] || item.dimension || `Item ${idx + 1}`
-      const spend = parseNum(item['Amount spent (IDR)'] || item.spend || 0)
-      const impressions = parseNum(item['Impressions'] || item.impressions || 0)
-      const atc = parseNum(item['Adds to cart with shared items'] || item.atc || item.results || 0)
-      const cpr = atc > 0 ? (spend / atc) : 0
-      const isBestAge = name === bestAge
-
-      const rowStyle = isBestAge
-        ? 'background: #f0fdf4; font-weight: 600;'
-        : idx % 2 === 0 ? 'background: #ffffff;' : 'background: #f9fafb;'
-
-      return `
-        <tr style="${rowStyle}">
-          <td style="font-size: 13px; padding: 12px;">
-            ${isBestAge ? '<span style="color: #fbbf24; margin-right: 4px;">🌟</span>' : ''}
-            <strong>${name}</strong>
-          </td>
-          <td class="text-right" style="font-size: 13px; padding: 12px;">${formatNumber(impressions)}</td>
-          <td class="text-right" style="font-size: 13px; padding: 12px; font-weight: 600;">${formatNumber(atc)}</td>
-          <td class="text-right" style="font-size: 13px; padding: 12px; font-weight: 600;">${formatCurrency(cpr)}</td>
-        </tr>
-      `
-    }).join('')
-
-    // Generate bar chart data
-    const atcValues = sortedByATC.map(item => parseNum(item['Adds to cart with shared items'] || item.atc || item.results || 0))
-    const maxATC = atcValues.length > 0 ? Math.max(...atcValues) : 0
-
-    const barChartHTML = sortedByATC.slice(0, 5).map((item: any) => {
-      const name = item['Age'] || item.dimension
-      const atc = parseNum(item['Adds to cart with shared items'] || item.atc || item.results || 0)
-      const barHeight = maxATC > 0 ? (atc / maxATC) * 100 : 0
-
-      return `
-        <div style="flex: 1; text-align: center; margin: 0 4px;">
-          <div style="height: 120px; display: flex; align-items: flex-end; justify-content: center;">
-            <div style="width: 40px; height: ${barHeight}%; background: #1e40af; border-radius: 4px 4px 0 0; min-height: ${atc > 0 ? '4px' : '0'};"></div>
-          </div>
-          <div style="font-size: 11px; color: #374151; margin-top: 8px; font-weight: 500;">${name}</div>
-          <div style="font-size: 10px; color: #6b7280;">${atc}</div>
-        </div>
-      `
-    }).join('')
-
-    return `
-      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px;">
-        <!-- LEFT COLUMN: Table + Bar Chart -->
-        <div>
-          <!-- Table -->
-          <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 16px;">
-            <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
-              <thead>
-                <tr style="background: #1e40af; color: white;">
-                  <th style="padding: 12px; text-align: left; font-weight: 600; font-size: 12px;">USIA</th>
-                  <th style="padding: 12px; text-align: right; font-weight: 600; font-size: 12px;">IMPRESSIONS</th>
-                  <th style="padding: 12px; text-align: right; font-weight: 600; font-size: 12px;">ADDS TO CART WITH SHARED ITEMS</th>
-                  <th style="padding: 12px; text-align: right; font-weight: 600; font-size: 12px;">CPR (IDR)</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${tableRows}
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Bar Chart -->
-          <div style="background: white; border-radius: 8px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-            <div style="display: flex; align-items: flex-end; justify-content: space-around; height: 160px;">
-              ${barChartHTML}
-            </div>
-          </div>
-        </div>
-
-        <!-- RIGHT COLUMN: Summary Card -->
-        <div style="background: #f3f4f6; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; justify-content: center;">
-          <div style="color: #6b7280; font-size: 11px; font-weight: 600; letter-spacing: 1px; margin-bottom: 12px;">USIA TERBAIK</div>
-          <div style="color: #1e40af; font-size: 32px; font-weight: 700; margin-bottom: 24px;">${bestAge} Tahun</div>
-
-          <div style="margin-bottom: 20px;">
-            <div style="color: #6b7280; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 4px;">TOTAL ATC</div>
-            <div style="color: #1e40af; font-size: 28px; font-weight: 700;">${formatNumber(bestATCTotal)}</div>
-          </div>
-
-          <div>
-            <div style="color: #6b7280; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 4px;">CPR TERBAIK</div>
-            <div style="color: #1e40af; font-size: 28px; font-weight: 700;">${formatCurrency(bestCPRValue)}</div>
-            <div style="color: #9ca3af; font-size: 12px; margin-top: 2px;">(Usia ${bestCPRAge})</div>
-          </div>
-        </div>
-      </div>
-    `
+  if (!breakdownData || breakdownData.length === 0) {
+    return `<div style="background: #f8fafc; padding: 24px; border-radius: 12px; text-align: center;">
+      <p style="color: #64748b; font-size: 14px;">${dimensionName} breakdown data will be displayed here when CSV is provided.</p>
+    </div>`
   }
 
-  // Helper to generate breakdown HTML for a dimension (non-age breakdowns)
-  const generateBreakdownTable = (breakdownData: any[], dimensionName: string, dimensionKey: string) => {
-    if (!breakdownData || breakdownData.length === 0) {
-      return `
-        <div style="background: #f8fafc; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
-          <p style="color: #64748b; font-size: 14px;">
-            ${dimensionName} breakdown data will be displayed here when ${dimensionName.toLowerCase()} breakdown CSV is provided.
-          </p>
-          <p style="color: #94a3b8; font-size: 12px; margin-top: 8px;">
-            Upload ${dimensionName.toLowerCase()} breakdown file to see detailed performance.
-          </p>
-        </div>
-      `
+  // Sort by spend or purchases CV
+  const sorted = [...breakdownData].sort((a, b) => {
+    if (sortBy === 'spend') {
+      return parseNum(b['Amount spent (IDR)'] || b.spend || 0) - parseNum(a['Amount spent (IDR)'] || a.spend || 0)
+    } else {
+      return parseNum(b['Purchases conversion value'] || b['Purchases conversion value for shared items only'] || 0) -
+             parseNum(a['Purchases conversion value'] || a['Purchases conversion value for shared items only'] || 0)
+    }
+  }).slice(0, topN)
+
+  const formatCurrency = (num: number) => 'Rp ' + Math.round(num).toLocaleString('id-ID')
+  const formatNumber = (num: number) => Math.round(num).toLocaleString('id-ID')
+  const formatPercent = (num: number) => num.toFixed(2) + '%'
+
+  const rows = sorted.map((item: any, idx: number) => {
+    // Get creative name with fallback logic
+    let creativeName = ''
+    if (includeCreativeName) {
+      // Try to extract from "Ads" column first (format: "Ads X || Creative Name;...")
+      if (item['Ads']) {
+        const adsText = item['Ads']
+        const match = adsText.match(/\|\|\s*([^;]+)/);
+        if (match && match[1]) {
+          creativeName = match[1].trim();
+        }
+      }
+
+      // Fallback to other fields if "Ads" parsing didn't work
+      if (!creativeName) {
+        const creativeFields = ['Ad name', 'Ad Name', 'Name', 'Creative name', 'ad_name', 'Ads']
+        creativeName = creativeFields.find(field => item[field] && field !== 'Ads') || item.name || `Creative ${idx + 1}`
+      }
     }
 
-    // Get top 5 by Amount Spent
-    const top5 = breakdownData.slice(0, 5)
+    const name = item[dimensionKey] || item.dimension || `Item ${idx + 1}`
+    const spend = parseNum(item['Amount spent (IDR)'] || item.spend || 0)
+    const impressions = parseNum(item['Impressions'] || 0)
+    const linkClicks = parseNum(item['Link clicks'] || item['Outbound clicks'] || 0)
+    const ctr = impressions > 0 ? (linkClicks / impressions * 100) : 0
+    const atc = parseNum(item['Adds to cart with shared items'] || 0)
+    const purchases = parseNum(item['Purchases with shared items'] || 0)
+    const purchasesCV = parseNum(item['Purchases conversion value'] || item['Purchases conversion value for shared items only'] || 0)
 
-    let tableRows = top5.map((item: any, idx: number) => {
-      const name = item[dimensionKey] || item.dimension || `Item ${idx + 1}`
-      const spend = parseNum(item['Amount spent (IDR)'] || item.spend || 0)
-      const impressions = parseNum(item['Impressions'] || item.impressions || 0)
-      const clicks = parseNum(item['Outbound clicks'] || item.clicks || 0)
-      const ctr = impressions > 0 ? (clicks / impressions * 100).toFixed(2) : '0.00'
-      const atc = parseNum(item['Adds to cart with shared items'] || item.atc || item.results || 0)
-      const cpr = atc > 0 ? (spend / atc) : 0
+    // Check if ATC and Purchases data exists (not all zeros)
+    const hasAtcData = atc > 0
+    const hasPurchasesData = purchases > 0
 
-      return `
-        <tr>
-          <td style="font-size: 13px;"><strong>${name}</strong></td>
-          <td class="text-right" style="font-size: 13px;">${formatNumber(impressions)}</td>
-          <td class="text-right" style="font-size: 13px;">${ctr}%</td>
-          <td class="text-right" style="font-size: 13px; font-weight: 600;">${formatNumber(atc)}</td>
-          <td class="text-right" style="font-size: 13px; font-weight: 600;">${formatCurrency(cpr)}</td>
-          <td class="text-right" style="font-size: 13px;">${formatCurrency(spend)}</td>
-        </tr>
-      `
-    }).join('')
+    const rowStyle = idx % 2 === 0 ? 'background: #ffffff;' : 'background: #f9fafb;'
 
     return `
-      <div style="overflow-x: auto; margin-bottom: 24px;">
-        <table style="font-size: 13px;">
-          <thead>
-            <tr>
-              <th style="width: 25%;">${dimensionName}</th>
-              <th class="text-right" style="width: 15%;">Impressions</th>
-              <th class="text-right" style="width: 10%;">CTR</th>
-              <th class="text-right" style="width: 15%;">Add to Cart</th>
-              <th class="text-right" style="width: 15%;">CPR</th>
-              <th class="text-right" style="width: 20%;">Amount Spent (IDR)</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${tableRows}
-          </tbody>
-        </table>
-      </div>
+      <tr style="${rowStyle}">
+        ${includeCreativeName ? `<td style="font-size: 11px;"><strong>${creativeName}</strong></td>` : ''}
+        ${includeCreativeName ? '' : `<td style="font-size: 11px;"><strong>${name}</strong></td>`}
+        <td class="text-right" style="font-size: 11px;">${formatNumber(impressions)}</td>
+        <td class="text-right" style="font-size: 11px;">${formatNumber(linkClicks)}</td>
+        <td class="text-right" style="font-size: 11px;">${formatPercent(ctr)}</td>
+        <td class="text-right" style="font-size: 11px; ${!hasAtcData ? 'color: #94a3b8;' : ''}">${hasAtcData ? formatNumber(atc) : '-'}</td>
+        <td class="text-right" style="font-size: 11px; ${!hasPurchasesData ? 'color: #94a3b8;' : ''}">${hasPurchasesData ? formatNumber(purchases) : '-'}</td>
+        <td class="text-right" style="font-size: 11px;">${formatCurrency(spend)}</td>
+      </tr>
     `
+  }).join('')
+
+  return `
+    <div style="overflow-x: auto;">
+      <table class="compact-table">
+        <thead>
+          <tr>
+            ${includeCreativeName ? '<th style="width: 25%;">Creative Name</th>' : '<th style="width: 15%;">' + dimensionName + '</th>'}
+            <th class="text-right" style="width: ${includeCreativeName ? '11.5' : '10'}%;">Impr</th>
+            <th class="text-right" style="width: ${includeCreativeName ? '10' : '8'}%;">Clicks</th>
+            <th class="text-right" style="width: ${includeCreativeName ? '9' : '8'}%;">CTR</th>
+            <th class="text-right" style="width: ${includeCreativeName ? '9' : '8'}%;">ATC</th>
+            <th class="text-right" style="width: ${includeCreativeName ? '9' : '8'}%;">Purch</th>
+            <th class="text-right" style="width: ${includeCreativeName ? '12.5' : '12'}%;">Spend</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `
+}
+
+/**
+ * Generate event comparison table for Twindate/Payday
+ */
+const generateEventComparisonTable = (
+  thisEvent: any,
+  lastEvent: any,
+  eventName: string
+): string => {
+  const formatCurrency = (num: number) => 'Rp ' + Math.round(num).toLocaleString('id-ID')
+  const formatNumber = (num: number) => Math.round(num).toLocaleString('id-ID')
+  const formatPercent = (num: number) => num.toFixed(2) + '%'
+  const formatROAS = (num: number) => num.toFixed(2)
+
+  const calcGrowth = (thisVal: number, lastVal: number) => {
+    if (lastVal === 0) return { value: 0, text: 'N/A' }
+    const growth = ((thisVal - lastVal) / lastVal) * 100
+    const text = (growth > 0 ? '+' : '') + growth.toFixed(2) + '%'
+    const color = growth >= 0 ? '#10b981' : '#ef4444'
+    return { value: growth, text, color }
   }
 
-  // Generate breakdown tables for each dimension
-  console.log('[DEBUG] breakdownThisWeek.age:', breakdownThisWeek.age)
-  const ageBreakdownHTML = generateAgeBreakdown(breakdownThisWeek.age || [])
-  const genderBreakdownHTML = generateBreakdownTable(breakdownThisWeek.gender || [], 'Gender', 'Gender')
-  const regionBreakdownHTML = generateBreakdownTable(breakdownThisWeek.region || [], 'Region', 'Region')
-  const platformBreakdownHTML = generateBreakdownTable(breakdownThisWeek.platform || [], 'Platform', 'Platform')
-  const placementBreakdownHTML = generateBreakdownTable(breakdownThisWeek.placement || [], 'Placement', 'Placement')
-  const creativeBreakdownHTML = generateBreakdownTable(breakdownThisWeek['ad-creative'] || breakdownThisWeek.creative || [], 'Creative', 'Ad name')
+  const metrics = [
+    { name: 'Amount Spent', thisVal: thisEvent.amountSpent || 0, lastVal: lastEvent.amountSpent || 0, format: formatCurrency },
+    { name: 'Impressions', thisVal: thisEvent.impressions || 0, lastVal: lastEvent.impressions || 0, format: formatNumber },
+    { name: 'Link Clicks', thisVal: thisEvent.linkClicks || 0, lastVal: lastEvent.linkClicks || 0, format: formatNumber },
+    { name: 'CTR', thisVal: (thisEvent.ctr || 0) * 100, lastVal: (lastEvent.ctr || 0) * 100, format: formatPercent },
+    { name: 'Adds to Cart', thisVal: thisEvent.addsToCart || 0, lastVal: lastEvent.addsToCart || 0, format: formatNumber },
+    { name: 'Purchases', thisVal: thisEvent.purchases || 0, lastVal: lastEvent.purchases || 0, format: formatNumber },
+    { name: 'Purchases CV', thisVal: thisEvent.purchasesConversionValue || 0, lastVal: lastEvent.purchasesConversionValue || 0, format: formatCurrency },
+    { name: 'ROAS', thisVal: thisEvent.roas || 0, lastVal: lastEvent.roas || 0, format: formatROAS },
+    { name: 'Cost per Purchase', thisVal: thisEvent.costPerPurchase || 0, lastVal: lastEvent.costPerPurchase || 0, format: formatCurrency },
+  ]
 
-  // Determine sentiment texts
-  // Variables for Slide 4 - removed unused variables from old design
+  const rows = metrics.map(metric => {
+    const growth = calcGrowth(metric.thisVal, metric.lastVal)
+    return `
+      <tr>
+        <td style="font-size: 12px;"><strong>${metric.name}</strong></td>
+        <td class="text-right" style="font-size: 12px;">${metric.format(metric.lastVal)}</td>
+        <td class="text-right" style="font-size: 12px;">${metric.format(metric.thisVal)}</td>
+        <td class="text-right" style="font-size: 12px; color: ${growth.color}; font-weight: 600;">${growth.text}</td>
+      </tr>
+    `
+  }).join('')
+
+  return `
+    <div style="overflow-x: auto;">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 30%;">Metric</th>
+            <th class="text-right" style="width: 25%;">${eventName === 'Twindate' ? 'Last Twindate' : 'Last Payday'}</th>
+            <th class="text-right" style="width: 25%;">This ${eventName}</th>
+            <th class="text-right" style="width: 20%;">MoM Growth</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `
+}
+
+/**
+ * Generate event highlights/lowlights
+ */
+const generateEventHighlights = (eventData: any, type: 'highlights' | 'lowlights'): string => {
+  if (!eventData || Object.keys(eventData).length === 0) {
+    return `<li style="margin-bottom: 8px; font-size: 13px;">No ${type} data available</li>`
+  }
+
+  const parseNum = (val: any) => typeof val === 'number' ? val : 0
+  const formatCurrency = (num: number) => 'Rp ' + Math.round(num).toLocaleString('id-ID')
+  const formatNumber = (num: number) => Math.round(num).toLocaleString('id-ID')
+
+  const getGrowth = (current: number, previous: number) => {
+    if (previous === 0) return null
+    return ((current - previous) / previous) * 100
+  }
+
+  const items: string[] = []
+  const spend = parseNum(eventData.amountSpent)
+  const purchases = parseNum(eventData.purchases)
+  const purchasesCV = parseNum(eventData.purchasesConversionValue)
+  const roas = parseNum(eventData.roas)
+  const atc = parseNum(eventData.addsToCart)
+  const ctr = parseNum(eventData.ctr) * 100
+
+  if (type === 'highlights') {
+    if (purchasesCV > 0 && spend > 0) {
+      items.push(`<li style="margin-bottom: 8px; font-size: 13px;"><span style="color: #10b981; font-weight: 600;">✓</span> Purchases CV: <strong>${formatCurrency(purchasesCV)}</strong></li>`)
+    }
+    if (roas >= 2) {
+      items.push(`<li style="margin-bottom: 8px; font-size: 13px;"><span style="color: #10b981; font-weight: 600;">✓</span> Healthy ROAS: <strong>${roas.toFixed(2)}x</strong></li>`)
+    }
+    if (atc > 0) {
+      items.push(`<li style="margin-bottom: 8px; font-size: 13px;"><span style="color: #10b981; font-weight: 600;">✓</span> Add to Cart: <strong>${formatNumber(atc)}</strong></li>`)
+    }
+    if (ctr >= 1.5) {
+      items.push(`<li style="margin-bottom: 8px; font-size: 13px;"><span style="color: #10b981; font-weight: 600;">✓</span> Strong CTR: <strong>${ctr.toFixed(2)}%</strong></li>`)
+    }
+  } else {
+    if (roas > 0 && roas < 1.5) {
+      items.push(`<li style="margin-bottom: 8px; font-size: 13px;"><span style="color: #ef4444; font-weight: 600;">!</span> Low ROAS: <strong>${roas.toFixed(2)}x</strong> (Target: ≥2.0x)</li>`)
+    }
+    if (ctr > 0 && ctr < 1.0) {
+      items.push(`<li style="margin-bottom: 8px; font-size: 13px;"><span style="color: #ef4444; font-weight: 600;">!</span> Weak CTR: <strong>${ctr.toFixed(2)}%</strong> (Target: ≥1.5%)</li>`)
+    }
+    if (spend > 0 && purchases === 0) {
+      items.push(`<li style="margin-bottom: 8px; font-size: 13px;"><span style="color: #ef4444; font-weight: 600;">!</span> Zero conversions with spend of ${formatCurrency(spend)}</li>`)
+    }
+    const costPerPurchase = parseNum(eventData.costPerPurchase)
+    if (costPerPurchase > 15000) {
+      items.push(`<li style="margin-bottom: 8px; font-size: 13px;"><span style="color: #ef4444; font-weight: 600;">!</span> High Cost per Purchase: <strong>${formatCurrency(costPerPurchase)}</strong></li>`)
+    }
+  }
+
+  if (items.length === 0) {
+    items.push(`<li style="margin-bottom: 8px; font-size: 13px;">No significant ${type}</li>`)
+  }
+
+  return items.join('')
+}
+
+/**
+ * Generate CPAS Report using inline template
+ * This works without external file dependencies
+ */
+export function generateReactTailwindReport(analysisData: any, reportName?: string, retentionType?: string, objectiveType?: string): string {
+  console.log('[CPAS Template] Starting report generation...')
+
+  const { thisWeek, lastWeek, breakdown, eventAnalysis, performanceSummary } = analysisData || {}
+
+  // Get data from performanceSummary or fallback to direct properties
+  const thisMonthData = performanceSummary?.thisWeek || thisWeek || {}
+  const lastMonthData = performanceSummary?.lastWeek || lastWeek || {}
+  const breakdownThisWeek = breakdown?.thisWeek || {}
+  const breakdownLastWeek = breakdown?.lastWeek || {}
+  const events = eventAnalysis || {}
+
+  // Extract and calculate all metrics with proper formulas
+  const parseNum = (val: any): number => {
+    if (typeof val === 'number') return val
+    if (!val) return 0
+    const parsed = parseFloat(String(val).replace(/,/g, ''))
+    return isNaN(parsed) ? 0 : parsed
+  }
+
+  const formatCurrency = (num: number) => 'Rp ' + Math.round(num).toLocaleString('id-ID')
+  const formatNumber = (num: number) => Math.round(num).toLocaleString('id-ID')
+  const formatPercent = (num: number) => num.toFixed(2) + '%'
+
+  // Extract basic metrics
+  const thisMonthSpend = parseNum(thisMonthData.amountSpent)
+  const lastMonthSpend = parseNum(lastMonthData.amountSpent)
+  const thisMonthATC = parseNum(thisMonthData.addToCart || thisMonthData.addsToCart)
+  const lastMonthATC = parseNum(lastMonthData.addToCart || lastMonthData.addsToCart)
+  const thisMonthPurchases = parseNum(thisMonthData.purchases)
+  const lastMonthPurchases = parseNum(lastMonthData.purchases)
+  const thisMonthImpressions = parseNum(thisMonthData.impressions)
+  const lastMonthImpressions = parseNum(lastMonthData.impressions)
+  const thisMonthClicks = parseNum(thisMonthData.linkClicks || thisMonthData.outboundClicks)
+  const lastMonthClicks = parseNum(lastMonthData.linkClicks || lastMonthData.outboundClicks)
+  const thisMonthCTR = thisMonthData.ctr || (thisMonthClicks > 0 && thisMonthImpressions > 0 ? (thisMonthClicks / thisMonthImpressions * 100) : 0)
+  const lastMonthCTR = lastMonthData.ctr || (lastMonthClicks > 0 && lastMonthImpressions > 0 ? (lastMonthClicks / lastMonthImpressions * 100) : 0)
+  const thisMonthCPM = thisMonthData.cpm || (thisMonthImpressions > 0 ? (thisMonthSpend / thisMonthImpressions * 1000) : 0)
+  const lastMonthCPM = lastMonthData.cpm || (lastMonthImpressions > 0 ? (lastMonthSpend / lastMonthImpressions * 1000) : 0)
+  const thisMonthCPC = thisMonthData.cpc || (thisMonthClicks > 0 ? (thisMonthSpend / thisMonthClicks) : 0)
+  const lastMonthCPC = lastMonthData.cpc || (lastMonthClicks > 0 ? (lastMonthSpend / lastMonthClicks) : 0)
+
+  // CPAS-specific metrics
+  const thisMonthATCCV = parseNum(thisMonthData.atcConversionValue)
+  const lastMonthATCCV = parseNum(lastMonthData.atcConversionValue)
+  const thisMonthPurchaseCV = parseNum(thisMonthData.purchasesConversionValue)
+  const lastMonthPurchaseCV = parseNum(lastMonthData.purchasesConversionValue)
+  const thisMonthROAS = thisMonthData.roas || (thisMonthSpend > 0 ? (thisMonthPurchaseCV / thisMonthSpend) : 0)
+  const lastMonthROAS = lastMonthData.roas || (lastMonthSpend > 0 ? (lastMonthPurchaseCV / lastMonthSpend) : 0)
+  const thisMonthAOV = thisMonthData.aov || (thisMonthPurchases > 0 ? (thisMonthPurchaseCV / thisMonthPurchases) : 0)
+  const lastMonthAOV = lastMonthData.aov || (lastMonthPurchases > 0 ? (lastMonthPurchaseCV / lastMonthPurchases) : 0)
+
+  // Calculate growth with proper formula: ((thisWeek - lastWeek) / lastWeek) * 100
+  const calcGrowth = (thisVal: number, lastVal: number): number => {
+    if (lastVal === 0) return 0
+    return ((thisVal - lastVal) / lastVal) * 100
+  }
+
+  const spendGrowth = calcGrowth(thisMonthSpend, lastMonthSpend)
+  const atcGrowth = calcGrowth(thisMonthATC, lastMonthATC)
+  const purchGrowth = calcGrowth(thisMonthPurchases, lastMonthPurchases)
+  const imprGrowth = calcGrowth(thisMonthImpressions, lastMonthImpressions)
+  const clicksGrowth = calcGrowth(thisMonthClicks, lastMonthClicks)
+  const ctrGrowth = calcGrowth(thisMonthCTR, lastMonthCTR)
+  const cpmGrowth = calcGrowth(thisMonthCPM, lastMonthCPM)
+  const cpcGrowth = calcGrowth(thisMonthCPC, lastMonthCPC)
+  const atcCVGrowth = calcGrowth(thisMonthATCCV, lastMonthATCCV)
+  const purchaseCVGrowth = calcGrowth(thisMonthPurchaseCV, lastMonthPurchaseCV)
+  const roasGrowth = calcGrowth(thisMonthROAS, lastMonthROAS)
+  const aovGrowth = calcGrowth(thisMonthAOV, lastMonthAOV)
+
+  const cprThisMonth = thisMonthATC > 0 ? (thisMonthSpend / thisMonthATC) : 0
+  const cprLastMonth = lastMonthATC > 0 ? (lastMonthSpend / lastMonthATC) : 0
+  const cprGrowth = calcGrowth(cprThisMonth, cprLastMonth)
+
+  const conversionRateThis = thisMonthClicks > 0 ? (thisMonthPurchases / thisMonthClicks) * 100 : 0
+  const conversionRateLast = lastMonthClicks > 0 ? (lastMonthPurchases / lastMonthClicks) * 100 : 0
+  const conversionRateGrowth = calcGrowth(conversionRateThis, conversionRateLast)
+
+  // Additional metrics
+  const thisMonthContentViews = parseNum(thisMonthData.contentViews || 0)
+  const lastMonthContentViews = parseNum(lastMonthData.contentViews || 0)
+  const thisMonthIGProfileVisits = parseNum(thisMonthData.igProfileVisits || 0)
+  const lastMonthIGProfileVisits = parseNum(lastMonthData.igProfileVisits || 0)
+  const thisMonthIGFollows = parseNum(thisMonthData.igFollows || 0)
+  const lastMonthIGFollows = parseNum(lastMonthData.igFollows || 0)
+  const thisMonthCostPerATC = thisMonthData.costPerATC || (thisMonthATC > 0 ? (thisMonthSpend / thisMonthATC) : 0)
+  const lastMonthCostPerATC = lastMonthData.costPerATC || (lastMonthATC > 0 ? (lastMonthSpend / lastMonthATC) : 0)
+  const thisMonthCostPerPurchase = thisMonthData.costPerPurchase || (thisMonthPurchases > 0 ? (thisMonthSpend / thisMonthPurchases) : 0)
+  const lastMonthCostPerPurchase = lastMonthData.costPerPurchase || (lastMonthPurchases > 0 ? (lastMonthSpend / lastMonthPurchases) : 0)
+
+  // Helper functions for badges and diffs
+  const getBadgeClass = (growth: number) => growth >= 0 ? 'badge-green' : 'badge-red'
+  const getGrowthText = (growth: number) => (growth > 0 ? '+' : '') + growth.toFixed(2) + '%'
+  const getDiffText = (thisVal: number, lastVal: number) => {
+    const diff = thisVal - lastVal
+    const sign = diff >= 0 ? '+' : ''
+    return sign + formatNumber(Math.abs(diff))
+  }
+  const getDiffClass = (thisVal: number, lastVal: number) => (thisVal - lastVal) >= 0 ? 'growth-positive' : 'growth-negative'
+
+  // Generate comprehensive breakdown tables
+  const ageBreakdownTable = generateComprehensiveBreakdown(breakdownThisWeek.age || [], 'Age', 'Age', 'spend', 10)
+  const genderBreakdownTable = generateComprehensiveBreakdown(breakdownThisWeek.gender || [], 'Gender', 'Gender', 'spend', 10)
+  const regionBreakdownTable = generateComprehensiveBreakdown(breakdownThisWeek.region || [], 'Region', 'Region', 'spend', 10)
+  const platformBreakdownTable = generateComprehensiveBreakdown(breakdownThisWeek.platform || [], 'Platform', 'Platform', 'spend', 10)
+  const placementBreakdownTable = generateComprehensiveBreakdown(breakdownThisWeek.placement || [], 'Placement', 'Placement', 'spend', 10)
+  const objectiveBreakdownTable = generateComprehensiveBreakdown(breakdownThisWeek.objective || [], 'Objective', 'Objective', 'spend', 10)
+  const creativeBreakdownTable = generateComprehensiveBreakdown(breakdownThisWeek['ad-creative'] || breakdownThisWeek.creative || [], 'Creative', 'Ad name', 'purchasesCV', 10, true)
+
+  // Generate event analysis slides
+  const twindateComparisonTable = generateEventComparisonTable(events.twindateThis || {}, events.twindateLast || {}, 'Twindate')
+  const paydayComparisonTable = generateEventComparisonTable(events.paydayThis || {}, events.paydayLast || {}, 'Payday')
+
+  const twindateHighlights = generateEventHighlights(events.twindateThis || {}, 'highlights')
+  const twindateLowlights = generateEventHighlights(events.twindateThis || {}, 'lowlights')
+  const paydayHighlights = generateEventHighlights(events.paydayThis || {}, 'highlights')
+  const paydayLowlights = generateEventHighlights(events.paydayThis || {}, 'lowlights')
+
+  // Generate insights based on data
+  const findBestPerformer = (data: any[], metric: string) => {
+    if (!data || data.length === 0) return 'N/A'
+    const sorted = [...data].sort((a, b) => parseNum(b[metric]) - parseNum(a[metric]))
+    return sorted[0]?.Age || sorted[0]?.Gender || sorted[0]?.Region || sorted[0]?.Platform || sorted[0]?.Placement || 'N/A'
+  }
+
+  // Helper to get top performer with metrics
+  const getTopAgePerformer = () => {
+    const data = breakdownThisWeek.age || []
+    if (!data || data.length === 0) return { name: '25-34', spend: 0, atc: 0, roas: 0 }
+    const sorted = [...data].sort((a, b) => parseNum(b['Amount spent (IDR)'] || b.spend || 0) - parseNum(a['Amount spent (IDR)'] || a.spend || 0))
+    const top = sorted[0]
+    const spend = parseNum(top['Amount spent (IDR)'] || top.spend || 0)
+    const atc = parseNum(top['Adds to cart with shared items'] || 0)
+    const purchases = parseNum(top['Purchases with shared items'] || 0)
+    const purchasesCV = parseNum(top['Purchases conversion value'] || 0)
+    const roas = spend > 0 ? purchasesCV / spend : 0
+    return {
+      name: top?.Age || '25-34',
+      spend,
+      atc,
+      roas
+    }
+  }
+
+  const topAgePerformer = getTopAgePerformer()
+
+  // Age Insight - Comprehensive Bahasa Indonesia
+  const ageInsight = `Segment usia ${topAgePerformer.name} mendominasi performa campaign dengan kontribusi spend terbesar sebesar ${formatCurrency(topAgePerformer.spend)}. Rekomendasi: Fokuskan 70-80% budget pada segment usia produktif (25-44 tahun) yang menunjukkan konversi terkuat. Pertimbangkan untuk exclude usia di atas 50+ jika ROAS di bawah target guna meningkatkan efisiensi campaign secara keseluruhan.`
+
+  // Gender Insight - Comprehensive Bahasa Indonesia
+  const getGenderDistribution = () => {
+    const data = breakdownThisWeek.gender || []
+    if (!data || data.length === 0) return { female: 65, male: 35 }
+    const totalSpend = data.reduce((sum: number, item: any) => sum + parseNum(item['Amount spent (IDR)'] || item.spend || 0), 0)
+    const female = data.find((d: any) => (d.Gender || '').toLowerCase().includes('female'))
+    const male = data.find((d: any) => (d.Gender || '').toLowerCase().includes('male'))
+    const femalePct = totalSpend > 0 ? (parseNum(female?.['Amount spent (IDR)'] || female?.spend || 0) / totalSpend * 100) : 65
+    const malePct = 100 - femalePct
+    return { female: Math.round(femalePct), male: Math.round(malePct) }
+  }
+
+  const genderDist = getGenderDistribution()
+  const genderInsight = `Segmen ${genderDist.female >= 50 ? 'Perempuan' : 'Laki-laki'} mendominasi kontribusi konversi sebesar approximately ${genderDist.female >= 50 ? genderDist.female : genderDist.male}% dari total Add to Cart. Rekomendasi: Pertahankan alokasi budget ${genderDist.female >= 50 ? '65-75% Female' : '60-70% Male'} untuk reach yang efisien namun tetap pertahankan 25-35% untuk gender balancing guna mengoptimalkan market penetration.`
+
+  // Region Insight - Comprehensive Bahasa Indonesia
+  const getTopRegion = () => {
+    const data = breakdownThisWeek.region || []
+    if (!data || data.length === 0) return { name: 'Jakarta', contribution: 40 }
+    const sorted = [...data].sort((a, b) => parseNum(b['Amount spent (IDR)'] || b.spend || 0) - parseNum(a['Amount spent (IDR)'] || a.spend || 0))
+    const totalSpend = data.reduce((sum: number, item: any) => sum + parseNum(item['Amount spent (IDR)'] || item.spend || 0), 0)
+    const top = sorted[0]
+    const topSpend = parseNum(top['Amount spent (IDR)'] || top.spend || 0)
+    const contribution = totalSpend > 0 ? (topSpend / totalSpend * 100) : 40
+    return { name: top?.Region || 'Jakarta', contribution: Math.round(contribution) }
+  }
+
+  const topRegion = getTopRegion()
+  const regionInsight = `Region ${topRegion.name} menjadi kontributor terbesar dengan pangsa spend sebesar ${topRegion.contribution}% dari total budget. Rekomendasi: Scale agresif di high-performing regions (Java + Jakarta) yang menyumbang 75-80% konversi sebelum expanding ke low-performing regions. Pertimbangkan geo-targeting optimization untuk exclude regions dengan ROAS < 1.0 guna meningkatkan efisiensi campaign.`
+
+  // Platform Insight - Comprehensive Bahasa Indonesia
+  const getPlatformSplit = () => {
+    const data = breakdownThisWeek.platform || []
+    if (!data || data.length === 0) return { ig: 70, fb: 30 }
+    const totalSpend = data.reduce((sum: number, item: any) => sum + parseNum(item['Amount spent (IDR)'] || item.spend || 0), 0)
+    const ig = data.find((d: any) => (d.Platform || '').toLowerCase().includes('instagram'))
+    const fb = data.find((d: any) => (d.Platform || '').toLowerCase().includes('facebook'))
+    const igPct = totalSpend > 0 ? (parseNum(ig?.['Amount spent (IDR)'] || ig?.spend || 0) / totalSpend * 100) : 70
+    const fbPct = 100 - igPct
+    return { ig: Math.round(igPct), fb: Math.round(fbPct) }
+  }
+
+  const platformSplit = getPlatformSplit()
+  const platformInsight = `Instagram mendominasi performa dengan kontribusi ${platformSplit.ig}% terhadap total konversi dibanding Facebook ${platformSplit.fb}%. Rekomendasi: Pertahankan alokasi budget 60:40 atau 65:35 (Instagram:Facebook) untuk diversification yang sehat. Scale top-performing Instagram ad sets sambil tetap maintain presence di Facebook untuk reach yang lebih luas dan cost efficiency yang optimal.`
+
+  // Placement Insight - Comprehensive Bahasa Indonesia
+  const getTopPlacement = () => {
+    const data = breakdownThisWeek.placement || []
+    if (!data || data.length === 0) return { name: 'Instagram Reels', ctr: 1.5, roas: 2.5 }
+    const sorted = [...data].sort((a, b) => parseNum(b['Amount spent (IDR)'] || b.spend || 0) - parseNum(a['Amount spent (IDR)'] || a.spend || 0))
+    const top = sorted[0]
+    const clicks = parseNum(top['Link clicks'] || top['Outbound clicks'] || 0)
+    const impr = parseNum(top['Impressions'] || 0)
+    const ctr = impr > 0 ? (clicks / impr * 100) : 1.5
+    const spend = parseNum(top['Amount spent (IDR)'] || top.spend || 0)
+    const cv = parseNum(top['Purchases conversion value'] || 0)
+    const roas = spend > 0 ? cv / spend : 2.5
+    return { name: top?.Placement || 'Instagram Reels', ctr, roas }
+  }
+
+  const topPlacement = getTopPlacement()
+  const placementInsight = `Placement ${topPlacement.name} menunjukkan performa terbaik dengan CTR ${topPlacement.ctr.toFixed(2)}% dan ROAS ${topPlacement.roas.toFixed(2)}. Rekomendasi: Re-alokasi budget sesuai performa dengan 70% ke Reels (IG + FB), 25% ke Feed, dan 5% ke Stories. Scale high-ROAS placements dan pause underperforming placements untuk maximize efficiency dan achieve target CPR.`
+
+  // Objective Insight - Comprehensive Bahasa Indonesia
+  const objectiveInsight = `Campaign dengan objective OUTCOME_SALES menjadi primary driver konversi dengan contribution rate terbesar. Rekomendasi: Optimize bidding strategy berdasarkan funnel stage - gunakan Cost Cap untuk upper funnel (Add to Cart) dengan target CPA sesuai benchmark, dan Lowest Cost atau Bid Cap untuk lower funnel (Purchase) untuk maximize conversion volume. Implement value-based bidding untuk ROAS optimization pada campaigns yang sudah mature.`
+
+  // Creative Insight - Comprehensive Bahasa Indonesia
+  const getTopCreativeFormat = () => {
+    const data = breakdownThisWeek['ad-creative'] || breakdownThisWeek.creative || []
+    if (!data || data.length === 0) return { format: 'Collection Ads', share: 85 }
+    const sorted = [...data].sort((a, b) => parseNum(b['Purchases conversion value'] || 0) - parseNum(a['Purchases conversion value'] || 0))
+    const top = sorted[0]
+    const totalCV = data.reduce((sum: number, item: any) => sum + parseNum(item['Purchases conversion value'] || 0), 0)
+    const topCV = parseNum(top['Purchases conversion value'] || 0)
+    const share = totalCV > 0 ? (topCV / totalCV * 100) : 85
+    return { format: 'Collection Ads', share: Math.round(share) }
+  }
+
+  const topCreative = getTopCreativeFormat()
+  const creativeInsight = `Format ${topCreative.format} mendominasi top performers dengan pangsa ${topCreative.share}% dari total Purchases Conversion Value. Rekomendasi: Scale winning collection ads dengan increase budget 20-30% sambil test variasi produk dalam collection. Pause single-image ads dengan ROAS < 1.5 dan realokasi budget ke top-performing collections. Launch 3-5 new creative variations per week untuk prevent ad fatigue dan maintain engagement levels.`
+
+  // Event-based action plans with comprehensive Bahasa Indonesia
+  const twindateActionPlan = events.twindateThis?.purchasesConversionValue > 0
+    ? `Twindate campaign menunjukkan performa positif dengan Purchases CV sebesar ${formatCurrency(parseNum(events.twindateThis?.purchasesConversionValue || 0))}. Action Plan: Scale high-performing Twindate creatives dan audiences dengan increase budget 20-30% untuk next Twindate event. Prepare H-4 dengan pre-warming audiences dan test new creative variants yang aligned dengan Twindate themes. Implement bid acceleration during peak hours (H-2 to H) untuk maximize visibility dan conversion.`
+    : `Twindate campaign belum menunjukkan hasil optimal dengan conversion masih di bawah target. Action Plan: Analyze underperforming elements - review creative relevance, audience targeting, dan offer competitiveness. Test minimum 3 new creative angles dengan messaging yang lebih spesifik ke Twindate. Experiment dengan limited-time offers atau exclusive deals untuk drive urgency. Review dan adjust bidding strategy untuk lebih aggressive selama Twindate period.`
+
+  const paydayActionPlan = events.paydayThis?.roas >= 2
+    ? `Payday campaign menunjukkan performa excellent dengan ROAS ${parseNum(events.paydayThis?.roas || 0).toFixed(2)} yang di atas target. Action Plan: Increase budget 25-35% selama Payday periods (dates 21-31 dan 1-5) untuk capitalize pada high purchase intent. Implement aggressive bidding strategy dengan cost cap yang di-adjust upward 15-20% selama peak Payday days. Scale winning creatives dan expand audiences ke lookalike 1-3% berdasarkan top converters dari Payday periods sebelumnya. Prepare creative inventory dengan minimum 5 fresh variants untuk prevent ad fatigue.`
+    : `Payday campaign menunjukkan performa di bawah target dengan ROAS ${parseNum(events.paydayThis?.roas || 0).toFixed(2)} yang perlu dioptimasi. Action Plan: Review dan restructure campaign setup - consider splitting campaigns berdasarkan product tier dengan different bidding strategies. Test urgency-driven creative messaging seperti "Payday Special", "Limited Time Offer", atau "Flash Sale" untuk trigger immediate action. Experiment dengan different ad formats - collection ads untuk showcase multiple products, single-image ads untuk focused messaging, dan video ads untuk storytelling. Implement dayparting untuk focus budget pada high-converting hours selama Payday period.`
+
+  // Sentiment analysis
+  const sentiment = spendGrowth >= 0 && atcGrowth >= 0 ? 'positif' : spendGrowth >= 0 ? 'mixed' : 'negatif'
   const spendSentiment = spendGrowth >= 0 ? 'sebanding' : 'perlu evaluasi'
   const performanceSentiment = atcGrowth >= 0 ? 'menggembirakan' : 'perlu improvement'
+  const growthSentiment = spendGrowth >= 0 ? 'pertumbuhan' : 'penurunan'
+  const efficiencySentiment = thisMonthROAS >= 2 ? 'efisien' : thisMonthROAS >= 1 ? 'moderat' : 'kurang efisien'
+
   const conversionSentiment = thisMonthPurchases > 0 && thisMonthATC > 0
-    ? `Conversion rate dari ATC ke Purchase adalah ${((thisMonthPurchases / thisMonthATC) * 100).toFixed(1)}%`
+    ? `Conversion rate dari ATC ke Purchase adalah ${conversionRateThis.toFixed(1)}%`
     : 'Perlu optimalisasi funnel konversi'
 
-  // Determine metric performance description
-  const metricPerformanceDesc = atcGrowth > 50 ? 'sangat impresif dengan pertumbuhan signifikan'
-    : atcGrowth > 0 ? 'positif dengan tren kenaikan'
-    : 'perlu evaluasi dan optimalisasi'
+  // Period labels
+  const isWeek = retentionType === 'week'
+  const thisPeriodLabel = isWeek ? 'Minggu Ini' : 'Bulan Ini'
+  const lastPeriodLabel = isWeek ? 'Minggu Lalu' : 'Bulan Lalu'
+  const periodType = isWeek ? 'Weekly' : 'Monthly'
 
-  // Find top performer
+  // Find top performer metric
   const metrics = [
     { name: 'Impressions', growth: imprGrowth },
     { name: 'Link Clicks', growth: clicksGrowth },
@@ -975,18 +1882,15 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     { name: 'Purchases', growth: purchGrowth }
   ]
   const topPerformer = metrics.reduce((prev, current) => (prev.growth > current.growth) ? prev : current)
-  const topPerformerMetric = topPerformer.name
-  const topPerformerGrowth = formatPercent(topPerformer.growth)
+
+  const metricPerformanceDesc = atcGrowth > 50 ? 'sangat impresif dengan pertumbuhan signifikan'
+    : atcGrowth > 0 ? 'positif dengan tren kenaikan'
+    : 'perlu evaluasi dan optimalisasi'
 
   const ctrSentiment = thisMonthCTR > 1.5 ? 'CTR yang sehat' : thisMonthCTR > 1.0 ? 'CTR yang moderat' : 'CTR yang perlu dioptimasi'
   const metricsRecommendation = thisMonthCTR < 1.5
     ? 'Optimasi creative dan copywriting untuk meningkatkan CTR di atas 1.5%'
     : 'Pertahankan performa dan scale winning ad sets'
-
-  // Conversion rate calculation
-  const conversionRateWin = thisMonthATC > 0 && thisMonthPurchases > 0
-    ? ((thisMonthPurchases / thisMonthATC) * 100).toFixed(1)
-    : '0.0'
 
   const improvementArea = thisMonthCTR < 1.5
     ? 'CTR perlu ditingkatkan di atas 1.5% untuk efficiency lebih baik'
@@ -997,6 +1901,10 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const nextPeriodFocus = atcGrowth < 0
     ? 'mengembalikan performa konversi ke level positif'
     : 'scaling winning campaigns sambil mempertahankan efisiensi'
+
+  const conversionRateWin = thisMonthATC > 0 && thisMonthPurchases > 0
+    ? ((thisMonthPurchases / thisMonthATC) * 100).toFixed(1)
+    : '0.0'
 
   // Action steps
   const actionStep1 = atcGrowth > 0
@@ -1031,19 +1939,26 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const targetGrowth = 20
   const targetCPR = cprThisMonth > 5000 ? formatCurrency(cprThisMonth * 0.8) : formatCurrency(cprThisMonth)
 
-  // Period labels
-  const isWeek = retentionType === 'week'
-  const thisPeriodLabel = isWeek ? 'Minggu Ini' : 'Bulan Ini'
-  const lastPeriodLabel = isWeek ? 'Minggu Lalu' : 'Bulan Lalu'
+  // Generate report date
+  const reportDate = new Date().toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
 
-  // Replace placeholders
+  // Growth indicator class and arrow
+  const growthIndicatorClass = spendGrowth >= 0 ? 'positive' : 'negative'
+  const growthArrow = spendGrowth >= 0 ? '📈' : '📉'
+
+  // Replace all placeholders in template
   let html = CPAS_TEMPLATE
     // Slide 1 & 2
     .replace(/{REPORT_NAME}/g, reportName || 'CPAS Report')
+    .replace(/{REPORT_DATE}/g, reportDate)
     .replace(/{PERIOD_LABEL}/g, `${thisPeriodLabel} vs ${lastPeriodLabel}`)
     .replace(/{THIS_PERIOD_LABEL}/g, thisPeriodLabel)
     .replace(/{LAST_PERIOD_LABEL}/g, lastPeriodLabel)
-    .replace(/{PERIOD_TYPE}/g, isWeek ? 'Weekly' : 'Monthly')
+    .replace(/{PERIOD_TYPE}/g, periodType)
     .replace(/{THIS_SPEND}/g, formatCurrency(thisMonthSpend))
     .replace(/{LAST_SPEND}/g, formatCurrency(lastMonthSpend))
     .replace(/{THIS_ATC}/g, formatNumber(thisMonthATC))
@@ -1052,11 +1967,17 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     .replace(/{LAST_CPR}/g, cprLastMonth > 0 ? formatCurrency(cprLastMonth) : '-')
     .replace(/{GROWTH_COLOR}/g, spendGrowth >= 0 ? '#10B981' : '#EF4444')
     .replace(/{GROWTH_PERCENT}/g, getGrowthText(spendGrowth))
+    .replace(/{GROWTH_INDICATOR_CLASS}/g, growthIndicatorClass)
+    .replace(/{GROWTH_ARROW}/g, growthArrow)
+    // Slide 2 - Key Insight
+    .replace(/{SPEND_SENTIMENT}/g, spendSentiment)
+    .replace(/{PERFORMANCE_SENTIMENT}/g, performanceSentiment)
+    .replace(/{CONVERSION_SENTIMENT}/g, conversionSentiment)
     // Slide 3 - Detailed Metrics
     .replace(/{THIS_IMPRESSIONS}/g, formatNumber(thisMonthImpressions))
     .replace(/{LAST_IMPRESSIONS}/g, formatNumber(lastMonthImpressions))
-    .replace(/{THIS_CLICKS}/g, formatNumber(thisMonthClicks))
-    .replace(/{LAST_CLICKS}/g, formatNumber(lastMonthClicks))
+    .replace(/{THIS_OUTBOUND_CLICKS}/g, formatNumber(thisMonthClicks))
+    .replace(/{LAST_OUTBOUND_CLICKS}/g, formatNumber(lastMonthClicks))
     .replace(/{THIS_PURCHASES}/g, formatNumber(thisMonthPurchases))
     .replace(/{LAST_PURCHASES}/g, formatNumber(lastMonthPurchases))
     .replace(/{SPEND_DIFF}/g, getDiffText(thisMonthSpend, lastMonthSpend))
@@ -1067,10 +1988,10 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     .replace(/{IMPR_CLASS}/g, getDiffClass(thisMonthImpressions, lastMonthImpressions))
     .replace(/{IMPR_BADGE_CLASS}/g, getBadgeClass(imprGrowth))
     .replace(/{IMPR_GROWTH}/g, getGrowthText(imprGrowth))
-    .replace(/{CLICKS_DIFF}/g, getDiffText(thisMonthClicks, lastMonthClicks))
-    .replace(/{CLICKS_CLASS}/g, getDiffClass(thisMonthClicks, lastMonthClicks))
-    .replace(/{CLICKS_BADGE_CLASS}/g, getBadgeClass(clicksGrowth))
-    .replace(/{CLICKS_GROWTH}/g, getGrowthText(clicksGrowth))
+    .replace(/{OUTBOUND_CLICKS_DIFF}/g, getDiffText(thisMonthClicks, lastMonthClicks))
+    .replace(/{OUTBOUND_CLICKS_CLASS}/g, getDiffClass(thisMonthClicks, lastMonthClicks))
+    .replace(/{OUTBOUND_CLICKS_BADGE_CLASS}/g, getBadgeClass(clicksGrowth))
+    .replace(/{OUTBOUND_CLICKS_GROWTH}/g, getGrowthText(clicksGrowth))
     .replace(/{ATC_DIFF}/g, getDiffText(thisMonthATC, lastMonthATC))
     .replace(/{ATC_CLASS}/g, getDiffClass(thisMonthATC, lastMonthATC))
     .replace(/{ATC_BADGE_CLASS}/g, getBadgeClass(atcGrowth))
@@ -1079,8 +2000,8 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     .replace(/{PURCH_CLASS}/g, getDiffClass(thisMonthPurchases, lastMonthPurchases))
     .replace(/{PURCH_BADGE_CLASS}/g, getBadgeClass(purchGrowth))
     .replace(/{PURCH_GROWTH}/g, getGrowthText(purchGrowth))
-    // Additional metrics for Detailed Performance Metrics
-    .replace(/{LAST_CTR}/g, lastMonthCTR > 0 ? lastMonthCTR.toFixed(2) + '%' : '0.00%')
+    // Additional metrics
+    .replace(/{LAST_CTR}/g, lastMonthCTR.toFixed(2) + '%')
     .replace(/{THIS_CTR}/g, thisMonthCTR.toFixed(2) + '%')
     .replace(/{CTR_DIFF}/g, (thisMonthCTR - lastMonthCTR >= 0 ? '+' : '') + (thisMonthCTR - lastMonthCTR).toFixed(2) + '%')
     .replace(/{CTR_CLASS}/g, getDiffClass(thisMonthCTR, lastMonthCTR))
@@ -1098,37 +2019,12 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     .replace(/{CPM_CLASS}/g, getDiffClass(thisMonthCPM, lastMonthCPM))
     .replace(/{CPM_BADGE_CLASS}/g, getBadgeClass(cpmGrowth))
     .replace(/{CPM_GROWTH}/g, lastMonthCPM > 0 ? getGrowthText(cpmGrowth) : 'N/A')
-    .replace(/{LAST_OUTBOUND_CLICKS}/g, formatNumber(lastMonthOutboundClicks))
-    .replace(/{THIS_OUTBOUND_CLICKS}/g, formatNumber(thisMonthOutboundClicks))
-    .replace(/{OUTBOUND_CLICKS_DIFF}/g, getDiffText(thisMonthOutboundClicks, lastMonthOutboundClicks))
-    .replace(/{OUTBOUND_CLICKS_CLASS}/g, getDiffClass(thisMonthOutboundClicks, lastMonthOutboundClicks))
-    .replace(/{OUTBOUND_CLICKS_BADGE_CLASS}/g, getBadgeClass(outboundClicksGrowth))
-    .replace(/{OUTBOUND_CLICKS_GROWTH}/g, lastMonthOutboundClicks > 0 ? getGrowthText(outboundClicksGrowth) : 'N/A')
-    .replace(/{LAST_CONTENT_VIEWS}/g, formatNumber(lastMonthContentViews))
-    .replace(/{THIS_CONTENT_VIEWS}/g, formatNumber(thisMonthContentViews))
-    .replace(/{CONTENT_VIEWS_DIFF}/g, getDiffText(thisMonthContentViews, lastMonthContentViews))
-    .replace(/{CONTENT_VIEWS_CLASS}/g, getDiffClass(thisMonthContentViews, lastMonthContentViews))
-    .replace(/{CONTENT_VIEWS_BADGE_CLASS}/g, getBadgeClass(contentViewsGrowth))
-    .replace(/{CONTENT_VIEWS_GROWTH}/g, lastMonthContentViews > 0 ? getGrowthText(contentViewsGrowth) : 'N/A')
-    .replace(/{LAST_IG_PROFILE_VISITS}/g, formatNumber(lastMonthIGProfileVisits))
-    .replace(/{THIS_IG_PROFILE_VISITS}/g, formatNumber(thisMonthIGProfileVisits))
-    .replace(/{IG_PROFILE_VISITS_DIFF}/g, getDiffText(thisMonthIGProfileVisits, lastMonthIGProfileVisits))
-    .replace(/{IG_PROFILE_VISITS_CLASS}/g, getDiffClass(thisMonthIGProfileVisits, lastMonthIGProfileVisits))
-    .replace(/{IG_PROFILE_VISITS_BADGE_CLASS}/g, getBadgeClass(igProfileVisitsGrowth))
-    .replace(/{IG_PROFILE_VISITS_GROWTH}/g, lastMonthIGProfileVisits > 0 ? getGrowthText(igProfileVisitsGrowth) : 'N/A')
-    .replace(/{LAST_IG_FOLLOWS}/g, formatNumber(lastMonthIGFollows))
-    .replace(/{THIS_IG_FOLLOWS}/g, formatNumber(thisMonthIGFollows))
-    .replace(/{IG_FOLLOWS_DIFF}/g, getDiffText(thisMonthIGFollows, lastMonthIGFollows))
-    .replace(/{IG_FOLLOWS_CLASS}/g, getDiffClass(thisMonthIGFollows, lastMonthIGFollows))
-    .replace(/{IG_FOLLOWS_BADGE_CLASS}/g, getBadgeClass(igFollowsGrowth))
-    .replace(/{IG_FOLLOWS_GROWTH}/g, lastMonthIGFollows > 0 ? getGrowthText(igFollowsGrowth) : 'N/A')
-    // Additional metrics for Detailed Performance Metrics table
     .replace(/{LAST_COST_PER_ATC}/g, formatCurrency(lastMonthCostPerATC))
     .replace(/{THIS_COST_PER_ATC}/g, formatCurrency(thisMonthCostPerATC))
     .replace(/{COST_PER_ATC_DIFF}/g, (thisMonthCostPerATC - lastMonthCostPerATC >= 0 ? '+' : '') + formatCurrency(Math.abs(thisMonthCostPerATC - lastMonthCostPerATC)))
     .replace(/{COST_PER_ATC_CLASS}/g, getDiffClass(thisMonthCostPerATC, lastMonthCostPerATC))
-    .replace(/{COST_PER_ATC_BADGE_CLASS}/g, getBadgeClass(costPerATCGrowth))
-    .replace(/{COST_PER_ATC_GROWTH}/g, lastMonthCostPerATC > 0 ? getGrowthText(costPerATCGrowth) : 'N/A')
+    .replace(/{COST_PER_ATC_BADGE_CLASS}/g, getBadgeClass(calcGrowth(thisMonthCostPerATC, lastMonthCostPerATC)))
+    .replace(/{COST_PER_ATC_GROWTH}/g, lastMonthCostPerATC > 0 ? getGrowthText(calcGrowth(thisMonthCostPerATC, lastMonthCostPerATC)) : 'N/A')
     .replace(/{LAST_ATC_CV}/g, formatCurrency(lastMonthATCCV))
     .replace(/{THIS_ATC_CV}/g, formatCurrency(thisMonthATCCV))
     .replace(/{ATC_CV_DIFF}/g, (thisMonthATCCV - lastMonthATCCV >= 0 ? '+' : '') + formatCurrency(Math.abs(thisMonthATCCV - lastMonthATCCV)))
@@ -1139,20 +2035,20 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     .replace(/{THIS_COST_PER_PURCHASE}/g, formatCurrency(thisMonthCostPerPurchase))
     .replace(/{COST_PER_PURCHASE_DIFF}/g, (thisMonthCostPerPurchase - lastMonthCostPerPurchase >= 0 ? '+' : '') + formatCurrency(Math.abs(thisMonthCostPerPurchase - lastMonthCostPerPurchase)))
     .replace(/{COST_PER_PURCHASE_CLASS}/g, getDiffClass(thisMonthCostPerPurchase, lastMonthCostPerPurchase))
-    .replace(/{COST_PER_PURCHASE_BADGE_CLASS}/g, getBadgeClass(costPerPurchaseGrowth))
-    .replace(/{COST_PER_PURCHASE_GROWTH}/g, lastMonthCostPerPurchase > 0 ? getGrowthText(costPerPurchaseGrowth) : 'N/A')
+    .replace(/{COST_PER_PURCHASE_BADGE_CLASS}/g, getBadgeClass(calcGrowth(thisMonthCostPerPurchase, lastMonthCostPerPurchase)))
+    .replace(/{COST_PER_PURCHASE_GROWTH}/g, lastMonthCostPerPurchase > 0 ? getGrowthText(calcGrowth(thisMonthCostPerPurchase, lastMonthCostPerPurchase)) : 'N/A')
     .replace(/{LAST_PURCHASE_CV}/g, formatCurrency(lastMonthPurchaseCV))
     .replace(/{THIS_PURCHASE_CV}/g, formatCurrency(thisMonthPurchaseCV))
     .replace(/{PURCHASE_CV_DIFF}/g, (thisMonthPurchaseCV - lastMonthPurchaseCV >= 0 ? '+' : '') + formatCurrency(Math.abs(thisMonthPurchaseCV - lastMonthPurchaseCV)))
     .replace(/{PURCHASE_CV_CLASS}/g, getDiffClass(thisMonthPurchaseCV, lastMonthPurchaseCV))
     .replace(/{PURCHASE_CV_BADGE_CLASS}/g, getBadgeClass(purchaseCVGrowth))
     .replace(/{PURCHASE_CV_GROWTH}/g, lastMonthPurchaseCV > 0 ? getGrowthText(purchaseCVGrowth) : 'N/A')
-    .replace(/{LAST_CONVERSION_RATE}/g, lastMonthConversionRate.toFixed(2) + '%')
-    .replace(/{THIS_CONVERSION_RATE}/g, thisMonthConversionRate.toFixed(2) + '%')
-    .replace(/{CONVERSION_RATE_DIFF}/g, (thisMonthConversionRate - lastMonthConversionRate >= 0 ? '+' : '') + (thisMonthConversionRate - lastMonthConversionRate).toFixed(2) + '%')
-    .replace(/{CONVERSION_RATE_CLASS}/g, getDiffClass(thisMonthConversionRate, lastMonthConversionRate))
+    .replace(/{LAST_CONVERSION_RATE}/g, conversionRateLast.toFixed(2) + '%')
+    .replace(/{THIS_CONVERSION_RATE}/g, conversionRateThis.toFixed(2) + '%')
+    .replace(/{CONVERSION_RATE_DIFF}/g, (conversionRateThis - conversionRateLast >= 0 ? '+' : '') + (conversionRateThis - conversionRateLast).toFixed(2) + '%')
+    .replace(/{CONVERSION_RATE_CLASS}/g, getDiffClass(conversionRateThis, conversionRateLast))
     .replace(/{CONVERSION_RATE_BADGE_CLASS}/g, getBadgeClass(conversionRateGrowth))
-    .replace(/{CONVERSION_RATE_GROWTH}/g, lastMonthConversionRate > 0 ? getGrowthText(conversionRateGrowth) : 'N/A')
+    .replace(/{CONVERSION_RATE_GROWTH}/g, lastMonthCTR > 0 ? getGrowthText(conversionRateGrowth) : 'N/A')
     .replace(/{LAST_ROAS}/g, lastMonthROAS.toFixed(2))
     .replace(/{THIS_ROAS}/g, thisMonthROAS.toFixed(2))
     .replace(/{ROAS_DIFF}/g, (thisMonthROAS - lastMonthROAS >= 0 ? '+' : '') + (thisMonthROAS - lastMonthROAS).toFixed(2))
@@ -1165,35 +2061,72 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     .replace(/{AOV_CLASS}/g, getDiffClass(thisMonthAOV, lastMonthAOV))
     .replace(/{AOV_BADGE_CLASS}/g, getBadgeClass(aovGrowth))
     .replace(/{AOV_GROWTH}/g, lastMonthAOV > 0 ? getGrowthText(aovGrowth) : 'N/A')
-    // Slide 2 - Key Insight
-    .replace(/{SPEND_SENTIMENT}/g, spendSentiment)
-    .replace(/{PERFORMANCE_SENTIMENT}/g, performanceSentiment)
-    .replace(/{CONVERSION_SENTIMENT}/g, conversionSentiment)
-    // Slide 3 - Key Insight
+    .replace(/{LAST_CONTENT_VIEWS}/g, formatNumber(lastMonthContentViews))
+    .replace(/{THIS_CONTENT_VIEWS}/g, formatNumber(thisMonthContentViews))
+    .replace(/{CONTENT_VIEWS_DIFF}/g, getDiffText(thisMonthContentViews, lastMonthContentViews))
+    .replace(/{CONTENT_VIEWS_CLASS}/g, getDiffClass(thisMonthContentViews, lastMonthContentViews))
+    .replace(/{CONTENT_VIEWS_BADGE_CLASS}/g, getBadgeClass(calcGrowth(thisMonthContentViews, lastMonthContentViews)))
+    .replace(/{CONTENT_VIEWS_GROWTH}/g, lastMonthContentViews > 0 ? getGrowthText(calcGrowth(thisMonthContentViews, lastMonthContentViews)) : 'N/A')
+    .replace(/{LAST_IG_PROFILE_VISITS}/g, formatNumber(lastMonthIGProfileVisits))
+    .replace(/{THIS_IG_PROFILE_VISITS}/g, formatNumber(thisMonthIGProfileVisits))
+    .replace(/{IG_PROFILE_VISITS_DIFF}/g, getDiffText(thisMonthIGProfileVisits, lastMonthIGProfileVisits))
+    .replace(/{IG_PROFILE_VISITS_CLASS}/g, getDiffClass(thisMonthIGProfileVisits, lastMonthIGProfileVisits))
+    .replace(/{IG_PROFILE_VISITS_BADGE_CLASS}/g, getBadgeClass(calcGrowth(thisMonthIGProfileVisits, lastMonthIGProfileVisits)))
+    .replace(/{IG_PROFILE_VISITS_GROWTH}/g, lastMonthIGProfileVisits > 0 ? getGrowthText(calcGrowth(thisMonthIGProfileVisits, lastMonthIGProfileVisits)) : 'N/A')
+    .replace(/{LAST_IG_FOLLOWS}/g, formatNumber(lastMonthIGFollows))
+    .replace(/{THIS_IG_FOLLOWS}/g, formatNumber(thisMonthIGFollows))
+    .replace(/{IG_FOLLOWS_DIFF}/g, getDiffText(thisMonthIGFollows, lastMonthIGFollows))
+    .replace(/{IG_FOLLOWS_CLASS}/g, getDiffClass(thisMonthIGFollows, lastMonthIGFollows))
+    .replace(/{IG_FOLLOWS_BADGE_CLASS}/g, getBadgeClass(calcGrowth(thisMonthIGFollows, lastMonthIGFollows)))
+    .replace(/{IG_FOLLOWS_GROWTH}/g, lastMonthIGFollows > 0 ? getGrowthText(calcGrowth(thisMonthIGFollows, lastMonthIGFollows)) : 'N/A')
+    // Slide 3 - Insight
     .replace(/{METRIC_PERFORMANCE_DESC}/g, metricPerformanceDesc)
-    .replace(/{TOP_PERFORMER_METRIC}/g, topPerformerMetric)
-    .replace(/{TOP_PERFORMER_GROWTH}/g, topPerformerGrowth)
+    .replace(/{TOP_PERFORMER_METRIC}/g, topPerformer.name)
+    .replace(/{TOP_PERFORMER_GROWTH}/g, getGrowthText(topPerformer.growth))
     .replace(/{CTR_SENTIMENT}/g, ctrSentiment)
     .replace(/{THIS_CTR}/g, thisMonthCTR.toFixed(2))
     .replace(/{METRICS_RECOMMENDATION}/g, metricsRecommendation)
-    // Slide 4 - Highlights & Lowlights
+    // Slide 4 - Key Insights
     .replace(/{CPM_SENTIMENT}/g, cpmGrowth >= 0 ? 'Naik' : 'Turun')
-    .replace(/{CPM_CHANGE_ABS}/g, formatNumber(Math.abs(cpmGrowth)))
-    .replace(/{CPM_INSIGHT}/g, `Impressions cost ${cpmGrowth >= 0 ? 'less' : 'more'} efficient at Rp ${formatNumber(thisMonthCPM)} per 1,000`)
+    .replace(/{CPM_CHANGE_ABS}/g, Math.abs(cpmGrowth).toFixed(2))
+    .replace(/{CPM_INSIGHT}/g, `CPM ${cpmGrowth >= 0 ? 'naik' : 'turun'} ${Math.abs(cpmGrowth).toFixed(2)}% dari Rp ${formatNumber(lastMonthCPM)} ke Rp ${formatNumber(thisMonthCPM)}`)
     .replace(/{CTR_SENTIMENT_LOW}/g, ctrGrowth >= 0 ? 'Naik' : 'Turun')
-    .replace(/{CTR_CHANGE_ABS}/g, formatNumber(Math.abs(ctrGrowth)))
-    .replace(/{CTR_INSIGHT}/g, lastMonthCTR > 0 ? `Dari ${lastMonthCTR.toFixed(2)}% ke ${thisMonthCTR.toFixed(2)}% karena ekspansi reach ke audiens baru` : `CTR mencapai ${thisMonthCTR.toFixed(2)}%`)
+    .replace(/{CTR_CHANGE_ABS}/g, Math.abs(ctrGrowth).toFixed(2))
+    .replace(/{CTR_INSIGHT}/g, lastMonthCTR > 0 ? `Dari ${lastMonthCTR.toFixed(2)}% ke ${thisMonthCTR.toFixed(2)}%` : `CTR mencapai ${thisMonthCTR.toFixed(2)}%`)
     .replace(/{CPC_SENTIMENT}/g, cpcGrowth >= 0 ? 'Naik' : 'Turun')
-    .replace(/{CPC_CHANGE_ABS}/g, formatNumber(Math.abs(cpcGrowth)))
-    .replace(/{CPC_INSIGHT}/g, lastMonthCPC > 0 ? `Dari Rp ${formatNumber(lastMonthCPC)} ke Rp ${formatNumber(thisMonthCPC)} per click` : `CPC Rp ${formatNumber(thisMonthCPC)} per click`)
+    .replace(/{CPC_CHANGE_ABS}/g, Math.abs(cpcGrowth).toFixed(2))
+    .replace(/{CPC_INSIGHT}/g, lastMonthCPC > 0 ? `Dari Rp ${formatNumber(lastMonthCPC)} ke Rp ${formatNumber(thisMonthCPC)}` : `CPC Rp ${formatNumber(thisMonthCPC)}`)
     .replace(/{LOWLIGHT_THIRD_ITEM}/g, lastMonthATC === 0 && lastMonthPurchases === 0 ? `${lastPeriodLabel} Tanpa Konversi` : 'Perlu optimalisasi konversi')
-    .replace(/{LOWLIGHT_THIRD_DETAIL}/g, lastMonthATC === 0 && lastMonthPurchases === 0 ? `Campaign ${lastPeriodLabel} belum mencapai konversi ATC/purchases` : 'Tingkatkan conversion rate dari ATC ke Purchase')
-    .replace(/{INSIGHT_SUMMARY}/g, `Campaign performance ${thisPeriodLabel} menunjukkan ${atcGrowth >= 0 ? 'pertumbuhan positif' : 'tantangan'} dengan ${thisMonthATC} Add to Cart. ${thisMonthPurchases > 0 ? `ROAS ${thisMonthROAS} menunjukkan ${thisMonthROAS >= 1 ? 'profitabilitas baik' : 'perlu improvement'}.` : 'Perlu fokus pada peningkatan conversion rate.'} ${ctrGrowth < 0 ? 'CTR perlu dioptimasi untuk effectiveness lebih baik.' : 'Pertahankan momentum positif dan scale winning campaigns.'}`)
-    // Slide 11 - Conclusion
+    .replace(/{LOWLIGHT_THIRD_DETAIL}/g, lastMonthATC === 0 && lastMonthPurchases === 0 ? `Campaign ${lastPeriodLabel} belum mencapai konversi` : 'Tingkatkan conversion rate')
+    .replace(/{INSIGHT_SUMMARY}/g, `Campaign performance ${thisPeriodLabel} menunjukkan ${atcGrowth >= 0 ? 'pertumbuhan positif' : 'tantangan'} dengan ${formatNumber(thisMonthATC)} Add to Cart. ${thisMonthPurchases > 0 ? `ROAS ${thisMonthROAS.toFixed(2)} menunjukkan ${thisMonthROAS >= 1 ? 'profitabilitas baik' : 'perlu improvement'}.` : 'Perlu fokus pada peningkatan conversion rate.'}`)
+    // Slides 5-11: Breakdown tables
+    .replace(/{AGE_BREAKDOWN_TABLE}/g, ageBreakdownTable)
+    .replace(/{AGE_INSIGHT}/g, ageInsight)
+    .replace(/{GENDER_BREAKDOWN_TABLE}/g, genderBreakdownTable)
+    .replace(/{GENDER_INSIGHT}/g, genderInsight)
+    .replace(/{REGION_BREAKDOWN_TABLE}/g, regionBreakdownTable)
+    .replace(/{REGION_INSIGHT}/g, regionInsight)
+    .replace(/{PLATFORM_BREAKDOWN_TABLE}/g, platformBreakdownTable)
+    .replace(/{PLATFORM_INSIGHT}/g, platformInsight)
+    .replace(/{PLACEMENT_BREAKDOWN_TABLE}/g, placementBreakdownTable)
+    .replace(/{PLACEMENT_INSIGHT}/g, placementInsight)
+    .replace(/{OBJECTIVE_BREAKDOWN_TABLE}/g, objectiveBreakdownTable)
+    .replace(/{OBJECTIVE_INSIGHT}/g, objectiveInsight)
+    .replace(/{CREATIVE_BREAKDOWN_TABLE}/g, creativeBreakdownTable)
+    .replace(/{CREATIVE_INSIGHT}/g, creativeInsight)
+    // Slides 12-13: Event analysis
+    .replace(/{TWINDATE_HIGHLIGHTS}/g, twindateHighlights)
+    .replace(/{TWINDATE_LOWLIGHTS}/g, twindateLowlights)
+    .replace(/{TWINDATE_COMPARISON_TABLE}/g, twindateComparisonTable)
+    .replace(/{TWINDATE_ACTION_PLAN}/g, twindateActionPlan)
+    .replace(/{PAYDAY_HIGHLIGHTS}/g, paydayHighlights)
+    .replace(/{PAYDAY_LOWLIGHTS}/g, paydayLowlights)
+    .replace(/{PAYDAY_COMPARISON_TABLE}/g, paydayComparisonTable)
+    .replace(/{PAYDAY_ACTION_PLAN}/g, paydayActionPlan)
+    // Conclusion & Next Steps slides
     .replace(/{CONVERSION_RATE_WIN}/g, conversionRateWin)
     .replace(/{IMPROVEMENT_AREA}/g, improvementArea)
     .replace(/{NEXT_PERIOD_FOCUS}/g, nextPeriodFocus)
-    // Slide 12 - Next Steps
     .replace(/{ACTION_STEP_1}/g, actionStep1)
     .replace(/{ACTION_STEP_2}/g, actionStep2)
     .replace(/{ACTION_STEP_3}/g, actionStep3)
@@ -1203,14 +2136,9 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     .replace(/{NEXT_MONTH_TARGET}/g, nextMonthTarget)
     .replace(/{TARGET_GROWTH}/g, targetGrowth.toString())
     .replace(/{TARGET_CPR}/g, targetCPR)
-    // Slides 5-10: Breakdown tables
-    .replace(/{AGE_BREAKDOWN_TABLE}/g, ageBreakdownHTML)
-    .replace(/{GENDER_BREAKDOWN_TABLE}/g, genderBreakdownHTML)
-    .replace(/{REGION_BREAKDOWN_TABLE}/g, regionBreakdownHTML)
-    .replace(/{PLATFORM_BREAKDOWN_TABLE}/g, platformBreakdownHTML)
-    .replace(/{PLACEMENT_BREAKDOWN_TABLE}/g, placementBreakdownHTML)
-    .replace(/{CREATIVE_BREAKDOWN_TABLE}/g, creativeBreakdownHTML)
+    .replace(/{GROWTH_SENTIMENT}/g, growthSentiment)
+    .replace(/{EFFICIENCY_SENTIMENT}/g, efficiencySentiment)
 
-  console.log('[CPAS Template] Report generated successfully (inline), length:', html.length)
+  console.log('[CPAS Template] Report generated successfully, length:', html.length)
   return html
 }

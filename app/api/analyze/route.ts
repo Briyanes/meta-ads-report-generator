@@ -5,13 +5,20 @@ import { parseCSV, analyzeDataStructure } from '@/lib/csvParser'
 // Security: Check origin
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS?.split(',') || [
   'http://localhost:3000',
+  'http://localhost:3001',
   'https://meta-ads-report-generator.vercel.app',
   'https://hadona.id'
 ]
 
 function isValidOrigin(origin: string | null): boolean {
   if (!origin) return false
-  return ALLOWED_ORIGINS.some(allowed => origin === allowed || origin.endsWith(allowed.replace('https://', '.')))
+  return ALLOWED_ORIGINS.some(allowed => {
+    // Exact match
+    if (origin === allowed) return true
+    // Subdomain match (for production)
+    const allowedDomain = allowed.replace('https://', '').replace('http://', '')
+    return origin.endsWith('.' + allowedDomain) || origin === `https://${allowedDomain}` || origin === `http://${allowedDomain}`
+  })
 }
 
 // Security: Validate file type and size
@@ -178,17 +185,18 @@ export async function POST(request: NextRequest) {
     // Parse breakdown files
     const breakdownDataThisWeek: Record<string, any> = {}
     const breakdownDataLastWeek: Record<string, any> = {}
-    
+
     for (const file of breakdownThisWeek) {
       const parsed = await parseCSV(file)
-      const fileType = file.name.includes('-age') ? 'age' :
-                      file.name.includes('-gender') ? 'gender' :
-                      file.name.includes('-region') ? 'region' :
-                      file.name.includes('-platform') ? 'platform' :
-                      file.name.includes('-placement') ? 'placement' :
-                      file.name.includes('-objective') ? 'objective' :
-                      file.name.includes('-ad-creative') || file.name.includes('-creative') ? 'ad-creative' : 'other'
-      
+      const fileName = file.name.toLowerCase()
+      const fileType = fileName.startsWith('age-') || fileName.includes('-age') ? 'age' :
+                      fileName.startsWith('gender-') || fileName.includes('-gender') ? 'gender' :
+                      fileName.startsWith('region-') || fileName.includes('-region') ? 'region' :
+                      fileName.startsWith('platform-') || fileName.includes('-platform') ? 'platform' :
+                      fileName.startsWith('placement-') || fileName.includes('-placement') ? 'placement' :
+                      fileName.startsWith('objective-') || fileName.includes('-objective') ? 'objective' :
+                      fileName.includes('ad-creative') || fileName.includes('creative') ? 'ad-creative' : 'other'
+
       // Aggregate breakdown data by dimension
       let aggregatedData = parsed.data
       if (fileType === 'age' && parsed.data.length > 0) {
@@ -204,20 +212,21 @@ export async function POST(request: NextRequest) {
       } else if (fileType === 'objective' && parsed.data.length > 0) {
         aggregatedData = aggregateBreakdownData(parsed.data, 'Objective')
       }
-      
+
       breakdownDataThisWeek[fileType] = aggregatedData
     }
     
     for (const file of breakdownLastWeek) {
       const parsed = await parseCSV(file)
-      const fileType = file.name.includes('-age') ? 'age' :
-                      file.name.includes('-gender') ? 'gender' :
-                      file.name.includes('-region') ? 'region' :
-                      file.name.includes('-platform') ? 'platform' :
-                      file.name.includes('-placement') ? 'placement' :
-                      file.name.includes('-objective') ? 'objective' :
-                      file.name.includes('-ad-creative') || file.name.includes('-creative') ? 'ad-creative' : 'other'
-      
+      const fileName = file.name.toLowerCase()
+      const fileType = fileName.startsWith('age-') || fileName.includes('-age') ? 'age' :
+                      fileName.startsWith('gender-') || fileName.includes('-gender') ? 'gender' :
+                      fileName.startsWith('region-') || fileName.includes('-region') ? 'region' :
+                      fileName.startsWith('platform-') || fileName.includes('-platform') ? 'platform' :
+                      fileName.startsWith('placement-') || fileName.includes('-placement') ? 'placement' :
+                      fileName.startsWith('objective-') || fileName.includes('-objective') ? 'objective' :
+                      fileName.includes('ad-creative') || fileName.includes('creative') ? 'ad-creative' : 'other'
+
       // Aggregate breakdown data by dimension
       let aggregatedData = parsed.data
       if (fileType === 'age' && parsed.data.length > 0) {
@@ -233,7 +242,7 @@ export async function POST(request: NextRequest) {
       } else if (fileType === 'objective' && parsed.data.length > 0) {
         aggregatedData = aggregateBreakdownData(parsed.data, 'Objective')
       }
-      
+
       breakdownDataLastWeek[fileType] = aggregatedData
     }
     
@@ -542,7 +551,18 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       
       return aggregated
     }
-    
+
+    // Aggregate main CSV data to get totals (including conversion values)
+    const aggregatedMainThisWeek = aggregateCSVData(parsedDataThisWeek.data)
+    const aggregatedMainLastWeek = aggregateCSVData(parsedDataLastWeek.data)
+
+    console.log('[DEBUG] aggregatedMainThisWeek conversion values:', {
+      atcCV: aggregatedMainThisWeek['Adds to cart conversion value for shared items only'],
+      purchCV: aggregatedMainThisWeek['Purchases conversion value for shared items only'],
+      roas: aggregatedMainThisWeek['ROAS'],
+      aov: aggregatedMainThisWeek['AOV (IDR)']
+    })
+
     // Extract first row from OBJECTIVE breakdown (matching Report Manual approach)
     // Report Manual uses objective.data[0] for CPAS metrics
     // objective.csv contains AGGREGATED totals, not daily data like main CSV
@@ -678,17 +698,34 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         ctrAll: debugCtrAll
       })
 
+      // Extract base metrics
+      const amountSpent = parseNum(getFieldValue(data, 'Amount spent (IDR)'))
+      const impressions = parseNum(getFieldValue(data, 'Impressions'))
+      const linkClicks = parseNum(getFieldValue(data, 'Outbound clicks'))
+
       const base = {
-        amountSpent: parseNum(getFieldValue(data, 'Amount spent (IDR)')),
-        impressions: parseNum(getFieldValue(data, 'Impressions')),
-        linkClicks: parseNum(getFieldValue(data, 'Outbound clicks')),
+        amountSpent: amountSpent,
+        impressions: impressions,
+        linkClicks: linkClicks,
         ctr: (() => {
           const ctrValue = parseNum(getFieldValue(data, 'CTR (link click-through rate)'))
           // CTR in CSV is already in percentage format (e.g., 1.3 means 1.3%), convert to decimal (0.013)
           return ctrValue > 1 ? ctrValue / 100 : ctrValue
         })(),
-        cpc: parseNum(getFieldValue(data, 'CPC (cost per link click)')),
-        cpm: parseNum(getFieldValue(data, 'CPM (cost per 1,000 impressions)')),
+        // Calculate CPC manually if not in CSV
+        cpc: (() => {
+          const cpcValue = parseNum(getFieldValue(data, 'CPC (cost per link click)'))
+          if (cpcValue > 0) return cpcValue
+          // Calculate CPC from amount spent and link clicks
+          return linkClicks > 0 ? (amountSpent / linkClicks) : 0
+        })(),
+        // Calculate CPM manually if not in CSV
+        cpm: (() => {
+          const cpmValue = parseNum(getFieldValue(data, 'CPM (cost per 1,000 impressions)'))
+          if (cpmValue > 0) return cpmValue
+          // Calculate CPM from amount spent and impressions
+          return impressions > 0 ? ((amountSpent / impressions) * 1000) : 0
+        })(),
         outboundClicks: parseNum(getFieldValue(data, 'Outbound clicks')),
         frequency: parseNum(getFieldValue(data, 'Frequency')),
         // Reach: try multiple field name variations to match Meta CSV export
@@ -699,7 +736,11 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       console.log('[DEBUG] base after parseNum:', {
         reach: base.reach,
         frequency: base.frequency,
-        linkClicks: base.linkClicks
+        linkClicks: base.linkClicks,
+        cpc: base.cpc,
+        cpm: base.cpm,
+        amountSpent: base.amountSpent,
+        impressions: base.impressions
       })
       
       // CTWA fields
@@ -733,9 +774,10 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       
       // CPAS fields
       if (objectiveType === 'cpas') {
+        const actualPurchases = parseNum(data['Purchases with shared items'] || data['Purchases'] || 0)
         const cpasData = {
           ...base,
-          purchases: results,
+          purchases: actualPurchases,
           addsToCart: parseNum(data['Adds to cart with shared items'] || data['Adds to cart'] || 0),
           contentViews: parseNum(data['Content views with shared items'] || data['Content views'] || 0),
           atcConversionValue: parseNum(getFieldValue(data, 'Adds to cart conversion value for shared items only', [
@@ -752,12 +794,10 @@ Return the analysis as structured JSON data that can be used to generate the HTM
           costPerATC: 0, // Will be calculated below
           // Calculate cost per purchase manually (not in CSV)
           costPerPurchase: 0, // Will be calculated below
-          purchaseROAS: parseNum(getFieldValue(data, 'Purchase ROAS for shared items only', [
-            'Purchase ROAS for shared items only',
-            'Purchase ROAS',
-            'ROAS'
-          ])),
-          aov: parseNum(getFieldValue(data, 'AOV (IDR)', ['AOV (IDR)', 'AOV', 'Average order value'])),
+          // ROAS - will be calculated below using formula: Purchases CV ÷ Amount Spent
+          roas: 0,
+          // AOV - will be calculated below using formula: Purchases CV ÷ Purchases
+          aov: 0,
           lcToCV: parseNum(getFieldValue(data, '* LC to CV', ['* LC to CV', 'LC to CV'])),
           cvToATC: parseNum(getFieldValue(data, '* CV to ATC', ['* CV to ATC', 'CV to ATC'])),
           atcToPurchase: parseNum(getFieldValue(data, 'ATC to Purchase', ['ATC to Purchase', 'ATC to Purchase conversion rate'])),
@@ -773,6 +813,46 @@ Return the analysis as structured JSON data that can be used to generate the HTM
 
         cpasData.costPerATC = addsToCart > 0 ? (amountSpent / addsToCart) : 0
         cpasData.costPerPurchase = purchases > 0 ? (amountSpent / purchases) : 0
+
+        // Calculate ROAS using formula: Purchases conversion value for shared items only ÷ Amount spent
+        const purchasesConvValue = parseNum(data['Purchases conversion value'] || data['Purchases conversion value for shared items only'] || 0)
+        if (purchasesConvValue > 0 && amountSpent > 0) {
+          cpasData.roas = purchasesConvValue / amountSpent
+          console.log('[DEBUG] Calculated ROAS:', {
+            purchasesConvValue: purchasesConvValue,
+            amountSpent: amountSpent,
+            roas: cpasData.roas
+          })
+        } else {
+          // Fallback: try to get ROAS from CSV if calculation is not possible
+          const csvROAS = parseNum(getFieldValue(data, 'Results ROAS', [
+            'Results ROAS',
+            'Purchase ROAS for shared items only',
+            'Purchase ROAS',
+            'ROAS'
+          ]))
+          if (csvROAS > 0) {
+            cpasData.roas = csvROAS
+            console.log('[DEBUG] Using ROAS from CSV:', cpasData.roas)
+          }
+        }
+
+        // Calculate AOV using formula: Purchases conversion value for shared items only ÷ Purchases
+        if (purchasesConvValue > 0 && purchases > 0) {
+          cpasData.aov = purchasesConvValue / purchases
+          console.log('[DEBUG] Calculated AOV:', {
+            purchasesConvValue: purchasesConvValue,
+            purchases: purchases,
+            aov: cpasData.aov
+          })
+        } else {
+          // Fallback: try to get AOV from CSV
+          const csvAOV = parseNum(getFieldValue(data, 'AOV (IDR)', ['AOV (IDR)', 'AOV', 'Average order value']))
+          if (csvAOV > 0) {
+            cpasData.aov = csvAOV
+            console.log('[DEBUG] Using AOV from CSV:', cpasData.aov)
+          }
+        }
 
         console.log('[DEBUG] CPAS data:', {
           reach: cpasData.reach,
@@ -798,9 +878,21 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     if (objectiveType === 'cpas') {
       eventAnalysis = extractEventData(parsedDataThisWeek.data, parsedDataLastWeek.data, retentionType)
     }
-    
-    const thisWeekPerf = buildPerformanceData(thisWeekData, thisWeekResults, thisWeekCPR)
-    const lastWeekPerf = buildPerformanceData(lastWeekData, lastWeekResults, lastWeekCPR)
+
+    // Merge objective.csv data with main CSV aggregated data
+    // objective.csv has basic metrics, main CSV has conversion values
+    const thisWeekDataMerged = { ...thisWeekData, ...aggregatedMainThisWeek }
+    const lastWeekDataMerged = { ...lastWeekData, ...aggregatedMainLastWeek }
+
+    console.log('[DEBUG] thisWeekDataMerged conversion values:', {
+      atcCV: thisWeekDataMerged['Adds to cart conversion value for shared items only'],
+      purchCV: thisWeekDataMerged['Purchases conversion value for shared items only'],
+      roas: thisWeekDataMerged['ROAS'],
+      aov: thisWeekDataMerged['AOV (IDR)']
+    })
+
+    const thisWeekPerf = buildPerformanceData(thisWeekDataMerged, thisWeekResults, thisWeekCPR)
+    const lastWeekPerf = buildPerformanceData(lastWeekDataMerged, lastWeekResults, lastWeekCPR)
 
     // Debug: Log performance data Reach values
 
@@ -1038,7 +1130,7 @@ function extractEventData(thisWeekData: any[], lastWeekData: any[], retentionTyp
         cpc: 0,
         cpm: 0,
         frequency: 0,
-        purchaseROAS: 0,
+        roas: 0,
         costPerPurchase: 0,
         costPerATC: 0,
         conversionRate: 0,
@@ -1084,12 +1176,12 @@ function extractEventData(thisWeekData: any[], lastWeekData: any[], retentionTyp
     const cpc = linkClicks > 0 ? parseNum(aggregated['CPC (cost per link click)']) : 0
     const cpm = parseNum(aggregated['CPM (cost per 1,000 impressions)'])
     const frequency = parseNum(aggregated['Frequency'])
-    const purchaseROAS = amountSpent > 0 ? purchasesConversionValue / amountSpent : 0
+    const roas = amountSpent > 0 ? purchasesConversionValue / amountSpent : 0
     const costPerPurchase = purchases > 0 ? amountSpent / purchases : 0
     const costPerATC = addsToCart > 0 ? amountSpent / addsToCart : 0
     const conversionRate = linkClicks > 0 ? purchases / linkClicks : 0
     const avgPurchaseValue = purchases > 0 ? purchasesConversionValue / purchases : 0
-    
+
     return {
       amountSpent,
       purchases,
@@ -1103,7 +1195,7 @@ function extractEventData(thisWeekData: any[], lastWeekData: any[], retentionTyp
       cpc,
       cpm,
       frequency,
-      purchaseROAS,
+      roas,
       costPerPurchase,
       costPerATC,
       conversionRate,
