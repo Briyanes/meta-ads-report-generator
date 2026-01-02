@@ -45,19 +45,21 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const defaultReportName = 'Meta Ads Performance Report'
   const objectiveLabel = 'CTWA (Click to WhatsApp)'
 
-  // Extract metrics
+  // Extract metrics - match API field names
   const thisSpent = parseNum(thisWeekData.amountSpent)
   const lastSpent = parseNum(lastWeekData.amountSpent)
-  const thisResults = parseNum(thisWeekData.messagingConversations)
-  const lastResults = parseNum(lastWeekData.messagingConversations)
-  const thisCPR = parseNum(thisWeekData.costPerMessagingConversation)
-  const lastCPR = parseNum(lastWeekData.costPerMessagingConversation)
+  const thisResults = parseNum(thisWeekData.messagingConversations || thisWeekData.results)
+  const lastResults = parseNum(lastWeekData.messagingConversations || lastWeekData.results)
+  const thisCPR = parseNum(thisWeekData.costPerWA || thisWeekData.costPerMessagingConversation)
+  const lastCPR = parseNum(lastWeekData.costPerWA || lastWeekData.costPerMessagingConversation)
   const thisImpr = parseNum(thisWeekData.impressions)
   const lastImpr = parseNum(lastWeekData.impressions)
-  const thisCTR = parseNum(thisWeekData.ctr || 0)
-  const lastCTR = parseNum(lastWeekData.ctr || 0)
-  const thisCPC = parseNum(thisWeekData.cpc || 0)
-  const lastCPC = parseNum(lastWeekData.cpc || 0)
+  const thisCTR = parseNum(thisWeekData.ctr || thisWeekData.ctrAll || 0)
+  const lastCTR = parseNum(lastWeekData.ctr || lastWeekData.ctrAll || 0)
+  const thisCPC = parseNum(thisWeekData.cpc)
+  const lastCPC = parseNum(lastWeekData.cpc)
+  const thisOutboundClicks = parseNum(thisWeekData.outboundClicks)
+  const lastOutboundClicks = parseNum(lastWeekData.outboundClicks)
 
   // Calculate growth
   const spendGrowth = calculateGrowth(thisSpent, lastSpent)
@@ -546,6 +548,13 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                     <td class="text-right">${thisWeekCPR}</td>
                     <td class="text-right">${formatCurrency(thisCPR - lastCPR)}</td>
                     <td class="text-right"><span class="badge ${cprGrowth <= 0 ? 'badge-green' : 'badge-red'}">${cprGrowth <= 0 ? '' : '+'}${formatPercent(cprGrowth)}</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Outbound Clicks</strong></td>
+                    <td class="text-right">${formatNumber(lastOutboundClicks)}</td>
+                    <td class="text-right">${formatNumber(thisOutboundClicks)}</td>
+                    <td class="text-right">${formatNumber(thisOutboundClicks - lastOutboundClicks)}</td>
+                    <td class="text-right"><span class="badge ${calculateGrowth(thisOutboundClicks, lastOutboundClicks) >= 0 ? 'badge-green' : 'badge-red'}">${calculateGrowth(thisOutboundClicks, lastOutboundClicks) >= 0 ? '+' : ''}${formatPercent(calculateGrowth(thisOutboundClicks, lastOutboundClicks))}</span></td>
                 </tr>
                 <tr>
                     <td><strong>Impressions</strong></td>

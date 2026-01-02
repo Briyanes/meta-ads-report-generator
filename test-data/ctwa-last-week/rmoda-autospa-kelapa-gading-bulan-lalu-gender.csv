@@ -1,0 +1,4 @@
+﻿Gender,Impressions,"CTR (link click-through rate)","Outbound clicks","Messaging conversations started","Cost per messaging conversation started","Instagram profile visits","Result type",Results,"Cost per result","Amount spent (IDR)","Reporting starts","Reporting ends"
+male,80360,0.47909408,219,153,15091.41830065,557,"Messaging conversations started",153,15091.41830065,2308987,2025-10-26,2025-11-25
+female,6173,0.48598736,14,11,19008.27272727,52,"Messaging conversations started",11,19008.27272727,209091,2025-10-26,2025-11-25
+unknown,605,0.16528926,,,,0,,,,10906,2025-10-26,2025-11-25
