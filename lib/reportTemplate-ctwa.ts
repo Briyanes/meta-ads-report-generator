@@ -841,7 +841,6 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             
             return (
                 <div className="min-h-screen bg-gray-50">
-                    {/* SLIDE 1 - WELCOME */}
                     <div className="bg-white p-8 min-h-screen flex items-center border-t-4 border-hadona-blue">
                         <div className="max-w-6xl mx-auto w-full text-center">
                             <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Logo" className="mx-auto mb-6" style={{width: '80px', height: 'auto'}} />
@@ -858,9 +857,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                         </div>
                     </div>
 
-                    {/* SLIDE 2 - PERFORMANCE SUMMARY */}
                     <div className="slide">
-                        {/* Agency Header */}
                         <div className="agency-header">
                             <div className="agency-logo">
                                 <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
@@ -879,7 +876,6 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                         <h2>Key Metrics Overview</h2>
 
                         <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px'}}>
-                            {/* This Month */}
                             <div className="card">
                                 <div className="card-header">
                                     <div className="card-title">{thisPeriodLabel}</div>
@@ -913,7 +909,6 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                 </div>
                             </div>
 
-                            {/* Last Month */}
                             <div className="card">
                                 <div className="card-header">
                                     <div className="card-title">{lastPeriodLabel}</div>
@@ -957,9 +952,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                         </div>
                     </div>
 
-                    {/* SLIDE 3 - TABEL RINGKASAN METRIK */}
                     <div className="slide">
-                        {/* Agency Header */}
                             <div className="agency-header">
                                 <div className="agency-logo">
                                     <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
@@ -1114,9 +1107,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                         </div>
                     </div>
 
-                    {/* SLIDE 4 - WEEK-ON-WEEK ANALYSIS */}
                     <div className="slide">
-                        {/* Agency Header */}
                             <div className="agency-header">
                                 <div className="agency-logo">
                                     <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
@@ -1196,7 +1187,6 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
 
                     ${generateBreakdownSlides(breakdown, thisWeek, lastWeek, thisPeriodLabel, lastPeriodLabel)}
 
-                    {/* SLIDE 13 - THANK YOU */}
                     <div className="slide" style={{textAlign: 'center', padding: '120px 64px', background: 'linear-gradient(135deg, white 0%, var(--neutral-50) 100%)'}}>
                         <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Logo" style={{width: '100px', height: 'auto', marginBottom: '48px'}} />
                         <h1 style={{fontSize: '56px', background: 'linear-gradient(135deg, var(--primary-blue) 0%, #3d5ee0 50%, var(--primary-yellow) 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', marginBottom: '24px', letterSpacing: '-0.04em'}}>Thank You</h1>
@@ -1245,9 +1235,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
       .slice(0, 6)
     
     slides += `
-                    {/* SLIDE 5 - AUDIENCE PERFORMANCE: AGE */}
                     <div className="slide">
-                        {/* Agency Header */}
                             <div className="agency-header">
                                 <div className="agency-logo">
                                     <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
@@ -1330,9 +1318,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
       })
     
     slides += `
-                    {/* SLIDE 6 - AUDIENCE PERFORMANCE: GENDER */}
                     <div className="slide">
-                        {/* Agency Header */}
                             <div className="agency-header">
                                 <div className="agency-logo">
                                     <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
@@ -1426,9 +1412,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
       .slice(0, 5)
     
     slides += `
-                    {/* SLIDE 7 - AUDIENCE PERFORMANCE: REGION */}
                     <div className="slide">
-                        {/* Agency Header */}
                             <div className="agency-header">
                                 <div className="agency-logo">
                                     <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
@@ -1525,9 +1509,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
       })
     
     slides += `
-                    {/* SLIDE 8 - PLATFORM PERFORMANCE */}
                     <div className="slide">
-                        {/* Agency Header */}
                             <div className="agency-header">
                                 <div className="agency-logo">
                                     <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
@@ -1625,9 +1607,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
       .slice(0, 5)
     
     slides += `
-                    {/* SLIDE 9 - CONTENT PERFORMANCE: PLACEMENT */}
                     <div className="slide">
-                        {/* Agency Header */}
                             <div className="agency-header">
                                 <div className="agency-logo">
                                     <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
@@ -1735,9 +1715,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
       .slice(0, 5)
     
     slides += `
-                    {/* SLIDE 10 - CREATIVE PERFORMANCE: AD ANALYSIS */}
                     <div className="slide">
-                        {/* Agency Header */}
                             <div className="agency-header">
                                 <div className="agency-logo">
                                     <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
@@ -1887,9 +1865,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
       .slice(0, 4)
     
     slides += `
-                    {/* SLIDE 11 - CAMPAIGN OBJECTIVE PERFORMANCE */}
                     <div className="slide">
-                        {/* Agency Header */}
                             <div className="agency-header">
                                 <div className="agency-logo">
                                     <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
@@ -1963,9 +1939,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
 
   // Slide 12: Overall Conclusion & Strategic Action Plan
   slides += `
-                    {/* SLIDE 12 - OVERALL CONCLUSION & STRATEGIC ACTION PLAN */}
                     <div className="slide">
-                        {/* Agency Header */}
                             <div className="agency-header">
                                 <div className="agency-logo">
                                     <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
