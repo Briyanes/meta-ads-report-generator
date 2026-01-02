@@ -932,9 +932,9 @@ ${objectiveRows}
         const resultB = b['Messaging conversations started'] || 0
         return resultB - resultA
       })
-      .slice(0, 5)
+      .slice(0, 10)
 
-    const creativeRows = sortedCreative.map((item, index) => {
+    const creativeRows = sortedCreative.map((item) => {
       const adName = item['Ads'] || item['Ad name'] || item['Ad Name'] || item['ad_name'] || 'Unknown'
       const results = item['Messaging conversations started'] || 0
       const impressions = item['Impressions'] || 0
@@ -942,18 +942,8 @@ ${objectiveRows}
       const spend = item['Amount spent (IDR)'] || item['Amount Spent'] || 0
       const cpr = results > 0 ? spend / results : 0
 
-      const badgeClass = index === 0 ? 'background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #92400e;' :
-                        index === 1 ? 'background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); color: #065f46;' :
-                        index === 2 ? 'background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); color: #1e40af;' :
-                        'background: var(--neutral-50); color: var(--neutral-700);'
-
-      return `                <tr style="${index === 0 ? 'background: #fef9c3;' : ''}">
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; font-size: 11px; font-weight: 700; ${badgeClass}">#${index + 1}</span>
-                            <span style="font-size: 11px; font-weight: 600;">${adName.length > 50 ? adName.substring(0, 47) + '...' : adName}</span>
-                        </div>
-                    </td>
+      return `                <tr>
+                    <td style="font-size: 11px;">${adName.length > 60 ? adName.substring(0, 57) + '...' : adName}</td>
                     <td class="text-right">${formatNumber(results)}</td>
                     <td class="text-right">${formatNumber(impressions)}</td>
                     <td class="text-right">${formatPercent(ctr * 100)}</td>
@@ -980,7 +970,7 @@ ${objectiveRows}
         </div>
 
         <h1>Creative Performance</h1>
-        <h2>Top Performing Ads</h2>
+        <h2>Top 10 Performing Ad Creatives (Sorted by Messaging Conversations)</h2>
 
         <table>
             <thead>
