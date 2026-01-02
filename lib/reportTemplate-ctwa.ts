@@ -79,8 +79,20 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const spendGrowth = calculateGrowth(thisWeek.amountSpent || 0, lastWeek.amountSpent || 0)
   const resultsGrowth = calculateGrowth(thisWeek.messagingConversations || 0, lastWeek.messagingConversations || 0)
   const cprGrowth = calculateGrowth(thisWeek.cpr || 0, lastWeek.cpr || 0)
-  const messagingFromAdsGrowth = calculateGrowth(thisWeek.messagingConversationsFromAds || 0, lastWeek.messagingConversationsFromAds || 0)
-  const costPerMessagingConvGrowth = calculateGrowth(thisWeek.costPerMessagingConversation || 0, lastWeek.costPerMessagingConversation || 0)
+  const messagingFromAdsGrowth = {
+    value: (thisWeek.messagingConversationsFromAds || 0) - (lastWeek.messagingConversationsFromAds || 0),
+    percent: !lastWeek.messagingConversationsFromAds || lastWeek.messagingConversationsFromAds === 0
+      ? 'N/A'
+      : ((thisWeek.messagingConversationsFromAds || 0) - (lastWeek.messagingConversationsFromAds || 0)) / Math.abs(lastWeek.messagingConversationsFromAds || 1) * 100,
+    isPositive: (thisWeek.messagingConversationsFromAds || 0) >= (lastWeek.messagingConversationsFromAds || 0)
+  }
+  const costPerMessagingConvGrowth = {
+    value: (thisWeek.costPerMessagingConversation || 0) - (lastWeek.costPerMessagingConversation || 0),
+    percent: !lastWeek.costPerMessagingConversation || lastWeek.costPerMessagingConversation === 0
+      ? 'N/A'
+      : ((thisWeek.costPerMessagingConversation || 0) - (lastWeek.costPerMessagingConversation || 0)) / Math.abs(lastWeek.costPerMessagingConversation || 1) * 100,
+    isPositive: (thisWeek.costPerMessagingConversation || 0) <= (lastWeek.costPerMessagingConversation || 0)
+  }
   
   // Process breakdown data for slides
   const ageData = breakdown.thisWeek?.age || []
@@ -1030,21 +1042,21 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                             <td className="text-right">{formatLastPeriod(parseNum(lastWeek.messagingConversations))}</td>
                                             <td className="text-right">{formatNumber(thisWeek.messagingConversations || 0)}</td>
                                             <td className="text-right">{formatNumber((thisWeek.messagingConversations || 0) - (lastWeek.messagingConversations || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${resultsGrowth.isPositive ? 'text-green-500' : 'text-red-500'}\`}>{resultsGrowth.isPositive ? '+' : ''}{resultsGrowth.percent}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.messagingConversations || 0) >= (lastWeek.messagingConversations || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.messagingConversations || 0) >= (lastWeek.messagingConversations || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.messagingConversations || 0, lastWeek.messagingConversations || 0))}</td>
                                         </tr>
                                         <tr>
                                             <td>Messaging Conversations Started (from Ads)</td>
                                             <td className="text-right">{formatLastPeriod(parseNum(lastWeek.messagingConversationsFromAds))}</td>
                                             <td className="text-right">{formatNumber(thisWeek.messagingConversationsFromAds || 0)}</td>
                                             <td className="text-right">{formatNumber((thisWeek.messagingConversationsFromAds || 0) - (lastWeek.messagingConversationsFromAds || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${messagingFromAdsGrowth.isPositive ? 'text-green-500' : 'text-red-500'}\`}>{messagingFromAdsGrowth.isPositive ? '+' : ''}{formatPercent(messagingFromAdsGrowth.percent)}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${messagingFromAdsGrowth.isPositive ? 'text-green-500' : 'text-red-500'}\`}>{messagingFromAdsGrowth.isPositive ? '+' : ''}{typeof messagingFromAdsGrowth.percent === 'number' ? formatPercent(messagingFromAdsGrowth.percent) : messagingFromAdsGrowth.percent}</td>
                                         </tr>
                                         <tr>
                                             <td>Cost per Messaging Conversation</td>
                                             <td className="text-right">{formatLastPeriodCurrency(parseNum(lastWeek.costPerMessagingConversation))}</td>
                                             <td className="text-right">{formatCurrency(thisWeek.costPerMessagingConversation || 0)}</td>
                                             <td className="text-right">{formatCurrency((thisWeek.costPerMessagingConversation || 0) - (lastWeek.costPerMessagingConversation || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.costPerMessagingConversation || 0) <= (lastWeek.costPerMessagingConversation || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.costPerMessagingConversation || 0) <= (lastWeek.costPerMessagingConversation || 0) ? '' : '+'}{formatPercent(costPerMessagingConvGrowth.percent)}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${costPerMessagingConvGrowth.isPositive ? 'text-green-500' : 'text-red-500'}\`}>{costPerMessagingConvGrowth.isPositive ? '' : '+'}{typeof costPerMessagingConvGrowth.percent === 'number' ? formatPercent(costPerMessagingConvGrowth.percent) : costPerMessagingConvGrowth.percent}</td>
                                         </tr>
                                         <tr>
                                             <td>Cost per WA</td>
