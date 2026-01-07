@@ -1,26 +1,19 @@
-/**
- * Complete HTML Report Template with React + Tailwind CSS for CTLP to WA Objective
- * All 13 slides included
- */
+export function generateReactTailwindReport(analysisData: any, reportName?: string, retentionType?: string, objectiveType: string = 'ctlptowa'): string {
+  console.log('[CTLPTOWA Template] Starting report generation...')
 
-export function generateReactTailwindReport(analysisData: any, reportName?: string, retentionType: string = 'wow', objectiveType: string = 'ctlptowa'): string {
   const data = typeof analysisData === 'string' ? JSON.parse(analysisData) : analysisData
-  
-  // Extract data
   const perf = data?.performanceSummary || {}
   const thisWeek = perf.thisWeek || {}
   const lastWeek = perf.lastWeek || {}
   const breakdown = data?.breakdown || {}
-  
+
   // Determine period labels based on retention type
   const isMoM = retentionType === 'mom'
   const periodLabel = isMoM ? 'Month' : 'Week'
-  const periodLabelId = isMoM ? 'Bulan' : 'Minggu'
-  const periodLabelEn = isMoM ? 'Month' : 'Week'
   const thisPeriodLabel = isMoM ? 'Bulan Ini (This Month)' : 'Minggu Ini (This Week)'
   const lastPeriodLabel = isMoM ? 'Bulan Lalu (Last Month)' : 'Minggu Lalu (Last Week)'
   const comparisonLabel = isMoM ? 'Month-on-Month' : 'Week-on-Week'
-  
+
   // Determine objective label
   const objectiveLabels: Record<string, string> = {
     'ctwa': 'CTWA (Click to WhatsApp)',
@@ -28,86 +21,90 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     'ctlptowa': 'CTLP to WA (Click to Landing Page to WhatsApp)'
   }
   const objectiveLabel = objectiveLabels[objectiveType] || 'CTLP to WA (Click to Landing Page to WhatsApp)'
-  
-  // Extract client name from reportName or analysisData
-  const extractClientName = (): string => {
-    // Try to extract from reportName first
-    if (reportName) {
-      const nameLower = reportName.toLowerCase()
-      // Check for common location patterns
-      if (nameLower.includes('makasar') || nameLower.includes('makassar')) {
-        return 'RMODA Studio Makasar'
-      }
-      if (nameLower.includes('bsd')) {
-        return 'RMODA Studio BSD'
-      }
-      // If reportName contains "RMODA Studio", use it
-      if (nameLower.includes('rmoda studio')) {
-        // Extract the full client name from reportName
-        const match = reportName.match(/RMODA\s+Studio\s+([A-Za-z\s]+)/i)
-        if (match) {
-          return `RMODA Studio ${match[1].trim()}`
-        }
-        return 'RMODA Studio'
-      }
-    }
-    
-    // Try to extract from analysisData if it contains file names
-    const fileNames = data?.fileNames || []
-    for (const fileName of fileNames) {
-      const nameLower = fileName.toLowerCase()
-      if (nameLower.includes('makasar') || nameLower.includes('makassar')) {
-        return 'RMODA Studio Makasar'
-      }
-      if (nameLower.includes('bsd')) {
-        return 'RMODA Studio BSD'
-      }
-    }
-    
-    // Default fallback
-    return 'RMODA Studio'
+
+  const thisWeekData = thisWeek || {}
+  const lastWeekData = lastWeek || {}
+  const breakdownThisWeek = breakdown?.thisWeek || {}
+  const breakdownLastWeek = breakdown?.lastWeek || {}
+
+  // Parse numbers safely
+  const parseNum = (val: any): number => {
+    if (typeof val === 'number') return val
+    if (!val) return 0
+    const parsed = parseFloat(String(val).replace(/,/g, ''))
+    return isNaN(parsed) ? 0 : parsed
   }
-  
-  const clientName = extractClientName()
-  
-  // Calculate growth percentage
-  const calculateGrowth = (current: number, previous: number) => {
+
+  // Helper functions
+  const formatNumber = (num: number): string => {
+    if (num === null || num === undefined || isNaN(num)) return '0'
+    return Math.round(num).toLocaleString('id-ID')
+  }
+
+  const formatCurrency = (num: number): string => {
+    if (num === null || num === undefined || isNaN(num)) return 'Rp 0'
+    return 'Rp ' + Math.round(num).toLocaleString('id-ID')
+  }
+
+  const formatPercent = (num: number): string => {
+    if (num === null || num === undefined || isNaN(num)) return '0%'
+    return num.toFixed(2) + '%'
+  }
+
+  const calculateGrowth = (current: number, previous: number): number => {
     if (!previous || previous === 0) return 0
     return ((current - previous) / previous) * 100
   }
-  
-  const spendGrowth = calculateGrowth(thisWeek.amountSpent || 0, lastWeek.amountSpent || 0)
-  const resultsGrowth = calculateGrowth(thisWeek.messagingConversations || 0, lastWeek.messagingConversations || 0)
-  const cprGrowth = calculateGrowth(thisWeek.cpr || 0, lastWeek.cpr || 0)
-  
-  // Process breakdown data for slides
-  const ageData = breakdown.thisWeek?.age || []
-  const genderData = breakdown.thisWeek?.gender || []
-  const regionData = breakdown.thisWeek?.region || []
-  const platformData = breakdown.thisWeek?.platform || []
-  const placementData = breakdown.thisWeek?.placement || []
-  const objectiveData = breakdown.thisWeek?.objective || []
-  const creativeData = breakdown.thisWeek?.['ad-creative'] || []
-  
-  return `<!DOCTYPE html>
+
+  // Labels
+  const defaultReportName = 'Meta Ads Performance Report'
+
+  // Extract metrics - match API field names for CTLPTOWA
+  const thisSpent = parseNum(thisWeekData.amountSpent)
+  const lastSpent = parseNum(lastWeekData.amountSpent)
+  const thisResults = parseNum(thisWeekData.checkoutsInitiated || thisWeekData.checkoutInitiated || 0)
+  const lastResults = parseNum(lastWeekData.checkoutsInitiated || lastWeekData.checkoutInitiated || 0)
+
+  // Calculate CPR manually: Amount Spent / Checkouts Initiated
+  const thisCPR = thisResults > 0 ? thisSpent / thisResults : 0
+  const lastCPR = lastResults > 0 ? lastSpent / lastResults : 0
+
+  const thisImpr = parseNum(thisWeekData.impressions)
+  const lastImpr = parseNum(lastWeekData.impressions)
+  const thisCTR = parseNum(thisWeekData.ctr || thisWeekData.ctrAll || 0)
+  const lastCTR = parseNum(lastWeekData.ctr || lastWeekData.ctrAll || 0)
+  const thisCPC = parseNum(thisWeekData.cpc)
+  const lastCPC = parseNum(lastWeekData.cpc)
+  const thisOutboundClicks = parseNum(thisWeekData.outboundClicks)
+  const lastOutboundClicks = parseNum(lastWeekData.outboundClicks)
+
+  // Calculate growth
+  const spendGrowth = calculateGrowth(thisSpent, lastSpent)
+  const resultsGrowth = calculateGrowth(thisResults, lastResults)
+  const cprGrowth = calculateGrowth(thisCPR, lastCPR)
+
+  // Format all values
+  const thisWeekSpent = formatCurrency(thisSpent)
+  const lastWeekSpent = formatCurrency(lastSpent)
+  const thisWeekResults = formatNumber(thisResults)
+  const lastWeekResults = formatNumber(lastResults)
+  const thisWeekCPR = formatCurrency(thisCPR)
+  const lastWeekCPR = formatCurrency(lastCPR)
+
+  // Generate HTML string directly (no nested template literals)
+  let html = `<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${comparisonLabel} Meta Ads Performance Report</title>
-    <script src="https://cdn.jsdelivr.net/npm/react@18.0.0/umd/react.development.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.0.0/umd/react-dom.development.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.js"></script>
+    <title>${comparisonLabel} CTLPTOWA Report - ${reportName || defaultReportName}</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <link rel="stylesheet" href="/css/bootstrap-icons-custom.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-blue: #2B46BB;
             --primary-yellow: #ECDC43;
             --success-green: #10B981;
-            --warning-amber: #F59E0B;
             --danger-red: #EF4444;
             --neutral-50: #f8fafc;
             --neutral-100: #f1f5f9;
@@ -121,75 +118,14 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             --neutral-900: #0f172a;
         }
 
-        body { font-family: 'Inter', sans-serif; }
-        .bg-hadona-blue { background-color: #2B46BB; }
-        .text-hadona-blue { color: #2B46BB; }
-        .bg-hadona-yellow { background-color: #ECDC43; }
-        .text-hadona-yellow { color: #ECDC43; }
-        .border-hadona-blue { border-color: #2B46BB; }
-        .border-hadona-yellow { border-color: #ECDC43; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* Agency Header Styles */
-        .agency-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 2px solid var(--neutral-100);
-        }
-
-        .agency-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .agency-logo-icon {
-            width: 65px;
-            height: auto;
-            object-fit: contain;
-            max-width: 100%;
-        }
-
-        .agency-name {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--neutral-900);
-            letter-spacing: -0.02em;
-        }
-
-        .agency-tagline {
-            font-size: 11px;
-            color: var(--neutral-500);
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .report-meta {
-            text-align: right;
-        }
-
-        .report-date {
-            font-size: 10px;
-            color: var(--neutral-500);
-            font-weight: 500;
-        }
-
-        .confidential-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            color: #92400e;
-            font-size: 9px;
-            font-weight: 700;
-            border-radius: 20px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-top: 6px;
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            color: var(--neutral-800);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
         }
 
         .slide {
@@ -210,6 +146,101 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             right: 0;
             height: 6px;
             background: linear-gradient(90deg, var(--primary-blue) 0%, var(--primary-yellow) 100%);
+        }
+
+        .agency-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--neutral-100);
+        }
+
+        .agency-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .agency-logo-icon {
+            width: 65px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .agency-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--neutral-900);
+            letter-spacing: -0.02em;
+        }
+
+        .agency-tagline {
+            font-size: 12px;
+            color: var(--neutral-500);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .report-meta {
+            text-align: right;
+        }
+
+        .report-date {
+            font-size: 11px;
+            color: var(--neutral-500);
+            font-weight: 500;
+        }
+
+        .confidential-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+            font-size: 10px;
+            font-weight: 700;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 8px;
+        }
+
+        .slide-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--neutral-200);
+            font-size: 10px;
+            color: var(--neutral-500);
+        }
+
+        .slide-number {
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            letter-spacing: -0.03em;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 14px;
+            color: var(--neutral-500);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 32px;
         }
 
         .card {
@@ -252,15 +283,6 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             letter-spacing: 0.03em;
         }
 
-        .metric-value {
-            font-size: 42px;
-            font-weight: 800;
-            color: var(--primary-blue);
-            margin: 12px 0;
-            letter-spacing: -0.04em;
-            line-height: 1;
-        }
-
         .metric-label {
             font-size: 12px;
             color: var(--neutral-500);
@@ -269,20 +291,13 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             letter-spacing: 0.03em;
         }
 
-        .metric-sublabel {
-            font-size: 11px;
-            color: var(--neutral-400);
-            margin-top: 4px;
-        }
-
-        .growth-positive {
-            color: var(--success-green);
-            font-weight: 700;
-        }
-
-        .growth-negative {
-            color: var(--danger-red);
-            font-weight: 700;
+        .metric-value {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin: 12px 0;
+            letter-spacing: -0.04em;
+            line-height: 1;
         }
 
         .growth-indicator {
@@ -303,6 +318,19 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         .growth-indicator.negative {
             background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
             color: #991b1b;
+        }
+
+        .period-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #3d5ee0 100%);
+            color: white;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(43, 70, 187, 0.25);
         }
 
         table {
@@ -331,30 +359,18 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             white-space: nowrap;
         }
 
-        th:first-child {
-            border-top-left-radius: 12px;
-        }
+        th:first-child { border-top-left-radius: 12px; }
+        th:last-child { border-top-right-radius: 12px; }
 
-        th:last-child {
-            border-top-right-radius: 12px;
-        }
-
-        .text-right {
-            text-align: right;
-        }
+        .text-right { text-align: right; }
 
         tbody tr {
             border-bottom: 1px solid var(--neutral-100);
             transition: background-color 0.15s ease;
         }
 
-        tbody tr:hover {
-            background: var(--neutral-50);
-        }
-
-        tbody tr:last-child {
-            border-bottom: none;
-        }
+        tbody tr:hover { background: var(--neutral-50); }
+        tbody tr:last-child { border-bottom: none; }
 
         td {
             padding: 12px;
@@ -362,13 +378,8 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             color: var(--neutral-700);
         }
 
-        tbody tr:nth-child(even) {
-            background: #fafbfc;
-        }
-
-        tbody tr:nth-child(even):hover {
-            background: var(--neutral-50);
-        }
+        tbody tr:nth-child(even) { background: #fafbfc; }
+        tbody tr:nth-child(even):hover { background: var(--neutral-50); }
 
         .badge {
             padding: 5px 10px;
@@ -392,10 +403,20 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             border: 1px solid #fecaca;
         }
 
-        .badge-blue {
-            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-            color: #1e40af;
-            border: 1px solid #bfdbfe;
+        .slide-cover {
+            text-align: center;
+            padding: 120px 64px;
+            background: linear-gradient(135deg, white 0%, var(--neutral-50) 100%);
+        }
+
+        .slide-cover h1 {
+            font-size: 56px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #3d5ee0 50%, var(--primary-yellow) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 24px;
+            letter-spacing: -0.04em;
         }
 
         .insight-box {
@@ -406,15 +427,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             position: relative;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(236, 220, 67, 0.2);
-        }
-
-        .insight-box::before {
-            content: '💡';
-            position: absolute;
-            top: -15px;
-            right: -10px;
-            font-size: 80px;
-            opacity: 0.15;
+            margin-top: 24px;
         }
 
         .insight-box p {
@@ -427,797 +440,692 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             margin: 0;
         }
 
-        .insight-box strong {
-            color: #713f12;
-            font-weight: 700;
-        }
-
-        .slide-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid var(--neutral-200);
-            font-size: 10px;
-            color: var(--neutral-500);
-        }
-
-        .slide-number {
-            font-weight: 600;
-            color: var(--primary-blue);
-        }
-
-        h1 {
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--primary-blue);
-            letter-spacing: -0.03em;
-            margin-bottom: 8px;
-            line-height: 1.2;
-        }
-
-        h2 {
-            font-size: 14px;
-            color: var(--neutral-500);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 32px;
-        }
-
-        h3 {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 16px;
-        }
-
-
         @media print {
-            body {
-                background: white;
-            }
-
+            body { background: white; }
             .slide {
                 box-shadow: none;
                 margin: 0;
                 page-break-after: always;
             }
-
-            .slide:last-child {
-                page-break-after: auto;
-            }
-            * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color-adjust: exact !important;
-            }
-            body { 
-                margin: 0; 
-                padding: 0; 
-                background: white !important;
-                font-size: 16px !important;
-                width: 100% !important;
-                overflow: visible !important;
-            }
-            /* Container optimization for landscape */
-            .min-h-screen {
-                min-height: auto !important;
-                height: auto !important;
-                width: 100% !important;
-            }
-            .max-w-6xl {
-                max-width: 95% !important;
-                margin-left: auto !important;
-                margin-right: auto !important;
-            }
-            /* Remove all min-height constraints for print */
-            .bg-white {
-                min-height: auto !important;
-                height: auto !important;
-                padding: 1.5rem !important;
-                width: 100% !important;
-                box-sizing: border-box !important;
-            }
-            /* Prevent slides from being cut - force page break before each slide if needed */
-            .bg-white.border-t-4 {
-                page-break-before: auto !important;
-                page-break-after: auto !important;
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-                min-height: auto !important;
-                height: auto !important;
-                width: 100% !important;
-                orphans: 3 !important;
-                widows: 3 !important;
-            }
-            /* Ensure each slide container doesn't break */
-            .bg-white.border-t-4 > div {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-            /* Force page break if slide is too tall for one page */
-            .bg-white.border-t-4:not(:first-child) {
-                page-break-before: auto !important;
-            }
-            /* Grid optimization for landscape */
-            .grid {
-                display: grid !important;
-            }
-            .grid-cols-2 {
-                grid-template-columns: repeat(2, 1fr) !important;
-                gap: 1rem !important;
-            }
-            .grid-cols-3 {
-                grid-template-columns: repeat(3, 1fr) !important;
-                gap: 0.75rem !important;
-            }
-            .grid-cols-4 {
-                grid-template-columns: repeat(4, 1fr) !important;
-                gap: 0.75rem !important;
-            }
-            /* Enlarge all text sizes for presentation */
-            h1 { font-size: 2.5rem !important; }
-            h2 { font-size: 2rem !important; }
-            h3 { font-size: 1.5rem !important; }
-            h4 { font-size: 1.25rem !important; }
-            .text-4xl { font-size: 2.5rem !important; }
-            .text-3xl { font-size: 2rem !important; }
-            .text-2xl { font-size: 1.75rem !important; }
-            .text-xl { font-size: 1.5rem !important; }
-            .text-lg { font-size: 1.25rem !important; }
-            .text-base { font-size: 1.125rem !important; }
-            .text-sm { font-size: 1rem !important; }
-            .text-xs { font-size: 0.9rem !important; }
-            /* Table optimization for landscape */
-            table { 
-                font-size: 1rem !important;
-                width: 100% !important;
-                table-layout: auto !important;
-            }
-            th, td { 
-                font-size: 1rem !important; 
-                padding: 0.5rem !important;
-                word-wrap: break-word !important;
-            }
-            /* Optimize spacing for landscape - more breathing room */
-            .space-y-2 > * + * { margin-top: 0.75rem !important; }
-            .space-y-3 > * + * { margin-top: 1rem !important; }
-            .space-y-4 > * + * { margin-top: 1.25rem !important; }
-            .mb-2 { margin-bottom: 0.75rem !important; }
-            .mb-3 { margin-bottom: 1rem !important; }
-            .mb-4 { margin-bottom: 1.5rem !important; }
-            .mb-6 { margin-bottom: 2rem !important; }
-            .mt-4 { margin-top: 1.5rem !important; }
-            .mt-1 { margin-top: 0.5rem !important; }
-            .p-3 { padding: 1rem !important; }
-            .p-4 { padding: 1.25rem !important; }
-            .p-6 { padding: 1.5rem !important; }
-            .p-8 { padding: 2rem !important; }
-            /* Gap optimization - more space between grid items */
-            .gap-3 { gap: 1rem !important; }
-            .gap-4 { gap: 1.25rem !important; }
-            .gap-8 { gap: 2rem !important; }
-            /* Add spacing between slides */
-            .bg-white.border-t-4 {
-                margin-bottom: 2rem !important;
-            }
-            /* Add spacing in grid containers */
-            .grid {
-                gap: 1rem !important;
-            }
-            .grid.grid-cols-2 {
-                gap: 1.5rem !important;
-            }
-            .grid.grid-cols-3 {
-                gap: 1rem !important;
-            }
-            .grid.grid-cols-4 {
-                gap: 0.75rem !important;
-            }
-            /* Enlarge icons */
-            .fas, .fab { font-size: 1.25rem !important; }
-            /* Enlarge borders */
-            .border-t-4 { 
-                border-top-width: 4px !important; 
-            }
-            .border-r-2 { 
-                border-right-width: 2px !important; 
-            }
-            .bg-white { 
-                background-color: white !important; 
-            }
-            .bg-blue-50 { 
-                background-color: #eff6ff !important; 
-            }
-            .bg-gray-50 { 
-                background-color: #f9fafb !important; 
-            }
-            .bg-yellow-50 { 
-                background-color: #fefce8 !important; 
-            }
-            .bg-green-50 { 
-                background-color: #f0fdf4 !important; 
-            }
-            .bg-hadona-blue { 
-                background-color: #2B46BB !important; 
-            }
-            .bg-hadona-yellow { 
-                background-color: #ECDC43 !important; 
-            }
-            .text-hadona-blue { 
-                color: #2B46BB !important; 
-            }
-            .text-hadona-yellow { 
-                color: #ECDC43 !important; 
-            }
-            /* Prevent breaking inside important elements */
-            table, thead, tbody, tr {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-            /* Prevent breaking in key sections */
-            .space-y-2, .space-y-3, .space-y-4 {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-            /* Prevent breaking in grid items */
-            .grid > div {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-            /* Prevent breaking in flex containers */
-            .flex {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-            /* Ensure images don't break */
-            img {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-            /* Image optimization */
-            img {
-                max-width: 100% !important;
-                height: auto !important;
-            }
-            /* Flex optimization */
-            .flex {
-                display: flex !important;
-            }
-            /* Overflow handling */
-            .overflow-x-auto {
-                overflow-x: visible !important;
-            }
-            /* Additional rules to prevent content cutting */
-            ul, ol {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-            li {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-            /* Ensure rounded boxes don't break */
-            .rounded-lg, .rounded {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-            /* Prevent breaking in conclusion boxes */
-            .bg-blue-50, .bg-yellow-50, .bg-green-50 {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-            /* Prevent breaking in space-y containers */
-            .space-y-2, .space-y-3, .space-y-4 {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-            /* Ensure full slide containers don't break */
-            .min-h-screen {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-            /* Prevent breaking in centered content */
-            .text-center {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-            @page { 
-                margin: 10mm; 
-                size: A4 landscape; 
-            }
+            .slide:last-child { page-break-after: auto; }
         }
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <!-- SLIDE 1: COVER -->
+    <div class="slide slide-cover">
+        <div class="agency-logo" style="justify-content: center; margin-bottom: 48px;">
+            <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" class="agency-logo-icon">
+        </div>
 
-    <script type="text/babel">
-        const App = () => {
-            const reportData = ${JSON.stringify(data)};
-            const isMoM = ${JSON.stringify(isMoM)};
-            const defaultReportName = isMoM ? 'Month-on-Month Report' : 'Week-on-Week Report';
-            const reportName = ${JSON.stringify(reportName || (isMoM ? 'Month-on-Month Report' : 'Week-on-Week Report'))};
-            
-            const formatNumber = (num) => {
-                if (!num && num !== 0) return '0';
-                const n = typeof num === 'string' ? parseFloat(String(num).replace(/,/g, '')) : num;
-                return isNaN(n) ? '0' : n.toLocaleString('id-ID');
-            };
-            
-            const formatCurrency = (num) => {
-                if (!num && num !== 0) return 'Rp 0';
-                const n = typeof num === 'string' ? parseFloat(String(num).replace(/,/g, '')) : num;
-                if (isNaN(n)) return 'Rp 0';
-                // Don't round - preserve decimals from CSV for accuracy
-                return 'Rp ' + n.toLocaleString('id-ID');
-            };
+        <h1>CTLPTOWA Performance Report</h1>
 
-            const formatPercent = (num) => {
-                if (!num && num !== 0) return '0%';
-                const n = typeof num === 'string' ? parseFloat(String(num).replace(/,/g, '')) : num;
-                return isNaN(n) ? '0%' : n.toFixed(2) + '%';
-            };
-            
-            const perf = reportData.performanceSummary || {};
-            const thisWeek = perf.thisWeek || {};
-            const lastWeek = perf.lastWeek || {};
-            const breakdown = reportData.breakdown || {};
+        <p style="font-size: 20px; color: var(--neutral-600); font-weight: 600; margin-bottom: 16px;">
+            ${objectiveLabel}
+        </p>
 
-            // Check if this is a new client (no last period data)
-            const parseNum = (val) => {
-                if (typeof val === 'number') return val;
-                if (!val) return 0;
-                const parsed = parseFloat(String(val).replace(/,/g, ''));
-                return isNaN(parsed) ? 0 : parsed;
-            };
+        <p style="font-size: 24px; color: var(--neutral-600); font-weight: 600; margin-bottom: 32px;">
+            ${reportName || defaultReportName}
+        </p>
 
-            const rawLastPeriodSpend = parseNum(lastWeek.amountSpent);
-            const rawLastPeriodImpr = parseNum(lastWeek.impressions);
-            const rawLastPeriodCheckouts = parseNum(lastWeek.checkoutsInitiated || lastWeek.checkoutInitiated);
-            const isNewClient = rawLastPeriodSpend === 0 && rawLastPeriodImpr === 0 && rawLastPeriodCheckouts === 0;
+        <div style="background: var(--neutral-100); padding: 20px 32px; border-radius: 24px; display: inline-flex; align-items: center; gap: 12px; box-shadow: 0 4px 12px rgba(43, 70, 187, 0.25);">
+            <span style="font-size: 20px;">📅</span>
+            <span style="font-size: 16px; font-weight: 600; color: var(--primary-blue);">${retentionType === 'mom' ? 'Month-over-Month Comparison' : 'Week-over-Week Comparison'}</span>
+        </div>
 
-            // Helper functions to format last period values (show "-" for new clients)
-            const formatLastPeriod = (value) => isNewClient && value === 0 ? '-' : formatNumber(value);
-            const formatLastPeriodCurrency = (value) => isNewClient && value === 0 ? '-' : formatCurrency(value);
-            const formatLastPeriodPercent = (value) => isNewClient && value === 0 ? '-' : value.toFixed(2) + '%';
+        <div style="margin-top: 64px;">
+            <div class="confidential-badge">
+                <span>🔒</span>
+                <span>Confidential Report</span>
+            </div>
+        </div>
 
-            const spendGrowth = ${spendGrowth.toFixed(2)};
-            const resultsGrowth = ${resultsGrowth.toFixed(2)};
-            const cprGrowth = ${cprGrowth.toFixed(2)};
-            const clientName = ${JSON.stringify(clientName)};
-            const periodLabel = ${JSON.stringify(periodLabel)};
-            const periodLabelId = ${JSON.stringify(periodLabelId)};
-            const periodLabelEn = ${JSON.stringify(periodLabelEn)};
-            const thisPeriodLabel = ${JSON.stringify(thisPeriodLabel)};
-            const lastPeriodLabel = ${JSON.stringify(lastPeriodLabel)};
-            const comparisonLabel = ${JSON.stringify(comparisonLabel)};
-            const objectiveLabel = ${JSON.stringify(objectiveLabel)};
+        <div style="position: absolute; bottom: 56px; left: 64px; right: 64px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--neutral-500);">
+                <span>© 2026 Hadona Digital Media. All rights reserved.</span>
+                <span>Generated: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+            </div>
+        </div>
+    </div>
 
-            function calculateGrowth(current, previous) {
-                const curr = typeof current === 'string' ? parseFloat(current.toString().replace(/,/g, '')) : (current || 0);
-                const prev = typeof previous === 'string' ? parseFloat(previous.toString().replace(/,/g, '')) : (previous || 0);
+    <!-- SLIDE 2: PERFORMANCE SUMMARY -->
+    <div class="slide">
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona" class="agency-logo-icon" />
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                <div class="confidential-badge">🔒 Confidential</div>
+            </div>
+        </div>
 
-                if (prev === 0) {
-                  return {
-                    value: curr,
-                    percent: 'N/A',
-                    isPositive: curr > 0
-                  };
-                }
+        <h1>Performance Summary</h1>
+        <h2>Key Metrics Overview</h2>
 
-                const growth = curr - prev;
-                const percent = ((growth / prev) * 100).toFixed(2);
-
-                return {
-                  value: growth,
-                  percent: percent + '%',
-                  isPositive: growth > 0
-                };
-            }
-            
-            // Age data
-            const ageData = ${JSON.stringify(ageData)};
-            const genderData = ${JSON.stringify(genderData)};
-            const regionData = ${JSON.stringify(regionData)};
-            const platformData = ${JSON.stringify(platformData)};
-            const placementData = ${JSON.stringify(placementData)};
-            const objectiveData = ${JSON.stringify(objectiveData)};
-            const creativeData = ${JSON.stringify(creativeData)};
-            
-            return (
-                <div className="min-h-screen bg-gray-50">
-                    {/* SLIDE 1 - WELCOME */}
-                    <div className="bg-white p-8 min-h-screen flex items-center border-t-4 border-hadona-blue">
-                        <div className="max-w-6xl mx-auto w-full text-center">
-                            <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Logo" className="mx-auto mb-6" style={{width: '80px', height: 'auto'}} />
-                            <h1 className="text-4xl font-bold text-hadona-blue mb-3">{comparisonLabel} Reporting</h1>
-                            <p className="text-2xl font-semibold text-hadona-blue mb-2">{objectiveLabel}</p>
-                            {reportName && reportName !== defaultReportName && (
-                                <p className="text-xl font-semibold text-hadona-blue mb-4">{reportName}</p>
-                            )}
-                            <p className="text-lg text-gray-500 mb-6">{periodLabel} vs {periodLabel}</p>
-                            <div className="bg-gray-100 p-6 rounded-lg max-w-2xl mx-auto">
-                                <p className="text-sm text-gray-700 font-semibold mb-2">Private & Confidential</p>
-                                <p className="text-sm text-gray-600">This presentation contains proprietary insights prepared exclusively for our valued client. Redistribution or disclosure is not permitted.</p>
-                            </div>
-                        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">${thisPeriodLabel}</div>
+                    <div class="card-badge">Current</div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <div class="metric-label">Amount Spent</div>
+                    <div class="metric-value">${thisWeekSpent}</div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <div class="metric-label">Checkouts Initiated</div>
+                    <div class="metric-value">${thisWeekResults}</div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <div class="metric-label">Cost per Checkout Initiated</div>
+                    <div class="metric-value">${thisWeekCPR}</div>
+                </div>
+                <div style="margin-top: 24px;">
+                    <div class="growth-indicator ${spendGrowth >= 0 ? 'positive' : 'negative'}">
+                        <span>${spendGrowth >= 0 ? '↑' : '↓'}</span>
+                        <span>Spend Growth: ${spendGrowth >= 0 ? '+' : ''}${formatPercent(spendGrowth)}</span>
                     </div>
+                </div>
+            </div>
 
-                    {/* SLIDE 2 - PERFORMANCE SUMMARY */}
-                    <div className="slide">
-                        {/* Agency Header */}
-                            <div className="agency-header">
-                                <div className="agency-logo">
-                                    <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
-                                    <div>
-                                        <div className="agency-name">Hadona Digital Media</div>
-                                        <div className="agency-tagline">Performance Marketing</div>
-                                    </div>
-                                </div>
-                                <div className="report-meta">
-                                    <div className="report-date">Generated: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
-                                    <div className="confidential-badge">🔒 Confidential</div>
-                                </div>
-                            </div>
-                            <h1>Performance Summary</h2>
-                            <div className="grid grid-cols-2 gap-8">
-                                <div className="bg-blue-50 p-6 rounded-lg border-2 border-hadona-blue">
-                                    <h3 className="text-lg font-semibold text-hadona-blue mb-3">{thisPeriodLabel}</h3>
-                                    <div className="space-y-4">
-                                        <div className="flex justify-between">
-                                            <span>Spend</span>
-                                            <span className="font-bold">{formatCurrency(thisWeek.amountSpent || 0)}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span>Result (Checkouts Initiated)</span>
-                                            <span className="font-bold">{formatNumber(thisWeek.checkoutsInitiated || 0)}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span>Cost per checkout initiated</span>
-                                            <span className="font-bold">{formatCurrency((thisWeek.checkoutsInitiated && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.checkoutsInitiated) : 0)}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span>Growth %</span>
-                                            <span className={\`font-bold \${spendGrowth.isPositive ? 'text-green-500' : 'text-red-500'}\`}>{spendGrowth.isPositive ? '+' : ''}{spendGrowth.percent}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="bg-gray-50 p-6 rounded-lg border-2 border-gray-300">
-                                    <h3 className="text-lg font-semibold text-gray-600 mb-3">{lastPeriodLabel}</h3>
-                                    <div className="space-y-4">
-                                        <div className="flex justify-between">
-                                            <span>Spend</span>
-                                            <span className="font-bold">{formatLastPeriodCurrency(parseNum(lastWeek.amountSpent))}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span>Result (Checkouts Initiated)</span>
-                                            <span className="font-bold">{formatLastPeriod(parseNum(lastWeek.checkoutsInitiated || lastWeek.checkoutInitiated))}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span>Cost per checkout initiated</span>
-                                            <span className="font-bold">{formatCurrency((lastWeek.checkoutsInitiated && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.checkoutsInitiated) : 0)}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span>Growth %</span>
-                                            <span className="font-bold text-gray-500">-</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="mt-4 p-3 bg-yellow-50 rounded-lg border-l-4 border-hadona-yellow">
-                                <p><i className="fas fa-lightbulb text-yellow-500 mr-2"></i> <strong>Key Insight:</strong> {spendGrowth.isPositive ? 'Performance meningkat' : 'Performance menurun'} {Math.abs(spendGrowth).toFixed(1)}% dengan {resultsGrowth.isPositive ? 'peningkatan' : 'penurunan'} {Math.abs(resultsGrowth).toFixed(1)}% checkouts initiated dan efisiensi cost yang {cprGrowth <= 0 ? 'lebih baik' : 'perlu optimasi'}.</p>
-                            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">${lastPeriodLabel}</div>
+                    <div class="card-badge">Previous</div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <div class="metric-label">Amount Spent</div>
+                    <div class="metric-value">${lastWeekSpent}</div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <div class="metric-label">Checkouts Initiated</div>
+                    <div class="metric-value">${lastWeekResults}</div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <div class="metric-label">Cost per Checkout Initiated</div>
+                    <div class="metric-value">${lastWeekCPR}</div>
+                </div>
+                <div style="margin-top: 24px; padding: 12px; background: var(--neutral-100); border-radius: 8px; font-size: 12px; color: var(--neutral-600);">
+                    Comparison Period
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CTLPTOWA Performance Report</span>
+            <span class="slide-number">Page 2</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 3: DETAILED METRICS TABLE -->
+    <div class="slide">
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona" class="agency-logo-icon" />
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                <div class="confidential-badge">🔒 Confidential</div>
+            </div>
+        </div>
+
+        <h1>Period Comparison</h1>
+        <h2>Key Metrics Overview</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Metrik</th>
+                    <th class="text-right">${lastPeriodLabel}</th>
+                    <th class="text-right">${thisPeriodLabel}</th>
+                    <th class="text-right">Trending Value</th>
+                    <th class="text-right">Trending %</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Amount Spent</strong></td>
+                    <td class="text-right">${lastWeekSpent}</td>
+                    <td class="text-right">${thisWeekSpent}</td>
+                    <td class="text-right">${formatCurrency(thisSpent - lastSpent)}</td>
+                    <td class="text-right"><span class="badge ${spendGrowth >= 0 ? 'badge-green' : 'badge-red'}">${spendGrowth >= 0 ? '+' : ''}${formatPercent(spendGrowth)}</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Checkouts Initiated</strong></td>
+                    <td class="text-right">${lastWeekResults}</td>
+                    <td class="text-right">${thisWeekResults}</td>
+                    <td class="text-right">${formatNumber(thisResults - lastResults)}</td>
+                    <td class="text-right"><span class="badge ${resultsGrowth >= 0 ? 'badge-green' : 'badge-red'}">${resultsGrowth >= 0 ? '+' : ''}${formatPercent(resultsGrowth)}</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Cost per Checkout Initiated</strong></td>
+                    <td class="text-right">${lastWeekCPR}</td>
+                    <td class="text-right">${thisWeekCPR}</td>
+                    <td class="text-right">${formatCurrency(thisCPR - lastCPR)}</td>
+                    <td class="text-right"><span class="badge ${cprGrowth <= 0 ? 'badge-green' : 'badge-red'}">${cprGrowth <= 0 ? '' : '+'}${formatPercent(cprGrowth)}</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Outbound Clicks</strong></td>
+                    <td class="text-right">${formatNumber(lastOutboundClicks)}</td>
+                    <td class="text-right">${formatNumber(thisOutboundClicks)}</td>
+                    <td class="text-right">${formatNumber(thisOutboundClicks - lastOutboundClicks)}</td>
+                    <td class="text-right"><span class="badge ${calculateGrowth(thisOutboundClicks, lastOutboundClicks) >= 0 ? 'badge-green' : 'badge-red'}">${calculateGrowth(thisOutboundClicks, lastOutboundClicks) >= 0 ? '+' : ''}${formatPercent(calculateGrowth(thisOutboundClicks, lastOutboundClicks))}</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Impressions</strong></td>
+                    <td class="text-right">${formatNumber(lastImpr)}</td>
+                    <td class="text-right">${formatNumber(thisImpr)}</td>
+                    <td class="text-right">${formatNumber(thisImpr - lastImpr)}</td>
+                    <td class="text-right"><span class="badge ${calculateGrowth(thisImpr, lastImpr) >= 0 ? 'badge-green' : 'badge-red'}">${calculateGrowth(thisImpr, lastImpr) >= 0 ? '+' : ''}${formatPercent(calculateGrowth(thisImpr, lastImpr))}</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Click-Through Rate (CTR)</strong></td>
+                    <td class="text-right">${formatPercent(lastCTR)}</td>
+                    <td class="text-right">${formatPercent(thisCTR)}</td>
+                    <td class="text-right">${formatPercent(thisCTR - lastCTR)}</td>
+                    <td class="text-right"><span class="badge ${calculateGrowth(thisCTR, lastCTR) >= 0 ? 'badge-green' : 'badge-red'}">${calculateGrowth(thisCTR, lastCTR) >= 0 ? '+' : ''}${formatPercent(calculateGrowth(thisCTR, lastCTR))}</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Cost per Click (CPC)</strong></td>
+                    <td class="text-right">${formatCurrency(lastCPC)}</td>
+                    <td class="text-right">${formatCurrency(thisCPC)}</td>
+                    <td class="text-right">${formatCurrency(thisCPC - lastCPC)}</td>
+                    <td class="text-right"><span class="badge ${calculateGrowth(thisCPC, lastCPC) <= 0 ? 'badge-green' : 'badge-red'}">${calculateGrowth(thisCPC, lastCPC) <= 0 ? '' : '+'}${formatPercent(calculateGrowth(thisCPC, lastCPC))}</span></td>
+                </tr>
+                <tr>
+                    <td><strong>OC → WA Landing Ratio</strong></td>
+                    <td class="text-right">${formatPercent((lastOutboundClicks && lastResults) ? (lastResults / lastOutboundClicks * 100) : 0)}</td>
+                    <td class="text-right">${formatPercent((thisOutboundClicks && thisResults) ? (thisResults / thisOutboundClicks * 100) : 0)}</td>
+                    <td class="text-right">${formatPercent(((thisOutboundClicks && thisResults) ? (thisResults / thisOutboundClicks * 100) : 0) - ((lastOutboundClicks && lastResults) ? (lastResults / lastOutboundClicks * 100) : 0))}</td>
+                    <td class="text-right"><span class="badge ${((thisOutboundClicks && thisResults) ? (thisResults / thisOutboundClicks) : 0) >= ((lastOutboundClicks && lastResults) ? (lastResults / lastOutboundClicks) : 0) ? 'badge-green' : 'badge-red'}">${((thisOutboundClicks && thisResults) ? (thisResults / thisOutboundClicks) : 0) >= ((lastOutboundClicks && lastResults) ? (lastResults / lastOutboundClicks) : 0) ? '+' : ''}${formatPercent(calculateGrowth((thisOutboundClicks && thisResults) ? (thisResults / thisOutboundClicks) : 0, (lastOutboundClicks && lastResults) ? (lastResults / lastOutboundClicks) : 0))}</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="insight-box">
+            <p><strong>Insight Utama:</strong> ${spendGrowth >= 0 ? 'Peningkatan' : 'Penurunan'} performa sebesar ${Math.abs(spendGrowth).toFixed(1)}% dengan ${resultsGrowth >= 0 ? 'peningkatan' : 'penurunan'} messaging conversations. CPR ${cprGrowth <= 0 ? 'turun' : 'naik'} ${Math.abs(cprGrowth).toFixed(1)}% menunjukkan efisiensi biaya yang ${cprGrowth <= 0 ? 'lebih baik' : 'perlu diperbaiki'}.</p>
+        </div>
+
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CTLPTOWA Performance Report</span>
+            <span class="slide-number">Page 3</span>
+        </div>
+    </div>`
+
+  // Analysis & Recommendations Slide
+  html += `
+    <!-- SLIDE: ANALYSIS & RECOMMENDATIONS -->
+    <div class="slide">
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona" class="agency-logo-icon" />
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                <div class="confidential-badge">🔒 Confidential</div>
+            </div>
+        </div>
+
+        <h1>Analysis & Recommendations</h1>
+        <h2>Performance Evaluation</h2>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+            <!-- Highlights -->
+            <div>
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                    <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #10B981 0%, #059669 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">✓</div>
+                    <h3 style="font-size: 18px; font-weight: 700; color: var(--success-green); margin: 0;">Highlights</h3>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 24px; border-radius: 16px; border-left: 5px solid var(--success-green);">
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        ${resultsGrowth > 0 ? `
+                        <div style="padding-bottom: 12px; border-bottom: 1px solid #bbf7d0;">
+                            <div style="font-size: 13px; color: #166534; font-weight: 600; margin-bottom: 4px;">Pertumbuhan Checkouts Initiated</div>
+                            <div style="font-size: 11px; color: #15803d;">Meningkat sebesar ${resultsGrowth.toFixed(1)}% dibanding ${isMoM ? 'bulan lalu' : 'minggu lalu'}, menunjukkan engagement pengguna yang kuat.</div>
                         </div>
-                    </div>
+                        ` : ''}
 
-                    {/* SLIDE 3 - TABEL RINGKASAN METRIK */}
-                    <div className="slide">
-                        {/* Agency Header */}
-                            <div className="agency-header">
-                                <div className="agency-logo">
-                                    <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
-                                    <div>
-                                        <div className="agency-name">Hadona Digital Media</div>
-                                        <div className="agency-tagline">Performance Marketing</div>
-                                    </div>
-                                </div>
-                                <div className="report-meta">
-                                    <div className="report-date">Generated: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
-                                    <div className="confidential-badge">🔒 Confidential</div>
-                                </div>
-                            </div>
-                            <h1>Tabel Ringkasan Metrik</h2>
-                            <div className="overflow-x-auto">
-                                <table className="w-full border-collapse border border-gray-300 text-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Metrik</th>
-                                            <th className="text-right">{lastPeriodLabel}</th>
-                                            <th className="text-right">{thisPeriodLabel}</th>
-                                            <th className="text-right">Trending Value</th>
-                                            <th className="text-right">Trending %</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>Amount Spent (IDR)</td>
-                                            <td className="text-right">{formatLastPeriodCurrency(parseNum(lastWeek.amountSpent))}</td>
-                                            <td className="text-right">{formatCurrency(thisWeek.amountSpent || 0)}</td>
-                                            <td className="text-right">{formatCurrency((thisWeek.amountSpent || 0) - (lastWeek.amountSpent || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${spendGrowth.isPositive ? 'text-green-500' : 'text-red-500'}\`}>{spendGrowth.isPositive ? '+' : ''}{spendGrowth.percent}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Reach</td>
-                                            <td className="text-right">{formatLastPeriod(parseNum(lastWeek.reach))}</td>
-                                            <td className="text-right">{formatNumber(thisWeek.reach || 0)}</td>
-                                            <td className="text-right">{formatNumber((thisWeek.reach || 0) - (lastWeek.reach || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.reach || 0) >= (lastWeek.reach || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.reach || 0) >= (lastWeek.reach || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.reach || 0, lastWeek.reach || 0))}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Cost per 1,000 Accounts Center accounts reached</td>
-                                            <td className="text-right">{formatCurrency((lastWeek.reach && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.reach * 1000) : 0)}</td>
-                                            <td className="text-right">{formatCurrency((thisWeek.reach && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.reach * 1000) : 0)}</td>
-                                            <td className="text-right">{formatCurrency(((thisWeek.reach && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.reach * 1000) : 0) - ((lastWeek.reach && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.reach * 1000) : 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${((thisWeek.reach && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.reach * 1000) : 0) <= ((lastWeek.reach && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.reach * 1000) : 0) ? 'text-green-500' : 'text-red-500'}\`}>{((thisWeek.reach && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.reach * 1000) : 0) <= ((lastWeek.reach && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.reach * 1000) : 0) ? '' : '+'}{formatPercent(calculateGrowth((thisWeek.reach && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.reach * 1000) : 0, (lastWeek.reach && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.reach * 1000) : 0))}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Impressions</td>
-                                            <td className="text-right">{formatLastPeriod(parseNum(lastWeek.impressions))}</td>
-                                            <td className="text-right">{formatNumber(thisWeek.impressions || 0)}</td>
-                                            <td className="text-right">{formatNumber((thisWeek.impressions || 0) - (lastWeek.impressions || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.impressions || 0) >= (lastWeek.impressions || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.impressions || 0) >= (lastWeek.impressions || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.impressions || 0, lastWeek.impressions || 0))}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>CPM (cost per 1,000 impressions)</td>
-                                            <td className="text-right">{formatLastPeriodCurrency(parseNum(lastWeek.cpm))}</td>
-                                            <td className="text-right">{formatCurrency(thisWeek.cpm || 0)}</td>
-                                            <td className="text-right">{formatCurrency((thisWeek.cpm || 0) - (lastWeek.cpm || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.cpm || 0) <= (lastWeek.cpm || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.cpm || 0) <= (lastWeek.cpm || 0) ? '' : '+'}{formatPercent(calculateGrowth(thisWeek.cpm || 0, lastWeek.cpm || 0))}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Frequency</td>
-                                            <td className="text-right">{formatLastPeriod(parseNum(lastWeek.frequency))}</td>
-                                            <td className="text-right">{formatNumber(thisWeek.frequency || 0)}</td>
-                                            <td className="text-right">{formatNumber((thisWeek.frequency || 0) - (lastWeek.frequency || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.frequency || 0) >= (lastWeek.frequency || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.frequency || 0) >= (lastWeek.frequency || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.frequency || 0, lastWeek.frequency || 0))}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Link clicks</td>
-                                            <td className="text-right">{formatLastPeriod(parseNum(lastWeek.linkClicks))}</td>
-                                            <td className="text-right">{formatNumber(thisWeek.linkClicks || 0)}</td>
-                                            <td className="text-right">{formatNumber((thisWeek.linkClicks || 0) - (lastWeek.linkClicks || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.linkClicks || 0) >= (lastWeek.linkClicks || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.linkClicks || 0) >= (lastWeek.linkClicks || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.linkClicks || 0, lastWeek.linkClicks || 0))}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Outbound clicks</td>
-                                            <td className="text-right">{formatNumber(lastWeek.outboundClicks || 0)}</td>
-                                            <td className="text-right">{formatNumber(thisWeek.outboundClicks || 0)}</td>
-                                            <td className="text-right">{formatNumber((thisWeek.outboundClicks || 0) - (lastWeek.outboundClicks || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.outboundClicks || 0) >= (lastWeek.outboundClicks || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.outboundClicks || 0) >= (lastWeek.outboundClicks || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.outboundClicks || 0, lastWeek.outboundClicks || 0))}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>CPC (cost per link click)</td>
-                                            <td className="text-right">{formatCurrency(lastWeek.cpc || 0)}</td>
-                                            <td className="text-right">{formatCurrency(thisWeek.cpc || 0)}</td>
-                                            <td className="text-right">{formatCurrency((thisWeek.cpc || 0) - (lastWeek.cpc || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.cpc || 0) <= (lastWeek.cpc || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.cpc || 0) <= (lastWeek.cpc || 0) ? '' : '+'}{formatPercent(calculateGrowth(thisWeek.cpc || 0, lastWeek.cpc || 0))}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>CTR (link click-through rate)</td>
-                                            <td className="text-right">{formatPercent(lastWeek.ctr || 0)}</td>
-                                            <td className="text-right">{formatPercent(thisWeek.ctr || 0)}</td>
-                                            <td className="text-right">{formatPercent((thisWeek.ctr || 0) - (lastWeek.ctr || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.ctr || 0) >= (lastWeek.ctr || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.ctr || 0) >= (lastWeek.ctr || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.ctr || 0, lastWeek.ctr || 0))}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Clicks (all)</td>
-                                            <td className="text-right">{formatNumber(lastWeek.clicksAll || lastWeek.linkClicks || 0)}</td>
-                                            <td className="text-right">{formatNumber(thisWeek.clicksAll || thisWeek.linkClicks || 0)}</td>
-                                            <td className="text-right">{formatNumber((thisWeek.clicksAll || thisWeek.linkClicks || 0) - (lastWeek.clicksAll || lastWeek.linkClicks || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.clicksAll || thisWeek.linkClicks || 0) >= (lastWeek.clicksAll || lastWeek.linkClicks || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.clicksAll || thisWeek.linkClicks || 0) >= (lastWeek.clicksAll || lastWeek.linkClicks || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.clicksAll || thisWeek.linkClicks || 0, lastWeek.clicksAll || lastWeek.linkClicks || 0))}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>CTR (all)</td>
-                                            <td className="text-right">{formatPercent((lastWeek.ctrAll || (lastWeek.clicksAll && lastWeek.impressions ? (lastWeek.clicksAll / lastWeek.impressions * 100) : 0) || 0))}</td>
-                                            <td className="text-right">{formatPercent((thisWeek.ctrAll || (thisWeek.clicksAll && thisWeek.impressions ? (thisWeek.clicksAll / thisWeek.impressions * 100) : 0) || 0))}</td>
-                                            <td className="text-right">{formatPercent(((thisWeek.ctrAll || (thisWeek.clicksAll && thisWeek.impressions ? (thisWeek.clicksAll / thisWeek.impressions * 100) : 0) || 0) - (lastWeek.ctrAll || (lastWeek.clicksAll && lastWeek.impressions ? (lastWeek.clicksAll / lastWeek.impressions * 100) : 0) || 0)))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.ctrAll || (thisWeek.clicksAll && thisWeek.impressions ? (thisWeek.clicksAll / thisWeek.impressions * 100) : 0) || 0) >= (lastWeek.ctrAll || (lastWeek.clicksAll && lastWeek.impressions ? (lastWeek.clicksAll / lastWeek.impressions * 100) : 0) || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.ctrAll || (thisWeek.clicksAll && thisWeek.impressions ? (thisWeek.clicksAll / thisWeek.impressions * 100) : 0) || 0) >= (lastWeek.ctrAll || (lastWeek.clicksAll && lastWeek.impressions ? (lastWeek.clicksAll / lastWeek.impressions * 100) : 0) || 0) ? '+' : ''}{formatPercent(calculateGrowth((thisWeek.ctrAll || (thisWeek.clicksAll && thisWeek.impressions ? (thisWeek.clicksAll / thisWeek.impressions * 100) : 0) || 0), (lastWeek.ctrAll || (lastWeek.clicksAll && lastWeek.impressions ? (lastWeek.clicksAll / lastWeek.impressions * 100) : 0) || 0)))}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>CPC (all)</td>
-                                            <td className="text-right">{formatCurrency((lastWeek.clicksAll && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.clicksAll) : (lastWeek.cpc || 0))}</td>
-                                            <td className="text-right">{formatCurrency((thisWeek.clicksAll && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.clicksAll) : (thisWeek.cpc || 0))}</td>
-                                            <td className="text-right">{formatCurrency(((thisWeek.clicksAll && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.clicksAll) : (thisWeek.cpc || 0)) - ((lastWeek.clicksAll && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.clicksAll) : (lastWeek.cpc || 0)))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${((thisWeek.clicksAll && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.clicksAll) : (thisWeek.cpc || 0)) <= ((lastWeek.clicksAll && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.clicksAll) : (lastWeek.cpc || 0)) ? 'text-green-500' : 'text-red-500'}\`}>{((thisWeek.clicksAll && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.clicksAll) : (thisWeek.cpc || 0)) <= ((lastWeek.clicksAll && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.clicksAll) : (lastWeek.cpc || 0)) ? '' : '+'}{formatPercent(calculateGrowth((thisWeek.clicksAll && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.clicksAll) : (thisWeek.cpc || 0), (lastWeek.clicksAll && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.clicksAll) : (lastWeek.cpc || 0)))}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Content views</td>
-                                            <td className="text-right">{formatNumber(lastWeek.contentViews || 0)}</td>
-                                            <td className="text-right">{formatNumber(thisWeek.contentViews || 0)}</td>
-                                            <td className="text-right">{formatNumber((thisWeek.contentViews || 0) - (lastWeek.contentViews || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.contentViews || 0) >= (lastWeek.contentViews || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.contentViews || 0) >= (lastWeek.contentViews || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.contentViews || 0, lastWeek.contentViews || 0))}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Landing page views</td>
-                                            <td className="text-right">{formatLastPeriod(parseNum(lastWeek.landingPageViews))}</td>
-                                            <td className="text-right">{formatNumber(thisWeek.landingPageViews || 0)}</td>
-                                            <td className="text-right">{formatNumber((thisWeek.landingPageViews || 0) - (lastWeek.landingPageViews || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.landingPageViews || 0) >= (lastWeek.landingPageViews || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.landingPageViews || 0) >= (lastWeek.landingPageViews || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.landingPageViews || 0, lastWeek.landingPageViews || 0))}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>* OC to LPV</td>
-                                            <td className="text-right">{formatPercent((lastWeek.ocToLPV !== undefined ? lastWeek.ocToLPV : (lastWeek.outboundClicks && lastWeek.landingPageViews) ? (lastWeek.landingPageViews / lastWeek.outboundClicks) : 0) * 100)}</td>
-                                            <td className="text-right">{formatPercent((thisWeek.ocToLPV !== undefined ? thisWeek.ocToLPV : (thisWeek.outboundClicks && thisWeek.landingPageViews) ? (thisWeek.landingPageViews / thisWeek.outboundClicks) : 0) * 100)}</td>
-                                            <td className="text-right">-</td>
-                                            <td className="text-right">-</td>
-                                        </tr>
-                                        <tr>
-                                            <td>* LC to LPV</td>
-                                            <td className="text-right">{formatPercent((lastWeek.lcToLPV !== undefined ? lastWeek.lcToLPV : (lastWeek.linkClicks && lastWeek.landingPageViews) ? (lastWeek.landingPageViews / lastWeek.linkClicks) : 0) * 100)}</td>
-                                            <td className="text-right">{formatPercent((thisWeek.lcToLPV !== undefined ? thisWeek.lcToLPV : (thisWeek.linkClicks && thisWeek.landingPageViews) ? (thisWeek.landingPageViews / thisWeek.linkClicks) : 0) * 100)}</td>
-                                            <td className="text-right">-</td>
-                                            <td className="text-right">-</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Checkouts initiated</td>
-                                            <td className="text-right">{formatLastPeriod(parseNum(lastWeek.checkoutsInitiated || lastWeek.checkoutInitiated))}</td>
-                                            <td className="text-right">{formatNumber(thisWeek.checkoutsInitiated || 0)}</td>
-                                            <td className="text-right">{formatNumber((thisWeek.checkoutsInitiated || 0) - (lastWeek.checkoutsInitiated || 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.checkoutsInitiated || 0) >= (lastWeek.checkoutsInitiated || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.checkoutsInitiated || 0) >= (lastWeek.checkoutsInitiated || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.checkoutsInitiated || 0, lastWeek.checkoutsInitiated || 0))}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Cost per checkout initiated</td>
-                                            <td className="text-right">{formatCurrency((lastWeek.checkoutsInitiated && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.checkoutsInitiated) : 0)}</td>
-                                            <td className="text-right">{formatCurrency((thisWeek.checkoutsInitiated && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.checkoutsInitiated) : 0)}</td>
-                                            <td className="text-right">{formatCurrency(((thisWeek.checkoutsInitiated && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.checkoutsInitiated) : 0) - ((lastWeek.checkoutsInitiated && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.checkoutsInitiated) : 0))}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${((thisWeek.checkoutsInitiated && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.checkoutsInitiated) : 0) <= ((lastWeek.checkoutsInitiated && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.checkoutsInitiated) : 0) ? 'text-green-500' : 'text-red-500'}\`}>{((thisWeek.checkoutsInitiated && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.checkoutsInitiated) : 0) <= ((lastWeek.checkoutsInitiated && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.checkoutsInitiated) : 0) ? '' : '+'}{formatPercent(calculateGrowth((thisWeek.checkoutsInitiated && thisWeek.amountSpent) ? (thisWeek.amountSpent / thisWeek.checkoutsInitiated) : 0, (lastWeek.checkoutsInitiated && lastWeek.amountSpent) ? (lastWeek.amountSpent / lastWeek.checkoutsInitiated) : 0))}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>* LPV to IC</td>
-                                            <td className="text-right">{formatPercent((lastWeek.lpvToIC !== undefined ? lastWeek.lpvToIC : (lastWeek.landingPageViews && lastWeek.checkoutsInitiated) ? (lastWeek.checkoutsInitiated / lastWeek.landingPageViews) : 0) * 100)}</td>
-                                            <td className="text-right">{formatPercent((thisWeek.lpvToIC !== undefined ? thisWeek.lpvToIC : (thisWeek.landingPageViews && thisWeek.checkoutsInitiated) ? (thisWeek.checkoutsInitiated / thisWeek.landingPageViews) : 0) * 100)}</td>
-                                            <td className="text-right">-</td>
-                                            <td className="text-right">-</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div style={{marginTop: '32px'}} className="space-y-3">
-                                <div className="insight-box">
-                                    <div className="flex items-start">
-                                                <div className="flex-1">
-                                            <p><strong>Kesimpulan:</strong> {spendGrowth.isPositive ? 'Peningkatan' : 'Penurunan'} performa {Math.abs(spendGrowth).toFixed(1)}% di semua metrik.</p>
-                                            <p className="text-xs mt-1">{resultsGrowth.isPositive ? 'Engagement' : 'Cost efficiency'} menjadi {resultsGrowth.isPositive ? 'driver utama' : 'area perbaikan'} ${isMoM ? 'bulan' : 'minggu'} ini.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="insight-box">
-                                    <div className="flex items-start">
-                                                <div className="flex-1">
-                                            <p><strong>Rekomendasi:</strong> {spendGrowth.isPositive ? 'Pertahankan momentum dengan' : 'Fokus pada optimasi'} {resultsGrowth.isPositive ? 'scaling budget ke performa terbaik' : 'cost efficiency dan targeting'}.</p>
-                                            <p className="text-xs mt-1">Monitor metrik kunci secara berkala untuk memastikan growth berkelanjutan.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        ${cprGrowth < 0 ? `
+                        <div style="padding-bottom: 12px; border-bottom: 1px solid #bbf7d0;">
+                            <div style="font-size: 13px; color: #166534; font-weight: 600; margin-bottom: 4px;">Efisiensi Biaya Meningkat</div>
+                            <div style="font-size: 11px; color: #15803d;">CPR turun sebesar ${Math.abs(cprGrowth).toFixed(1)}%, menghasilkan ROI yang lebih baik dan pengeluaran iklan yang optimal.</div>
                         </div>
-                    </div>
+                        ` : ''}
 
-                    {/* SLIDE 4 - WEEK-ON-WEEK ANALYSIS */}
-                    <div className="slide">
-                        {/* Agency Header */}
-                            <div className="agency-header">
-                                <div className="agency-logo">
-                                    <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
-                                    <div>
-                                        <div className="agency-name">Hadona Digital Media</div>
-                                        <div className="agency-tagline">Performance Marketing</div>
-                                    </div>
-                                </div>
-                                <div className="report-meta">
-                                    <div className="report-date">Generated: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
-                                    <div className="confidential-badge">🔒 Confidential</div>
-                                </div>
-                            </div>
-                            <h1>{comparisonLabel} Analysis</h2>
-                            <div className="grid grid-cols-2 gap-0">
-                                <div className="border-r-2 border-gray-300 pr-6">
-                                    <h3 className="text-lg font-semibold text-green-600 mb-3"><i className="fas fa-arrow-up mr-2"></i>Highlight</h3>
-                                    <ul className="space-y-3">
-                                        <li className="flex items-start">
-                                                        <span><strong>Checkouts Initiated</strong> {resultsGrowth.isPositive ? 'meningkat' : 'menurun'} {Math.abs(resultsGrowth).toFixed(1)}% dengan {resultsGrowth.isPositive ? 'peningkatan' : 'penurunan'} kualitas conversion</span>
-                                        </li>
-                                        <li className="flex items-start">
-                                                        <span><strong>Click-Through Rate</strong> {thisWeek.ctr >= lastWeek.ctr ? 'stabil' : 'meningkat'} di {formatPercent(thisWeek.ctr || 0)} meskipun impressions {thisWeek.impressions >= lastWeek.impressions ? 'meningkat' : 'menurun'}</span>
-                                        </li>
-                                        <li className="flex items-start">
-                                                        <span><strong>Cost Efficiency</strong> {cprGrowth <= 0 ? 'meningkat' : 'menurun'} dengan CPR {cprGrowth <= 0 ? 'turun' : 'naik'} {Math.abs(cprGrowth).toFixed(1)}%</span>
-                                        </li>
-                                        <li className="flex items-start">
-                                                        <span><strong>Budget Utilization</strong> optimal dengan spend {spendGrowth.isPositive ? 'meningkat' : 'menurun'} {Math.abs(spendGrowth).toFixed(1)}%</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div className="pl-6">
-                                    <h3 className="text-lg font-semibold text-red-600 mb-3"><i className="fas fa-arrow-down mr-2"></i>Lowlight</h3>
-                                    <ul className="space-y-3">
-                                        <li className="flex items-start">
-                                                        <span><strong>CPC Link</strong> {thisWeek.cpc > lastWeek.cpc ? 'meningkat' : 'stabil'} {thisWeek.cpc > lastWeek.cpc ? 'meskipun hasil baik' : ''}</span>
-                                        </li>
-                                        <li className="flex items-start">
-                                                        <span><strong>Impressions</strong> {thisWeek.impressions < lastWeek.impressions ? 'menurun' : 'meningkat'} {Math.abs(calculateGrowth(thisWeek.impressions || 0, lastWeek.impressions || 0)).toFixed(1)}% {thisWeek.impressions < lastWeek.impressions ? 'perlu optimasi targeting' : ''}</span>
-                                        </li>
-                                        <li className="flex items-start">
-                                                        <span><strong>Frequency</strong> {thisWeek.frequency > lastWeek.frequency ? 'meningkat' : 'stabil'} {thisWeek.frequency > lastWeek.frequency ? '- perlu monitor ad fatigue' : ''}</span>
-                                        </li>
-                                        <li className="flex items-start">
-                                                        <span><strong>Reach</strong> {thisWeek.reach < lastWeek.reach ? 'menurun' : 'meningkat'} {thisWeek.reach < lastWeek.reach ? '- perlu expand audience' : ''}</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div className="mt-4 space-y-2">
-                                <div className="p-3 bg-yellow-50 rounded-lg">
-                                    <div className="flex items-start">
-                                        <i className="fas fa-lightbulb text-yellow-500 mr-2 mt-0.5"></i>
-                                        <div className="flex-1">
-                                            <p><strong>Kesimpulan:</strong> Fokus optimasi {thisWeek.cpc > lastWeek.cpc ? 'CPC' : 'CTR'} untuk efisiensi sambil {thisWeek.impressions < lastWeek.impressions ? 'expand reach' : 'maintain reach'}.</p>
-                                            <p className="text-xs mt-1">Growth berkelanjutan memerlukan monitoring metrik kunci secara berkala dan penyesuaian strategi.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="insight-box">
-                                    <div className="flex items-start">
-                                                <div className="flex-1">
-                                            <p><strong>Rekomendasi:</strong> {thisWeek.cpc > lastWeek.cpc ? 'Optimasi CPC dengan testing creative dan targeting untuk menurunkan cost.' : 'Tingkatkan CTR dengan testing creative dan optimasi placement.'}</p>
-                                            <p className="text-xs mt-1">{thisWeek.impressions < lastWeek.impressions ? 'Ekspansi reach dengan penambahan audience dan budget untuk meningkatkan exposure.' : 'Pertahankan reach sambil fokus pada optimasi conversion rate dan cost efficiency.'}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        ${thisCTR > 0.4 ? `
+                        <div style="padding-bottom: 12px; border-bottom: 1px solid #bbf7d0;">
+                            <div style="font-size: 13px; color: #166534; font-weight: 600; margin-bottom: 4px;">Click-Through Rate Kuat</div>
+                            <div style="font-size: 11px; color: #15803d;">CTR sebesar ${thisCTR.toFixed(2)}% menunjukkan creative iklan yang menarik dan targeting yang efektif.</div>
                         </div>
-                    </div>
+                        ` : ''}
 
-                    ${generateBreakdownSlides(breakdown, thisWeek, lastWeek, thisPeriodLabel, lastPeriodLabel)}
+                        ${thisOutboundClicks > lastOutboundClicks ? `
+                        <div style="padding-bottom: 12px; border-bottom: 1px solid #bbf7d0;">
+                            <div style="font-size: 13px; color: #166534; font-weight: 600; margin-bottom: 4px;">Outbound Clicks Lebih Tinggi</div>
+                            <div style="font-size: 11px; color: #15803d;">Outbound clicks meningkat sebesar ${calculateGrowth(thisOutboundClicks, lastOutboundClicks).toFixed(1)}%, mengarahkan lebih banyak trafik ke WhatsApp.</div>
+                        </div>
+                        ` : ''}
 
-                    {/* SLIDE 13 - THANK YOU */}
-                    <div className="bg-white p-8 border-t-4 border-hadona-blue min-h-screen flex items-center">
-                        <div className="max-w-6xl mx-auto w-full text-center">
-                            <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Logo" className="mx-auto mb-6" style={{width: '100px', height: 'auto'}} />
-                            <h2 className="text-4xl font-bold text-hadona-blue mb-6">Terima Kasih</h2>
-                            <div className="space-y-3 mb-6">
-                                <p className="text-xl"><i className="fab fa-instagram text-purple-500 mr-2"></i> Instagram: @hadona.id</p>
-                                <p className="text-xl"><i className="fab fa-tiktok text-black mr-2"></i> TikTok: @hadona.id</p>
-                                <p className="text-xl"><i className="fas fa-globe text-blue-500 mr-2"></i> Website: www.hadona.id</p>
-                            </div>
-                            <div className="mt-8 pt-6 border-t border-gray-300">
-                                <p className="text-sm text-gray-500">Powered by <span className="font-semibold text-gray-700">Hadona Digital Media</span></p>
-                            </div>
+                        <div style="${resultsGrowth <= 0 && cprGrowth >= 0 && thisCTR <= 0.4 && thisOutboundClicks <= lastOutboundClicks ? '' : 'padding-bottom: 12px; border-bottom: 1px solid #bbf7d0;'}">
+                            <div style="font-size: 13px; color: #166534; font-weight: 600; margin-bottom: 4px;">Performa Konsisten</div>
+                            <div style="font-size: 11px; color: #15803d;">Mempertahankan messaging conversations stabil dengan total ${formatNumber(thisResults)} hasil ${retentionType === 'mom' ? 'bulan ini' : 'minggu ini'}.</div>
                         </div>
                     </div>
                 </div>
-            );
-        };
+            </div>
 
-        try {
-        ReactDOM.render(<App />, document.getElementById('root'));
-        } catch (error) {
-            console.error('Error rendering React app:', error);
-            const root = document.getElementById('root');
-            if (root) {
-                root.innerHTML = '<div style="padding: 2rem; text-align: center;"><h1 style="color: red;">Error loading report</h1><p>' + (error.message || 'Unknown error') + '</p></div>';
-            }
-        }
-    </script>
+            <!-- Lowlights -->
+            <div>
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                    <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">⚠</div>
+                    <h3 style="font-size: 18px; font-weight: 700; color: var(--danger-red); margin: 0;">Lowlights</h3>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); padding: 24px; border-radius: 16px; border-left: 5px solid var(--danger-red);">
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        ${cprGrowth > 0 ? `
+                        <div style="padding-bottom: 12px; border-bottom: 1px solid #fecaca;">
+                            <div style="font-size: 13px; color: #991b1b; font-weight: 600; margin-bottom: 4px;">Biaya per Hasil Meningkat</div>
+                            <div style="font-size: 11px; color: #b91c1c;">CPR naik sebesar ${cprGrowth.toFixed(1)}%, perlu optimasi untuk mempertahankan profitabilitas.</div>
+                        </div>
+                        ` : ''}
+
+                        ${resultsGrowth < 0 ? `
+                        <div style="padding-bottom: 12px; border-bottom: 1px solid #fecaca;">
+                            <div style="font-size: 13px; color: #991b1b; font-weight: 600; margin-bottom: 4px;">Penurunan Checkouts Initiated</div>
+                            <div style="font-size: 11px; color: #b91c1c;">Hasil menurun sebesar ${Math.abs(resultsGrowth).toFixed(1)}%, mengindikasikan kemungkinan audience fatigue atau creative fatigue.</div>
+                        </div>
+                        ` : ''}
+
+                        ${thisCTR < 0.3 ? `
+                        <div style="padding-bottom: 12px; border-bottom: 1px solid #fecaca;">
+                            <div style="font-size: 13px; color: #991b1b; font-weight: 600; margin-bottom: 4px;">CTR Di Bawah Rata-Rata</div>
+                            <div style="font-size: 11px; color: #b91c1c;">CTR sebesar ${thisCTR.toFixed(2)}% di bawah benchmark industri. Pertimbangkan untuk refresh creative iklan dan testing format baru.</div>
+                        </div>
+                        ` : ''}
+
+                        ${spendGrowth > resultsGrowth && resultsGrowth > 0 ? `
+                        <div style="padding-bottom: 12px; border-bottom: 1px solid #fecaca;">
+                            <div style="font-size: 13px; color: #991b1b; font-weight: 600; margin-bottom: 4px;">Pengembalian yang Menurun</div>
+                            <div style="font-size: 11px; color: #b91c1c;">Pertumbuhan spend (${spendGrowth.toFixed(1)}%) melebihi pertumbuhan hasil (${resultsGrowth.toFixed(1)}%). Perlu peningkatan efisiensi konversi.</div>
+                        </div>
+                        ` : ''}
+
+                        <div style="${cprGrowth <= 0 && resultsGrowth >= 0 && thisCTR >= 0.3 && !(spendGrowth > resultsGrowth && resultsGrowth > 0) ? '' : 'padding-bottom: 12px; border-bottom: 1px solid #fecaca;'}">
+                            <div style="font-size: 13px; color: #991b1b; font-weight: 600; margin-bottom: 4px;">Peluang Optimasi</div>
+                            <div style="font-size: 11px; color: #b91c1c;">Fokus pada segmen dengan performa terbaik yang teridentifikasi dalam analisis breakdown untuk memaksimalkan ROI.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="insight-box" style="margin-top: 32px;">
+            <p><strong>Rekomendasi Strategis:</strong> ${spendGrowth >= 0 && resultsGrowth >= 0 && cprGrowth <= 0 ? 'Performa kuat dengan efisiensi yang meningkat. Lanjutkan scaling audience dan creative terbaik sambil mempertahankan strategi optimasi saat ini.' : spendGrowth >= 0 && resultsGrowth >= 0 ? 'Trah pertumbuhan positif namun biaya meningkat. Optimalkan pengeluaran iklan dengan mengalokasikan ulang budget ke segmen terbaik dan testing variasi creative baru.' : resultsGrowth < 0 ? 'Hasil menurun. Perlu tindakan segera: refresh creative iklan, tinjau audience targeting, dan pause ad set yang underperform.' : 'Performa stabil. Fokus pada peningkatan bertahap melalui A/B testing dan ekspansi audience bertahap.'}</p>
+        </div>
+
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CTLPTOWA Performance Report</span>
+            <span class="slide-number">Page 4</span>
+        </div>
+    </div>`
+
+  // Generate breakdown slides
+  const ageData = breakdownThisWeek.age || []
+  const genderData = breakdownThisWeek.gender || []
+  const regionData = breakdownThisWeek.region || []
+  const platformData = breakdownThisWeek.platform || []
+  const placementData = breakdownThisWeek.placement || []
+  const objectiveData = breakdownThisWeek.objective || []
+  const creativeData = breakdownThisWeek['ad-creative'] || []
+
+  let slideNumber = 5
+
+  // Age Breakdown Slide
+  if (ageData.length > 0) {
+    html += generateBreakdownSlide(
+      'Audience Performance: Age',
+      ageData,
+      breakdownLastWeek.age || [],
+      'Messaging conversations started',
+      'Age',
+      formatNumber,
+      slideNumber++
+    )
+  }
+
+  // Gender Breakdown Slide
+  if (genderData.length > 0) {
+    html += generateBreakdownSlide(
+      'Audience Performance: Gender',
+      genderData,
+      breakdownLastWeek.gender || [],
+      'Messaging conversations started',
+      'Gender',
+      formatNumber,
+      slideNumber++
+    )
+  }
+
+  // Region Breakdown Slide
+  if (regionData.length > 0) {
+    html += generateBreakdownSlide(
+      'Audience Performance: Region',
+      regionData,
+      breakdownLastWeek.region || [],
+      'Messaging conversations started',
+      'Region',
+      formatNumber,
+      slideNumber++
+    )
+  }
+
+  // Platform Performance Slide
+  if (platformData.length > 0) {
+    html += generateBreakdownSlide(
+      'Platform Performance',
+      platformData,
+      breakdownLastWeek.platform || [],
+      'Messaging conversations started',
+      'Platform',
+      formatNumber,
+      slideNumber++
+    )
+  }
+
+  // Placement Performance Slide
+  if (placementData.length > 0) {
+    html += generateBreakdownSlide(
+      'Placement Performance',
+      placementData,
+      breakdownLastWeek.placement || [],
+      'Messaging conversations started',
+      'Placement',
+      formatNumber,
+      slideNumber++
+    )
+  }
+
+  // Campaign Objective Performance Slide
+  if (objectiveData.length > 0) {
+    const sortedObjectives = [...objectiveData]
+      .filter(item => item['Objective'] || item['objective'] || item['Campaign objective'])
+      .sort((a, b) => {
+        const spendA = a['Amount spent (IDR)'] || a['Amount Spent'] || 0
+        const spendB = b['Amount spent (IDR)'] || b['Amount Spent'] || 0
+        return spendB - spendA
+      })
+      .slice(0, 6)
+
+    const objectiveRows = sortedObjectives.map((item) => {
+      const objective = item['Objective'] || item['objective'] || item['Campaign objective'] || 'Unknown'
+      const results = parseNum(item['Messaging conversations started'] || item['Results'] || 0)
+      const spend = parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0)
+      const impressions = parseNum(item['Impressions'] || 0)
+      const outboundClicks = parseNum(item['Outbound clicks'] || 0)
+      const cpr = results > 0 ? spend / results : 0
+
+      // Format outbound clicks as "Traffic"
+      const formatTraffic = (val: number): string => {
+        if (val === null || val === undefined || isNaN(val)) return '0'
+        return Math.round(val).toLocaleString('id-ID')
+      }
+
+      return `                <tr>
+                    <td><strong>${objective}</strong></td>
+                    <td class="text-right">${formatNumber(results)}</td>
+                    <td class="text-right">${formatCurrency(cpr)}</td>
+                    <td class="text-right">${formatCurrency(spend)}</td>
+                    <td class="text-right">${formatNumber(impressions)}</td>
+                    <td class="text-right">${formatTraffic(outboundClicks)}</td>
+                </tr>`
+    }).join('\n')
+
+    html += `
+    <!-- SLIDE: CAMPAIGN OBJECTIVE PERFORMANCE -->
+    <div class="slide">
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona" class="agency-logo-icon" />
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                <div class="confidential-badge">🔒 Confidential</div>
+            </div>
+        </div>
+
+        <h1>Campaign Objective Performance</h1>
+        <h2>Performance by Campaign Objective</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Objective</th>
+                    <th class="text-right">Results</th>
+                    <th class="text-right">CPR</th>
+                    <th class="text-right">Amount Spent</th>
+                    <th class="text-right">Impressions</th>
+                    <th class="text-right">Traffic</th>
+                </tr>
+            </thead>
+            <tbody>
+${objectiveRows}
+            </tbody>
+        </table>
+
+        <div class="insight-box">
+            <p><strong>Insight Utama:</strong> Top objective <strong>${sortedObjectives[0] ? (sortedObjectives[0]['Objective'] || sortedObjectives[0]['objective'] || 'N/A') : 'N/A'}</strong> menghasilkan ${formatNumber(sortedObjectives[0] ? (sortedObjectives[0]['Checkouts initiated'] || sortedObjectives[0]['Results'] || 0) : 0)} hasil dengan CPR ${formatCurrency(sortedObjectives[0] && sortedObjectives[0]['Checkouts initiated'] > 0 ? (sortedObjectives[0]['Amount spent (IDR)'] || 0) / (sortedObjectives[0]['Checkouts initiated'] || 1) : 0)}.</p>
+        </div>
+
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CTLPTOWA Performance Report</span>
+            <span class="slide-number">Page ${slideNumber++}</span>
+        </div>
+    </div>`
+  }
+
+  // Creative Performance Slide (Top Ads)
+  if (creativeData.length > 0) {
+    const sortedCreative = [...creativeData]
+      .filter(item => item['Ads'] || item['Ad name'] || item['Ad Name'] || item['ad_name'])
+      .sort((a, b) => {
+        const resultA = a['Checkouts initiated'] || 0
+        const resultB = b['Checkouts initiated'] || 0
+        return resultB - resultA
+      })
+      .slice(0, 10)
+
+    const creativeRows = sortedCreative.map((item) => {
+      const adName = item['Ads'] || item['Ad name'] || item['Ad Name'] || item['ad_name'] || 'Unknown'
+      const results = parseNum(item['Checkouts initiated'] || 0)
+      const impressions = parseNum(item['Impressions'] || 0)
+      const ctr = parseNum(item['CTR (link click-through rate)'] || 0)
+      const spend = parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0)
+      const cpr = results > 0 ? spend / results : 0
+
+      return `                <tr>
+                    <td style="font-size: 11px;">${adName.length > 60 ? adName.substring(0, 57) + '...' : adName}</td>
+                    <td class="text-right">${formatNumber(results)}</td>
+                    <td class="text-right">${formatNumber(impressions)}</td>
+                    <td class="text-right">${formatPercent(ctr)}</td>
+                    <td class="text-right">${formatCurrency(spend)}</td>
+                    <td class="text-right">${formatCurrency(cpr)}</td>
+                </tr>`
+    }).join('\n')
+
+    html += `
+    <!-- SLIDE: CREATIVE PERFORMANCE -->
+    <div class="slide">
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona" class="agency-logo-icon" />
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                <div class="confidential-badge">🔒 Confidential</div>
+            </div>
+        </div>
+
+        <h1>Creative Performance</h1>
+        <h2>Top 10 Performing Ad Creatives (Sorted by Checkouts Initiated)</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Ad Name</th>
+                    <th class="text-right">Results</th>
+                    <th class="text-right">Impressions</th>
+                    <th class="text-right">CTR</th>
+                    <th class="text-right">Spend</th>
+                    <th class="text-right">CPR</th>
+                </tr>
+            </thead>
+            <tbody>
+${creativeRows}
+            </tbody>
+        </table>
+
+        <div class="insight-box">
+            <p><strong>Insight Utama:</strong> Top 3 iklan berkontribusi ${Math.round(sortedCreative.slice(0, 3).reduce((sum, item) => sum + (item['Checkouts initiated'] || 0), 0) / Math.max(thisResults, 1) * 100)}% dari total checkouts initiated. Fokuskan budget pada top performers dan lakukan A/B test untuk format creative yang serupa.</p>
+        </div>
+
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CTLPTOWA Performance Report</span>
+            <span class="slide-number">Page ${slideNumber++}</span>
+        </div>
+    </div>`
+  }
+
+  // Conclusion & Action Plan Slide
+  html += `
+    <!-- SLIDE: CONCLUSION & STRATEGIC ACTION PLAN -->
+    <div class="slide">
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona" class="agency-logo-icon" />
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                <div class="confidential-badge">🔒 Confidential</div>
+            </div>
+        </div>
+
+        <h1>Kesimpulan & Rencana Aksi Strategis</h1>
+        <h2>Rekomendasi untuk Periode Berikutnya</h2>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+            <div>
+                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--success-green);">✓ Yang Berfungsi Baik</h3>
+                <div style="background: var(--neutral-50); padding: 20px; border-radius: 12px; border-left: 4px solid var(--success-green);">
+                    <ul style="list-style: none; padding: 0; margin: 0; space-y: 12px;">
+                        <li style="padding: 8px 0; border-bottom: 1px solid var(--neutral-200); font-size: 13px;">
+                            <strong>Efisiensi Spend:</strong> CPR ${cprGrowth <= 0 ? 'meningkat sebesar' : 'sebesar'} ${Math.abs(cprGrowth).toFixed(1)}%
+                        </li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid var(--neutral-200); font-size: 13px;">
+                            <strong>Engagement:</strong> Messaging conversations ${resultsGrowth >= 0 ? 'meningkat' : 'stabil'}
+                        </li>
+                        <li style="padding: 8px 0; font-size: 13px;">
+                            <strong>Platform Terbaik:</strong> ${platformData.length > 0 ? platformData[0].Platform || platformData[0].platform || 'Facebook' : 'Facebook'} memimpin performa
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div>
+                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--warning-amber);">⚡ Item Aksi</h3>
+                <div style="background: var(--neutral-50); padding: 20px; border-radius: 12px; border-left: 4px solid var(--warning-amber);">
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="padding: 8px 0; border-bottom: 1px solid var(--neutral-200); font-size: 13px;">
+                            <strong>1. Optimasi Budget:</strong> Alokasikan 60-70% budget ke 3 iklan dengan performa terbaik
+                        </li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid var(--neutral-200); font-size: 13px;">
+                            <strong>2. Testing Creative:</strong> Tes 3-5 variasi iklan baru berdasarkan top performers
+                        </li>
+                        <li style="padding: 8px 0; font-size: 13px;">
+                            <strong>3. Ekspansi Audience:</strong> Scale audience yang menang ke segmen serupa
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="insight-box">
+            <p><strong>Rekomendasi Strategis:</strong> ${spendGrowth >= 0 && resultsGrowth >= 0 ? 'Lanjutkan scaling dengan strategi saat ini. Pertahankan pembagian 70/30 antara proven winners dan tes baru.' : 'Optimalkan iklan yang underperform. Fokus pada penurunan CPR sambil mempertahankan volume percakapan. Tinjau parameter targeting.'}</p>
+        </div>
+
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CTLPTOWA Performance Report</span>
+            <span class="slide-number">Page ${slideNumber++}</span>
+        </div>
+    </div>
+
+    <!-- SLIDE: THANK YOU -->
+    <div class="slide" style="text-align: center; padding: 120px 64px; background: linear-gradient(135deg, white 0%, var(--neutral-50) 100%);">
+        <div class="agency-logo" style="justify-content: center; margin-bottom: 48px;">
+            <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" class="agency-logo-icon" style="width: 200px;">
+        </div>
+
+        <h1 style="font-size: 64px; margin-bottom: 24px; background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-yellow) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+            Thank You!
+        </h1>
+        <p style="font-size: 20px; color: var(--neutral-600); margin-bottom: 56px; font-weight: 500;">
+            We appreciate your trust in managing your Meta Ads campaigns
+        </p>
+
+        <div style="background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-yellow) 100%);
+                    padding: 40px; border-radius: 20px; color: white; max-width: 640px; margin: 0 auto; box-shadow: 0 8px 24px rgba(43, 70, 187, 0.25);">
+            <p style="font-size: 20px; margin-bottom: 12px; font-weight: 700;">
+                Questions or Feedback?
+            </p>
+            <p style="font-size: 15px; opacity: 0.95; line-height: 1.7;">
+                Contact us anytime for campaign consultation
+            </p>
+            <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.3); font-size: 13px; opacity: 0.9;">
+                © 2026 Hadona Digital Media. All rights reserved.
+            </div>
+        </div>
+    </div>
 </body>
 </html>`
+
+  return html
 }
 
-function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, thisPeriodLabel: string, lastPeriodLabel: string): string {
-  let slides = ''
-
+function generateBreakdownSlide(
+  title: string,
+  thisWeekData: any[],
+  lastWeekData: any[],
+  metricKey: string,
+  labelKey: string,
+  formatFn: (val: number) => string,
+  slideNumber: number
+): string {
   // Parse numbers safely
   const parseNum = (val: any): number => {
     if (typeof val === 'number') return val
@@ -1226,790 +1134,103 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
     return isNaN(parsed) ? 0 : parsed
   }
 
-  // Slide 5: Age Performance
-  const ageThisWeek = breakdown.thisWeek?.age || []
-  const ageLastWeek = breakdown.lastWeek?.age || []
-  
-  if (ageThisWeek.length > 0 || ageLastWeek.length > 0) {
-    // Sort by checkouts initiated (highest first) for CTLP to WA
-    const sortedAge = [...ageThisWeek]
-      .filter((a: any) => a.Age && a.Age.trim())
-      .sort((a: any, b: any) => {
-        const resultA = parseNum(a['Checkouts initiated'] || 0)
-        const resultB = parseNum(b['Checkouts initiated'] || 0)
-        return resultB - resultA
-      })
-      .slice(0, 6)
-    
-    slides += `
-                    {/* SLIDE 5 - AUDIENCE PERFORMANCE: AGE */}
-                    <div className="slide">
-                        {/* Agency Header */}
-                            <div className="agency-header">
-                                <div className="agency-logo">
-                                    <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
-                                    <div>
-                                        <div className="agency-name">Hadona Digital Media</div>
-                                        <div className="agency-tagline">Performance Marketing</div>
-                                    </div>
-                                </div>
-                                <div className="report-meta">
-                                    <div className="report-date">Generated: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
-                                    <div className="confidential-badge">🔒 Confidential</div>
-                                </div>
-                            </div>
-                            <h1>Audience Performance: Age</h2>
-                            <div className="grid grid-cols-2 gap-0">
-                                <div className="border-r-2 border-gray-300 pr-6">
-                                    <h3 className="text-base font-semibold mb-3">Total Result / Checkouts Initiated</h3>
-                                    <div className="space-y-2">
-                                        ${sortedAge.map((item: any) => {
-          const age = item.Age || 'Unknown'
-          const result = parseNum(item['Checkouts initiated'] || 0)
-          return `<div className="flex justify-between items-center">
-                                            <span className="text-xs">${age}</span>
-                                            <span className="font-bold text-xs">{formatNumber(${result})}</span>
-                                        </div>`
-        }).join('')}
-                                    </div>
-                                </div>
-                                <div className="pl-6">
-                                    <h3 className="text-base font-semibold mb-3">Cost per Checkout Initiated</h3>
-                                    <div className="space-y-2">
-                                        ${sortedAge.map((item: any) => {
-          const age = item.Age || 'Unknown'
-          const cpr = parseNum(item['Cost per checkout initiated'] || 0)
-          return `<div className="flex justify-between items-center">
-                                            <span className="text-xs">${age}</span>
-                                            <span className="font-bold text-xs">{formatCurrency(${cpr})}</span>
-                                        </div>`
-        }).join('')}
-                                    </div>
-                                </div>
-                            </div>
-                            <div style={{marginTop: '32px'}} className="space-y-3">
-                                <div className="insight-box">
-                                    <div className="flex items-start">
-                                        <div className="flex-1">
-                                            <p><strong>Kesimpulan:</strong> ${sortedAge.length > 0 ? 'Demografi ' + sortedAge[0].Age + ' menghasilkan ' + sortedAge[0]['Checkouts initiated'] + ' checkouts dengan cost per checkout terendah.' : 'Data age breakdown menunjukkan variasi performa signifikan.'}</p>
-                                            <p className="text-xs mt-1">${sortedAge.length > 0 ? 'Segment ini menjadi pilihan terbaik untuk optimasi budget dan scaling.' : 'Perlu analisis lebih lanjut untuk identifikasi segment terbaik.'}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="insight-box">
-                                    <div className="flex items-start">
-                                                <div className="flex-1">
-                                            <p><strong>Rekomendasi:</strong> ${sortedAge.length > 0 ? 'Alokasikan lebih banyak budget ke demografi ' + sortedAge[0].Age + ' untuk hasil optimal.' : 'Lakukan A/B testing pada berbagai segment age untuk menemukan performa terbaik.'}</p>
-                                            <p className="text-xs mt-1">Pertimbangkan ekspansi ke segment age serupa dengan performa baik untuk meningkatkan reach.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`
+  if (thisWeekData.length === 0 && lastWeekData.length === 0) {
+    return '' // Skip slide if no data
   }
-  
-  // Slide 6: Gender Performance
-  const genderThisWeek = breakdown.thisWeek?.gender || []
-  if (genderThisWeek.length > 0) {
-    // Sort by impressions (highest first)
-    const sortedGender = [...genderThisWeek]
-      .filter((g: any) => g.Gender && g.Gender.trim())
-      .sort((a: any, b: any) => {
-        const impA = parseNum(a.Impressions || 0)
-        const impB = parseNum(b.Impressions || 0)
-        return impB - impA
-      })
-    
-    slides += `
-                    {/* SLIDE 6 - AUDIENCE PERFORMANCE: GENDER */}
-                    <div className="slide">
-                        {/* Agency Header */}
-                            <div className="agency-header">
-                                <div className="agency-logo">
-                                    <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
-                                    <div>
-                                        <div className="agency-name">Hadona Digital Media</div>
-                                        <div className="agency-tagline">Performance Marketing</div>
-                                    </div>
-                                </div>
-                                <div className="report-meta">
-                                    <div className="report-date">Generated: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
-                                    <div className="confidential-badge">🔒 Confidential</div>
-                                </div>
-                            </div>
-                            <h1>Audience Performance: Gender</h2>
-                            <div className="grid grid-cols-3 gap-0">
-                                <div className="border-r-2 border-gray-300 pr-4">
-                                    <h3 className="text-base font-semibold mb-3">Impressions</h3>
-                                    <div className="space-y-2">
-                                        ${sortedGender.map((item: any) => {
-          const gender = item.Gender || 'Unknown'
-          const impressions = parseNum(item.Impressions || 0)
-          return `<div className="flex justify-between items-center">
-                                            <span className="text-xs">${gender}</span>
-                                            <span className="font-bold text-xs">{formatNumber(${impressions})}</span>
-                                        </div>`
-        }).join('')}
-                                    </div>
-                                </div>
-                                <div className="border-r-2 border-gray-300 px-4">
-                                    <h3 className="text-base font-semibold mb-3">Outbound Click</h3>
-                                    <div className="space-y-2">
-                                        ${sortedGender.map((item: any) => {
-          const gender = item.Gender || 'Unknown'
-          const clicks = parseNum(item['Outbound clicks'] || 0)
-          return `<div className="flex justify-between items-center">
-                                            <span className="text-xs">${gender}</span>
-                                            <span className="font-bold text-xs">{formatNumber(${clicks})}</span>
-                                        </div>`
-        }).join('')}
-                                    </div>
-                                </div>
-                                <div className="pl-4">
-                                    <h3 className="text-base font-semibold mb-3">CTR (Link)</h3>
-                                    <div className="space-y-2">
-                                        ${sortedGender.map((item: any) => {
-          const gender = item.Gender || 'Unknown'
-          const ctr = parseNum(item['CTR (link click-through rate)'] || 0)
-          return `<div className="flex justify-between items-center">
-                                            <span className="text-xs">${gender}</span>
-                                            <span className="font-bold text-xs">{formatPercent(${ctr})}</span>
-                                        </div>`
-        }).join('')}
-                                    </div>
-                                </div>
-                            </div>
-                            <div style={{marginTop: '32px'}} className="space-y-3">
-                                <div className="insight-box">
-                                    <div className="flex items-start">
-                                        <i className="fas fa-venus-mars text-blue-500 mr-2 mt-0.5"></i>
-                                        <div className="flex-1">
-                                            <p><strong>Kesimpulan:</strong> ${sortedGender.length > 0 ? sortedGender[0].Gender + ' menghasilkan impressions tertinggi dengan CTR ' + (sortedGender[0]['CTR (link click-through rate)'] || 0).toFixed(2) + '%.' : 'Gender breakdown menunjukkan variasi performa signifikan antar segment.'}</p>
-                                            <p className="text-xs mt-1">${sortedGender.length > 0 ? 'Segment ini menunjukkan engagement lebih tinggi dibanding segment lainnya.' : 'Perlu analisis lebih lanjut untuk identifikasi segment terbaik.'}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="insight-box">
-                                    <div className="flex items-start">
-                                                <div className="flex-1">
-                                            <p><strong>Rekomendasi:</strong> ${sortedGender.length > 0 ? 'Fokus targeting pada segment ' + sortedGender[0].Gender + ' untuk optimasi budget dan hasil maksimal.' : 'Lakukan testing pada berbagai segment gender untuk menemukan performa terbaik.'}</p>
-                                            <p className="text-xs mt-1">Pertimbangkan ekspansi ke segment gender lain dengan performa baik untuk diversifikasi audience.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`
-  }
-  
-  // Slide 7: Region Performance
-  const regionThisWeek = breakdown.thisWeek?.region || []
-  if (regionThisWeek.length > 0) {
-    // Sort by impressions (highest first)
-    const sortedRegion = [...regionThisWeek]
-      .filter((r: any) => r.Region && r.Region.trim())
-      .sort((a: any, b: any) => {
-        const impA = parseNum(a.Impressions || 0)
-        const impB = parseNum(b.Impressions || 0)
-        return impB - impA
-      })
-      .slice(0, 5)
-    
-    slides += `
-                    {/* SLIDE 7 - AUDIENCE PERFORMANCE: REGION */}
-                    <div className="slide">
-                        {/* Agency Header */}
-                            <div className="agency-header">
-                                <div className="agency-logo">
-                                    <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
-                                    <div>
-                                        <div className="agency-name">Hadona Digital Media</div>
-                                        <div className="agency-tagline">Performance Marketing</div>
-                                    </div>
-                                </div>
-                                <div className="report-meta">
-                                    <div className="report-date">Generated: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
-                                    <div className="confidential-badge">🔒 Confidential</div>
-                                </div>
-                            </div>
-                            <h1>Audience Performance: Region</h2>
-                            <div className="grid grid-cols-3 gap-0">
-                                <div className="border-r-2 border-gray-300 pr-4">
-                                    <h3 className="text-base font-semibold mb-3">Impressions</h3>
-                                    <div className="space-y-2">
-                                        ${sortedRegion.map((item: any) => {
-          const region = item.Region || 'Unknown'
-          const impressions = parseNum(item.Impressions || 0)
-          return `<div className="flex justify-between items-center">
-                                            <span className="text-xs">${region}</span>
-                                            <span className="font-bold text-xs">{formatNumber(${impressions})}</span>
-                                        </div>`
-        }).join('')}
-                                    </div>
-                                </div>
-                                <div className="border-r-2 border-gray-300 px-4">
-                                    <h3 className="text-base font-semibold mb-3">Link Click</h3>
-                                    <div className="space-y-2">
-                                        ${sortedRegion.map((item: any) => {
-          const region = item.Region || 'Unknown'
-          const clicks = parseNum(item['Outbound clicks'] || 0)
-          return `<div className="flex justify-between items-center">
-                                            <span className="text-xs">${region}</span>
-                                            <span className="font-bold text-xs">{formatNumber(${clicks})}</span>
-                                        </div>`
-        }).join('')}
-                                    </div>
-                                </div>
-                                <div className="pl-4">
-                                    <h3 className="text-base font-semibold mb-3">CTR (Link)</h3>
-                                    <div className="space-y-2">
-                                        ${sortedRegion.map((item: any) => {
-          const region = item.Region || 'Unknown'
-          const ctr = parseNum(item['CTR (link click-through rate)'] || 0)
-          return `<div className="flex justify-between items-center">
-                                            <span className="text-xs">${region}</span>
-                                            <span className="font-bold text-xs">{formatPercent(${ctr})}</span>
-                                        </div>`
-        }).join('')}
-                                    </div>
-                                </div>
-                            </div>
-                            <div style={{marginTop: '32px'}} className="space-y-3">
-                                <div className="insight-box">
-                                    <div className="flex items-start">
-                                        <i className="fas fa-map-marker-alt text-blue-500 mr-2 mt-0.5"></i>
-                                        <div className="flex-1">
-                                            <p><strong>Kesimpulan:</strong> ${sortedRegion.length > 0 ? sortedRegion[0].Region + ' menghasilkan impressions tertinggi dengan CTR ' + (sortedRegion[0]['CTR (link click-through rate)'] || 0).toFixed(2) + '%.' : 'Region breakdown menunjukkan variasi performa signifikan antar lokasi.'}</p>
-                                            <p className="text-xs mt-1">${sortedRegion.length > 0 ? 'Region ini menjadi pilihan terbaik untuk fokus targeting dan optimasi budget.' : 'Perlu analisis lebih lanjut untuk identifikasi region terbaik.'}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="insight-box">
-                                    <div className="flex items-start">
-                                                <div className="flex-1">
-                                            <p><strong>Rekomendasi:</strong> ${sortedRegion.length > 0 ? 'Alokasikan lebih banyak budget ke region ' + sortedRegion[0].Region + ' untuk hasil optimal.' : 'Lakukan testing pada berbagai region untuk menemukan performa terbaik.'}</p>
-                                            <p className="text-xs mt-1">Pertimbangkan ekspansi ke region serupa dengan performa baik untuk meningkatkan reach dan diversifikasi.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`
-  }
-  
-  // Slide 8: Platform Performance
-  const platformThisWeek = breakdown.thisWeek?.platform || []
-  if (platformThisWeek.length > 0) {
-    // Sort by checkouts initiated (highest first) for CTLP to WA
-    const sortedPlatform = [...platformThisWeek]
-      .filter((p: any) => p.Platform && p.Platform.trim())
-      .sort((a: any, b: any) => {
-        const convA = parseNum(a['Checkouts initiated'] || 0)
-        const convB = parseNum(b['Checkouts initiated'] || 0)
-        return convB - convA
-      })
-    
-    slides += `
-                    {/* SLIDE 8 - PLATFORM PERFORMANCE */}
-                    <div className="slide">
-                        {/* Agency Header */}
-                            <div className="agency-header">
-                                <div className="agency-logo">
-                                    <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
-                                    <div>
-                                        <div className="agency-name">Hadona Digital Media</div>
-                                        <div className="agency-tagline">Performance Marketing</div>
-                                    </div>
-                                </div>
-                                <div className="report-meta">
-                                    <div className="report-date">Generated: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
-                                    <div className="confidential-badge">🔒 Confidential</div>
-                                </div>
-                            </div>
-                            <h1>Platform Performance</h2>
-                            <div className="grid grid-cols-3 gap-0">
-                                <div className="border-r-2 border-gray-300 pr-4">
-                                    <h3 className="text-base font-semibold mb-3">Checkouts Initiated</h3>
-                                    <div className="space-y-2">
-                                        ${sortedPlatform.map((item: any) => {
-          const platform = item.Platform || 'Unknown'
-          const conv = parseNum(item['Checkouts initiated'] || 0)
-          return `<div className="flex justify-between items-center">
-                                            <span className="text-xs">${platform}</span>
-                                            <span className="font-bold text-xs">{formatNumber(${conv})}</span>
-                                        </div>`
-        }).join('')}
-                                    </div>
-                                </div>
-                                <div className="border-r-2 border-gray-300 px-4">
-                                    <h3 className="text-base font-semibold mb-3">Impressions</h3>
-                                    <div className="space-y-2">
-                                        ${sortedPlatform.map((item: any) => {
-          const platform = item.Platform || 'Unknown'
-          const impressions = parseNum(item.Impressions || 0)
-          return `<div className="flex justify-between items-center">
-                                            <span className="text-xs">${platform}</span>
-                                            <span className="font-bold text-xs">{formatNumber(${impressions})}</span>
-                                        </div>`
-        }).join('')}
-                                    </div>
-                                </div>
-                                <div className="pl-4">
-                                    <h3 className="text-base font-semibold mb-3">CTR (Link)</h3>
-                                    <div className="space-y-2">
-                                        ${sortedPlatform.map((item: any) => {
-          const platform = item.Platform || 'Unknown'
-          const ctr = parseNum(item['CTR (link click-through rate)'] || 0)
-          return `<div className="flex justify-between items-center">
-                                            <span className="text-xs">${platform}</span>
-                                            <span className="font-bold text-xs">{formatPercent(${ctr})}</span>
-                                        </div>`
-        }).join('')}
-                                    </div>
-                                </div>
-                            </div>
-                            <div style={{marginTop: '32px'}} className="space-y-3">
-                                <div className="insight-box">
-                                    <div className="flex items-start">
-                                        <i className="fab fa-instagram text-purple-500 mr-2 mt-0.5"></i>
-                                        <div className="flex-1">
-                                            <p><strong>Kesimpulan:</strong> ${sortedPlatform.length > 0 ? sortedPlatform[0].Platform + ' menghasilkan checkouts tertinggi dengan CTR ' + (sortedPlatform[0]['CTR (link click-through rate)'] || 0).toFixed(2) + '%.' : 'Platform breakdown menunjukkan variasi performa signifikan antar platform.'}</p>
-                                            <p className="text-xs mt-1">${sortedPlatform.length > 0 ? 'Platform ini menjadi pilihan terbaik untuk optimasi budget dan scaling campaign.' : 'Perlu analisis lebih lanjut untuk identifikasi platform terbaik.'}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="insight-box">
-                                    <div className="flex items-start">
-                                                <div className="flex-1">
-                                            <p><strong>Rekomendasi:</strong> ${sortedPlatform.length > 0 ? 'Alokasikan lebih banyak budget ke platform ' + sortedPlatform[0].Platform + ' untuk hasil maksimal.' : 'Lakukan testing pada berbagai platform untuk menemukan performa terbaik.'}</p>
-                                            <p className="text-xs mt-1">Pertimbangkan ekspansi ke platform lain dengan performa baik untuk diversifikasi dan meningkatkan reach.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`
-  }
-  
-  // Slide 9: Placement Performance
-  const placementThisWeek = breakdown.thisWeek?.placement || []
-  if (placementThisWeek.length > 0) {
-    // Sort by checkouts initiated (highest first) for CTLP to WA
-    const sortedPlacement = [...placementThisWeek]
-      .filter((p: any) => p.Placement && p.Placement.trim())
-      .sort((a: any, b: any) => {
-        const resultA = parseNum(a['Checkouts initiated'] || 0)
-        const resultB = parseNum(b['Checkouts initiated'] || 0)
-        return resultB - resultA
-      })
-      .slice(0, 5)
-    
-    slides += `
-                    {/* SLIDE 9 - CONTENT PERFORMANCE: PLACEMENT */}
-                    <div className="slide">
-                        {/* Agency Header */}
-                            <div className="agency-header">
-                                <div className="agency-logo">
-                                    <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
-                                    <div>
-                                        <div className="agency-name">Hadona Digital Media</div>
-                                        <div className="agency-tagline">Performance Marketing</div>
-                                    </div>
-                                </div>
-                                <div className="report-meta">
-                                    <div className="report-date">Generated: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
-                                    <div className="confidential-badge">🔒 Confidential</div>
-                                </div>
-                            </div>
-                            <h1>Content Performance: Placement</h2>
-                            <div className="grid grid-cols-3 gap-0">
-                                <div className="border-r-2 border-gray-300 pr-4">
-                                    <h3 className="text-base font-semibold mb-3">Total Result / Checkouts Initiated</h3>
-                                    <div className="space-y-2">
-                                        ${sortedPlacement.map((item: any) => {
-          const placement = item.Placement || 'Unknown'
-          const result = parseNum(item['Checkouts initiated'] || 0)
-          return `<div className="flex justify-between items-center">
-                                            <span className="text-xs">${placement}</span>
-                                            <span className="font-bold text-xs">{formatNumber(${result})}</span>
-                                        </div>`
-        }).join('')}
-                                    </div>
-                                </div>
-                                <div className="border-r-2 border-gray-300 px-4">
-                                    <h3 className="text-base font-semibold mb-3">Impressions</h3>
-                                    <div className="space-y-2">
-                                        ${sortedPlacement.map((item: any) => {
-          const placement = item.Placement || 'Unknown'
-          const impressions = parseNum(item.Impressions || 0)
-          return `<div className="flex justify-between items-center">
-                                            <span className="text-xs">${placement}</span>
-                                            <span className="font-bold text-xs">{formatNumber(${impressions})}</span>
-                                        </div>`
-        }).join('')}
-                                    </div>
-                                </div>
-                                <div className="pl-4">
-                                    <h3 className="text-base font-semibold mb-3">CTR (Link)</h3>
-                                    <div className="space-y-2">
-                                        ${sortedPlacement.map((item: any) => {
-          const placement = item.Placement || 'Unknown'
-          const ctr = parseNum(item['CTR (link click-through rate)'] || 0)
-          return `<div className="flex justify-between items-center">
-                                            <span className="text-xs">${placement}</span>
-                                            <span className="font-bold text-xs">{formatPercent(${ctr})}</span>
-                                        </div>`
-        }).join('')}
-                                    </div>
-                                </div>
-                            </div>
-                            <div style={{marginTop: '32px'}} className="space-y-3">
-                                <div className="insight-box">
-                                    <div className="flex items-start">
-                                        <i className="fas fa-photo-video text-blue-500 mr-2 mt-0.5"></i>
-                                        <div className="flex-1">
-                                            <p><strong>Kesimpulan:</strong> ${sortedPlacement.length > 0 ? sortedPlacement[0].Placement + ' menghasilkan checkouts tertinggi dengan CTR ' + (sortedPlacement[0]['CTR (link click-through rate)'] || 0).toFixed(2) + '%.' : 'Placement breakdown menunjukkan variasi performa signifikan antar format.'}</p>
-                                            <p className="text-xs mt-1">${sortedPlacement.length > 0 ? 'Format konten ini menjadi pilihan terbaik untuk optimasi dan scaling.' : 'Perlu analisis lebih lanjut untuk identifikasi format terbaik.'}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="insight-box">
-                                    <div className="flex items-start">
-                                                <div className="flex-1">
-                                            <p><strong>Rekomendasi:</strong> ${sortedPlacement.length > 0 ? 'Buat lebih banyak konten dengan format ' + sortedPlacement[0].Placement + ' untuk hasil optimal.' : 'Lakukan testing pada berbagai format placement untuk menemukan performa terbaik.'}</p>
-                                            <p className="text-xs mt-1">Pertimbangkan ekspansi ke format placement lain dengan performa baik untuk diversifikasi konten.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`
-  }
-  
-  // Slide 10: Creative Performance
-  const creativeThisWeek = breakdown.thisWeek?.['ad-creative'] || []
-  if (creativeThisWeek.length > 0) {
-    // Get top 5 performers based on: Checkouts Initiated + Instagram Visits + Followers for CTLP to WA
-    const sortedCreative = [...creativeThisWeek]
-      .filter((c: any) => {
-        const checkouts = parseNum(c['Checkouts initiated'] || 0)
-        const instagramVisits = parseNum(c['Instagram profile visits'] || 0)
-        const instagramFollows = parseNum(c['Instagram follows'] || 0)
-        // Filter ads that have at least one of these metrics > 0
-        return checkouts > 0 || instagramVisits > 0 || instagramFollows > 0
-      })
-      .map((item: any) => {
-        const checkouts = parseNum(item['Checkouts initiated'] || 0)
-        const instagramVisits = parseNum(item['Instagram profile visits'] || 0)
-        const instagramFollows = parseNum(item['Instagram follows'] || 0)
-        // Calculate combined score (weighted)
-        const combinedScore = (checkouts * 3) + (instagramVisits * 1) + (instagramFollows * 2)
-        return { ...item, _combinedScore: combinedScore }
-      })
-      .sort((a: any, b: any) => b._combinedScore - a._combinedScore)
-      .slice(0, 5)
-    
-    slides += `
-                    {/* SLIDE 10 - CREATIVE PERFORMANCE: AD ANALYSIS */}
-                    <div className="slide">
-                        {/* Agency Header */}
-                            <div className="agency-header">
-                                <div className="agency-logo">
-                                    <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
-                                    <div>
-                                        <div className="agency-name">Hadona Digital Media</div>
-                                        <div className="agency-tagline">Performance Marketing</div>
-                                    </div>
-                                </div>
-                                <div className="report-meta">
-                                    <div className="report-date">Generated: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
-                                    <div className="confidential-badge">🔒 Confidential</div>
-                                </div>
-                            </div>
-                            <h1>Creative Performance: Ad Analysis</h2>
-                            <div className="mb-3">
-                                <p className="text-xs text-gray-600">
-                                    <i className="fas fa-info-circle text-blue-500 mr-2"></i>
-                                    Top 5 Iklan berdasarkan kombinasi: Checkouts Initiated, Instagram Profile Visits, dan Instagram Follows
-                                </p>
-                            </div>
-                            <div className="space-y-4">
-                                ${sortedCreative.map((item: any, index: number) => {
-          const adNameRaw = item['Ads'] || item['Ad name'] || item['Ad Name'] || item['Campaign name'] || item['Campaign Name'] || item['Ad'] || item['Creative'] || item['Ad creative'] || (item['Campaign'] && item['Ad set'] ? item['Campaign'] + ' - ' + item['Ad set'] : null) || Object.values(item).find((v: any) => typeof v === 'string' && v.length > 0 && !v.match(/^[0-9.,]+$/)) || 'N/A'
-          
-          // Parse ad names - split by semicolon and clean up
-          let adNamesList: string[] = []
-          if (adNameRaw && typeof adNameRaw === 'string') {
-            // Split by semicolon
-            adNamesList = adNameRaw.split(';').map((name: string) => name.trim()).filter((name: string) => name.length > 0)
-            // Remove "...and X more ads" pattern
-            adNamesList = adNamesList.map((name: string) => name.replace(/\.\.\.and \d+ more ads?/i, '').trim()).filter((name: string) => name.length > 0)
-            // If still empty or only one item, use original
-            if (adNamesList.length === 0) {
-              adNamesList = [adNameRaw]
-            }
-          } else {
-            adNamesList = [String(adNameRaw || 'N/A')]
-          }
-          
-          // Take first 3 ad names for display
-          const displayAdNames = adNamesList.slice(0, 3)
-          const hasMore = adNamesList.length > 3
 
-          const checkouts = parseNum(item['Checkouts initiated'] || 0)
-          const instagramVisits = parseNum(item['Instagram profile visits'] || 0)
-          const instagramFollows = parseNum(item['Instagram follows'] || 0)
-          const cpr = parseNum(item['Cost per checkout initiated'] || 0)
-          const ctr = parseNum(item['CTR (link click-through rate)'] || 0)
-          const impressions = parseNum(item['Impressions'] || 0)
-          const outboundClicks = parseNum(item['Outbound clicks'] || 0)
+  const sortedData = [...thisWeekData]
+    .filter(item => item[labelKey] && item[labelKey].trim())
+    .sort((a, b) => {
+      const resultA = parseNum(a[metricKey] || 0)
+      const resultB = parseNum(b[metricKey] || 0)
+      return resultB - resultA
+    })
+    .slice(0, 6)
 
-          return `<div className="border-2 ${index === 0 ? 'border-yellow-400 bg-yellow-50' : index === 1 ? 'border-green-300 bg-green-50' : index === 2 ? 'border-blue-300 bg-blue-50' : 'border-gray-200 bg-gray-50'} p-3 rounded-lg">
-                                            <div className="mb-3">
-                                                <div className="flex items-center gap-2 mb-2">
-                                                    <span className="text-base font-bold ${index === 0 ? 'text-yellow-600' : index === 1 ? 'text-green-600' : index === 2 ? 'text-blue-600' : 'text-gray-600'}">#${index + 1}</span>
-                                                    <h4 className="font-semibold text-xs text-gray-800">Daftar Nama Ads:</h4>
-                                                </div>
-                                                <div className="bg-white p-2 rounded border border-gray-200">
-                                                    <ul className="space-y-1">
-                                                        ${displayAdNames.map((name: string) => {
-            const cleanName = name.length > 70 ? name.substring(0, 67) + '...' : name
-            return `<li className="text-xs text-gray-700 flex items-start">
-                                                            <span className="text-gray-400 mr-2">•</span>
-                                                            <span>${cleanName}</span>
-                                                        </li>`
-          }).join('')}
-                                                        ${hasMore ? `<li className="text-xs text-gray-500 italic flex items-start">
-                                                            <span className="text-gray-400 mr-2">•</span>
-                                                            <span>...dan ${adNamesList.length - 3} ads lainnya</span>
-                                                        </li>` : ''}
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                            <div className="grid grid-cols-3 gap-3 mt-3">
-                                                <div className="bg-white p-3 rounded border">
-                                                    <div className="text-xs text-gray-600 mb-1">Checkouts Initiated</div>
-                                                    <div className="text-sm font-bold text-green-600">{formatNumber(${checkouts})}</div>
-                                                </div>
-                                                <div className="bg-white p-3 rounded border">
-                                                    <div className="text-xs text-gray-600 mb-1">Instagram Visits</div>
-                                                    <div className="text-sm font-bold text-purple-600">{formatNumber(${instagramVisits})}</div>
-                                                </div>
-                                                <div className="bg-white p-3 rounded border">
-                                                    <div className="text-xs text-gray-600 mb-1">Instagram Follows</div>
-                                                    <div className="text-sm font-bold text-pink-600">{formatNumber(${instagramFollows})}</div>
-                                                </div>
-                                            </div>
-                                            <div className="grid grid-cols-4 gap-3 mt-3 pt-3 border-t">
-                                                <div>
-                                                    <div className="text-xs text-gray-600">Cost per Checkout</div>
-                                                    <div className="text-sm font-semibold">{formatCurrency(${cpr})}</div>
-                                                </div>
-                                                <div>
-                                                    <div className="text-xs text-gray-600">CTR</div>
-                                                    <div className="text-sm font-semibold">{formatPercent(${ctr})}</div>
-                                                </div>
-                                                <div>
-                                                    <div className="text-xs text-gray-600">Impressions</div>
-                                                    <div className="text-sm font-semibold">{formatNumber(${impressions})}</div>
-                                                </div>
-                                                <div>
-                                                    <div className="text-xs text-gray-600">Outbound Clicks</div>
-                                                    <div className="text-sm font-semibold">{formatNumber(${outboundClicks})}</div>
-                                                </div>
-                                            </div>
-                                        </div>`
-        }).join('')}
-                            </div>
-                            <div className="mt-4 space-y-2">
-                                <div className="p-3 bg-yellow-50 rounded-lg">
-                                    <div className="flex items-start">
-                                        <div className="flex-1">
-                                            <p><strong>Kesimpulan:</strong> ${sortedCreative.length > 0 ? 'Top iklan menghasilkan ' + sortedCreative[0]['Checkouts initiated'] + ' checkouts dengan ' + sortedCreative[0]['Instagram profile visits'] + ' Instagram visits.' : 'Creative breakdown menunjukkan variasi performa signifikan antar iklan.'}</p>
-                                            <p className="text-xs mt-1">${sortedCreative.length > 0 ? 'Format dan strategi ini menunjukkan performa terbaik untuk scaling campaign.' : 'Perlu analisis lebih lanjut untuk identifikasi format creative terbaik.'}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="insight-box">
-                                    <div className="flex items-start">
-                                                <div className="flex-1">
-                                            <p><strong>Rekomendasi:</strong> ${sortedCreative.length > 0 ? 'Buat lebih banyak creative dengan format dan strategi serupa untuk hasil maksimal.' : 'Lakukan A/B testing pada berbagai format creative untuk menemukan performa terbaik.'}</p>
-                                            <p className="text-xs mt-1">Pertimbangkan variasi creative dengan elemen yang terbukti efektif untuk meningkatkan engagement dan conversion.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`
-  }
-  
-  // Slide 11: Campaign Objective Performance
-  const objectiveThisWeek = breakdown.thisWeek?.objective || []
-  if (objectiveThisWeek.length > 0) {
-    // Sort by checkouts initiated (highest first) for CTLP to WA
-    const sortedObjective = [...objectiveThisWeek]
-      .filter((o: any) => o['Campaign objective'] && o['Campaign objective'].trim())
-      .sort((a: any, b: any) => {
-        const convA = parseNum(a['Checkouts initiated'] || 0)
-        const convB = parseNum(b['Checkouts initiated'] || 0)
-        return convB - convA
-      })
-      .slice(0, 4)
-    
-    slides += `
-                    {/* SLIDE 11 - CAMPAIGN OBJECTIVE PERFORMANCE */}
-                    <div className="slide">
-                        {/* Agency Header */}
-                            <div className="agency-header">
-                                <div className="agency-logo">
-                                    <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
-                                    <div>
-                                        <div className="agency-name">Hadona Digital Media</div>
-                                        <div className="agency-tagline">Performance Marketing</div>
-                                    </div>
-                                </div>
-                                <div className="report-meta">
-                                    <div className="report-date">Generated: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
-                                    <div className="confidential-badge">🔒 Confidential</div>
-                                </div>
-                            </div>
-                            <h1>Campaign Objective Performance</h2>
-                            <div className="grid grid-cols-4 gap-3">
-                                ${sortedObjective.map((item: any) => {
-          const objective = item['Campaign objective'] || 'Unknown'
-          const conv = parseNum(item['Checkouts initiated'] || 0)
-          const impressions = parseNum(item.Impressions || 0)
-          const clicks = parseNum(item['Outbound clicks'] || 0)
-          const ctr = parseNum(item['CTR (link click-through rate)'] || 0)
-          return `<div>
-                                            <h3 className="text-base font-semibold mb-3">${objective}</h3>
-                                            <div className="space-y-2">
-                                                <div className="flex justify-between">
-                                                    <span>Checkouts Initiated</span>
-                                                    <span className="font-bold">{formatNumber(${conv})}</span>
-                                                </div>
-                                                <div className="flex justify-between">
-                                                    <span>Impressions</span>
-                                                    <span className="font-bold">{formatNumber(${impressions})}</span>
-                                                </div>
-                                                <div className="flex justify-between">
-                                                    <span>Outbound Click</span>
-                                                    <span className="font-bold">{formatNumber(${clicks})}</span>
-                                                </div>
-                                                <div className="flex justify-between">
-                                                    <span>CTR</span>
-                                                    <span className="font-bold">{formatPercent(${ctr})}</span>
-                                                </div>
-                                            </div>
-                                        </div>`
-        }).join('')}
-                            </div>
-                            <div style={{marginTop: '32px'}} className="space-y-3">
-                                <div className="insight-box">
-                                    <div className="flex items-start">
-                                        <div className="flex-1">
-                                            <p><strong>Kesimpulan:</strong> ${sortedObjective.length > 0 ? sortedObjective[0]['Campaign objective'] + ' menghasilkan checkouts tertinggi dengan CTR ' + (sortedObjective[0]['CTR (link click-through rate)'] || 0).toFixed(2) + '%.' : 'Objective breakdown menunjukkan variasi performa signifikan antar objective.'}</p>
-                                            <p className="text-xs mt-1">${sortedObjective.length > 0 ? 'Objective ini menjadi pilihan terbaik untuk optimasi dan scaling campaign.' : 'Perlu analisis lebih lanjut untuk identifikasi objective terbaik.'}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="insight-box">
-                                    <div className="flex items-start">
-                                                <div className="flex-1">
-                                            <p><strong>Rekomendasi:</strong> ${sortedObjective.length > 0 ? 'Fokus pada objective ' + sortedObjective[0]['Campaign objective'] + ' untuk hasil optimal dan scaling.' : 'Lakukan testing pada berbagai objective untuk menemukan performa terbaik.'}</p>
-                                            <p className="text-xs mt-1">Pertimbangkan kombinasi objective dengan performa baik untuk diversifikasi strategi campaign.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`
-  }
-  
-  // Slide 12: Overall Conclusion & Strategic Action Plan
-  slides += `
-                    {/* SLIDE 12 - OVERALL CONCLUSION & STRATEGIC ACTION PLAN */}
-                    <div className="slide">
-                        {/* Agency Header */}
-                            <div className="agency-header">
-                                <div className="agency-logo">
-                                    <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" className="agency-logo-icon" />
-                                    <div>
-                                        <div className="agency-name">Hadona Digital Media</div>
-                                        <div className="agency-tagline">Performance Marketing</div>
-                                    </div>
-                                </div>
-                                <div className="report-meta">
-                                    <div className="report-date">Generated: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
-                                    <div className="confidential-badge">🔒 Confidential</div>
-                                </div>
-                            </div>
-                            <h1>Overall Conclusion & Strategic Action Plan</h2>
-                            <div className="grid grid-cols-2 gap-0">
-                                <div className="border-r-2 border-gray-300 pr-6">
-                                    <h3 className="text-base font-semibold mb-3">Ringkasan Performa</h3>
-                                    <ul className="space-y-2 text-sm">
-                                        <li className="flex items-start">
-                                            <i className="fas fa-check-circle text-green-500 mt-1 mr-2 text-xs"></i>
-                                            <span className="text-xs"><strong>Performa {thisPeriodLabel}:</strong> {thisWeek.amountSpent >= lastWeek.amountSpent ? 'Meningkat' : 'Menurun'} {Math.abs(((thisWeek.amountSpent || 0) - (lastWeek.amountSpent || 0)) / (lastWeek.amountSpent || 1) * 100).toFixed(1)}% dengan spend {thisWeek.cpr <= lastWeek.cpr ? 'lebih efisien' : 'kurang efisien'}</span>
-                                        </li>
-                                        <li className="flex items-start">
-                                            <i className="fas fa-check-circle text-green-500 mt-1 mr-2 text-xs"></i>
-                                            <span className="text-xs"><strong>Platform Terbaik:</strong> ${platformThisWeek.length > 0 ? platformThisWeek[0]?.Platform || 'Platform tertentu' : 'Platform tertentu'} memberikan hasil terbaik</span>
-                                        </li>
-                                        <li className="flex items-start">
-                                            <i className="fas fa-check-circle text-green-500 mt-1 mr-2 text-xs"></i>
-                                            <span className="text-xs"><strong>Demografi Terbaik:</strong> ${ageThisWeek.length > 0 ? ageThisWeek.find((a: any) => a.Age && a.Age.trim())?.Age || '25-34 tahun' : '25-34 tahun'} dengan cost per result terendah</span>
-                                        </li>
-                                        <li className="flex items-start">
-                                            <i className="fas fa-check-circle text-green-500 mt-1 mr-2 text-xs"></i>
-                                            <span className="text-xs"><strong>Content Terbaik:</strong> ${placementThisWeek.length > 0 ? placementThisWeek[0]?.Placement || 'Format tertentu' : 'Format tertentu'} memberikan hasil terbaik</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div className="pl-6">
-                                    <h3 className="text-base font-semibold mb-3">Rencana Aksi Strategis</h3>
-                                    <ul className="space-y-2 text-sm">
-                                        <li className="flex items-start">
-                                            <i className="fas fa-arrow-right text-blue-500 mt-1 mr-2 text-xs"></i>
-                                            <span className="text-xs"><strong>Optimasi Budget:</strong> Alokasikan lebih banyak budget ke platform dan placement yang memberikan hasil terbaik</span>
-                                        </li>
-                                        <li className="flex items-start">
-                                            <i className="fas fa-arrow-right text-blue-500 mt-1 mr-2 text-xs"></i>
-                                            <span className="text-xs"><strong>TARGETING:</strong> Fokus pada demografi yang memberikan cost per result terendah</span>
-                                        </li>
-                                        <li className="flex items-start">
-                                            <i className="fas fa-arrow-right text-blue-500 mt-1 mr-2 text-xs"></i>
-                                            <span className="text-xs"><strong>Creative:</strong> Buat lebih banyak konten dengan format yang terbukti efektif</span>
-                                        </li>
-                                        <li className="flex items-start">
-                                            <i className="fas fa-arrow-right text-blue-500 mt-1 mr-2 text-xs"></i>
-                                            <span className="text-xs"><strong>Testing:</strong> A/B test berbagai creative untuk meningkatkan CTR dan menurunkan CPR</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div style={{marginTop: '32px'}} className="space-y-3">
-                                <div className="insight-box">
-                                    <div className="flex items-start">
-                                                <div className="flex-1">
-                                            <p><strong>Kesimpulan:</strong> ${thisWeek.amountSpent >= lastWeek.amountSpent ? 'Peningkatan' : 'Penurunan'} performa ${Math.abs(((thisWeek.amountSpent || 0) - (lastWeek.amountSpent || 0)) / (lastWeek.amountSpent || 1) * 100).toFixed(1)}% dengan ${platformThisWeek.length > 0 ? platformThisWeek[0]?.Platform : 'platform'} dan ${ageThisWeek.length > 0 ? ageThisWeek.find((a: any) => a.Age && a.Age.trim())?.Age : 'demografi'} sebagai driver utama.</p>
-                                            <p className="text-xs mt-1">Perlu optimasi budget dan targeting untuk scaling dan growth berkelanjutan.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="insight-box">
-                                    <div className="flex items-start">
-                                                <div className="flex-1">
-                                            <p><strong>Rekomendasi:</strong> Alokasikan budget ke performa terbaik dan fokus targeting pada demografi dengan cost per result terendah.</p>
-                                            <p className="text-xs mt-1">Lakukan A/B testing creative dan ekspansi ke segment serupa untuk meningkatkan reach dan diversifikasi.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`
-  
-  return slides
+  // Calculate insights
+  const topPerformer = sortedData[0]
+  const topPerformerName = topPerformer ? topPerformer[labelKey] : 'N/A'
+  const topPerformerValue = topPerformer ? parseNum(topPerformer[metricKey] || 0) : 0
+  const totalValue = sortedData.reduce((sum, item) => sum + parseNum(item[metricKey] || 0), 0)
+  const topPerformerPercentage = totalValue > 0 ? ((topPerformerValue / totalValue) * 100).toFixed(1) : '0'
+
+  // Calculate average CTR
+  const avgCTR = sortedData.reduce((sum, item) => {
+    const ctr = parseNum(item['CTR (link click-through rate)'] || 0)
+    return sum + ctr
+  }, 0) / Math.max(sortedData.length, 1)
+
+  const tableRows = sortedData.map(item => {
+    const label = item[labelKey] || 'Unknown'
+    const value = item[metricKey] || 0
+    const formattedValue = formatFn(value)
+
+    // Extract additional metrics
+    const impressions = parseNum(item['Impressions'] || 0)
+    const linkClicks = parseNum(item['Outbound clicks'] || 0)
+    const ctrLinkClick = parseNum(item['CTR (link click-through rate)'] || 0)
+
+    // Format additional metrics
+    const formatNum = (val: number): string => {
+      if (val === null || val === undefined || isNaN(val)) return '0'
+      return Math.round(val).toLocaleString('id-ID')
+    }
+    const formatPercentVal = (val: number): string => {
+      if (val === null || val === undefined || isNaN(val)) return '0%'
+      return val.toFixed(2) + '%'
+    }
+
+    return `                <tr>
+                    <td><strong>${label}</strong></td>
+                    <td class="text-right">${formattedValue}</td>
+                    <td class="text-right">${formatNum(impressions)}</td>
+                    <td class="text-right">${formatNum(linkClicks)}</td>
+                    <td class="text-right">${formatPercentVal(ctrLinkClick)}</td>
+                </tr>`
+  }).join('\n')
+
+  return `
+    <!-- SLIDE: ${title} -->
+    <div class="slide">
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona" class="agency-logo-icon" />
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                <div class="confidential-badge">🔒 Confidential</div>
+            </div>
+        </div>
+
+        <h1>${title}</h1>
+        <h2>Performance by ${title.split(':').pop()}</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>${labelKey}</th>
+                    <th class="text-right">Checkouts Initiated</th>
+                    <th class="text-right">Impressions</th>
+                    <th class="text-right">Link Click</th>
+                    <th class="text-right">CTR Link Click</th>
+                </tr>
+            </thead>
+            <tbody>
+${tableRows}
+            </tbody>
+        </table>
+
+        <div class="insight-box">
+            <p><strong>Insight Utama:</strong> Top performer <strong>${topPerformerName}</strong> berkontribusi <strong>${topPerformerPercentage}%</strong> dari total checkouts initiated dengan ${formatFn(topPerformerValue)} hasil. Rata-rata CTR di semua segmen adalah <strong>${avgCTR.toFixed(2)}%</strong>, menunjukkan tingkat engagement ${avgCTR > 0.5 ? 'kuat' : avgCTR > 0.3 ? 'sedang' : 'rendah'}.</p>
+        </div>
+
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CTLPTOWA Performance Report</span>
+            <span class="slide-number">Page ${slideNumber}</span>
+        </div>
+    </div>`
 }
