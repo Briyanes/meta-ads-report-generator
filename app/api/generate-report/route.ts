@@ -158,9 +158,9 @@ export async function POST(request: NextRequest) {
         throw new Error('Generated HTML report is too short or empty')
       }
 
-      // Validate HTML structure - CPAS uses different format
-      const hasValidHTML = htmlReport.includes('<!DOCTYPE html>') || htmlReport.includes('<html')
-      const hasRoot = htmlReport.includes('<div id="root">') || htmlReport.includes('class="slide')
+      // Validate HTML structure - Templates return HTML fragments (slide-based), not full documents
+      const hasValidHTML = htmlReport.includes('<div') || htmlReport.includes('<!DOCTYPE html>') || htmlReport.includes('<html')
+      const hasRoot = htmlReport.includes('class="slide') || htmlReport.includes('<div id="root">')
 
       if (!hasValidHTML) {
         throw new Error('Generated HTML report is missing required HTML structure')
