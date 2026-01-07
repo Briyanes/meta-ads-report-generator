@@ -1377,7 +1377,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="flex items-start">
                                         <i className="fas fa-venus-mars text-blue-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
-                                            <p><strong>Kesimpulan:</strong> ${sortedGender.length > 0 ? sortedGender[0].Gender + ' menghasilkan impressions tertinggi dengan CTR ' + ((sortedGender[0]['CTR (link click-through rate)'] || 0).toFixed(2) + '%.' : 'Gender breakdown menunjukkan variasi performa signifikan antar segment.'}</p>
+                                            <p><strong>Kesimpulan:</strong> ${sortedGender.length > 0 ? sortedGender[0].Gender + ' menghasilkan impressions tertinggi dengan CTR ' + (sortedGender[0]['CTR (link click-through rate)'] || 0).toFixed(2) + '%.' : 'Gender breakdown menunjukkan variasi performa signifikan antar segment.'}</p>
                                             <p className="text-xs mt-1">${sortedGender.length > 0 ? 'Segment ini menunjukkan engagement lebih tinggi dibanding segment lainnya.' : 'Perlu analisis lebih lanjut untuk identifikasi segment terbaik.'}</p>
                                         </div>
                                     </div>
@@ -1472,7 +1472,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="flex items-start">
                                         <i className="fas fa-map-marker-alt text-blue-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
-                                            <p><strong>Kesimpulan:</strong> ${sortedRegion.length > 0 ? sortedRegion[0].Region + ' menghasilkan impressions tertinggi dengan CTR ' + ((sortedRegion[0]['CTR (link click-through rate)'] || 0).toFixed(2) + '%.' : 'Region breakdown menunjukkan variasi performa signifikan antar lokasi.'}</p>
+                                            <p><strong>Kesimpulan:</strong> ${sortedRegion.length > 0 ? sortedRegion[0].Region + ' menghasilkan impressions tertinggi dengan CTR ' + (sortedRegion[0]['CTR (link click-through rate)'] || 0).toFixed(2) + '%.' : 'Region breakdown menunjukkan variasi performa signifikan antar lokasi.'}</p>
                                             <p className="text-xs mt-1">${sortedRegion.length > 0 ? 'Region ini menjadi pilihan terbaik untuk fokus targeting dan optimasi budget.' : 'Perlu analisis lebih lanjut untuk identifikasi region terbaik.'}</p>
                                         </div>
                                     </div>
@@ -1566,7 +1566,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="flex items-start">
                                         <i className="fab fa-instagram text-purple-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
-                                            <p><strong>Kesimpulan:</strong> ${sortedPlatform.length > 0 ? sortedPlatform[0].Platform + ' menghasilkan checkouts tertinggi dengan CTR ' + ((sortedPlatform[0]['CTR (link click-through rate)'] || 0).toFixed(2) + '%.' : 'Platform breakdown menunjukkan variasi performa signifikan antar platform.'}</p>
+                                            <p><strong>Kesimpulan:</strong> ${sortedPlatform.length > 0 ? sortedPlatform[0].Platform + ' menghasilkan checkouts tertinggi dengan CTR ' + (sortedPlatform[0]['CTR (link click-through rate)'] || 0).toFixed(2) + '%.' : 'Platform breakdown menunjukkan variasi performa signifikan antar platform.'}</p>
                                             <p className="text-xs mt-1">${sortedPlatform.length > 0 ? 'Platform ini menjadi pilihan terbaik untuk optimasi budget dan scaling campaign.' : 'Perlu analisis lebih lanjut untuk identifikasi platform terbaik.'}</p>
                                         </div>
                                     </div>
@@ -1661,7 +1661,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="flex items-start">
                                         <i className="fas fa-photo-video text-blue-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
-                                            <p><strong>Kesimpulan:</strong> ${sortedPlacement.length > 0 ? sortedPlacement[0].Placement + ' menghasilkan checkouts tertinggi dengan CTR ' + ((sortedPlacement[0]['CTR (link click-through rate)'] || 0).toFixed(2) + '%.' : 'Placement breakdown menunjukkan variasi performa signifikan antar format.'}</p>
+                                            <p><strong>Kesimpulan:</strong> ${sortedPlacement.length > 0 ? sortedPlacement[0].Placement + ' menghasilkan checkouts tertinggi dengan CTR ' + (sortedPlacement[0]['CTR (link click-through rate)'] || 0).toFixed(2) + '%.' : 'Placement breakdown menunjukkan variasi performa signifikan antar format.'}</p>
                                             <p className="text-xs mt-1">${sortedPlacement.length > 0 ? 'Format konten ini menjadi pilihan terbaik untuk optimasi dan scaling.' : 'Perlu analisis lebih lanjut untuk identifikasi format terbaik.'}</p>
                                         </div>
                                     </div>
@@ -1901,7 +1901,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                 <div className="insight-box">
                                     <div className="flex items-start">
                                         <div className="flex-1">
-                                            <p><strong>Kesimpulan:</strong> ${sortedObjective.length > 0 ? sortedObjective[0]['Campaign objective'] + ' menghasilkan checkouts tertinggi dengan CTR ' + ((sortedObjective[0]['CTR (link click-through rate)'] || 0).toFixed(2) + '%.' : 'Objective breakdown menunjukkan variasi performa signifikan antar objective.'}</p>
+                                            <p><strong>Kesimpulan:</strong> ${sortedObjective.length > 0 ? sortedObjective[0]['Campaign objective'] + ' menghasilkan checkouts tertinggi dengan CTR ' + (sortedObjective[0]['CTR (link click-through rate)'] || 0).toFixed(2) + '%.' : 'Objective breakdown menunjukkan variasi performa signifikan antar objective.'}</p>
                                             <p className="text-xs mt-1">${sortedObjective.length > 0 ? 'Objective ini menjadi pilihan terbaik untuk optimasi dan scaling campaign.' : 'Perlu analisis lebih lanjut untuk identifikasi objective terbaik.'}</p>
                                         </div>
                                     </div>
