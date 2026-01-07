@@ -1217,7 +1217,15 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
 
 function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, thisPeriodLabel: string, lastPeriodLabel: string): string {
   let slides = ''
-  
+
+  // Parse numbers safely
+  const parseNum = (val: any): number => {
+    if (typeof val === 'number') return val
+    if (!val) return 0
+    const parsed = parseFloat(String(val).replace(/,/g, ''))
+    return isNaN(parsed) ? 0 : parsed
+  }
+
   // Slide 5: Age Performance
   const ageThisWeek = breakdown.thisWeek?.age || []
   const ageLastWeek = breakdown.lastWeek?.age || []
@@ -1227,8 +1235,8 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
     const sortedAge = [...ageThisWeek]
       .filter((a: any) => a.Age && a.Age.trim())
       .sort((a: any, b: any) => {
-        const resultA = a['Checkouts initiated'] || 0
-        const resultB = b['Checkouts initiated'] || 0
+        const resultA = parseNum(a['Checkouts initiated'] || 0)
+        const resultB = parseNum(b['Checkouts initiated'] || 0)
         return resultB - resultA
       })
       .slice(0, 6)
@@ -1257,7 +1265,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedAge.map((item: any) => {
           const age = item.Age || 'Unknown'
-          const result = item['Checkouts initiated'] || 0
+          const result = parseNum(item['Checkouts initiated'] || 0)
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${age}</span>
                                             <span className="font-bold text-xs">{formatNumber(${result})}</span>
@@ -1270,7 +1278,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedAge.map((item: any) => {
           const age = item.Age || 'Unknown'
-          const cpr = item['Cost per checkout initiated'] || 0
+          const cpr = parseNum(item['Cost per checkout initiated'] || 0)
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${age}</span>
                                             <span className="font-bold text-xs">{formatCurrency(${cpr})}</span>
@@ -1308,8 +1316,8 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
     const sortedGender = [...genderThisWeek]
       .filter((g: any) => g.Gender && g.Gender.trim())
       .sort((a: any, b: any) => {
-        const impA = a.Impressions || 0
-        const impB = b.Impressions || 0
+        const impA = parseNum(a.Impressions || 0)
+        const impB = parseNum(b.Impressions || 0)
         return impB - impA
       })
     
@@ -1337,7 +1345,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedGender.map((item: any) => {
           const gender = item.Gender || 'Unknown'
-          const impressions = item.Impressions || 0
+          const impressions = parseNum(item.Impressions || 0)
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${gender}</span>
                                             <span className="font-bold text-xs">{formatNumber(${impressions})}</span>
@@ -1350,7 +1358,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedGender.map((item: any) => {
           const gender = item.Gender || 'Unknown'
-          const clicks = item['Outbound clicks'] || 0
+          const clicks = parseNum(item['Outbound clicks'] || 0)
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${gender}</span>
                                             <span className="font-bold text-xs">{formatNumber(${clicks})}</span>
@@ -1363,7 +1371,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedGender.map((item: any) => {
           const gender = item.Gender || 'Unknown'
-          const ctr = item['CTR (link click-through rate)'] || 0
+          const ctr = parseNum(item['CTR (link click-through rate)'] || 0)
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${gender}</span>
                                             <span className="font-bold text-xs">{formatPercent(${ctr})}</span>
@@ -1402,8 +1410,8 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
     const sortedRegion = [...regionThisWeek]
       .filter((r: any) => r.Region && r.Region.trim())
       .sort((a: any, b: any) => {
-        const impA = a.Impressions || 0
-        const impB = b.Impressions || 0
+        const impA = parseNum(a.Impressions || 0)
+        const impB = parseNum(b.Impressions || 0)
         return impB - impA
       })
       .slice(0, 5)
@@ -1432,7 +1440,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedRegion.map((item: any) => {
           const region = item.Region || 'Unknown'
-          const impressions = item.Impressions || 0
+          const impressions = parseNum(item.Impressions || 0)
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${region}</span>
                                             <span className="font-bold text-xs">{formatNumber(${impressions})}</span>
@@ -1445,7 +1453,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedRegion.map((item: any) => {
           const region = item.Region || 'Unknown'
-          const clicks = item['Outbound clicks'] || 0
+          const clicks = parseNum(item['Outbound clicks'] || 0)
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${region}</span>
                                             <span className="font-bold text-xs">{formatNumber(${clicks})}</span>
@@ -1458,7 +1466,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedRegion.map((item: any) => {
           const region = item.Region || 'Unknown'
-          const ctr = item['CTR (link click-through rate)'] || 0
+          const ctr = parseNum(item['CTR (link click-through rate)'] || 0)
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${region}</span>
                                             <span className="font-bold text-xs">{formatPercent(${ctr})}</span>
@@ -1497,8 +1505,8 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
     const sortedPlatform = [...platformThisWeek]
       .filter((p: any) => p.Platform && p.Platform.trim())
       .sort((a: any, b: any) => {
-        const convA = a['Checkouts initiated'] || 0
-        const convB = b['Checkouts initiated'] || 0
+        const convA = parseNum(a['Checkouts initiated'] || 0)
+        const convB = parseNum(b['Checkouts initiated'] || 0)
         return convB - convA
       })
     
@@ -1526,7 +1534,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedPlatform.map((item: any) => {
           const platform = item.Platform || 'Unknown'
-          const conv = item['Checkouts initiated'] || 0
+          const conv = parseNum(item['Checkouts initiated'] || 0)
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${platform}</span>
                                             <span className="font-bold text-xs">{formatNumber(${conv})}</span>
@@ -1539,7 +1547,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedPlatform.map((item: any) => {
           const platform = item.Platform || 'Unknown'
-          const impressions = item.Impressions || 0
+          const impressions = parseNum(item.Impressions || 0)
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${platform}</span>
                                             <span className="font-bold text-xs">{formatNumber(${impressions})}</span>
@@ -1552,7 +1560,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedPlatform.map((item: any) => {
           const platform = item.Platform || 'Unknown'
-          const ctr = item['CTR (link click-through rate)'] || 0
+          const ctr = parseNum(item['CTR (link click-through rate)'] || 0)
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${platform}</span>
                                             <span className="font-bold text-xs">{formatPercent(${ctr})}</span>
@@ -1591,8 +1599,8 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
     const sortedPlacement = [...placementThisWeek]
       .filter((p: any) => p.Placement && p.Placement.trim())
       .sort((a: any, b: any) => {
-        const resultA = a['Checkouts initiated'] || 0
-        const resultB = b['Checkouts initiated'] || 0
+        const resultA = parseNum(a['Checkouts initiated'] || 0)
+        const resultB = parseNum(b['Checkouts initiated'] || 0)
         return resultB - resultA
       })
       .slice(0, 5)
@@ -1621,7 +1629,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedPlacement.map((item: any) => {
           const placement = item.Placement || 'Unknown'
-          const result = item['Checkouts initiated'] || 0
+          const result = parseNum(item['Checkouts initiated'] || 0)
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${placement}</span>
                                             <span className="font-bold text-xs">{formatNumber(${result})}</span>
@@ -1634,7 +1642,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedPlacement.map((item: any) => {
           const placement = item.Placement || 'Unknown'
-          const impressions = item.Impressions || 0
+          const impressions = parseNum(item.Impressions || 0)
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${placement}</span>
                                             <span className="font-bold text-xs">{formatNumber(${impressions})}</span>
@@ -1647,7 +1655,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedPlacement.map((item: any) => {
           const placement = item.Placement || 'Unknown'
-          const ctr = item['CTR (link click-through rate)'] || 0
+          const ctr = parseNum(item['CTR (link click-through rate)'] || 0)
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${placement}</span>
                                             <span className="font-bold text-xs">{formatPercent(${ctr})}</span>
@@ -1685,16 +1693,16 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
     // Get top 5 performers based on: Checkouts Initiated + Instagram Visits + Followers for CTLP to WA
     const sortedCreative = [...creativeThisWeek]
       .filter((c: any) => {
-        const checkouts = c['Checkouts initiated'] || 0
-        const instagramVisits = c['Instagram profile visits'] || 0
-        const instagramFollows = c['Instagram follows'] || 0
+        const checkouts = parseNum(c['Checkouts initiated'] || 0)
+        const instagramVisits = parseNum(c['Instagram profile visits'] || 0)
+        const instagramFollows = parseNum(c['Instagram follows'] || 0)
         // Filter ads that have at least one of these metrics > 0
         return checkouts > 0 || instagramVisits > 0 || instagramFollows > 0
       })
       .map((item: any) => {
-        const checkouts = item['Checkouts initiated'] || 0
-        const instagramVisits = item['Instagram profile visits'] || 0
-        const instagramFollows = item['Instagram follows'] || 0
+        const checkouts = parseNum(item['Checkouts initiated'] || 0)
+        const instagramVisits = parseNum(item['Instagram profile visits'] || 0)
+        const instagramFollows = parseNum(item['Instagram follows'] || 0)
         // Calculate combined score (weighted)
         const combinedScore = (checkouts * 3) + (instagramVisits * 1) + (instagramFollows * 2)
         return { ...item, _combinedScore: combinedScore }
@@ -1748,15 +1756,15 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
           // Take first 3 ad names for display
           const displayAdNames = adNamesList.slice(0, 3)
           const hasMore = adNamesList.length > 3
-          
-          const checkouts = item['Checkouts initiated'] || 0
-          const instagramVisits = item['Instagram profile visits'] || 0
-          const instagramFollows = item['Instagram follows'] || 0
-          const cpr = item['Cost per checkout initiated'] || 0
-          const ctr = item['CTR (link click-through rate)'] || 0
-          const impressions = item['Impressions'] || 0
-          const outboundClicks = item['Outbound clicks'] || 0
-          
+
+          const checkouts = parseNum(item['Checkouts initiated'] || 0)
+          const instagramVisits = parseNum(item['Instagram profile visits'] || 0)
+          const instagramFollows = parseNum(item['Instagram follows'] || 0)
+          const cpr = parseNum(item['Cost per checkout initiated'] || 0)
+          const ctr = parseNum(item['CTR (link click-through rate)'] || 0)
+          const impressions = parseNum(item['Impressions'] || 0)
+          const outboundClicks = parseNum(item['Outbound clicks'] || 0)
+
           return `<div className="border-2 ${index === 0 ? 'border-yellow-400 bg-yellow-50' : index === 1 ? 'border-green-300 bg-green-50' : index === 2 ? 'border-blue-300 bg-blue-50' : 'border-gray-200 bg-gray-50'} p-3 rounded-lg">
                                             <div className="mb-3">
                                                 <div className="flex items-center gap-2 mb-2">
@@ -1843,8 +1851,8 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
     const sortedObjective = [...objectiveThisWeek]
       .filter((o: any) => o['Campaign objective'] && o['Campaign objective'].trim())
       .sort((a: any, b: any) => {
-        const convA = a['Checkouts initiated'] || 0
-        const convB = b['Checkouts initiated'] || 0
+        const convA = parseNum(a['Checkouts initiated'] || 0)
+        const convB = parseNum(b['Checkouts initiated'] || 0)
         return convB - convA
       })
       .slice(0, 4)
@@ -1870,10 +1878,10 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                             <div className="grid grid-cols-4 gap-3">
                                 ${sortedObjective.map((item: any) => {
           const objective = item['Campaign objective'] || 'Unknown'
-          const conv = item['Checkouts initiated'] || 0
-          const impressions = item.Impressions || 0
-          const clicks = item['Outbound clicks'] || 0
-          const ctr = item['CTR (link click-through rate)'] || 0
+          const conv = parseNum(item['Checkouts initiated'] || 0)
+          const impressions = parseNum(item.Impressions || 0)
+          const clicks = parseNum(item['Outbound clicks'] || 0)
+          const ctr = parseNum(item['CTR (link click-through rate)'] || 0)
           return `<div>
                                             <h3 className="text-base font-semibold mb-3">${objective}</h3>
                                             <div className="space-y-2">

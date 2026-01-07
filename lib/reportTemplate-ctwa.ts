@@ -854,10 +854,10 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
 
     const objectiveRows = sortedObjectives.map((item) => {
       const objective = item['Objective'] || item['objective'] || item['Campaign objective'] || 'Unknown'
-      const results = item['Messaging conversations started'] || item['Results'] || 0
-      const spend = item['Amount spent (IDR)'] || item['Amount Spent'] || 0
-      const impressions = item['Impressions'] || 0
-      const outboundClicks = item['Outbound clicks'] || 0
+      const results = parseNum(item['Messaging conversations started'] || item['Results'] || 0)
+      const spend = parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0)
+      const impressions = parseNum(item['Impressions'] || 0)
+      const outboundClicks = parseNum(item['Outbound clicks'] || 0)
       const cpr = results > 0 ? spend / results : 0
 
       // Format outbound clicks as "Traffic"
@@ -936,10 +936,10 @@ ${objectiveRows}
 
     const creativeRows = sortedCreative.map((item) => {
       const adName = item['Ads'] || item['Ad name'] || item['Ad Name'] || item['ad_name'] || 'Unknown'
-      const results = item['Messaging conversations started'] || 0
-      const impressions = item['Impressions'] || 0
-      const ctr = item['CTR (link click-through rate)'] || 0
-      const spend = item['Amount spent (IDR)'] || item['Amount Spent'] || 0
+      const results = parseNum(item['Messaging conversations started'] || 0)
+      const impressions = parseNum(item['Impressions'] || 0)
+      const ctr = parseNum(item['CTR (link click-through rate)'] || 0)
+      const spend = parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0)
       const cpr = results > 0 ? spend / results : 0
 
       return `                <tr>
@@ -1107,6 +1107,14 @@ function generateBreakdownSlide(
   formatFn: (val: number) => string,
   slideNumber: number
 ): string {
+  // Parse numbers safely
+  const parseNum = (val: any): number => {
+    if (typeof val === 'number') return val
+    if (!val) return 0
+    const parsed = parseFloat(String(val).replace(/,/g, ''))
+    return isNaN(parsed) ? 0 : parsed
+  }
+
   if (thisWeekData.length === 0 && lastWeekData.length === 0) {
     return '' // Skip slide if no data
   }
@@ -1114,8 +1122,8 @@ function generateBreakdownSlide(
   const sortedData = [...thisWeekData]
     .filter(item => item[labelKey] && item[labelKey].trim())
     .sort((a, b) => {
-      const resultA = a[metricKey] || 0
-      const resultB = b[metricKey] || 0
+      const resultA = parseNum(a[metricKey] || 0)
+      const resultB = parseNum(b[metricKey] || 0)
       return resultB - resultA
     })
     .slice(0, 6)
@@ -1123,13 +1131,13 @@ function generateBreakdownSlide(
   // Calculate insights
   const topPerformer = sortedData[0]
   const topPerformerName = topPerformer ? topPerformer[labelKey] : 'N/A'
-  const topPerformerValue = topPerformer ? topPerformer[metricKey] || 0 : 0
-  const totalValue = sortedData.reduce((sum, item) => sum + (item[metricKey] || 0), 0)
+  const topPerformerValue = topPerformer ? parseNum(topPerformer[metricKey] || 0) : 0
+  const totalValue = sortedData.reduce((sum, item) => sum + parseNum(item[metricKey] || 0), 0)
   const topPerformerPercentage = totalValue > 0 ? ((topPerformerValue / totalValue) * 100).toFixed(1) : '0'
 
   // Calculate average CTR
   const avgCTR = sortedData.reduce((sum, item) => {
-    const ctr = item['CTR (link click-through rate)'] || 0
+    const ctr = parseNum(item['CTR (link click-through rate)'] || 0)
     return sum + ctr
   }, 0) / Math.max(sortedData.length, 1)
 
@@ -1139,9 +1147,9 @@ function generateBreakdownSlide(
     const formattedValue = formatFn(value)
 
     // Extract additional metrics
-    const impressions = item['Impressions'] || 0
-    const linkClicks = item['Outbound clicks'] || 0
-    const ctrLinkClick = item['CTR (link click-through rate)'] || 0
+    const impressions = parseNum(item['Impressions'] || 0)
+    const linkClicks = parseNum(item['Outbound clicks'] || 0)
+    const ctrLinkClick = parseNum(item['CTR (link click-through rate)'] || 0)
 
     // Format additional metrics
     const formatNum = (val: number): string => {
