@@ -7,7 +7,8 @@ const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS?.split(',') || [
   'http://localhost:3000',
   'http://localhost:3001',
   'https://meta-ads-report-generator.vercel.app',
-  'https://hadona.id'
+  'https://hadona.id',
+  'https://report.hadona.id'
 ]
 
 function isValidOrigin(origin: string | null): boolean {
@@ -15,9 +16,13 @@ function isValidOrigin(origin: string | null): boolean {
   return ALLOWED_ORIGINS.some(allowed => {
     // Exact match
     if (origin === allowed) return true
-    // Subdomain match (for production)
+    // Subdomain match
     const allowedDomain = allowed.replace('https://', '').replace('http://', '')
-    return origin.endsWith('.' + allowedDomain) || origin === `https://${allowedDomain}` || origin === `http://${allowedDomain}`
+    const originDomain = origin.replace('https://', '').replace('http://', '')
+    // Check if origin is exactly the allowed domain OR a subdomain of it
+    return originDomain === allowedDomain ||
+           originDomain.endsWith('.' + allowedDomain) ||
+           allowedDomain.startsWith(originDomain + '.')
   })
 }
 
