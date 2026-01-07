@@ -992,32 +992,13 @@ Return the analysis as structured JSON data that can be used to generate the HTM
 }
 
 // Helper function to extract event data from CSV based on dates
-function extractEventData(thisWeekData: any[], lastWeekData: any[], retentionType: string): any {
-  const eventAnalysis: any = {
-    twindateThis: {},
-    twindateLast: {},
-    paydayThis: {},
-    paydayLast: {}
-  }
-  
-  // Check if CSV has date column
-  const dateColumnNames = ['Date', 'Day', 'Day (YYYY-MM-DD)', 'Day (YYYY/MM/DD)', 'Reporting starts', 'Day name']
-  let dateColumn: string | null = null
-  
-  if (thisWeekData.length > 0) {
-    const firstRow = thisWeekData[0]
-    dateColumn = Object.keys(firstRow).find(key => 
-      dateColumnNames.some(name => key.toLowerCase().includes(name.toLowerCase()))
-    ) || null
-  }
-  
-  // If no date column found, return empty event analysis
-  if (!dateColumn) {
-    return eventAnalysis
-  }
-  
-  // Helper function to parse date - handles multiple formats
-  const parseDate = (dateStr: string): Date | null => {
+// ===== HELPER FUNCTIONS FOR EVENT DATA EXTRACTION =====
+// Moved outside extractEventData to avoid JSON serialization issues
+
+/**
+ * Helper function to parse date - handles multiple formats
+ */
+function parseEventDate(dateStr: string): Date | null {
     if (!dateStr) return null
     
     // Clean the string
@@ -1067,81 +1048,89 @@ function extractEventData(thisWeekData: any[], lastWeekData: any[], retentionTyp
     }
     
     return null
-  }
-  
-  // Helper function to check if date is within Twindate period
-  // Twindate: iklan start H-4 sebelum tanggal kembar dan mati setelah twindate selesai
-  // Contoh: Twindate 12.12 = iklan start 8 Desember, mati setelah 12 Desember selesai
-  // Jadi periode: 8 Desember - 12 Desember (sampai akhir hari 12 Desember)
-  const isTwindate = (date: Date): boolean => {
-    if (!date || isNaN(date.getTime())) return false
-    
-    // List semua tanggal kembar (1.1, 2.2, ..., 12.12)
-    const twindateDates = [
-      { month: 1, day: 1 },   // 1.1
-      { month: 2, day: 2 },   // 2.2
-      { month: 3, day: 3 },   // 3.3
-      { month: 4, day: 4 },   // 4.4
-      { month: 5, day: 5 },   // 5.5
-      { month: 6, day: 6 },   // 6.6
-      { month: 7, day: 7 },   // 7.7
-      { month: 8, day: 8 },   // 8.8
-      { month: 9, day: 9 },   // 9.9
-      { month: 10, day: 10 }, // 10.10
-      { month: 11, day: 11 }, // 11.11
-      { month: 12, day: 12 }  // 12.12
-    ]
-    
-    const checkDate = new Date(date)
-    checkDate.setHours(0, 0, 0, 0) // Normalize to start of day
-    
-    // Check each twindate
-    for (const twindate of twindateDates) {
-      // Calculate twindate date (H)
-      const twindateDate = new Date(checkDate.getFullYear(), twindate.month - 1, twindate.day)
-      twindateDate.setHours(0, 0, 0, 0)
-      
-      // Start date is H-4 (4 days before twindate)
-      const startDate = new Date(twindateDate)
-      startDate.setDate(startDate.getDate() - 4)
-      
-      // End date is H (twindate date) sampai akhir hari (setelah twindate selesai)
-      const endDate = new Date(twindateDate)
-      endDate.setHours(23, 59, 59, 999) // End of twindate day
-      
-      // Check if date is within range [startDate, endDate]
-      if (checkDate >= startDate && checkDate <= endDate) {
-        return true
-      }
-      
-      // Also check for previous year (for dates like 1.1 that might span year boundary)
-      const prevYearTwindateDate = new Date(checkDate.getFullYear() - 1, twindate.month - 1, twindate.day)
-      prevYearTwindateDate.setHours(0, 0, 0, 0)
-      const prevYearStartDate = new Date(prevYearTwindateDate)
-      prevYearStartDate.setDate(prevYearStartDate.getDate() - 4)
-      const prevYearEndDate = new Date(prevYearTwindateDate)
-      prevYearEndDate.setHours(23, 59, 59, 999) // End of twindate day
-      
-      if (checkDate >= prevYearStartDate && checkDate <= prevYearEndDate) {
-        return true
-      }
+}
+
+/**
+ * Helper function to check if date is within Twindate period
+ * Twindate: iklan start H-4 sebelum tanggal kembar dan mati setelah twindate selesai
+ * Contoh: Twindate 12.12 = iklan start 8 Desember, mati setelah 12 Desember selesai
+ * Jadi periode: 8 Desember - 12 Desember (sampai akhir hari 12 Desember)
+ */
+function isTwindateEvent(date: Date): boolean {
+  if (!date || isNaN(date.getTime())) return false
+
+  // List semua tanggal kembar (1.1, 2.2, ..., 12.12)
+  const twindateDates = [
+    { month: 1, day: 1 },   // 1.1
+    { month: 2, day: 2 },   // 2.2
+    { month: 3, day: 3 },   // 3.3
+    { month: 4, day: 4 },   // 4.4
+    { month: 5, day: 5 },   // 5.5
+    { month: 6, day: 6 },   // 6.6
+    { month: 7, day: 7 },   // 7.7
+    { month: 8, day: 8 },   // 8.8
+    { month: 9, day: 9 },   // 9.9
+    { month: 10, day: 10 }, // 10.10
+    { month: 11, day: 11 }, // 11.11
+    { month: 12, day: 12 }  // 12.12
+  ]
+
+  const checkDate = new Date(date)
+  checkDate.setHours(0, 0, 0, 0) // Normalize to start of day
+
+  // Check each twindate
+  for (const twindate of twindateDates) {
+    // Calculate twindate date (H)
+    const twindateDate = new Date(checkDate.getFullYear(), twindate.month - 1, twindate.day)
+    twindateDate.setHours(0, 0, 0, 0)
+
+    // Start date is H-4 (4 days before twindate)
+    const startDate = new Date(twindateDate)
+    startDate.setDate(startDate.getDate() - 4)
+
+    // End date is H (twindate date) sampai akhir hari (setelah twindate selesai)
+    const endDate = new Date(twindateDate)
+    endDate.setHours(23, 59, 59, 999) // End of twindate day
+
+    // Check if date is within range [startDate, endDate]
+    if (checkDate >= startDate && checkDate <= endDate) {
+      return true
     }
-    
-    return false
+
+    // Also check for previous year (for dates like 1.1 that might span year boundary)
+    const prevYearTwindateDate = new Date(checkDate.getFullYear() - 1, twindate.month - 1, twindate.day)
+    prevYearTwindateDate.setHours(0, 0, 0, 0)
+    const prevYearStartDate = new Date(prevYearTwindateDate)
+    prevYearStartDate.setDate(prevYearStartDate.getDate() - 4)
+    const prevYearEndDate = new Date(prevYearTwindateDate)
+    prevYearEndDate.setHours(23, 59, 59, 999) // End of twindate day
+
+    if (checkDate >= prevYearStartDate && checkDate <= prevYearEndDate) {
+      return true
+    }
   }
-  
-  // Helper function to check if date is Payday (tanggal 21-5: dari tanggal 21 bulan ini sampai tanggal 5 bulan berikutnya)
-  const isPayday = (date: Date): boolean => {
-    const day = date.getDate()
-    // Payday: tanggal 21-31 (akhir bulan) atau tanggal 1-5 (awal bulan)
-    return day >= 21 || day <= 5
-  }
-  
-  // Helper function to aggregate data for event
-  const aggregateEventData = (data: any[]): any => {
-    // Return default structure with all fields set to 0 if no data
-    // This ensures consistent structure for both periods
-    if (data.length === 0) {
+
+  return false
+}
+
+/**
+ * Helper function to check if date is Payday (tanggal 21-5: dari tanggal 21 bulan ini sampai tanggal 5 bulan berikutnya)
+ * Payday: tanggal 21-31 (akhir bulan) atau tanggal 1-5 (awal bulan)
+ */
+function isPaydayEvent(date: Date): boolean {
+  const day = date.getDate()
+  // Payday: tanggal 21-31 (akhir bulan) atau tanggal 1-5 (awal bulan)
+  return day >= 21 || day <= 5
+}
+
+/**
+ * Helper function to aggregate data for event
+ * Returns default structure with all fields set to 0 if no data
+ * This ensures consistent structure for both periods
+ */
+function aggregateEventData(data: any[], dateColumn: string | null): any {
+  // Return default structure with all fields set to 0 if no data
+  if (data.length === 0) {
       return {
         amountSpent: 0,
         purchases: 0,
@@ -1226,8 +1215,36 @@ function extractEventData(thisWeekData: any[], lastWeekData: any[], retentionTyp
       conversionRate,
       avgPurchaseValue
     }
+}
+
+/**
+ * Main function to extract event data from CSV
+ * Uses the helper functions defined above
+ */
+function extractEventData(thisWeekData: any[], lastWeekData: any[], retentionType: string): any {
+  const eventAnalysis: any = {
+    twindateThis: {},
+    twindateLast: {},
+    paydayThis: {},
+    paydayLast: {}
   }
-  
+
+  // Check if CSV has date column
+  const dateColumnNames = ['Date', 'Day', 'Day (YYYY-MM-DD)', 'Day (YYYY/MM/DD)', 'Reporting starts', 'Day name']
+  let dateColumn: string | null = null
+
+  if (thisWeekData.length > 0) {
+    const firstRow = thisWeekData[0]
+    dateColumn = Object.keys(firstRow).find(key =>
+      dateColumnNames.some(name => key.toLowerCase().includes(name.toLowerCase()))
+    ) || null
+  }
+
+  // If no date column found, return empty event analysis
+  if (!dateColumn) {
+    return eventAnalysis
+  }
+
   // Filter and aggregate Twindate data for this period
   // Twindate: iklan start H-4 sebelum tanggal kembar dan mati setelah twindate selesai
   // Deteksi berdasarkan tanggal yang ada di CSV, bukan berdasarkan periode report
@@ -1236,59 +1253,47 @@ function extractEventData(thisWeekData: any[], lastWeekData: any[], retentionTyp
   const twindateThisData = thisWeekData.filter(row => {
     const dateStr = row[dateColumn!]
     if (!dateStr) return false
-    const date = parseDate(dateStr)
+    const date = parseEventDate(dateStr)
     if (!date) return false
-    const isTwindateDate = isTwindate(date)
-    return isTwindateDate
+    return isTwindateEvent(date)
   })
-  
+
   // Filter and aggregate Twindate data for last period
   // Deteksi berdasarkan tanggal yang ada di CSV, bukan berdasarkan periode report
   const twindateLastData = lastWeekData.filter(row => {
     const dateStr = row[dateColumn!]
     if (!dateStr) return false
-    const date = parseDate(dateStr)
+    const date = parseEventDate(dateStr)
     if (!date) return false
-    const isTwindateDate = isTwindate(date)
-    return isTwindateDate
+    return isTwindateEvent(date)
   })
-  
+
   // Filter and aggregate Payday data for this period
   // Payday: tanggal 21-31 (akhir bulan) atau tanggal 1-5 (awal bulan)
   // Note: Payday akan selalu muncul karena periode report (26-25) selalu mencakup tanggal 21-31 atau 1-5
   const paydayThisData = thisWeekData.filter(row => {
     const dateStr = row[dateColumn!]
     if (!dateStr) return false
-    const date = parseDate(dateStr)
+    const date = parseEventDate(dateStr)
     if (!date) return false
-    const isPaydayDate = isPayday(date)
-    return isPaydayDate
+    return isPaydayEvent(date)
   })
-  
+
   // Filter and aggregate Payday data for last period
   const paydayLastData = lastWeekData.filter(row => {
     const dateStr = row[dateColumn!]
     if (!dateStr) return false
-    const date = parseDate(dateStr)
+    const date = parseEventDate(dateStr)
     if (!date) return false
-    const isPaydayDate = isPayday(date)
-    return isPaydayDate
+    return isPaydayEvent(date)
   })
-  
+
   // Aggregate event data - always aggregate even if empty to ensure consistent structure
   // This ensures both periods have the same structure even if one has no data
-  eventAnalysis.twindateThis = twindateThisData.length > 0 
-    ? aggregateEventData(twindateThisData) 
-    : aggregateEventData([])
-  eventAnalysis.twindateLast = twindateLastData.length > 0 
-    ? aggregateEventData(twindateLastData) 
-    : aggregateEventData([])
-  eventAnalysis.paydayThis = paydayThisData.length > 0 
-    ? aggregateEventData(paydayThisData) 
-    : aggregateEventData([])
-  eventAnalysis.paydayLast = paydayLastData.length > 0 
-    ? aggregateEventData(paydayLastData) 
-    : aggregateEventData([])
+  eventAnalysis.twindateThis = aggregateEventData(twindateThisData, dateColumn)
+  eventAnalysis.twindateLast = aggregateEventData(twindateLastData, dateColumn)
+  eventAnalysis.paydayThis = aggregateEventData(paydayThisData, dateColumn)
+  eventAnalysis.paydayLast = aggregateEventData(paydayLastData, dateColumn)
   
   return eventAnalysis
 }
