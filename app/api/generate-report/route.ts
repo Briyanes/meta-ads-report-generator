@@ -73,8 +73,23 @@ export async function POST(request: NextRequest) {
       body = await request.json()
     } catch (parseError: any) {
       console.error('Error parsing request body:', parseError)
+      console.error('Request headers:', Object.fromEntries(request.headers.entries()))
+
+      // Try to get more details about the request
+      try {
+        const text = await request.text()
+        console.error('Body length:', text.length)
+        console.error('Body preview:', text.substring(0, 500))
+      } catch (textError) {
+        console.error('Could not read request body for debugging')
+      }
+
       return NextResponse.json(
-        { error: 'Invalid JSON in request body' },
+        {
+          error: 'Invalid JSON in request body',
+          details: parseError.message,
+          hint: 'Please try re-uploading your CSV file'
+        },
         { status: 400 }
       )
     }

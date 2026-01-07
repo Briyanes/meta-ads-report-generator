@@ -222,6 +222,55 @@ export default function MetaAdsPage() {
     }
   }
 
+  /**
+   * Sanitize analysis data to remove non-serializable values
+   * Removes functions, undefined values, and circular references
+   */
+  const sanitizeAnalysisData = (data: any): any => {
+    if (data === null || data === undefined) {
+      return null
+    }
+
+    // Skip functions
+    if (typeof data === 'function') {
+      return null
+    }
+
+    // Primitive types
+    if (typeof data !== 'object') {
+      return data
+    }
+
+    // Arrays
+    if (Array.isArray(data)) {
+      return data.map(sanitizeAnalysisData).filter(item => item !== null)
+    }
+
+    // Objects - recursively sanitize each property
+    const cleaned: any = {}
+
+    for (const key in data) {
+      if (data.hasOwnProperty(key)) {
+        const value = data[key]
+
+        // Skip functions and undefined
+        if (typeof value === 'function' || value === undefined) {
+          continue
+        }
+
+        // Serialize primitive values directly
+        if (typeof value !== 'object' || value === null) {
+          cleaned[key] = value
+        } else {
+          // Recursively sanitize objects
+          cleaned[key] = sanitizeAnalysisData(value)
+        }
+      }
+    }
+
+    return cleaned
+  }
+
   const handleGenerateReport = async () => {
     if (!analysis) {
       setError('Please analyze data first')
@@ -234,24 +283,38 @@ export default function MetaAdsPage() {
 
     try {
       // Extract analysis data - handle both structures: {analysis: {...}} or direct analysis object
-      const analysisData = (analysis.analysis && typeof analysis.analysis === 'object') 
-        ? analysis.analysis 
+      const rawData = (analysis.analysis && typeof analysis.analysis === 'object')
+        ? analysis.analysis
         : (analysis.analysis && typeof analysis.analysis === 'string')
         ? JSON.parse(analysis.analysis)
-        : analysis;
-      
-      
-      const response = await fetch('/api/generate-report', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
+        : analysis
+
+      // Sanitize data to remove non-serializable values (functions, undefined, circular refs)
+      const analysisData = sanitizeAnalysisData(rawData)
+
+      // Prepare request body with error handling
+      let requestBody
+      try {
+        requestBody = JSON.stringify({
           analysisData: analysisData,
           reportName: reportName || undefined,
           retentionType: retentionType || analysis.analysis?.retentionType || analysis.retentionType || 'wow',
           objectiveType: objectiveType || analysis.analysis?.objectiveType || analysis.objectiveType || 'cpas'
         })
+      } catch (stringifyError: any) {
+        console.error('Failed to stringify request body:', stringifyError)
+        setError(`Data serialization error: ${stringifyError.message}. Please try re-uploading your CSV.`)
+        setGenerationProgress('')
+        setIsGenerating(false)
+        return
+      }
+
+      const response = await fetch('/api/generate-report', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: requestBody
       })
 
       const contentType = response.headers.get('content-type')
