@@ -8,7 +8,8 @@ const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS?.split(',') || [
   'http://localhost:3001',
   'https://meta-ads-report-generator.vercel.app',
   'https://hadona.id',
-  'https://report.hadona.id'
+  'https://report.hadona.id',
+  'https://*.vercel.app' // Allow all Vercel preview/deployment URLs
 ]
 
 function isValidOrigin(origin: string | null): boolean {
@@ -16,6 +17,14 @@ function isValidOrigin(origin: string | null): boolean {
   return ALLOWED_ORIGINS.some(allowed => {
     // Exact match
     if (origin === allowed) return true
+
+    // Wildcard match (e.g., https://*.vercel.app)
+    if (allowed.includes('*')) {
+      const wildcardPattern = allowed.replace('*', '.*')
+      const regex = new RegExp('^' + wildcardPattern)
+      return regex.test(origin)
+    }
+
     // Subdomain match
     const allowedDomain = allowed.replace('https://', '').replace('http://', '')
     const originDomain = origin.replace('https://', '').replace('http://', '')
