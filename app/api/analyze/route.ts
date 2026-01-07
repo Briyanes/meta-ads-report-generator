@@ -719,8 +719,9 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         linkClicks: linkClicks,
         ctr: (() => {
           const ctrValue = parseNum(getFieldValue(data, 'CTR (link click-through rate)'))
-          // CTR in CSV is already in percentage format (e.g., 1.3 means 1.3%), convert to decimal (0.013)
-          return ctrValue > 1 ? ctrValue / 100 : ctrValue
+          // CTR in CSV is already in percentage format (e.g., 1.3 means 1.3%)
+          // Return as-is to maintain consistency across all templates
+          return ctrValue
         })(),
         // Calculate CPC manually if not in CSV
         cpc: (() => {

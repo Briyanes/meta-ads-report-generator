@@ -1515,7 +1515,7 @@ const generateEventComparisonTable = (
     { name: 'Amount Spent', thisVal: thisEvent.amountSpent || 0, lastVal: lastEvent.amountSpent || 0, format: formatCurrency },
     { name: 'Impressions', thisVal: thisEvent.impressions || 0, lastVal: lastEvent.impressions || 0, format: formatNumber },
     { name: 'Link Clicks', thisVal: thisEvent.linkClicks || 0, lastVal: lastEvent.linkClicks || 0, format: formatNumber },
-    { name: 'CTR', thisVal: (thisEvent.ctr || 0) * 100, lastVal: (lastEvent.ctr || 0) * 100, format: formatPercent },
+    { name: 'CTR', thisVal: thisEvent.ctr || 0, lastVal: lastEvent.ctr || 0, format: formatPercent },
     { name: 'Adds to Cart', thisVal: thisEvent.addsToCart || 0, lastVal: lastEvent.addsToCart || 0, format: formatNumber },
     { name: 'Purchases', thisVal: thisEvent.purchases || 0, lastVal: lastEvent.purchases || 0, format: formatNumber },
     { name: 'Purchases CV', thisVal: thisEvent.purchasesConversionValue || 0, lastVal: lastEvent.purchasesConversionValue || 0, format: formatCurrency },
@@ -1575,7 +1575,7 @@ const generateEventHighlights = (eventData: any, type: 'highlights' | 'lowlights
   const purchasesCV = parseNum(eventData.purchasesConversionValue)
   const roas = parseNum(eventData.roas)
   const atc = parseNum(eventData.addsToCart)
-  const ctr = parseNum(eventData.ctr) * 100
+  const ctr = parseNum(eventData.ctr)
 
   if (type === 'highlights') {
     if (purchasesCV > 0 && spend > 0) {
@@ -2114,7 +2114,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     .replace(/{TOP_PERFORMER_METRIC}/g, topPerformer.name)
     .replace(/{TOP_PERFORMER_GROWTH}/g, getGrowthText(topPerformer.growth))
     .replace(/{CTR_SENTIMENT}/g, ctrSentiment)
-    .replace(/{THIS_CTR}/g, thisMonthCTR.toFixed(2))
+    .replace(/{THIS_CTR}/g, thisMonthCTR.toFixed(2) + '%')
     .replace(/{METRICS_RECOMMENDATION}/g, metricsRecommendation)
     // Slide 4 - Key Insights
     .replace(/{CPM_SENTIMENT}/g, cpmGrowth >= 0 ? 'Naik' : 'Turun')

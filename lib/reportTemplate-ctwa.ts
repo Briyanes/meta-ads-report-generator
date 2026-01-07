@@ -610,9 +610,9 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                 </tr>
                 <tr>
                     <td><strong>Click-Through Rate (CTR)</strong></td>
-                    <td class="text-right">${formatPercent(lastCTR * 100)}</td>
-                    <td class="text-right">${formatPercent(thisCTR * 100)}</td>
-                    <td class="text-right">${formatPercent((thisCTR - lastCTR) * 100)}</td>
+                    <td class="text-right">${formatPercent(lastCTR)}</td>
+                    <td class="text-right">${formatPercent(thisCTR)}</td>
+                    <td class="text-right">${formatPercent(thisCTR - lastCTR)}</td>
                     <td class="text-right"><span class="badge ${calculateGrowth(thisCTR, lastCTR) >= 0 ? 'badge-green' : 'badge-red'}">${calculateGrowth(thisCTR, lastCTR) >= 0 ? '+' : ''}${formatPercent(calculateGrowth(thisCTR, lastCTR))}</span></td>
                 </tr>
                 <tr>
@@ -690,7 +690,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                         ${thisCTR > 0.4 ? `
                         <div style="padding-bottom: 12px; border-bottom: 1px solid #bbf7d0;">
                             <div style="font-size: 13px; color: #166534; font-weight: 600; margin-bottom: 4px;">Click-Through Rate Kuat</div>
-                            <div style="font-size: 11px; color: #15803d;">CTR sebesar ${(thisCTR * 100).toFixed(2)}% menunjukkan creative iklan yang menarik dan targeting yang efektif.</div>
+                            <div style="font-size: 11px; color: #15803d;">CTR sebesar ${thisCTR.toFixed(2)}% menunjukkan creative iklan yang menarik dan targeting yang efektif.</div>
                         </div>
                         ` : ''}
 
@@ -735,7 +735,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                         ${thisCTR < 0.3 ? `
                         <div style="padding-bottom: 12px; border-bottom: 1px solid #fecaca;">
                             <div style="font-size: 13px; color: #991b1b; font-weight: 600; margin-bottom: 4px;">CTR Di Bawah Rata-Rata</div>
-                            <div style="font-size: 11px; color: #b91c1c;">CTR sebesar ${(thisCTR * 100).toFixed(2)}% di bawah benchmark industri. Pertimbangkan untuk refresh creative iklan dan testing format baru.</div>
+                            <div style="font-size: 11px; color: #b91c1c;">CTR sebesar ${thisCTR.toFixed(2)}% di bawah benchmark industri. Pertimbangkan untuk refresh creative iklan dan testing format baru.</div>
                         </div>
                         ` : ''}
 
@@ -946,7 +946,7 @@ ${objectiveRows}
                     <td style="font-size: 11px;">${adName.length > 60 ? adName.substring(0, 57) + '...' : adName}</td>
                     <td class="text-right">${formatNumber(results)}</td>
                     <td class="text-right">${formatNumber(impressions)}</td>
-                    <td class="text-right">${formatPercent(ctr * 100)}</td>
+                    <td class="text-right">${formatPercent(ctr)}</td>
                     <td class="text-right">${formatCurrency(spend)}</td>
                     <td class="text-right">${formatCurrency(cpr)}</td>
                 </tr>`

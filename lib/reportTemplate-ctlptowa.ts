@@ -1006,10 +1006,10 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                         </tr>
                                         <tr>
                                             <td>CTR (link click-through rate)</td>
-                                            <td className="text-right">{formatPercent((lastWeek.ctr || 0) * 100)}</td>
-                                            <td className="text-right">{formatPercent((thisWeek.ctr || 0) * 100)}</td>
-                                            <td className="text-right">{formatPercent(((thisWeek.ctr || 0) - (lastWeek.ctr || 0)) * 100)}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.ctr || 0) >= (lastWeek.ctr || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.ctr || 0) >= (lastWeek.ctr || 0) ? '+' : ''}{formatPercent(calculateGrowth((thisWeek.ctr || 0) * 100, (lastWeek.ctr || 0) * 100))}</td>
+                                            <td className="text-right">{formatPercent(lastWeek.ctr || 0)}</td>
+                                            <td className="text-right">{formatPercent(thisWeek.ctr || 0)}</td>
+                                            <td className="text-right">{formatPercent((thisWeek.ctr || 0) - (lastWeek.ctr || 0))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.ctr || 0) >= (lastWeek.ctr || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.ctr || 0) >= (lastWeek.ctr || 0) ? '+' : ''}{formatPercent(calculateGrowth(thisWeek.ctr || 0, lastWeek.ctr || 0))}</td>
                                         </tr>
                                         <tr>
                                             <td>Clicks (all)</td>
@@ -1020,10 +1020,10 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                         </tr>
                                         <tr>
                                             <td>CTR (all)</td>
-                                            <td className="text-right">{formatPercent((lastWeek.ctrAll || (lastWeek.clicksAll && lastWeek.impressions ? (lastWeek.clicksAll / lastWeek.impressions) : 0) || 0) * 100)}</td>
-                                            <td className="text-right">{formatPercent((thisWeek.ctrAll || (thisWeek.clicksAll && thisWeek.impressions ? (thisWeek.clicksAll / thisWeek.impressions) : 0) || 0) * 100)}</td>
-                                            <td className="text-right">{formatPercent(((thisWeek.ctrAll || (thisWeek.clicksAll && thisWeek.impressions ? (thisWeek.clicksAll / thisWeek.impressions) : 0) || 0) - (lastWeek.ctrAll || (lastWeek.clicksAll && lastWeek.impressions ? (lastWeek.clicksAll / lastWeek.impressions) : 0) || 0)) * 100)}</td>
-                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.ctrAll || (thisWeek.clicksAll && thisWeek.impressions ? (thisWeek.clicksAll / thisWeek.impressions) : 0) || 0) >= (lastWeek.ctrAll || (lastWeek.clicksAll && lastWeek.impressions ? (lastWeek.clicksAll / lastWeek.impressions) : 0) || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.ctrAll || (thisWeek.clicksAll && thisWeek.impressions ? (thisWeek.clicksAll / thisWeek.impressions) : 0) || 0) >= (lastWeek.ctrAll || (lastWeek.clicksAll && lastWeek.impressions ? (lastWeek.clicksAll / lastWeek.impressions) : 0) || 0) ? '+' : ''}{formatPercent(calculateGrowth((thisWeek.ctrAll || (thisWeek.clicksAll && thisWeek.impressions ? (thisWeek.clicksAll / thisWeek.impressions) : 0) || 0) * 100, (lastWeek.ctrAll || (lastWeek.clicksAll && lastWeek.impressions ? (lastWeek.clicksAll / lastWeek.impressions) : 0) || 0) * 100))}</td>
+                                            <td className="text-right">{formatPercent((lastWeek.ctrAll || (lastWeek.clicksAll && lastWeek.impressions ? (lastWeek.clicksAll / lastWeek.impressions * 100) : 0) || 0))}</td>
+                                            <td className="text-right">{formatPercent((thisWeek.ctrAll || (thisWeek.clicksAll && thisWeek.impressions ? (thisWeek.clicksAll / thisWeek.impressions * 100) : 0) || 0))}</td>
+                                            <td className="text-right">{formatPercent(((thisWeek.ctrAll || (thisWeek.clicksAll && thisWeek.impressions ? (thisWeek.clicksAll / thisWeek.impressions * 100) : 0) || 0) - (lastWeek.ctrAll || (lastWeek.clicksAll && lastWeek.impressions ? (lastWeek.clicksAll / lastWeek.impressions * 100) : 0) || 0)))}</td>
+                                            <td className={\`border border-gray-300 p-2 text-right text-xs \${(thisWeek.ctrAll || (thisWeek.clicksAll && thisWeek.impressions ? (thisWeek.clicksAll / thisWeek.impressions * 100) : 0) || 0) >= (lastWeek.ctrAll || (lastWeek.clicksAll && lastWeek.impressions ? (lastWeek.clicksAll / lastWeek.impressions * 100) : 0) || 0) ? 'text-green-500' : 'text-red-500'}\`}>{(thisWeek.ctrAll || (thisWeek.clicksAll && thisWeek.impressions ? (thisWeek.clicksAll / thisWeek.impressions * 100) : 0) || 0) >= (lastWeek.ctrAll || (lastWeek.clicksAll && lastWeek.impressions ? (lastWeek.clicksAll / lastWeek.impressions * 100) : 0) || 0) ? '+' : ''}{formatPercent(calculateGrowth((thisWeek.ctrAll || (thisWeek.clicksAll && thisWeek.impressions ? (thisWeek.clicksAll / thisWeek.impressions * 100) : 0) || 0), (lastWeek.ctrAll || (lastWeek.clicksAll && lastWeek.impressions ? (lastWeek.clicksAll / lastWeek.impressions * 100) : 0) || 0)))}</td>
                                         </tr>
                                         <tr>
                                             <td>CPC (all)</td>
@@ -1130,7 +1130,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                                                         <span><strong>Checkouts Initiated</strong> {resultsGrowth.isPositive ? 'meningkat' : 'menurun'} {Math.abs(resultsGrowth).toFixed(1)}% dengan {resultsGrowth.isPositive ? 'peningkatan' : 'penurunan'} kualitas conversion</span>
                                         </li>
                                         <li className="flex items-start">
-                                                        <span><strong>Click-Through Rate</strong> {thisWeek.ctr >= lastWeek.ctr ? 'stabil' : 'meningkat'} di {formatPercent((thisWeek.ctr || 0) * 100)} meskipun impressions {thisWeek.impressions >= lastWeek.impressions ? 'meningkat' : 'menurun'}</span>
+                                                        <span><strong>Click-Through Rate</strong> {thisWeek.ctr >= lastWeek.ctr ? 'stabil' : 'meningkat'} di {formatPercent(thisWeek.ctr || 0)} meskipun impressions {thisWeek.impressions >= lastWeek.impressions ? 'meningkat' : 'menurun'}</span>
                                         </li>
                                         <li className="flex items-start">
                                                         <span><strong>Cost Efficiency</strong> {cprGrowth <= 0 ? 'meningkat' : 'menurun'} dengan CPR {cprGrowth <= 0 ? 'turun' : 'naik'} {Math.abs(cprGrowth).toFixed(1)}%</span>
@@ -1363,7 +1363,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedGender.map((item: any) => {
           const gender = item.Gender || 'Unknown'
-          const ctr = (item['CTR (link click-through rate)'] || 0) * 100
+          const ctr = item['CTR (link click-through rate)'] || 0
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${gender}</span>
                                             <span className="font-bold text-xs">{formatPercent(${ctr})}</span>
@@ -1377,7 +1377,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="flex items-start">
                                         <i className="fas fa-venus-mars text-blue-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
-                                            <p><strong>Kesimpulan:</strong> ${sortedGender.length > 0 ? sortedGender[0].Gender + ' menghasilkan impressions tertinggi dengan CTR ' + ((sortedGender[0]['CTR (link click-through rate)'] || 0) * 100).toFixed(2) + '%.' : 'Gender breakdown menunjukkan variasi performa signifikan antar segment.'}</p>
+                                            <p><strong>Kesimpulan:</strong> ${sortedGender.length > 0 ? sortedGender[0].Gender + ' menghasilkan impressions tertinggi dengan CTR ' + ((sortedGender[0]['CTR (link click-through rate)'] || 0).toFixed(2) + '%.' : 'Gender breakdown menunjukkan variasi performa signifikan antar segment.'}</p>
                                             <p className="text-xs mt-1">${sortedGender.length > 0 ? 'Segment ini menunjukkan engagement lebih tinggi dibanding segment lainnya.' : 'Perlu analisis lebih lanjut untuk identifikasi segment terbaik.'}</p>
                                         </div>
                                     </div>
@@ -1458,7 +1458,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedRegion.map((item: any) => {
           const region = item.Region || 'Unknown'
-          const ctr = (item['CTR (link click-through rate)'] || 0) * 100
+          const ctr = item['CTR (link click-through rate)'] || 0
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${region}</span>
                                             <span className="font-bold text-xs">{formatPercent(${ctr})}</span>
@@ -1472,7 +1472,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="flex items-start">
                                         <i className="fas fa-map-marker-alt text-blue-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
-                                            <p><strong>Kesimpulan:</strong> ${sortedRegion.length > 0 ? sortedRegion[0].Region + ' menghasilkan impressions tertinggi dengan CTR ' + ((sortedRegion[0]['CTR (link click-through rate)'] || 0) * 100).toFixed(2) + '%.' : 'Region breakdown menunjukkan variasi performa signifikan antar lokasi.'}</p>
+                                            <p><strong>Kesimpulan:</strong> ${sortedRegion.length > 0 ? sortedRegion[0].Region + ' menghasilkan impressions tertinggi dengan CTR ' + ((sortedRegion[0]['CTR (link click-through rate)'] || 0).toFixed(2) + '%.' : 'Region breakdown menunjukkan variasi performa signifikan antar lokasi.'}</p>
                                             <p className="text-xs mt-1">${sortedRegion.length > 0 ? 'Region ini menjadi pilihan terbaik untuk fokus targeting dan optimasi budget.' : 'Perlu analisis lebih lanjut untuk identifikasi region terbaik.'}</p>
                                         </div>
                                     </div>
@@ -1552,7 +1552,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedPlatform.map((item: any) => {
           const platform = item.Platform || 'Unknown'
-          const ctr = (item['CTR (link click-through rate)'] || 0) * 100
+          const ctr = item['CTR (link click-through rate)'] || 0
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${platform}</span>
                                             <span className="font-bold text-xs">{formatPercent(${ctr})}</span>
@@ -1566,7 +1566,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="flex items-start">
                                         <i className="fab fa-instagram text-purple-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
-                                            <p><strong>Kesimpulan:</strong> ${sortedPlatform.length > 0 ? sortedPlatform[0].Platform + ' menghasilkan checkouts tertinggi dengan CTR ' + ((sortedPlatform[0]['CTR (link click-through rate)'] || 0) * 100).toFixed(2) + '%.' : 'Platform breakdown menunjukkan variasi performa signifikan antar platform.'}</p>
+                                            <p><strong>Kesimpulan:</strong> ${sortedPlatform.length > 0 ? sortedPlatform[0].Platform + ' menghasilkan checkouts tertinggi dengan CTR ' + ((sortedPlatform[0]['CTR (link click-through rate)'] || 0).toFixed(2) + '%.' : 'Platform breakdown menunjukkan variasi performa signifikan antar platform.'}</p>
                                             <p className="text-xs mt-1">${sortedPlatform.length > 0 ? 'Platform ini menjadi pilihan terbaik untuk optimasi budget dan scaling campaign.' : 'Perlu analisis lebih lanjut untuk identifikasi platform terbaik.'}</p>
                                         </div>
                                     </div>
@@ -1647,7 +1647,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="space-y-2">
                                         ${sortedPlacement.map((item: any) => {
           const placement = item.Placement || 'Unknown'
-          const ctr = (item['CTR (link click-through rate)'] || 0) * 100
+          const ctr = item['CTR (link click-through rate)'] || 0
           return `<div className="flex justify-between items-center">
                                             <span className="text-xs">${placement}</span>
                                             <span className="font-bold text-xs">{formatPercent(${ctr})}</span>
@@ -1661,7 +1661,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                     <div className="flex items-start">
                                         <i className="fas fa-photo-video text-blue-500 mr-2 mt-0.5"></i>
                                         <div className="flex-1">
-                                            <p><strong>Kesimpulan:</strong> ${sortedPlacement.length > 0 ? sortedPlacement[0].Placement + ' menghasilkan checkouts tertinggi dengan CTR ' + ((sortedPlacement[0]['CTR (link click-through rate)'] || 0) * 100).toFixed(2) + '%.' : 'Placement breakdown menunjukkan variasi performa signifikan antar format.'}</p>
+                                            <p><strong>Kesimpulan:</strong> ${sortedPlacement.length > 0 ? sortedPlacement[0].Placement + ' menghasilkan checkouts tertinggi dengan CTR ' + ((sortedPlacement[0]['CTR (link click-through rate)'] || 0).toFixed(2) + '%.' : 'Placement breakdown menunjukkan variasi performa signifikan antar format.'}</p>
                                             <p className="text-xs mt-1">${sortedPlacement.length > 0 ? 'Format konten ini menjadi pilihan terbaik untuk optimasi dan scaling.' : 'Perlu analisis lebih lanjut untuk identifikasi format terbaik.'}</p>
                                         </div>
                                     </div>
@@ -1753,7 +1753,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
           const instagramVisits = item['Instagram profile visits'] || 0
           const instagramFollows = item['Instagram follows'] || 0
           const cpr = item['Cost per checkout initiated'] || 0
-          const ctr = (item['CTR (link click-through rate)'] || 0) * 100
+          const ctr = item['CTR (link click-through rate)'] || 0
           const impressions = item['Impressions'] || 0
           const outboundClicks = item['Outbound clicks'] || 0
           
@@ -1873,7 +1873,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
           const conv = item['Checkouts initiated'] || 0
           const impressions = item.Impressions || 0
           const clicks = item['Outbound clicks'] || 0
-          const ctr = (item['CTR (link click-through rate)'] || 0) * 100
+          const ctr = item['CTR (link click-through rate)'] || 0
           return `<div>
                                             <h3 className="text-base font-semibold mb-3">${objective}</h3>
                                             <div className="space-y-2">
@@ -1901,7 +1901,7 @@ function generateBreakdownSlides(breakdown: any, thisWeek: any, lastWeek: any, t
                                 <div className="insight-box">
                                     <div className="flex items-start">
                                         <div className="flex-1">
-                                            <p><strong>Kesimpulan:</strong> ${sortedObjective.length > 0 ? sortedObjective[0]['Campaign objective'] + ' menghasilkan checkouts tertinggi dengan CTR ' + ((sortedObjective[0]['CTR (link click-through rate)'] || 0) * 100).toFixed(2) + '%.' : 'Objective breakdown menunjukkan variasi performa signifikan antar objective.'}</p>
+                                            <p><strong>Kesimpulan:</strong> ${sortedObjective.length > 0 ? sortedObjective[0]['Campaign objective'] + ' menghasilkan checkouts tertinggi dengan CTR ' + ((sortedObjective[0]['CTR (link click-through rate)'] || 0).toFixed(2) + '%.' : 'Objective breakdown menunjukkan variasi performa signifikan antar objective.'}</p>
                                             <p className="text-xs mt-1">${sortedObjective.length > 0 ? 'Objective ini menjadi pilihan terbaik untuk optimasi dan scaling campaign.' : 'Perlu analisis lebih lanjut untuk identifikasi objective terbaik.'}</p>
                                         </div>
                                     </div>
