@@ -128,40 +128,16 @@ export async function POST(request: NextRequest) {
     // Import template based on objective type
     let generateReport: (analysisData: any, reportName?: string, retentionType?: string, objectiveType?: string) => string | Promise<string>
 
-    // console.log('[Generate Report] Objective type:', objectiveType)
-    // console.log('[Generate Report] Analysis data keys:', analysisData ? Object.keys(analysisData).slice(0, 20) : 'null')
-    // console.log('[Generate Report] Report name:', reportName)
-    // console.log('[Generate Report] Retention type:', retentionType)
-    
-    // Debug: Check ad-creative data
-    if (analysisData?.breakdown?.thisWeek?.['ad-creative']) {
-      const adCreative = analysisData.breakdown.thisWeek['ad-creative']
-      // console.log('[Generate Report] Ad Creative data count:', adCreative.length)
-      if (adCreative.length > 0) {
-        // console.log('[Generate Report] First ad creative:', JSON.stringify({
-          name: adCreative[0]?.Ads || adCreative[0]?.['Ad name'],
-          wa: adCreative[0]?.['Messaging conversations started'],
-          oc: adCreative[0]?.['Outbound clicks']
-        }))
-      }
-    }
-
     try {
       if (objectiveType === 'cpas') {
-        // console.log('[Generate Report] Loading CPAS template...')
         const { generateReactTailwindReport: generateCPAS } = await import('@/lib/reports/cpas/template')
         generateReport = generateCPAS
-        // console.log('[Generate Report] CPAS template loaded successfully')
       } else if (objectiveType === 'ctwa') {
-        // console.log('[Generate Report] Loading CTWA template...')
         const { generateReactTailwindReport: generateCTWA } = await import('@/lib/reports/ctwa/template')
         generateReport = generateCTWA
-        // console.log('[Generate Report] CTWA template loaded successfully')
       } else if (objectiveType === 'ctlptowa') {
-        // console.log('[Generate Report] Loading CTLPTOWA template...')
         const { generateReactTailwindReport: generateCTLP } = await import('@/lib/reports/ctlptowa/template')
         generateReport = generateCTLP
-        // console.log('[Generate Report] CTLPTOWA template loaded successfully')
       } else {
         // Fallback to CTWA
         const { generateReactTailwindReport: generateCTWA } = await import('@/lib/reports/ctwa/template')
@@ -178,10 +154,7 @@ export async function POST(request: NextRequest) {
     // This ensures each objective type has its own isolated template and doesn't affect others
     let htmlReport: string
     try {
-      // console.log('[Generate Report] Calling generateReport function...')
       htmlReport = await generateReport(analysisData, sanitizedName, retentionType, objectiveType)
-      // console.log('[Generate Report] HTML report generated, length:', htmlReport?.length)
-      // console.log('[Generate Report] HTML preview (first 200 chars):', htmlReport?.substring(0, 200))
 
       if (!htmlReport || htmlReport.length < 100) {
         console.error('[Generate Report] HTML report too short or empty')
@@ -192,8 +165,6 @@ export async function POST(request: NextRequest) {
       const hasValidHTML = htmlReport.includes('<div') || htmlReport.includes('<!DOCTYPE html>') || htmlReport.includes('<html')
       const hasRoot = htmlReport.includes('class="slide') || htmlReport.includes('<div id="root">')
 
-      // console.log('[Generate Report] Validation - hasValidHTML:', hasValidHTML, 'hasRoot:', hasRoot)
-
       if (!hasValidHTML) {
         console.error('[Generate Report] HTML validation failed - missing valid HTML structure')
         throw new Error('Generated HTML report is missing required HTML structure')
@@ -203,8 +174,6 @@ export async function POST(request: NextRequest) {
         console.error('[Generate Report] HTML validation failed - missing root element')
         throw new Error('Generated HTML report is missing root element (div id="root" or class="slide")')
       }
-
-      // console.log('[Generate Report] HTML validation passed, returning success')
 
     } catch (templateError: any) {
       console.error('[Generate Report] Template generation error:', templateError)

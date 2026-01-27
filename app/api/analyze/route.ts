@@ -226,12 +226,6 @@ export async function POST(request: NextRequest) {
         totals['CTR (link click-through rate)'] = parseNum(totals['Impressions']) > 0 ? (parseNum(totals['Link clicks']) / parseNum(totals['Impressions'])) * 100 : 0
         totals['CPC (cost per link click)'] = parseNum(totals['Link clicks']) > 0 ? parseNum(totals['Amount spent (IDR)']) / parseNum(totals['Link clicks']) : 0
         totals['Cost per messaging conversation started'] = parseNum(totals['Messaging conversations started']) > 0 ? parseNum(totals['Amount spent (IDR)']) / parseNum(totals['Messaging conversations started']) : 0
-        // console.log('[DEBUG] Using summary row from CSV:', {
-          reach: totals['Reach'],
-          impressions: totals['Impressions'],
-          amountSpent: totals['Amount spent (IDR)'],
-          messagingConversations: totals['Messaging conversations started']
-        })
         return [totals]
       }
       
@@ -281,13 +275,6 @@ export async function POST(request: NextRequest) {
       result['Cost per messaging conversation started'] = totals['Messaging conversations started'] > 0 ? totals['Amount spent (IDR)'] / totals['Messaging conversations started'] : 0
       result['Reporting starts'] = reportingStarts
       result['Reporting ends'] = reportingEnds
-      
-      // console.log('[DEBUG] Aggregated from detail rows:', {
-        reach: result['Reach'],
-        impressions: result['Impressions'],
-        amountSpent: result['Amount spent (IDR)'],
-        messagingConversations: result['Messaging conversations started']
-      })
       
       return [result]
     }
@@ -471,20 +458,11 @@ export async function POST(request: NextRequest) {
               k.toLowerCase() === 'ads' || k.toLowerCase() === 'ad name' || k.toLowerCase().includes('ad name')
             ) || 'Ads'
             const aggregatedCreatives = aggregateBreakdownData(parsed.data, adNameKey)
-            // console.log('[DEBUG] Aggregated ad-creative data count:', aggregatedCreatives.length)
-            if (aggregatedCreatives.length > 0) {
-              // console.log('[DEBUG] First aggregated creative:', JSON.stringify({
-                name: aggregatedCreatives[0][adNameKey],
-                wa: aggregatedCreatives[0]['Messaging conversations started'],
-                oc: aggregatedCreatives[0]['Outbound clicks']
-              }))
-            }
             breakdownDataThisWeek['ad-creative'] = aggregatedCreatives
           }
         }
       }
       
-      // console.log('[DEBUG] Extracted breakdowns from combined files (This Week):', Object.keys(breakdownDataThisWeek))
     } else {
       // Original logic for separate breakdown files
       for (const file of breakdownThisWeek) {
@@ -947,16 +925,6 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     const aggregatedMainThisWeek = aggregateCSVData(parsedDataThisWeek.data)
     const aggregatedMainLastWeek = aggregateCSVData(parsedDataLastWeek.data)
 
-    // console.log('[DEBUG] aggregatedMainThisWeek:', {
-      reach: aggregatedMainThisWeek['Reach'],
-      impressions: aggregatedMainThisWeek['Impressions'],
-      amountSpent: aggregatedMainThisWeek['Amount spent (IDR)'],
-      messagingConversations: aggregatedMainThisWeek['Messaging conversations started'],
-      linkClicks: aggregatedMainThisWeek['Link clicks']
-    })
-
-    // console.log('[DEBUG] breakdownDataThisWeek keys:', Object.keys(breakdownDataThisWeek))
-
     // For CTWA (and most objectives), use aggregatedMain which contains total across all objectives
     // For combined files, this already has the correct totals from the summary row or aggregation
     // The objective breakdown is only used for breakdown analysis, not main metrics
@@ -984,26 +952,7 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     // For last week, allow missing objective data (for new clients with no historical data)
     if (!lastWeekData || Object.keys(lastWeekData).length === 0) {
       console.warn('[WARN] Objective breakdown file not found for lastWeek - this is expected for new clients')
-      // console.log('[DEBUG] ✓ Using objective.csv for this week only (new client)')
-    } else {
-      // console.log('[DEBUG] ✓ Using objective.csv for both weeks')
     }
-    // console.log('[DEBUG] thisWeekData Amount Spent:', thisWeekData['Amount spent (IDR)'])
-    if (lastWeekData) {
-      // console.log('[DEBUG] lastWeekData Amount Spent:', lastWeekData['Amount spent (IDR)'])
-    } else {
-      // console.log('[DEBUG] lastWeekData Amount Spent: N/A (new client)')
-    }
-
-    // DEBUG: Log aggregated data
-    // console.log('[DEBUG] thisWeekData keys:', Object.keys(thisWeekData))
-    // console.log('[DEBUG] thisWeekData sample:', {
-      Reach: thisWeekData['Reach'],
-      reach: thisWeekData['reach'],
-      Frequency: thisWeekData['Frequency'],
-      'Link clicks': thisWeekData['Link clicks'],
-      'Clicks (all)': thisWeekData['Clicks (all)']
-    })
 
     // Calculate base metrics
     const thisWeekSpend = parseNum(thisWeekData['Amount spent (IDR)'])
@@ -1082,21 +1031,6 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     
     // Build performance summary with all fields
     const buildPerformanceData = (data: any, results: number, cpr: number) => {
-      // DEBUG: Log what getFieldValue returns for key metrics
-      const debugReach = getFieldValue(data, 'Reach', ['Reach', 'reach', 'Accounts Center accounts reached'])
-      const debugFreq = getFieldValue(data, 'Frequency')
-      const debugLinkClicks = getFieldValue(data, 'Link clicks')
-      const debugClicksAll = getFieldValue(data, 'Clicks (all)')
-      const debugCtrAll = getFieldValue(data, 'CTR (all)')
-
-      // console.log('[DEBUG] buildPerformanceData inputs:', {
-        reach: debugReach,
-        frequency: debugFreq,
-        linkClicks: debugLinkClicks,
-        clicksAll: debugClicksAll,
-        ctrAll: debugCtrAll
-      })
-
       // Extract base metrics
       const amountSpent = parseNum(getFieldValue(data, 'Amount spent (IDR)'))
       const impressions = parseNum(getFieldValue(data, 'Impressions'))
@@ -1132,16 +1066,6 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         reach: parseNum(getFieldValue(data, 'Reach', ['Reach', 'reach', 'Accounts Center accounts reached'])),
         cpr: cpr
       }
-
-      // console.log('[DEBUG] base after parseNum:', {
-        reach: base.reach,
-        frequency: base.frequency,
-        linkClicks: base.linkClicks,
-        cpc: base.cpc,
-        cpm: base.cpm,
-        amountSpent: base.amountSpent,
-        impressions: base.impressions
-      })
       
       // CTWA fields
       if (objectiveType === 'ctwa') {
@@ -1218,11 +1142,6 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         const purchasesConvValue = parseNum(data['Purchases conversion value'] || data['Purchases conversion value for shared items only'] || 0)
         if (purchasesConvValue > 0 && amountSpent > 0) {
           cpasData.roas = purchasesConvValue / amountSpent
-          // console.log('[DEBUG] Calculated ROAS:', {
-            purchasesConvValue: purchasesConvValue,
-            amountSpent: amountSpent,
-            roas: cpasData.roas
-          })
         } else {
           // Fallback: try to get ROAS from CSV if calculation is not possible
           const csvROAS = parseNum(getFieldValue(data, 'Results ROAS', [
@@ -1233,34 +1152,19 @@ Return the analysis as structured JSON data that can be used to generate the HTM
           ]))
           if (csvROAS > 0) {
             cpasData.roas = csvROAS
-            // console.log('[DEBUG] Using ROAS from CSV:', cpasData.roas)
           }
         }
 
         // Calculate AOV using formula: Purchases conversion value for shared items only ÷ Purchases
         if (purchasesConvValue > 0 && purchases > 0) {
           cpasData.aov = purchasesConvValue / purchases
-          // console.log('[DEBUG] Calculated AOV:', {
-            purchasesConvValue: purchasesConvValue,
-            purchases: purchases,
-            aov: cpasData.aov
-          })
         } else {
           // Fallback: try to get AOV from CSV
           const csvAOV = parseNum(getFieldValue(data, 'AOV (IDR)', ['AOV (IDR)', 'AOV', 'Average order value']))
           if (csvAOV > 0) {
             cpasData.aov = csvAOV
-            // console.log('[DEBUG] Using AOV from CSV:', cpasData.aov)
           }
         }
-
-        // console.log('[DEBUG] CPAS data:', {
-          reach: cpasData.reach,
-          frequency: cpasData.frequency,
-          linkClicks: cpasData.linkClicks,
-          clicksAll: cpasData.clicksAll,
-          ctrAll: cpasData.ctrAll
-        })
 
         return cpasData
       }
@@ -1284,17 +1188,8 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     const thisWeekDataMerged = { ...thisWeekData, ...aggregatedMainThisWeek }
     const lastWeekDataMerged = { ...lastWeekData, ...aggregatedMainLastWeek }
 
-    // console.log('[DEBUG] thisWeekDataMerged conversion values:', {
-      atcCV: thisWeekDataMerged['Adds to cart conversion value for shared items only'],
-      purchCV: thisWeekDataMerged['Purchases conversion value for shared items only'],
-      roas: thisWeekDataMerged['ROAS'],
-      aov: thisWeekDataMerged['AOV (IDR)']
-    })
-
     const thisWeekPerf = buildPerformanceData(thisWeekDataMerged, thisWeekResults, thisWeekCPR)
     const lastWeekPerf = buildPerformanceData(lastWeekDataMerged, lastWeekResults, lastWeekCPR)
-
-    // Debug: Log performance data Reach values
 
     const analysis = {
         performanceSummary: {

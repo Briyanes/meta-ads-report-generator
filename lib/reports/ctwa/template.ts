@@ -2059,43 +2059,14 @@ function generateAdCreativeSlide(data: any[], slideNumber: number): string {
 }
 
 function generateContentPerformanceSlide(data: any[], slideNumber: number): string {
-  // console.log('[Content Performance] TOTAL DATA COUNT:', data.length)
-  
   const firstItem = data[0] || {}
   const creativeNameKey = Object.keys(firstItem).find(k => k.toLowerCase() === 'ads' || k.toLowerCase() === 'ad name' || k.toLowerCase().includes('ad name') || k.toLowerCase().includes('creative')) || 'Ads'
-
-  // Debug: Log ALL items with WA > 1000 (suspicious data from combined files)
-  const suspiciousItems = data.filter(item => parseNum(item['Messaging conversations started'] || 0) > 1000)
-  if (suspiciousItems.length > 0) {
-    // console.log('[Content Performance] SUSPICIOUS ITEMS (WA > 1000):', suspiciousItems.map(item => ({
-      name: String(item[creativeNameKey]).slice(0, 30),
-      wa: parseNum(item['Messaging conversations started'] || 0),
-      results: parseNum(item['Results'] || 0)
-    })))
-  }
-
-  // Debug: Log available data
-  // console.log('[Content Performance] First item keys:', Object.keys(firstItem))
-  // console.log('[Content Performance] Sample item:', JSON.stringify({
-    name: firstItem[creativeNameKey],
-    wa: firstItem['Messaging conversations started'],
-    oc: firstItem['Outbound clicks'],
-    spent: firstItem['Amount spent (IDR)'],
-    impr: firstItem['Impressions'],
-    clicks: firstItem['Link clicks']
-  }, null, 2))
 
   // Sort by WA results (Messaging conversations started ONLY - no fallback to Results to avoid bad data)
   const sortedData = [...data].filter(item => {
     const name = item[creativeNameKey]
     return name && String(name).trim() !== ''
   }).sort((a, b) => parseNum(b['Messaging conversations started'] || 0) - parseNum(a['Messaging conversations started'] || 0))
-
-  // console.log('[Content Performance] Top 5 WA results:', sortedData.slice(0, 5).map(item => ({
-    name: String(item[creativeNameKey]).slice(0, 30),
-    wa: parseNum(item['Messaging conversations started'] || 0),
-    oc: parseNum(item['Outbound clicks'] || 0)
-  })))
 
   // Get top 5 creatives
   const top5 = sortedData.slice(0, 5)
