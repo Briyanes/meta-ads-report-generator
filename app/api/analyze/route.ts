@@ -6,6 +6,8 @@ import { parseCSV, analyzeDataStructure } from '@/lib/csvParser'
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS?.split(',') || [
   'http://localhost:3000',
   'http://localhost:3001',
+  'http://localhost:3002',
+  'http://localhost:3003',
   'https://meta-ads-report-generator.vercel.app',
   'https://hadona.id',
   'https://report.hadona.id',
@@ -133,10 +135,192 @@ export async function POST(request: NextRequest) {
       }
     }
     
+    // Helper: Detect if file is a "combined" format (contains multiple breakdown dimensions)
+    const isCombinedFile = (fileName: string): boolean => {
+      const nameLower = fileName.toLowerCase()
+      // Combined files typically have patterns like "age-gender" or "platform-placement" together
+      const combinedPatterns = [
+        'age-gender',
+        'platform-placement',
+        'campaign-name-ad-creative'
+      ]
+      return combinedPatterns.some(pattern => nameLower.includes(pattern))
+    }
+    
+    // Helper: Extract breakdown data from combined CSV file
+    const extractBreakdownsFromCombinedFile = async (file: File): Promise<Record<string, any[]>> => {
+      const parsed = await parseCSV(file)
+      const data = parsed.data
+      const headers = parsed.headers
+      
+      const breakdowns: Record<string, any[]> = {}
+      
+      // Check which dimensions exist in the data
+      const hasAge = headers.includes('Age') && data.some((r: any) => r['Age'])
+      const hasGender = headers.includes('Gender') && data.some((r: any) => r['Gender'])
+      const hasRegion = headers.includes('Region') && data.some((r: any) => r['Region'])
+      const hasPlatform = headers.includes('Platform') && data.some((r: any) => r['Platform'])
+      const hasPlacement = headers.includes('Placement') && data.some((r: any) => r['Placement'])
+      const hasObjective = headers.includes('Objective') && data.some((r: any) => r['Objective'])
+      const hasAds = headers.includes('Ads') && data.some((r: any) => r['Ads'])
+      
+      // console.log('[DEBUG] Combined file:', file.name)
+      // console.log('[DEBUG] Dimensions found:', { hasAge, hasGender, hasRegion, hasPlatform, hasPlacement, hasObjective, hasAds })
+      
+      if (hasAge) breakdowns['age'] = data.filter((r: any) => r['Age'])
+      if (hasGender) breakdowns['gender'] = data.filter((r: any) => r['Gender'])
+      if (hasRegion) breakdowns['region'] = data.filter((r: any) => r['Region'])
+      if (hasPlatform) breakdowns['platform'] = data.filter((r: any) => r['Platform'])
+      if (hasPlacement) breakdowns['placement'] = data.filter((r: any) => r['Placement'])
+      if (hasObjective) breakdowns['objective'] = data.filter((r: any) => r['Objective'])
+      if (hasAds) breakdowns['ad-creative'] = data.filter((r: any) => r['Ads'])
+      
+      return breakdowns
+    }
+    
+    // Helper: Create aggregated main report from combined files
+    const createMainReportFromCombinedFiles = async (files: File[]): Promise<any[]> => {
+      const parseNum = (val: any): number => {
+        if (!val && val !== 0) return 0
+        let str = String(val).replace(/,/g, '').replace(/\s+/g, '')
+        const num = parseFloat(str)
+        return isNaN(num) ? 0 : num
+      }
+      
+      // First, read the summary row (first row after header which usually contains totals)
+      // In Meta Ads exports, the first data row is often the total row
+      let summaryRow: any = null
+      let reportingStarts = ''
+      let reportingEnds = ''
+      
+      for (const file of files) {
+        const parsed = await parseCSV(file)
+        if (parsed.data.length > 0) {
+          // Check if first row is a summary row (no campaign name, just totals)
+          const firstRow = parsed.data[0]
+          if (!firstRow['Campaign name'] && firstRow['Amount spent (IDR)']) {
+            // This is a summary row
+            if (!summaryRow) {
+              summaryRow = { ...firstRow }
+            }
+          }
+          // Get reporting dates from any row
+          for (const row of parsed.data) {
+            if (!reportingStarts && row['Reporting starts']) {
+              reportingStarts = row['Reporting starts']
+              reportingEnds = row['Reporting ends']
+              break
+            }
+          }
+        }
+      }
+      
+      // If we found a summary row, use it directly (most accurate)
+      if (summaryRow) {
+        summaryRow['Reporting starts'] = reportingStarts
+        summaryRow['Reporting ends'] = reportingEnds
+        // Recalculate derived metrics
+        const totals = summaryRow
+        totals['Frequency'] = parseNum(totals['Reach']) > 0 ? parseNum(totals['Impressions']) / parseNum(totals['Reach']) : 0
+        totals['CPM (cost per 1,000 impressions)'] = parseNum(totals['Impressions']) > 0 ? (parseNum(totals['Amount spent (IDR)']) / parseNum(totals['Impressions'])) * 1000 : 0
+        totals['CTR (link click-through rate)'] = parseNum(totals['Impressions']) > 0 ? (parseNum(totals['Link clicks']) / parseNum(totals['Impressions'])) * 100 : 0
+        totals['CPC (cost per link click)'] = parseNum(totals['Link clicks']) > 0 ? parseNum(totals['Amount spent (IDR)']) / parseNum(totals['Link clicks']) : 0
+        totals['Cost per messaging conversation started'] = parseNum(totals['Messaging conversations started']) > 0 ? parseNum(totals['Amount spent (IDR)']) / parseNum(totals['Messaging conversations started']) : 0
+        // console.log('[DEBUG] Using summary row from CSV:', {
+          reach: totals['Reach'],
+          impressions: totals['Impressions'],
+          amountSpent: totals['Amount spent (IDR)'],
+          messagingConversations: totals['Messaging conversations started']
+        })
+        return [totals]
+      }
+      
+      // Fallback: Aggregate from detail rows (less accurate due to potential overlaps)
+      const totals: Record<string, number> = {
+        'Reach': 0,
+        'Impressions': 0,
+        'Link clicks': 0,
+        'Clicks (all)': 0,
+        'Amount spent (IDR)': 0,
+        'Messaging conversations started': 0,
+        'Instagram follows': 0,
+        'Outbound clicks': 0
+      }
+      
+      // Use objective-level aggregation to avoid double-counting
+      // Only count from ONE file to avoid duplicates across files
+      let bestFile: File | null = null
+      let bestRowCount = 0
+      
+      for (const file of files) {
+        const parsed = await parseCSV(file)
+        const dataRows = parsed.data.filter((r: any) => r['Campaign name']) // Only detail rows
+        if (dataRows.length > bestRowCount) {
+          bestRowCount = dataRows.length
+          bestFile = file
+        }
+      }
+      
+      if (bestFile) {
+        const parsed = await parseCSV(bestFile)
+        for (const row of parsed.data) {
+          if (row['Campaign name']) { // Only detail rows
+            for (const field of Object.keys(totals)) {
+              totals[field] += parseNum(row[field])
+            }
+          }
+        }
+      }
+      
+      // Calculate derived metrics
+      const result: any = { ...totals }
+      result['Frequency'] = totals['Reach'] > 0 ? totals['Impressions'] / totals['Reach'] : 0
+      result['CPM (cost per 1,000 impressions)'] = totals['Impressions'] > 0 ? (totals['Amount spent (IDR)'] / totals['Impressions']) * 1000 : 0
+      result['CTR (link click-through rate)'] = totals['Impressions'] > 0 ? (totals['Link clicks'] / totals['Impressions']) * 100 : 0
+      result['CPC (cost per link click)'] = totals['Link clicks'] > 0 ? totals['Amount spent (IDR)'] / totals['Link clicks'] : 0
+      result['Cost per messaging conversation started'] = totals['Messaging conversations started'] > 0 ? totals['Amount spent (IDR)'] / totals['Messaging conversations started'] : 0
+      result['Reporting starts'] = reportingStarts
+      result['Reporting ends'] = reportingEnds
+      
+      // console.log('[DEBUG] Aggregated from detail rows:', {
+        reach: result['Reach'],
+        impressions: result['Impressions'],
+        amountSpent: result['Amount spent (IDR)'],
+        messagingConversations: result['Messaging conversations started']
+      })
+      
+      return [result]
+    }
+    
+    // Check if we're dealing with combined files (new format from rmoda workshop)
+    const allThisWeekFiles = [fileThisWeek, ...breakdownThisWeek]
+    const allLastWeekFiles = [fileLastWeek, ...breakdownLastWeek]
+    const hasCombinedFilesThisWeek = allThisWeekFiles.some(f => isCombinedFile(f.name))
+    const hasCombinedFilesLastWeek = allLastWeekFiles.some(f => isCombinedFile(f.name))
+    
+    // console.log('[DEBUG] Has combined files - This Week:', hasCombinedFilesThisWeek, 'Last Week:', hasCombinedFilesLastWeek)
 
-    // Parse main CSV files
-    const parsedDataThisWeek = await parseCSV(fileThisWeek)
-    const parsedDataLastWeek = await parseCSV(fileLastWeek)
+    // Parse main CSV files - handle combined format
+    let parsedDataThisWeek: any
+    let parsedDataLastWeek: any
+    
+    if (hasCombinedFilesThisWeek) {
+      // Create aggregated main report from all combined files
+      const mainData = await createMainReportFromCombinedFiles(allThisWeekFiles)
+      parsedDataThisWeek = { data: mainData, headers: Object.keys(mainData[0] || {}), summary: { totalRows: 1 } }
+      // console.log('[DEBUG] Created aggregated main report for This Week from combined files')
+    } else {
+      parsedDataThisWeek = await parseCSV(fileThisWeek)
+    }
+    
+    if (hasCombinedFilesLastWeek) {
+      // Create aggregated main report from all combined files
+      const mainData = await createMainReportFromCombinedFiles(allLastWeekFiles)
+      parsedDataLastWeek = { data: mainData, headers: Object.keys(mainData[0] || {}), summary: { totalRows: 1 } }
+      // console.log('[DEBUG] Created aggregated main report for Last Week from combined files')
+    } else {
+      parsedDataLastWeek = await parseCSV(fileLastWeek)
+    }
     
     // Helper to aggregate breakdown data by dimension (age, platform, etc.)
     const aggregateBreakdownData = (data: any[], dimensionKey: string): any[] => {
@@ -151,9 +335,15 @@ export async function POST(request: NextRequest) {
         return isNaN(num) ? 0 : num
       }
       
+      // Filter out rows with empty/blank dimension key (these are usually summary rows)
+      const filteredData = data.filter(row => {
+        const dimValue = row[dimensionKey]
+        return dimValue && String(dimValue).trim() !== '' && dimValue !== 'Unknown'
+      })
+      
       // Group by dimension (age, platform, placement, etc.)
       const grouped: Record<string, any[]> = {}
-      for (const row of data) {
+      for (const row of filteredData) {
         const key = row[dimensionKey] || 'Unknown'
         if (!grouped[key]) {
           grouped[key] = []
@@ -165,6 +355,8 @@ export async function POST(request: NextRequest) {
       const aggregated: any[] = []
       for (const [key, rows] of Object.entries(grouped)) {
         if (rows.length === 0) continue
+        // Skip 'Unknown' key as it's likely a summary row
+        if (key === 'Unknown' || key === '') continue
         
         const firstRow = rows[0]
         const aggregatedRow: any = { [dimensionKey]: key }
@@ -200,72 +392,249 @@ export async function POST(request: NextRequest) {
     const breakdownDataThisWeek: Record<string, any> = {}
     const breakdownDataLastWeek: Record<string, any> = {}
 
-    console.log('[DEBUG] breakdownThisWeek files:', breakdownThisWeek.map(f => f.name))
+    // console.log('[DEBUG] breakdownThisWeek files:', breakdownThisWeek.map(f => f.name))
+    // console.log('[DEBUG] hasCombinedFilesThisWeek:', hasCombinedFilesThisWeek)
 
-    for (const file of breakdownThisWeek) {
-      const parsed = await parseCSV(file)
-      const fileName = file.name.toLowerCase()
-      const fileType = fileName.startsWith('age-') || fileName.includes('-age') ? 'age' :
-                      fileName.startsWith('gender-') || fileName.includes('-gender') ? 'gender' :
-                      fileName.startsWith('region-') || fileName.includes('-region') ? 'region' :
-                      fileName.startsWith('platform-') || fileName.includes('-platform') ? 'platform' :
-                      fileName.startsWith('placement-') || fileName.includes('-placement') ? 'placement' :
-                      fileName.startsWith('objective-') || fileName.includes('-objective') ? 'objective' :
-                      fileName.includes('ad-creative') || fileName.includes('creative') ? 'ad-creative' : 'other'
-
-      console.log('[DEBUG] File:', fileName, '→ Detected as:', fileType)
-
-      // Aggregate breakdown data by dimension
-      let aggregatedData = parsed.data
-      if (fileType === 'age' && parsed.data.length > 0) {
-        aggregatedData = aggregateBreakdownData(parsed.data, 'Age')
-      } else if (fileType === 'gender' && parsed.data.length > 0) {
-        aggregatedData = aggregateBreakdownData(parsed.data, 'Gender')
-      } else if (fileType === 'region' && parsed.data.length > 0) {
-        aggregatedData = aggregateBreakdownData(parsed.data, 'Region')
-      } else if (fileType === 'platform' && parsed.data.length > 0) {
-        aggregatedData = aggregateBreakdownData(parsed.data, 'Platform')
-      } else if (fileType === 'placement' && parsed.data.length > 0) {
-        aggregatedData = aggregateBreakdownData(parsed.data, 'Placement')
-      } else if (fileType === 'objective' && parsed.data.length > 0) {
-        aggregatedData = aggregateBreakdownData(parsed.data, 'Objective')
+    // Process this week files
+    if (hasCombinedFilesThisWeek) {
+      // Extract breakdowns from combined files - only extract each type ONCE to avoid duplicates
+      // Track which breakdown types have already been extracted
+      const extractedTypes = new Set<string>()
+      
+      for (const file of allThisWeekFiles) {
+        if (isCombinedFile(file.name)) {
+          const extractedBreakdowns = await extractBreakdownsFromCombinedFile(file)
+          for (const [type, data] of Object.entries(extractedBreakdowns)) {
+            // Only add if this type hasn't been extracted yet (prevents duplicate counting)
+            if (!extractedTypes.has(type)) {
+              breakdownDataThisWeek[type] = data
+              extractedTypes.add(type)
+            }
+          }
+        }
       }
+      // Aggregate each breakdown type
+      for (const [type, data] of Object.entries(breakdownDataThisWeek)) {
+        const dimensionKey = type === 'age' ? 'Age' :
+                            type === 'gender' ? 'Gender' :
+                            type === 'region' ? 'Region' :
+                            type === 'platform' ? 'Platform' :
+                            type === 'placement' ? 'Placement' :
+                            type === 'objective' ? 'Objective' :
+                            type === 'ad-creative' ? 'Ads' : type
+        breakdownDataThisWeek[type] = aggregateBreakdownData(data, dimensionKey)
+      }
+      
+      // IMPORTANT: Also check for dedicated objective.csv file and use it (better data quality)
+      // Combined files don't have proper WA data per objective
+      for (const file of allThisWeekFiles) {
+        const fileName = file.name.toLowerCase()
+        // Check if this is a dedicated objective file (not a combined file with objective)
+        const isObjectiveOnly = fileName === 'objective.csv' || 
+          fileName.match(/^objective-.*\.csv$/) || 
+          (fileName.endsWith('-objective.csv') && 
+           !fileName.includes('creative') && 
+           !fileName.includes('region') && 
+           !fileName.includes('age') && 
+           !fileName.includes('gender') && 
+           !fileName.includes('platform') && 
+           !fileName.includes('placement'))
+        
+        if (isObjectiveOnly) {
+          const parsed = await parseCSV(file)
+          if (parsed.data.length > 0) {
+            // console.log('[DEBUG] Found dedicated objective file (This Week):', file.name)
+            // console.log('[DEBUG] Objective file sample:', JSON.stringify(parsed.data[0], null, 2))
+            breakdownDataThisWeek['objective'] = aggregateBreakdownData(parsed.data, 'Objective')
+          }
+        }
+        
+        // IMPORTANT: Also check for dedicated ad-creative.csv file (better data quality)
+        // Combined files have WA=0 per creative because they are broken down by other dimensions
+        const isAdCreativeOnly = fileName === 'ad-creative.csv' || 
+          fileName.match(/^ad-creative-.*\.csv$/) || 
+          (fileName.endsWith('-ad-creative.csv') && 
+           !fileName.includes('region') && 
+           !fileName.includes('age') && 
+           !fileName.includes('gender') && 
+           !fileName.includes('platform') && 
+           !fileName.includes('placement') &&
+           !fileName.includes('objective'))
+        
+        if (isAdCreativeOnly) {
+          const parsed = await parseCSV(file)
+          if (parsed.data.length > 0) {
+            // console.log('[DEBUG] Found dedicated ad-creative file (This Week):', file.name)
+            // console.log('[DEBUG] Ad Creative file sample:', JSON.stringify(parsed.data[0], null, 2))
+            // Use 'Ads' or 'Ad name' as the dimension key
+            const adNameKey = Object.keys(parsed.data[0]).find(k => 
+              k.toLowerCase() === 'ads' || k.toLowerCase() === 'ad name' || k.toLowerCase().includes('ad name')
+            ) || 'Ads'
+            const aggregatedCreatives = aggregateBreakdownData(parsed.data, adNameKey)
+            // console.log('[DEBUG] Aggregated ad-creative data count:', aggregatedCreatives.length)
+            if (aggregatedCreatives.length > 0) {
+              // console.log('[DEBUG] First aggregated creative:', JSON.stringify({
+                name: aggregatedCreatives[0][adNameKey],
+                wa: aggregatedCreatives[0]['Messaging conversations started'],
+                oc: aggregatedCreatives[0]['Outbound clicks']
+              }))
+            }
+            breakdownDataThisWeek['ad-creative'] = aggregatedCreatives
+          }
+        }
+      }
+      
+      // console.log('[DEBUG] Extracted breakdowns from combined files (This Week):', Object.keys(breakdownDataThisWeek))
+    } else {
+      // Original logic for separate breakdown files
+      for (const file of breakdownThisWeek) {
+        const parsed = await parseCSV(file)
+        const fileName = file.name.toLowerCase()
+        const fileType = fileName.startsWith('age-') || fileName.includes('-age') ? 'age' :
+                        fileName.startsWith('gender-') || fileName.includes('-gender') ? 'gender' :
+                        fileName.startsWith('region-') || fileName.includes('-region') ? 'region' :
+                        fileName.startsWith('platform-') || fileName.includes('-platform') ? 'platform' :
+                        fileName.startsWith('placement-') || fileName.includes('-placement') ? 'placement' :
+                        fileName.startsWith('objective-') || fileName.includes('-objective') ? 'objective' :
+                        fileName.includes('ad-creative') || fileName.includes('creative') ? 'ad-creative' : 'other'
 
-      breakdownDataThisWeek[fileType] = aggregatedData
+        // console.log('[DEBUG] File:', fileName, '→ Detected as:', fileType)
+
+        // Aggregate breakdown data by dimension
+        let aggregatedData = parsed.data
+        if (fileType === 'age' && parsed.data.length > 0) {
+          aggregatedData = aggregateBreakdownData(parsed.data, 'Age')
+        } else if (fileType === 'gender' && parsed.data.length > 0) {
+          aggregatedData = aggregateBreakdownData(parsed.data, 'Gender')
+        } else if (fileType === 'region' && parsed.data.length > 0) {
+          aggregatedData = aggregateBreakdownData(parsed.data, 'Region')
+        } else if (fileType === 'platform' && parsed.data.length > 0) {
+          aggregatedData = aggregateBreakdownData(parsed.data, 'Platform')
+        } else if (fileType === 'placement' && parsed.data.length > 0) {
+          aggregatedData = aggregateBreakdownData(parsed.data, 'Placement')
+        } else if (fileType === 'objective' && parsed.data.length > 0) {
+          aggregatedData = aggregateBreakdownData(parsed.data, 'Objective')
+        }
+
+        breakdownDataThisWeek[fileType] = aggregatedData
+      }
     }
     
-    console.log('[DEBUG] breakdownLastWeek files:', breakdownLastWeek.map(f => f.name))
+    // console.log('[DEBUG] breakdownLastWeek files:', breakdownLastWeek.map(f => f.name))
+    // console.log('[DEBUG] hasCombinedFilesLastWeek:', hasCombinedFilesLastWeek)
 
-    for (const file of breakdownLastWeek) {
-      const parsed = await parseCSV(file)
-      const fileName = file.name.toLowerCase()
-      const fileType = fileName.startsWith('age-') || fileName.includes('-age') ? 'age' :
-                      fileName.startsWith('gender-') || fileName.includes('-gender') ? 'gender' :
-                      fileName.startsWith('region-') || fileName.includes('-region') ? 'region' :
-                      fileName.startsWith('platform-') || fileName.includes('-platform') ? 'platform' :
-                      fileName.startsWith('placement-') || fileName.includes('-placement') ? 'placement' :
-                      fileName.startsWith('objective-') || fileName.includes('-objective') ? 'objective' :
-                      fileName.includes('ad-creative') || fileName.includes('creative') ? 'ad-creative' : 'other'
-
-      console.log('[DEBUG] File:', fileName, '→ Detected as:', fileType)
-
-      // Aggregate breakdown data by dimension
-      let aggregatedData = parsed.data
-      if (fileType === 'age' && parsed.data.length > 0) {
-        aggregatedData = aggregateBreakdownData(parsed.data, 'Age')
-      } else if (fileType === 'gender' && parsed.data.length > 0) {
-        aggregatedData = aggregateBreakdownData(parsed.data, 'Gender')
-      } else if (fileType === 'region' && parsed.data.length > 0) {
-        aggregatedData = aggregateBreakdownData(parsed.data, 'Region')
-      } else if (fileType === 'platform' && parsed.data.length > 0) {
-        aggregatedData = aggregateBreakdownData(parsed.data, 'Platform')
-      } else if (fileType === 'placement' && parsed.data.length > 0) {
-        aggregatedData = aggregateBreakdownData(parsed.data, 'Placement')
-      } else if (fileType === 'objective' && parsed.data.length > 0) {
-        aggregatedData = aggregateBreakdownData(parsed.data, 'Objective')
+    // Process last week files
+    if (hasCombinedFilesLastWeek) {
+      // Extract breakdowns from combined files - only extract each type ONCE to avoid duplicates
+      // Track which breakdown types have already been extracted
+      const extractedTypesLast = new Set<string>()
+      
+      for (const file of allLastWeekFiles) {
+        if (isCombinedFile(file.name)) {
+          const extractedBreakdowns = await extractBreakdownsFromCombinedFile(file)
+          for (const [type, data] of Object.entries(extractedBreakdowns)) {
+            // Only add if this type hasn't been extracted yet (prevents duplicate counting)
+            if (!extractedTypesLast.has(type)) {
+              breakdownDataLastWeek[type] = data
+              extractedTypesLast.add(type)
+            }
+          }
+        }
       }
+      // Aggregate each breakdown type
+      for (const [type, data] of Object.entries(breakdownDataLastWeek)) {
+        const dimensionKey = type === 'age' ? 'Age' :
+                            type === 'gender' ? 'Gender' :
+                            type === 'region' ? 'Region' :
+                            type === 'platform' ? 'Platform' :
+                            type === 'placement' ? 'Placement' :
+                            type === 'objective' ? 'Objective' :
+                            type === 'ad-creative' ? 'Ads' : type
+        breakdownDataLastWeek[type] = aggregateBreakdownData(data, dimensionKey)
+      }
+      
+      // IMPORTANT: Also check for dedicated objective.csv file and use it (better data quality)
+      for (const file of allLastWeekFiles) {
+        const fileName = file.name.toLowerCase()
+        // Check if this is a dedicated objective file (not a combined file with objective)
+        const isObjectiveOnly = fileName === 'objective.csv' || 
+          fileName.match(/^objective-.*\.csv$/) || 
+          (fileName.endsWith('-objective.csv') && 
+           !fileName.includes('creative') && 
+           !fileName.includes('region') && 
+           !fileName.includes('age') && 
+           !fileName.includes('gender') && 
+           !fileName.includes('platform') && 
+           !fileName.includes('placement'))
+        
+        if (isObjectiveOnly) {
+          const parsed = await parseCSV(file)
+          if (parsed.data.length > 0) {
+            // console.log('[DEBUG] Found dedicated objective file (Last Week):', file.name)
+            // console.log('[DEBUG] Objective file sample:', JSON.stringify(parsed.data[0], null, 2))
+            breakdownDataLastWeek['objective'] = aggregateBreakdownData(parsed.data, 'Objective')
+          }
+        }
+        
+        // IMPORTANT: Also check for dedicated ad-creative.csv file (better data quality)
+        const isAdCreativeOnly = fileName === 'ad-creative.csv' || 
+          fileName.match(/^ad-creative-.*\.csv$/) || 
+          (fileName.endsWith('-ad-creative.csv') && 
+           !fileName.includes('region') && 
+           !fileName.includes('age') && 
+           !fileName.includes('gender') && 
+           !fileName.includes('platform') && 
+           !fileName.includes('placement') &&
+           !fileName.includes('objective'))
+        
+        if (isAdCreativeOnly) {
+          const parsed = await parseCSV(file)
+          if (parsed.data.length > 0) {
+            // console.log('[DEBUG] Found dedicated ad-creative file (Last Week):', file.name)
+            // console.log('[DEBUG] Ad Creative file sample:', JSON.stringify(parsed.data[0], null, 2))
+            // Use 'Ads' or 'Ad name' as the dimension key
+            const adNameKey = Object.keys(parsed.data[0]).find(k => 
+              k.toLowerCase() === 'ads' || k.toLowerCase() === 'ad name' || k.toLowerCase().includes('ad name')
+            ) || 'Ads'
+            breakdownDataLastWeek['ad-creative'] = aggregateBreakdownData(parsed.data, adNameKey)
+          }
+        }
+      }
+      
+      // console.log('[DEBUG] Extracted breakdowns from combined files (Last Week):', Object.keys(breakdownDataLastWeek))
+    } else {
+      // Original logic for separate breakdown files
+      for (const file of breakdownLastWeek) {
+        const parsed = await parseCSV(file)
+        const fileName = file.name.toLowerCase()
+        const fileType = fileName.startsWith('age-') || fileName.includes('-age') ? 'age' :
+                        fileName.startsWith('gender-') || fileName.includes('-gender') ? 'gender' :
+                        fileName.startsWith('region-') || fileName.includes('-region') ? 'region' :
+                        fileName.startsWith('platform-') || fileName.includes('-platform') ? 'platform' :
+                        fileName.startsWith('placement-') || fileName.includes('-placement') ? 'placement' :
+                        fileName.startsWith('objective-') || fileName.includes('-objective') ? 'objective' :
+                        fileName.includes('ad-creative') || fileName.includes('creative') ? 'ad-creative' : 'other'
 
-      breakdownDataLastWeek[fileType] = aggregatedData
+        // console.log('[DEBUG] File:', fileName, '→ Detected as:', fileType)
+
+        // Aggregate breakdown data by dimension
+        let aggregatedData = parsed.data
+        if (fileType === 'age' && parsed.data.length > 0) {
+          aggregatedData = aggregateBreakdownData(parsed.data, 'Age')
+        } else if (fileType === 'gender' && parsed.data.length > 0) {
+          aggregatedData = aggregateBreakdownData(parsed.data, 'Gender')
+        } else if (fileType === 'region' && parsed.data.length > 0) {
+          aggregatedData = aggregateBreakdownData(parsed.data, 'Region')
+        } else if (fileType === 'platform' && parsed.data.length > 0) {
+          aggregatedData = aggregateBreakdownData(parsed.data, 'Platform')
+        } else if (fileType === 'placement' && parsed.data.length > 0) {
+          aggregatedData = aggregateBreakdownData(parsed.data, 'Placement')
+        } else if (fileType === 'objective' && parsed.data.length > 0) {
+          aggregatedData = aggregateBreakdownData(parsed.data, 'Objective')
+        }
+
+        breakdownDataLastWeek[fileType] = aggregatedData
+      }
     }
     
     // Analyze data structure
@@ -578,30 +947,36 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     const aggregatedMainThisWeek = aggregateCSVData(parsedDataThisWeek.data)
     const aggregatedMainLastWeek = aggregateCSVData(parsedDataLastWeek.data)
 
-    console.log('[DEBUG] aggregatedMainThisWeek conversion values:', {
-      atcCV: aggregatedMainThisWeek['Adds to cart conversion value for shared items only'],
-      purchCV: aggregatedMainThisWeek['Purchases conversion value for shared items only'],
-      roas: aggregatedMainThisWeek['ROAS'],
-      aov: aggregatedMainThisWeek['AOV (IDR)']
+    // console.log('[DEBUG] aggregatedMainThisWeek:', {
+      reach: aggregatedMainThisWeek['Reach'],
+      impressions: aggregatedMainThisWeek['Impressions'],
+      amountSpent: aggregatedMainThisWeek['Amount spent (IDR)'],
+      messagingConversations: aggregatedMainThisWeek['Messaging conversations started'],
+      linkClicks: aggregatedMainThisWeek['Link clicks']
     })
 
-    // Extract first row from OBJECTIVE breakdown (matching Report Manual approach)
-    // Report Manual uses objective.data[0] for CPAS metrics
-    // objective.csv contains AGGREGATED totals, not daily data like main CSV
-    // CRITICAL: NO FALLBACK to main CSV - objective.csv is REQUIRED for CPAS!
+    // console.log('[DEBUG] breakdownDataThisWeek keys:', Object.keys(breakdownDataThisWeek))
 
-    console.log('[DEBUG] breakdownDataThisWeek keys:', Object.keys(breakdownDataThisWeek))
-    console.log('[DEBUG] breakdownDataThisWeek.objective:', breakdownDataThisWeek.objective)
-    console.log('[DEBUG] breakdownDataLastWeek.objective:', breakdownDataLastWeek.objective)
+    // For CTWA (and most objectives), use aggregatedMain which contains total across all objectives
+    // For combined files, this already has the correct totals from the summary row or aggregation
+    // The objective breakdown is only used for breakdown analysis, not main metrics
+    
+    // Use aggregatedMain data as the primary source (this is the TOTAL across all objectives)
+    let thisWeekData = aggregatedMainThisWeek
+    let lastWeekData = aggregatedMainLastWeek
+    
+    // Only use objective[0] for CPAS where we need specific objective metrics
+    if (objectiveType === 'cpas' && breakdownDataThisWeek.objective?.length > 0) {
+      // For CPAS, we need the OUTCOME_SALES objective specifically
+      thisWeekData = breakdownDataThisWeek.objective.find((o: any) => o.Objective === 'OUTCOME_SALES') || aggregatedMainThisWeek
+      lastWeekData = breakdownDataLastWeek.objective?.find((o: any) => o.Objective === 'OUTCOME_SALES') || aggregatedMainLastWeek
+    }
 
-    const thisWeekData = breakdownDataThisWeek.objective?.[0]
-    const lastWeekData = breakdownDataLastWeek.objective?.[0]
-
-    // Validate objective data exists for this week
+    // Validate data exists
     if (!thisWeekData || Object.keys(thisWeekData).length === 0) {
-      console.error('[ERROR] Objective breakdown file not found for thisWeek!')
+      console.error('[ERROR] No data found for thisWeek!')
       return NextResponse.json(
-        { error: 'Objective breakdown file is required for CPAS reports. Please upload the -objective.csv file for this week.' },
+        { error: 'Could not parse data from uploaded files. Please check the CSV format.' },
         { status: 400 }
       )
     }
@@ -609,20 +984,20 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     // For last week, allow missing objective data (for new clients with no historical data)
     if (!lastWeekData || Object.keys(lastWeekData).length === 0) {
       console.warn('[WARN] Objective breakdown file not found for lastWeek - this is expected for new clients')
-      console.log('[DEBUG] ✓ Using objective.csv for this week only (new client)')
+      // console.log('[DEBUG] ✓ Using objective.csv for this week only (new client)')
     } else {
-      console.log('[DEBUG] ✓ Using objective.csv for both weeks')
+      // console.log('[DEBUG] ✓ Using objective.csv for both weeks')
     }
-    console.log('[DEBUG] thisWeekData Amount Spent:', thisWeekData['Amount spent (IDR)'])
+    // console.log('[DEBUG] thisWeekData Amount Spent:', thisWeekData['Amount spent (IDR)'])
     if (lastWeekData) {
-      console.log('[DEBUG] lastWeekData Amount Spent:', lastWeekData['Amount spent (IDR)'])
+      // console.log('[DEBUG] lastWeekData Amount Spent:', lastWeekData['Amount spent (IDR)'])
     } else {
-      console.log('[DEBUG] lastWeekData Amount Spent: N/A (new client)')
+      // console.log('[DEBUG] lastWeekData Amount Spent: N/A (new client)')
     }
 
     // DEBUG: Log aggregated data
-    console.log('[DEBUG] thisWeekData keys:', Object.keys(thisWeekData))
-    console.log('[DEBUG] thisWeekData sample:', {
+    // console.log('[DEBUG] thisWeekData keys:', Object.keys(thisWeekData))
+    // console.log('[DEBUG] thisWeekData sample:', {
       Reach: thisWeekData['Reach'],
       reach: thisWeekData['reach'],
       Frequency: thisWeekData['Frequency'],
@@ -714,7 +1089,7 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       const debugClicksAll = getFieldValue(data, 'Clicks (all)')
       const debugCtrAll = getFieldValue(data, 'CTR (all)')
 
-      console.log('[DEBUG] buildPerformanceData inputs:', {
+      // console.log('[DEBUG] buildPerformanceData inputs:', {
         reach: debugReach,
         frequency: debugFreq,
         linkClicks: debugLinkClicks,
@@ -725,7 +1100,7 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       // Extract base metrics
       const amountSpent = parseNum(getFieldValue(data, 'Amount spent (IDR)'))
       const impressions = parseNum(getFieldValue(data, 'Impressions'))
-      const linkClicks = parseNum(getFieldValue(data, 'Outbound clicks'))
+      const linkClicks = parseNum(getFieldValue(data, 'Link clicks', ['Link clicks', 'link clicks', 'Link Clicks']))
 
       const base = {
         amountSpent: amountSpent,
@@ -758,7 +1133,7 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         cpr: cpr
       }
 
-      console.log('[DEBUG] base after parseNum:', {
+      // console.log('[DEBUG] base after parseNum:', {
         reach: base.reach,
         frequency: base.frequency,
         linkClicks: base.linkClicks,
@@ -843,7 +1218,7 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         const purchasesConvValue = parseNum(data['Purchases conversion value'] || data['Purchases conversion value for shared items only'] || 0)
         if (purchasesConvValue > 0 && amountSpent > 0) {
           cpasData.roas = purchasesConvValue / amountSpent
-          console.log('[DEBUG] Calculated ROAS:', {
+          // console.log('[DEBUG] Calculated ROAS:', {
             purchasesConvValue: purchasesConvValue,
             amountSpent: amountSpent,
             roas: cpasData.roas
@@ -858,14 +1233,14 @@ Return the analysis as structured JSON data that can be used to generate the HTM
           ]))
           if (csvROAS > 0) {
             cpasData.roas = csvROAS
-            console.log('[DEBUG] Using ROAS from CSV:', cpasData.roas)
+            // console.log('[DEBUG] Using ROAS from CSV:', cpasData.roas)
           }
         }
 
         // Calculate AOV using formula: Purchases conversion value for shared items only ÷ Purchases
         if (purchasesConvValue > 0 && purchases > 0) {
           cpasData.aov = purchasesConvValue / purchases
-          console.log('[DEBUG] Calculated AOV:', {
+          // console.log('[DEBUG] Calculated AOV:', {
             purchasesConvValue: purchasesConvValue,
             purchases: purchases,
             aov: cpasData.aov
@@ -875,11 +1250,11 @@ Return the analysis as structured JSON data that can be used to generate the HTM
           const csvAOV = parseNum(getFieldValue(data, 'AOV (IDR)', ['AOV (IDR)', 'AOV', 'Average order value']))
           if (csvAOV > 0) {
             cpasData.aov = csvAOV
-            console.log('[DEBUG] Using AOV from CSV:', cpasData.aov)
+            // console.log('[DEBUG] Using AOV from CSV:', cpasData.aov)
           }
         }
 
-        console.log('[DEBUG] CPAS data:', {
+        // console.log('[DEBUG] CPAS data:', {
           reach: cpasData.reach,
           frequency: cpasData.frequency,
           linkClicks: cpasData.linkClicks,
@@ -909,7 +1284,7 @@ Return the analysis as structured JSON data that can be used to generate the HTM
     const thisWeekDataMerged = { ...thisWeekData, ...aggregatedMainThisWeek }
     const lastWeekDataMerged = { ...lastWeekData, ...aggregatedMainLastWeek }
 
-    console.log('[DEBUG] thisWeekDataMerged conversion values:', {
+    // console.log('[DEBUG] thisWeekDataMerged conversion values:', {
       atcCV: thisWeekDataMerged['Adds to cart conversion value for shared items only'],
       purchCV: thisWeekDataMerged['Purchases conversion value for shared items only'],
       roas: thisWeekDataMerged['ROAS'],

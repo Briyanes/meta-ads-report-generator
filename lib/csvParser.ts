@@ -1,5 +1,77 @@
 import Papa from 'papaparse'
 
+// =====================================
+// FIELD NAME CONSTANTS
+// Centralized mapping for Meta Ads CSV field names
+// Handle variations in column naming across different CSV exports
+// =====================================
+
+export const FIELD_NAMES = {
+  // Spend & Budget
+  AMOUNT_SPENT: ['Amount spent (IDR)', 'Amount Spent', 'amount spent', 'Spend'],
+  
+  // Reach & Impressions
+  REACH: ['Reach', 'reach', 'Accounts Center accounts reached'],
+  IMPRESSIONS: ['Impressions', 'impressions'],
+  FREQUENCY: ['Frequency', 'frequency'],
+  
+  // Clicks
+  LINK_CLICKS: ['Link clicks', 'link clicks', 'Link Clicks'],
+  OUTBOUND_CLICKS: ['Outbound clicks', 'outbound clicks', 'Outbound Clicks'],
+  CLICKS_ALL: ['Clicks (all)', 'clicks (all)', 'Clicks'],
+  
+  // CTR & CPC
+  CTR_LINK: ['CTR (link click-through rate)', 'CTR (link)', 'ctr link'],
+  CTR_ALL: ['CTR (all)', 'ctr all'],
+  CPC: ['CPC (cost per link click)', 'CPC', 'cpc'],
+  CPM: ['CPM (cost per 1,000 impressions)', 'CPM', 'cpm'],
+  
+  // Conversions - CTWA
+  MESSAGING_CONVERSATIONS: ['Messaging conversations started', 'messaging conversations started'],
+  COST_PER_MESSAGING: ['Cost per messaging conversation started'],
+  
+  // Conversions - CTLPTOWA
+  CHECKOUTS_INITIATED: ['Checkouts initiated', 'checkouts initiated', 'Checkouts Initiated'],
+  LANDING_PAGE_VIEWS: ['Website landing page views', 'Landing page views', 'landing page views'],
+  CONTENT_VIEWS: ['Content views', 'content views'],
+  
+  // Conversions - CPAS
+  ADDS_TO_CART: ['Adds to cart with shared items', 'Adds to cart', 'adds to cart'],
+  ATC_VALUE: ['Adds to cart conversion value for shared items only', 'ATC Value'],
+  PURCHASES: ['Purchases with shared items', 'Purchases', 'purchases'],
+  PURCHASES_VALUE: ['Purchases conversion value for shared items only', 'Purchase Value'],
+  ROAS: ['ROAS', 'Results ROAS', 'roas'],
+  AOV: ['AOV (IDR)', 'AOV', 'aov'],
+  
+  // Breakdown Dimensions
+  AGE: ['Age', 'age'],
+  GENDER: ['Gender', 'gender'],
+  REGION: ['Region', 'region', 'Location'],
+  PLATFORM: ['Platform', 'platform', 'Publisher platform'],
+  PLACEMENT: ['Placement', 'placement', 'Publisher placement'],
+  OBJECTIVE: ['Objective', 'objective', 'Campaign objective'],
+} as const
+
+// Helper function to get field value with multiple fallback names
+export function getFieldByName(data: Record<string, any>, fieldNames: readonly string[]): any {
+  for (const name of fieldNames) {
+    if (data[name] !== undefined && data[name] !== null && data[name] !== '') {
+      return data[name]
+    }
+  }
+  return undefined
+}
+
+// Centralized parseNum function - single source of truth
+export function parseNum(val: any): number {
+  if (typeof val === 'number') return val
+  if (!val || val === '-' || val === 'N/A') return 0
+  // Remove commas, whitespace, currency symbols
+  const cleanStr = String(val).replace(/[,\s]/g, '').replace(/^Rp\s*/i, '')
+  const parsed = parseFloat(cleanStr)
+  return isNaN(parsed) ? 0 : parsed
+}
+
 export interface MetaAdsData {
   [key: string]: any
 }

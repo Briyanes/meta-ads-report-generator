@@ -450,13 +450,13 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         </p>
 
         <div class="period-badge">
-            <span>📅</span>
+            <span>�</span>
             <span>${retentionType === 'mom' ? 'Month-over-Month Comparison' : 'Week-over-Week Comparison'}</span>
         </div>
 
         <div style="margin-top: 64px;">
             <div class="confidential-badge">
-                <span>🔒</span>
+                <span>�</span>
                 <span>Confidential Report</span>
             </div>
         </div>

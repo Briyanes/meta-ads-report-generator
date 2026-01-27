@@ -120,66 +120,97 @@ export default function MetaAdsPage() {
     try {
       const formData = new FormData()
       
+      // Check if we have combined files (new format from rmoda workshop)
+      const combinedPatterns = ['age-gender', 'platform-placement', 'campaign-name-ad-creative']
+      const isCombinedFile = (fileName: string) => {
+        const nameLower = fileName.toLowerCase()
+        return combinedPatterns.some(pattern => nameLower.includes(pattern))
+      }
+      
+      const hasCombinedFilesThisWeek = filesThisWeek.some(f => isCombinedFile(f.name))
+      const hasCombinedFilesLastWeek = filesLastWeek.some(f => isCombinedFile(f.name))
+      
       // Find main CSV files (files without breakdown keywords)
       // Main file is typically the one without breakdown dimension keywords
       const breakdownKeywords = ['-age', '-gender', '-region', '-platform', '-placement', '-objective', '-ad-creative', '-creative', '-adcreative']
       
-      const mainThisWeek = filesThisWeek.find(file => {
-        const name = file.name.toLowerCase()
-        // Check if file contains any breakdown keyword
-        const hasBreakdownKeyword = breakdownKeywords.some(keyword => name.includes(keyword))
-        // Main file should not have breakdown keywords
-        return !hasBreakdownKeyword
-      })
+      let finalMainThisWeek: File | null = null
+      let finalMainLastWeek: File | null = null
       
-      const mainLastWeek = filesLastWeek.find(file => {
-        const name = file.name.toLowerCase()
-        // Check if file contains any breakdown keyword
-        const hasBreakdownKeyword = breakdownKeywords.some(keyword => name.includes(keyword))
-        // Main file should not have breakdown keywords
-        return !hasBreakdownKeyword
-      })
-      
-      // If no main file found, try to find the largest file or file with most common name pattern
-      const findMainFileFallback = (files: File[]) => {
-        if (files.length === 0) return null
+      if (hasCombinedFilesThisWeek) {
+        // For combined format, use the first combined file as main (will be processed specially in API)
+        finalMainThisWeek = filesThisWeek.find(f => isCombinedFile(f.name)) || filesThisWeek[0]
+      } else {
+        const mainThisWeek = filesThisWeek.find(file => {
+          const name = file.name.toLowerCase()
+          const hasBreakdownKeyword = breakdownKeywords.some(keyword => name.includes(keyword))
+          return !hasBreakdownKeyword
+        })
         
-        // Try to find file that matches common main file patterns
-        const mainPatterns = ['main', 'data', 'report', 'summary']
-        for (const pattern of mainPatterns) {
-          const found = files.find(f => f.name.toLowerCase().includes(pattern))
-          if (found) return found
+        // If no main file found, try to find the largest file or file with most common name pattern
+        const findMainFileFallback = (files: File[]) => {
+          if (files.length === 0) return null
+          const mainPatterns = ['main', 'data', 'report', 'summary']
+          for (const pattern of mainPatterns) {
+            const found = files.find(f => f.name.toLowerCase().includes(pattern))
+            if (found) return found
+          }
+          return files.reduce((prev, current) => 
+            current.name.length > prev.name.length ? current : prev
+          )
         }
         
-        // If no pattern match, return the file with the longest name (usually main file)
-        return files.reduce((prev, current) => 
-          current.name.length > prev.name.length ? current : prev
-        )
+        finalMainThisWeek = mainThisWeek || findMainFileFallback(filesThisWeek)
       }
       
-      const finalMainThisWeek = mainThisWeek || findMainFileFallback(filesThisWeek)
-      const finalMainLastWeek = mainLastWeek || findMainFileFallback(filesLastWeek)
+      if (hasCombinedFilesLastWeek) {
+        // For combined format, use the first combined file as main (will be processed specially in API)
+        finalMainLastWeek = filesLastWeek.find(f => isCombinedFile(f.name)) || filesLastWeek[0]
+      } else {
+        const mainLastWeek = filesLastWeek.find(file => {
+          const name = file.name.toLowerCase()
+          const hasBreakdownKeyword = breakdownKeywords.some(keyword => name.includes(keyword))
+          return !hasBreakdownKeyword
+        })
+        
+        const findMainFileFallback = (files: File[]) => {
+          if (files.length === 0) return null
+          const mainPatterns = ['main', 'data', 'report', 'summary']
+          for (const pattern of mainPatterns) {
+            const found = files.find(f => f.name.toLowerCase().includes(pattern))
+            if (found) return found
+          }
+          return files.reduce((prev, current) => 
+            current.name.length > prev.name.length ? current : prev
+          )
+        }
+        
+        finalMainLastWeek = mainLastWeek || findMainFileFallback(filesLastWeek)
+      }
 
       if (!finalMainThisWeek || !finalMainLastWeek) {
-        setError('Please upload main CSV files (without breakdown keywords like -age, -gender, etc.) for both periods')
+        setError('Please upload CSV files for both periods')
         setIsAnalyzing(false)
         return
       }
 
       // Debug: Log detected files
+      console.log('[DEBUG] Main file this week:', finalMainThisWeek.name)
+      console.log('[DEBUG] Main file last week:', finalMainLastWeek.name)
+      console.log('[DEBUG] Combined format detected - This Week:', hasCombinedFilesThisWeek, 'Last Week:', hasCombinedFilesLastWeek)
 
       // Add main CSV files
       formData.append('fileThisWeek', finalMainThisWeek)
       formData.append('fileLastWeek', finalMainLastWeek)
       
-      // Add breakdown files for this week
+      // Add breakdown files for this week (all files except main)
       filesThisWeek.forEach((file, index) => {
         if (file !== finalMainThisWeek) {
           formData.append(`breakdownThisWeek_${index}`, file)
         }
       })
       
-      // Add breakdown files for last week
+      // Add breakdown files for last week (all files except main)
       filesLastWeek.forEach((file, index) => {
         if (file !== finalMainLastWeek) {
           formData.append(`breakdownLastWeek_${index}`, file)
@@ -1416,17 +1447,22 @@ export default function MetaAdsPage() {
                       <div key={index} style={{
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'space-between',
+                        justifyContent: 'flex-start',
+                        gap: '8px',
                         backgroundColor: '#f9fafb',
-                        padding: '8px',
+                        padding: '8px 12px',
                         borderRadius: '6px',
-                        marginBottom: '8px'
+                        marginBottom: '8px',
+                        textAlign: 'left'
                       }}>
+                        <i className="bi bi-check-circle" style={{ color: '#16a34a', flexShrink: 0 }}></i>
                         <span style={{
                           fontSize: '14px',
-                          color: '#374151'
+                          color: '#374151',
+                          flex: 1,
+                          textAlign: 'left',
+                          wordBreak: 'break-word'
                         }}>
-                          <i className="bi bi-check-circle" style={{ color: '#16a34a', marginRight: '8px' }}></i>
                           {file.name}
                         </span>
                         <button
@@ -1440,7 +1476,8 @@ export default function MetaAdsPage() {
                             border: 'none',
                             cursor: 'pointer',
                             fontSize: '14px',
-                            padding: '4px'
+                            padding: '4px',
+                            flexShrink: 0
                           }}
                           onMouseEnter={(e) => e.currentTarget.style.color = '#dc2626'}
                           onMouseLeave={(e) => e.currentTarget.style.color = '#ef4444'}
@@ -1522,17 +1559,22 @@ export default function MetaAdsPage() {
                       <div key={index} style={{
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'space-between',
+                        justifyContent: 'flex-start',
+                        gap: '8px',
                         backgroundColor: '#f9fafb',
-                        padding: '8px',
+                        padding: '8px 12px',
                         borderRadius: '6px',
-                        marginBottom: '8px'
+                        marginBottom: '8px',
+                        textAlign: 'left'
                       }}>
+                        <i className="bi bi-check-circle" style={{ color: '#16a34a', flexShrink: 0 }}></i>
                         <span style={{
                           fontSize: '14px',
-                          color: '#374151'
+                          color: '#374151',
+                          flex: 1,
+                          textAlign: 'left',
+                          wordBreak: 'break-word'
                         }}>
-                          <i className="bi bi-check-circle" style={{ color: '#16a34a', marginRight: '8px' }}></i>
                           {file.name}
                         </span>
                         <button
@@ -1546,7 +1588,8 @@ export default function MetaAdsPage() {
                             border: 'none',
                             cursor: 'pointer',
                             fontSize: '14px',
-                            padding: '4px'
+                            padding: '4px',
+                            flexShrink: 0
                           }}
                           onMouseEnter={(e) => e.currentTarget.style.color = '#dc2626'}
                           onMouseLeave={(e) => e.currentTarget.style.color = '#ef4444'}

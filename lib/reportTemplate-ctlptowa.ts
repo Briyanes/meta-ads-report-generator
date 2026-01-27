@@ -469,13 +469,13 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         </p>
 
         <div style="background: var(--neutral-100); padding: 20px 32px; border-radius: 24px; display: inline-flex; align-items: center; gap: 12px; box-shadow: 0 4px 12px rgba(43, 70, 187, 0.25);">
-            <span style="font-size: 20px;">📅</span>
+            <span style="font-size: 20px;">�</span>
             <span style="font-size: 16px; font-weight: 600; color: var(--primary-blue);">${retentionType === 'mom' ? 'Month-over-Month Comparison' : 'Week-over-Week Comparison'}</span>
         </div>
 
         <div style="margin-top: 64px;">
             <div class="confidential-badge">
-                <span>🔒</span>
+                <span>�</span>
                 <span>Confidential Report</span>
             </div>
         </div>
@@ -652,7 +652,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         </table>
 
         <div class="insight-box">
-            <p><strong>Insight Utama:</strong> ${spendGrowth >= 0 ? 'Peningkatan' : 'Penurunan'} performa sebesar ${Math.abs(spendGrowth).toFixed(1)}% dengan ${resultsGrowth >= 0 ? 'peningkatan' : 'penurunan'} messaging conversations. CPR ${cprGrowth <= 0 ? 'turun' : 'naik'} ${Math.abs(cprGrowth).toFixed(1)}% menunjukkan efisiensi biaya yang ${cprGrowth <= 0 ? 'lebih baik' : 'perlu diperbaiki'}.</p>
+            <p><strong>Insight Utama:</strong> ${spendGrowth >= 0 ? 'Peningkatan' : 'Penurunan'} performa sebesar ${Math.abs(spendGrowth).toFixed(1)}% dengan ${resultsGrowth >= 0 ? 'peningkatan' : 'penurunan'} checkouts initiated. CPR ${cprGrowth <= 0 ? 'turun' : 'naik'} ${Math.abs(cprGrowth).toFixed(1)}% menunjukkan efisiensi biaya yang ${cprGrowth <= 0 ? 'lebih baik' : 'perlu diperbaiki'}.</p>
         </div>
 
         <div class="slide-footer">
@@ -801,7 +801,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
       'Audience Performance: Age',
       ageData,
       breakdownLastWeek.age || [],
-      'Messaging conversations started',
+      'Checkouts initiated',
       'Age',
       formatNumber,
       slideNumber++
@@ -814,7 +814,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
       'Audience Performance: Gender',
       genderData,
       breakdownLastWeek.gender || [],
-      'Messaging conversations started',
+      'Checkouts initiated',
       'Gender',
       formatNumber,
       slideNumber++
@@ -827,7 +827,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
       'Audience Performance: Region',
       regionData,
       breakdownLastWeek.region || [],
-      'Messaging conversations started',
+      'Checkouts initiated',
       'Region',
       formatNumber,
       slideNumber++
@@ -840,7 +840,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
       'Platform Performance',
       platformData,
       breakdownLastWeek.platform || [],
-      'Messaging conversations started',
+      'Checkouts initiated',
       'Platform',
       formatNumber,
       slideNumber++
@@ -853,7 +853,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
       'Placement Performance',
       placementData,
       breakdownLastWeek.placement || [],
-      'Messaging conversations started',
+      'Checkouts initiated',
       'Placement',
       formatNumber,
       slideNumber++
