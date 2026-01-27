@@ -416,12 +416,10 @@ export default function MetaAdsPage() {
         main: [
           'Amount spent (IDR)',
           'Messaging conversations started',
-          'Cost per messaging conversation started',
           'Link clicks',
           'CPC (cost per link click)',
           'CTR (link click-through rate)',
           'Outbound clicks',
-          '* OC→WA landing ratio',
           'Impressions',
           'CPM (cost per 1,000 impressions)',
           'Reach',
@@ -438,9 +436,7 @@ export default function MetaAdsPage() {
             'Impressions',
             'CTR (link click-through rate)',
             'Outbound clicks',
-            '* OC→WA landing ratio',
             'Messaging conversations started',
-            'Cost per messaging conversation started',
             'Amount spent (IDR)'
           ],
           'Gender (gender.csv)': [
@@ -448,9 +444,7 @@ export default function MetaAdsPage() {
             'Impressions',
             'CTR (link click-through rate)',
             'Outbound clicks',
-            '* OC→WA landing ratio',
             'Messaging conversations started',
-            'Cost per messaging conversation started',
             'Amount spent (IDR)'
           ],
           'Region (region.csv)': [
@@ -458,9 +452,7 @@ export default function MetaAdsPage() {
             'Impressions',
             'CTR (link click-through rate)',
             'Outbound clicks',
-            '* OC→WA landing ratio',
             'Messaging conversations started',
-            'Cost per messaging conversation started',
             'Amount spent (IDR)'
           ],
           'Platform (platform.csv)': [
@@ -468,9 +460,7 @@ export default function MetaAdsPage() {
             'Impressions',
             'CTR (link click-through rate)',
             'Outbound clicks',
-            '* OC→WA landing ratio',
             'Messaging conversations started',
-            'Cost per messaging conversation started',
             'Amount spent (IDR)'
           ],
           'Placement (placement.csv)': [
@@ -478,9 +468,7 @@ export default function MetaAdsPage() {
             'Impressions',
             'CTR (link click-through rate)',
             'Outbound clicks',
-            '* OC→WA landing ratio',
             'Messaging conversations started',
-            'Cost per messaging conversation started',
             'Amount spent (IDR)'
           ],
           'Campaign objective (objective.csv)': [
@@ -488,19 +476,14 @@ export default function MetaAdsPage() {
             'Impressions',
             'CTR (link click-through rate)',
             'Outbound clicks',
-            '* OC→WA landing ratio',
             'Messaging conversations started',
-            'Cost per messaging conversation started',
             'Amount spent (IDR)'
           ],
           'Ad creative/Ad name (ad-creative.csv)': [
             'Ad creative/Ad name',
             'Impressions',
             'CTR (link click-through rate)',
-            'Outbound clicks',
-            '* OC→WA landing ratio',
             'Messaging conversations started',
-            'Cost per messaging conversation started',
             'Amount spent (IDR)'
           ]
         }

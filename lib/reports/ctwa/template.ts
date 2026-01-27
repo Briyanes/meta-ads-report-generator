@@ -861,7 +861,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             color: var(--gray-800);
         }
 
-        /* Scrollable Table */
+        /* Scrollable Table - for screen display */
         .scrollable-table {
             max-height: 320px;
             overflow-y: auto;
@@ -869,10 +869,31 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             border-radius: 12px;
         }
 
-        .scrollable-table thead {
+        /* Full table without scroll - for PDF export */
+        .full-table {
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            overflow: visible;
+        }
+
+        .scrollable-table thead,
+        .full-table thead {
             position: sticky;
             top: 0;
             z-index: 10;
+        }
+
+        /* Print/PDF styles - remove scroll constraints */
+        @media print {
+            .scrollable-table,
+            .full-table {
+                max-height: none !important;
+                overflow: visible !important;
+            }
+            .slide {
+                page-break-after: always;
+                page-break-inside: avoid;
+            }
         }
 
         /* Priority Badge */
@@ -1986,7 +2007,7 @@ function generateAdCreativeSlide(data: any[], slideNumber: number): string {
             <p>All Creatives (${sortedData.length} Total)</p>
         </div>
 
-        <div class="scrollable-table">
+        <div class="full-table">
             <table>
                 <thead>
                     <tr>
