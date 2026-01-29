@@ -20,8 +20,6 @@ const icon = (name: string, size: number = 16, color?: string) => {
 }
 
 export function generateReactTailwindReport(analysisData: any, reportName?: string, retentionType?: string): string {
-  // console.log('[CTWA Template] Starting report generation...')
-
   const { thisWeek, lastWeek, breakdown, performanceSummary } = analysisData || {}
 
   const thisWeekData = performanceSummary?.thisWeek || thisWeek || {}
@@ -1184,6 +1182,11 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     html += generateGenderSlide(genderData, genderDataLast, thisPeriodLabel, lastPeriodLabel, ++slideNumber)
   }
 
+  // Region Breakdown
+  if (regionData.length > 0) {
+    html += generateRegionSlide(regionData, regionDataLast, thisPeriodLabel, lastPeriodLabel, ++slideNumber)
+  }
+
   // Placement Breakdown
   if (placementData.length > 0) {
     html += generatePlacementSlide(placementData, placementDataLast, thisPeriodLabel, lastPeriodLabel, ++slideNumber)
@@ -1192,11 +1195,6 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   // Platform Breakdown
   if (platformData.length > 0) {
     html += generatePlatformSlide(platformData, platformDataLast, thisPeriodLabel, lastPeriodLabel, ++slideNumber)
-  }
-
-  // Region Breakdown
-  if (regionData.length > 0) {
-    html += generateRegionSlide(regionData, regionDataLast, thisPeriodLabel, lastPeriodLabel, ++slideNumber)
   }
 
   // Objective Breakdown

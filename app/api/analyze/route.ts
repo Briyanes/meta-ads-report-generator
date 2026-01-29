@@ -163,10 +163,7 @@ export async function POST(request: NextRequest) {
       const hasPlacement = headers.includes('Placement') && data.some((r: any) => r['Placement'])
       const hasObjective = headers.includes('Objective') && data.some((r: any) => r['Objective'])
       const hasAds = headers.includes('Ads') && data.some((r: any) => r['Ads'])
-      
-      // console.log('[DEBUG] Combined file:', file.name)
-      // console.log('[DEBUG] Dimensions found:', { hasAge, hasGender, hasRegion, hasPlatform, hasPlacement, hasObjective, hasAds })
-      
+
       if (hasAge) breakdowns['age'] = data.filter((r: any) => r['Age'])
       if (hasGender) breakdowns['gender'] = data.filter((r: any) => r['Gender'])
       if (hasRegion) breakdowns['region'] = data.filter((r: any) => r['Region'])
@@ -387,7 +384,7 @@ export async function POST(request: NextRequest) {
       // Extract breakdowns from combined files - only extract each type ONCE to avoid duplicates
       // Track which breakdown types have already been extracted
       const extractedTypes = new Set<string>()
-      
+
       for (const file of allThisWeekFiles) {
         if (isCombinedFile(file.name)) {
           const extractedBreakdowns = await extractBreakdownsFromCombinedFile(file)
@@ -411,22 +408,22 @@ export async function POST(request: NextRequest) {
                             type === 'ad-creative' ? 'Ads' : type
         breakdownDataThisWeek[type] = aggregateBreakdownData(data, dimensionKey)
       }
-      
+
       // IMPORTANT: Also check for dedicated objective.csv file and use it (better data quality)
       // Combined files don't have proper WA data per objective
       for (const file of allThisWeekFiles) {
         const fileName = file.name.toLowerCase()
         // Check if this is a dedicated objective file (not a combined file with objective)
-        const isObjectiveOnly = fileName === 'objective.csv' || 
-          fileName.match(/^objective-.*\.csv$/) || 
-          (fileName.endsWith('-objective.csv') && 
-           !fileName.includes('creative') && 
-           !fileName.includes('region') && 
-           !fileName.includes('age') && 
-           !fileName.includes('gender') && 
-           !fileName.includes('platform') && 
+        const isObjectiveOnly = fileName === 'objective.csv' ||
+          fileName.match(/^objective-.*\.csv$/) ||
+          (fileName.endsWith('-objective.csv') &&
+           !fileName.includes('creative') &&
+           !fileName.includes('region') &&
+           !fileName.includes('age') &&
+           !fileName.includes('gender') &&
+           !fileName.includes('platform') &&
            !fileName.includes('placement'))
-        
+
         if (isObjectiveOnly) {
           const parsed = await parseCSV(file)
           if (parsed.data.length > 0) {
@@ -435,30 +432,50 @@ export async function POST(request: NextRequest) {
             breakdownDataThisWeek['objective'] = aggregateBreakdownData(parsed.data, 'Objective')
           }
         }
-        
+
         // IMPORTANT: Also check for dedicated ad-creative.csv file (better data quality)
         // Combined files have WA=0 per creative because they are broken down by other dimensions
-        const isAdCreativeOnly = fileName === 'ad-creative.csv' || 
-          fileName.match(/^ad-creative-.*\.csv$/) || 
-          (fileName.endsWith('-ad-creative.csv') && 
-           !fileName.includes('region') && 
-           !fileName.includes('age') && 
-           !fileName.includes('gender') && 
-           !fileName.includes('platform') && 
+        const isAdCreativeOnly = fileName === 'ad-creative.csv' ||
+          fileName.match(/^ad-creative-.*\.csv$/) ||
+          (fileName.endsWith('-ad-creative.csv') &&
+           !fileName.includes('region') &&
+           !fileName.includes('age') &&
+           !fileName.includes('gender') &&
+           !fileName.includes('platform') &&
            !fileName.includes('placement') &&
            !fileName.includes('objective'))
-        
+
         if (isAdCreativeOnly) {
           const parsed = await parseCSV(file)
           if (parsed.data.length > 0) {
             // console.log('[DEBUG] Found dedicated ad-creative file (This Week):', file.name)
             // console.log('[DEBUG] Ad Creative file sample:', JSON.stringify(parsed.data[0], null, 2))
             // Use 'Ads' or 'Ad name' as the dimension key
-            const adNameKey = Object.keys(parsed.data[0]).find(k => 
+            const adNameKey = Object.keys(parsed.data[0]).find(k =>
               k.toLowerCase() === 'ads' || k.toLowerCase() === 'ad name' || k.toLowerCase().includes('ad name')
             ) || 'Ads'
             const aggregatedCreatives = aggregateBreakdownData(parsed.data, adNameKey)
             breakdownDataThisWeek['ad-creative'] = aggregatedCreatives
+          }
+        }
+
+        // IMPORTANT: Also check for dedicated region.csv file
+        // Region files are often separate (not combined) files
+        const isRegionOnly = fileName === 'region.csv' ||
+          fileName.match(/^region-.*\.csv$/) ||
+          (fileName.includes('-region.') &&
+           !fileName.includes('creative') &&
+           !fileName.includes('age') &&
+           !fileName.includes('gender') &&
+           !fileName.includes('platform') &&
+           !fileName.includes('placement') &&
+           !fileName.includes('objective'))
+
+        if (isRegionOnly) {
+          const parsed = await parseCSV(file)
+          if (parsed.data.length > 0) {
+            const aggregatedRegion = aggregateBreakdownData(parsed.data, 'Region')
+            breakdownDataThisWeek['region'] = aggregatedRegion
           }
         }
       }
@@ -575,6 +592,26 @@ export async function POST(request: NextRequest) {
               k.toLowerCase() === 'ads' || k.toLowerCase() === 'ad name' || k.toLowerCase().includes('ad name')
             ) || 'Ads'
             breakdownDataLastWeek['ad-creative'] = aggregateBreakdownData(parsed.data, adNameKey)
+          }
+        }
+
+        // IMPORTANT: Also check for dedicated region.csv file
+        // Region files are often separate (not combined) files
+        const isRegionOnly = fileName === 'region.csv' ||
+          fileName.match(/^region-.*\.csv$/) ||
+          (fileName.includes('-region.') &&
+           !fileName.includes('creative') &&
+           !fileName.includes('age') &&
+           !fileName.includes('gender') &&
+           !fileName.includes('platform') &&
+           !fileName.includes('placement') &&
+           !fileName.includes('objective'))
+
+        if (isRegionOnly) {
+          const parsed = await parseCSV(file)
+          if (parsed.data.length > 0) {
+            const aggregatedRegion = aggregateBreakdownData(parsed.data, 'Region')
+            breakdownDataLastWeek['region'] = aggregatedRegion
           }
         }
       }
