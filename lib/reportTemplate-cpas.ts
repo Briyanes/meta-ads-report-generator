@@ -1080,15 +1080,23 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
             </div>
         </div>
 
-        <h1>Campaign Objective Performance</h1>
-        <h2>Performance by Campaign Objective (Sorted by Amount Spent)</h2>
+        <h1>Objective Performance</h1>
+        <h2>Performance by Campaign Objective</h2>
 
         {OBJECTIVE_BREAKDOWN_TABLE}
 
-        <div class="insight-box" style="margin-top: 24px;">
-            <p>
-                <strong>Insight:</strong> {OBJECTIVE_INSIGHT}
+        <!-- Key Insight Box -->
+        <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 20px 24px; border-radius: 16px; border-left: 5px solid #2563eb; margin-top: 24px;">
+            <h4 style="color: #1d4ed8; font-size: 14px; font-weight: 700; margin-bottom: 10px;">💡 Key Insight</h4>
+            <p style="font-size: 13px; color: #374151; line-height: 1.7; margin: 0;">
+                {OBJECTIVE_INSIGHT}
             </p>
+        </div>
+
+        <!-- Recommendation Box -->
+        <div style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); padding: 16px 24px; border-radius: 12px; border-left: 5px solid #d97706; margin-top: 16px;">
+            <h4 style="color: #d97706; font-size: 13px; font-weight: 700; margin-bottom: 8px;">⭐ Rekomendasi</h4>
+            <p style="font-size: 13px; color: #374151; margin: 0;">Fokuskan <strong style="color: #2563eb;">70-80% budget</strong> pada objective dengan CPATC terendah untuk memaksimalkan konversi. Gunakan objective lainnya dengan <strong style="color: #2563eb;">20-30% budget</strong> untuk awareness dan diversifikasi strategi.</p>
         </div>
 
         <!-- Slide Footer -->
@@ -1382,6 +1390,121 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
     <!-- End of slides -->
 </body>
 </html>`
+
+/**
+ * Generate CPAS Objective Performance table with Status badges (similar to CTLP to Purchase)
+ * Metrics: OBJECTIVE, ATC, CPATC, SPENT, REACH, STATUS
+ */
+const generateObjectiveBreakdownCPAS = (breakdownData: any[]): string => {
+  const parseNum = (val: any): number => {
+    if (typeof val === 'number') return val
+    if (!val) return 0
+    const parsed = parseFloat(String(val).replace(/,/g, ''))
+    return isNaN(parsed) ? 0 : parsed
+  }
+
+  if (!breakdownData || breakdownData.length === 0) {
+    return `<div style="background: #f8fafc; padding: 24px; border-radius: 12px; text-align: center;">
+      <p style="color: #64748b; font-size: 14px;">Objective breakdown data will be displayed here when CSV is provided.</p>
+    </div>`
+  }
+
+  const formatCurrency = (num: number) => 'Rp ' + Math.round(num).toLocaleString('id-ID')
+  const formatNumber = (num: number) => Math.round(num).toLocaleString('id-ID')
+
+  // Sort by Amount Spent (desc)
+  const sortedObjectives = [...breakdownData]
+    .filter(item => item['Objective'] || item['objective'])
+    .sort((a, b) => {
+      const spendA = parseNum(a['Amount spent (IDR)'] || a['Amount Spent'] || 0)
+      const spendB = parseNum(b['Amount spent (IDR)'] || b['Amount Spent'] || 0)
+      return spendB - spendA
+    })
+
+  // Calculate totals
+  const totalATC = sortedObjectives.reduce((sum, item) => {
+    return sum + parseNum(item['Adds to cart with shared items'] || item['Adds to cart'] || 0)
+  }, 0)
+  const totalSpent = sortedObjectives.reduce((sum, item) => {
+    return sum + parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0)
+  }, 0)
+  const totalReach = sortedObjectives.reduce((sum, item) => {
+    return sum + parseNum(item['Reach'] || 0)
+  }, 0)
+
+  // Find winner (lowest CPATC with significant ATC)
+  const objWithCPATC = sortedObjectives.map(item => {
+    const atc = parseNum(item['Adds to cart with shared items'] || item['Adds to cart'] || 0)
+    const spent = parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0)
+    const cpatc = atc > 0 ? spent / atc : Infinity
+    return { ...item, calculatedCPATC: cpatc, calculatedATC: atc }
+  }).filter(item => item.calculatedATC > 0)
+
+  const winner = objWithCPATC.length > 0 ? objWithCPATC.reduce((a, b) => a.calculatedCPATC < b.calculatedCPATC ? a : b) : null
+  const winnerName = winner ? (winner['Objective'] || winner['objective'] || 'N/A') : 'N/A'
+
+  const rows = sortedObjectives.map((item, idx) => {
+    const objective = item['Objective'] || item['objective'] || 'Unknown'
+    const atc = parseNum(item['Adds to cart with shared items'] || item['Adds to cart'] || 0)
+    const spent = parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0)
+    const reach = parseNum(item['Reach'] || 0)
+    const cpatc = atc > 0 ? spent / atc : 0
+    
+    const isWinner = winner && objective === winnerName && atc > 0
+    const status = isWinner ? 'Winner' : atc > 0 ? 'Monitor' : 'Low'
+    const statusColor = isWinner ? '#10b981' : atc > 0 ? '#f59e0b' : '#94a3b8'
+    const statusBg = isWinner ? '#d1fae5' : atc > 0 ? '#fef3c7' : '#f3f4f6'
+    const rankBg = isWinner ? '#10b981' : '#2563eb'
+    
+    return `
+      <tr style="border-bottom: 1px solid #e5e7eb;">
+          <td style="padding: 14px 16px;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                  <span style="width: 24px; height: 24px; background: ${rankBg}; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">${idx + 1}</span>
+                  <strong style="font-size: 13px;">${objective}</strong>
+              </div>
+          </td>
+          <td style="padding: 14px 16px; text-align: center; font-weight: 600;">${formatNumber(atc)}</td>
+          <td style="padding: 14px 16px; text-align: center;">${formatCurrency(cpatc)}</td>
+          <td style="padding: 14px 16px; text-align: center;">${formatCurrency(spent)}</td>
+          <td style="padding: 14px 16px; text-align: center;">${formatNumber(reach)}</td>
+          <td style="padding: 14px 16px; text-align: center;">
+              <span style="display: inline-block; padding: 4px 12px; background: ${statusBg}; color: ${statusColor}; border-radius: 20px; font-size: 11px; font-weight: 600;">${status}</span>
+          </td>
+      </tr>`
+  }).join('')
+
+  // Total row
+  const totalCPATC = totalATC > 0 ? totalSpent / totalATC : 0
+
+  return `
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white;">
+              <th style="padding: 14px 16px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; text-align: left;">Objective</th>
+              <th style="padding: 14px 16px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">ATC</th>
+              <th style="padding: 14px 16px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">CPATC</th>
+              <th style="padding: 14px 16px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">Spent</th>
+              <th style="padding: 14px 16px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">Reach</th>
+              <th style="padding: 14px 16px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows}
+          <tr style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); font-weight: 700;">
+              <td style="padding: 14px 16px; color: white;"><strong>TOTAL</strong></td>
+              <td style="padding: 14px 16px; text-align: center; color: white;">${formatNumber(totalATC)}</td>
+              <td style="padding: 14px 16px; text-align: center; color: white;">${formatCurrency(totalCPATC)}</td>
+              <td style="padding: 14px 16px; text-align: center; color: white;">${formatCurrency(totalSpent)}</td>
+              <td style="padding: 14px 16px; text-align: center; color: white;">${formatNumber(totalReach)}</td>
+              <td style="padding: 14px 16px;"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  `
+}
 
 /**
  * Generate comprehensive CPAS breakdown table with all metrics
@@ -1754,7 +1877,8 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const regionBreakdownTable = generateComprehensiveBreakdown(breakdownThisWeek.region || [], 'Region', 'Region', 'spend', 10)
   const platformBreakdownTable = generateComprehensiveBreakdown(breakdownThisWeek.platform || [], 'Platform', 'Platform', 'spend', 10)
   const placementBreakdownTable = generateComprehensiveBreakdown(breakdownThisWeek.placement || [], 'Placement', 'Placement', 'spend', 10)
-  const objectiveBreakdownTable = generateComprehensiveBreakdown(breakdownThisWeek.objective || [], 'Objective', 'Objective', 'spend', 10)
+  // Use new CPAS-specific objective table with Status badges
+  const objectiveBreakdownTable = generateObjectiveBreakdownCPAS(breakdownThisWeek.objective || [])
   const creativeBreakdownTable = generateComprehensiveBreakdown(breakdownThisWeek['ad-creative'] || breakdownThisWeek.creative || [], 'Creative', 'Ad name', 'purchasesCV', 10, true)
 
   // Generate event analysis slides
@@ -1860,8 +1984,36 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const topPlacement = getTopPlacement()
   const placementInsight = `Placement ${topPlacement.name} menunjukkan performa terbaik dengan CTR ${topPlacement.ctr.toFixed(2)}% dan ROAS ${topPlacement.roas.toFixed(2)}. Rekomendasi: Re-alokasi budget sesuai performa dengan 70% ke Reels (IG + FB), 25% ke Feed, dan 5% ke Stories. Scale high-ROAS placements dan pause underperforming placements untuk maximize efficiency dan achieve target CPR.`
 
-  // Objective Insight - Comprehensive Bahasa Indonesia
-  const objectiveInsight = `Campaign dengan objective OUTCOME_SALES menjadi primary driver konversi dengan contribution rate terbesar. Rekomendasi: Optimize bidding strategy berdasarkan funnel stage - gunakan Cost Cap untuk upper funnel (Add to Cart) dengan target CPA sesuai benchmark, dan Lowest Cost atau Bid Cap untuk lower funnel (Purchase) untuk maximize conversion volume. Implement value-based bidding untuk ROAS optimization pada campaigns yang sudah mature.`
+  // Objective Insight - Dynamic based on data
+  const getObjectiveInsight = () => {
+    const objData = breakdownThisWeek.objective || []
+    if (!objData || objData.length === 0) {
+      return `Campaign dengan objective OUTCOME_SALES menjadi primary driver konversi dengan contribution rate terbesar. Rekomendasi: Optimize bidding strategy berdasarkan funnel stage - gunakan Cost Cap untuk upper funnel (Add to Cart) dengan target CPA sesuai benchmark, dan Lowest Cost atau Bid Cap untuk lower funnel (Purchase) untuk maximize conversion volume.`
+    }
+    
+    // Find top objectives by ATC
+    const sortedBySpend = [...objData].sort((a, b) => {
+      const spendA = parseNum(a['Amount spent (IDR)'] || 0)
+      const spendB = parseNum(b['Amount spent (IDR)'] || 0)
+      return spendB - spendA
+    })
+    
+    const insights: string[] = []
+    sortedBySpend.slice(0, 2).forEach(item => {
+      const objective = item['Objective'] || item['objective'] || 'Unknown'
+      const atc = parseNum(item['Adds to cart with shared items'] || item['Adds to cart'] || 0)
+      const spent = parseNum(item['Amount spent (IDR)'] || 0)
+      const cpatc = atc > 0 ? spent / atc : 0
+      insights.push(`Objective <strong>${objective}</strong> menghasilkan <strong>${formatNumber(atc)} ATC</strong> (CPATC ${formatCurrency(cpatc)})`)
+    })
+    
+    const totalATC = sortedBySpend.reduce((sum, item) => sum + parseNum(item['Adds to cart with shared items'] || item['Adds to cart'] || 0), 0)
+    const totalSpent = sortedBySpend.reduce((sum, item) => sum + parseNum(item['Amount spent (IDR)'] || 0), 0)
+    
+    return `${insights.join('. ')}. Total keseluruhan: <strong>${formatNumber(totalATC)} ATC</strong> dengan spend <strong>${formatCurrency(totalSpent)}</strong>. Rekomendasi: Fokuskan 70-80% budget pada objective dengan CPATC terendah untuk memaksimalkan konversi.`
+  }
+  
+  const objectiveInsight = getObjectiveInsight()
 
   // Creative Insight - Comprehensive Bahasa Indonesia
   const getTopCreativeFormat = () => {
