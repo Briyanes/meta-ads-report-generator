@@ -1140,7 +1140,134 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
         </div>
     </div>
 
-    <!-- SLIDE 12: TWINDATE EVENT HIGHLIGHTS -->
+    <!-- SLIDE 12: SHOPEE CPAS EVENT STRATEGY GUIDE -->
+    <div class="slide">
+        <!-- Agency Header -->
+        <div class="agency-header">
+            <div class="agency-logo">
+                <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" class="agency-logo-icon">
+                <div>
+                    <div class="agency-name">Hadona Digital Media</div>
+                    <div class="agency-tagline">Performance Marketing</div>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="report-date">Generated: {REPORT_DATE}</div>
+                <div class="confidential-badge">
+                    <span>🛒</span> CPAS Strategy
+                </div>
+            </div>
+        </div>
+
+        <h1>Shopee CPAS Event Strategy</h1>
+        <h2>Panduan Strategis Payday & Twindate untuk Maksimalkan ROAS</h2>
+
+        <!-- Event Calendar Overview -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <!-- PAYDAY EVENT -->
+            <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 16px; padding: 24px; border: 2px solid #f59e0b;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                    <span style="font-size: 32px;">💰</span>
+                    <div>
+                        <h3 style="color: #92400e; font-size: 18px; font-weight: 800; margin: 0;">PAYDAY EVENT</h3>
+                        <p style="color: #a16207; font-size: 12px; margin: 4px 0 0 0;">Tanggal 25 s/d 5 setiap bulan</p>
+                    </div>
+                </div>
+                <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+                    <p style="font-size: 13px; color: #78350f; font-weight: 600; margin: 0 0 8px 0;">📅 Timeline Persiapan:</p>
+                    <ul style="margin: 0; padding-left: 20px; color: #92400e; font-size: 12px; line-height: 1.8;">
+                        <li><strong>H-7 (Tgl 18-20):</strong> Siapkan creative assets, setup campaign</li>
+                        <li><strong>H-4 (Tgl 21-24):</strong> Launch awareness campaign, warm-up audience</li>
+                        <li><strong>H-Day (Tgl 25-5):</strong> Push budget agresif, scale winning ads</li>
+                        <li><strong>H+1 (Tgl 6-7):</strong> Turunkan budget, evaluate performance</li>
+                    </ul>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <span style="background: #fef3c7; color: #92400e; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">🎯 High Intent</span>
+                    <span style="background: #fef3c7; color: #92400e; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">💳 Gaji Fresh</span>
+                    <span style="background: #fef3c7; color: #92400e; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">📈 +40-60% Conv</span>
+                </div>
+            </div>
+
+            <!-- TWINDATE EVENT -->
+            <div style="background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); border-radius: 16px; padding: 24px; border: 2px solid #ec4899;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                    <span style="font-size: 32px;">🎉</span>
+                    <div>
+                        <h3 style="color: #9d174d; font-size: 18px; font-weight: 800; margin: 0;">TWINDATE EVENT</h3>
+                        <p style="color: #be185d; font-size: 12px; margin: 4px 0 0 0;">1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8, 9.9, 10.10, 11.11, 12.12</p>
+                    </div>
+                </div>
+                <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+                    <p style="font-size: 13px; color: #831843; font-weight: 600; margin: 0 0 8px 0;">📅 Timeline Persiapan:</p>
+                    <ul style="margin: 0; padding-left: 20px; color: #9d174d; font-size: 12px; line-height: 1.8;">
+                        <li><strong>H-7:</strong> Riset kompetitor, finalize promo & creative</li>
+                        <li><strong>H-4:</strong> Launch teaser campaign, build hype</li>
+                        <li><strong>H-Day:</strong> All-out push, max budget pada jam prime time</li>
+                        <li><strong>H+1:</strong> Retargeting viewers & cart abandoners</li>
+                    </ul>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <span style="background: #fce7f3; color: #9d174d; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">🔥 Flash Sale</span>
+                    <span style="background: #fce7f3; color: #9d174d; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">🏷️ Big Discount</span>
+                    <span style="background: #fce7f3; color: #9d174d; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">📈 +80-150% Conv</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Strategy Recommendations -->
+        <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius: 16px; padding: 24px; border-left: 5px solid #2563eb; margin-bottom: 20px;">
+            <h3 style="color: #1e40af; font-size: 16px; font-weight: 700; margin: 0 0 16px 0;">🎯 CPAS Budget Allocation Strategy</h3>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                <div style="background: white; border-radius: 12px; padding: 16px; text-align: center;">
+                    <p style="font-size: 11px; color: #64748b; margin: 0 0 4px 0;">Non-Event Period</p>
+                    <p style="font-size: 28px; font-weight: 800; color: #2563eb; margin: 0;">40%</p>
+                    <p style="font-size: 10px; color: #94a3b8; margin: 4px 0 0 0;">Maintain baseline performance</p>
+                </div>
+                <div style="background: white; border-radius: 12px; padding: 16px; text-align: center;">
+                    <p style="font-size: 11px; color: #64748b; margin: 0 0 4px 0;">Payday Period</p>
+                    <p style="font-size: 28px; font-weight: 800; color: #f59e0b; margin: 0;">80%</p>
+                    <p style="font-size: 10px; color: #94a3b8; margin: 4px 0 0 0;">Scale 2x dari baseline</p>
+                </div>
+                <div style="background: white; border-radius: 12px; padding: 16px; text-align: center;">
+                    <p style="font-size: 11px; color: #64748b; margin: 0 0 4px 0;">Twindate Period</p>
+                    <p style="font-size: 28px; font-weight: 800; color: #ec4899; margin: 0;">150%</p>
+                    <p style="font-size: 10px; color: #94a3b8; margin: 4px 0 0 0;">Scale 3-4x dari baseline</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pro Tips -->
+        <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 20px; border-left: 5px solid #22c55e;">
+            <h3 style="color: #166534; font-size: 14px; font-weight: 700; margin: 0 0 12px 0;">💡 Pro Tips dari Expert Advertiser</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div style="display: flex; align-items: flex-start; gap: 8px;">
+                    <span style="color: #22c55e; font-weight: 700;">✓</span>
+                    <p style="margin: 0; font-size: 11px; color: #166534;">Gunakan <strong>Catalog Sales objective</strong> dengan Dynamic Product Ads untuk CPAS</p>
+                </div>
+                <div style="display: flex; align-items: flex-start; gap: 8px;">
+                    <span style="color: #22c55e; font-weight: 700;">✓</span>
+                    <p style="margin: 0; font-size: 11px; color: #166534;">Setup <strong>retargeting audience</strong> H-7 sebelum event untuk warm-up</p>
+                </div>
+                <div style="display: flex; align-items: flex-start; gap: 8px;">
+                    <span style="color: #22c55e; font-weight: 700;">✓</span>
+                    <p style="margin: 0; font-size: 11px; color: #166534;">Bid agresif di <strong>jam 19:00-23:00</strong> saat peak shopping hours</p>
+                </div>
+                <div style="display: flex; align-items: flex-start; gap: 8px;">
+                    <span style="color: #22c55e; font-weight: 700;">✓</span>
+                    <p style="margin: 0; font-size: 11px; color: #166534;">Sync promo dengan <strong>Shopee voucher</strong> untuk conversion boost</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide Footer -->
+        <div class="slide-footer">
+            <span>Hadona Digital Media • CPAS Performance Report</span>
+            <span class="slide-number">Page 12</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 13: TWINDATE EVENT HIGHLIGHTS -->
     <div class="slide">
         <!-- Agency Header -->
         <div class="agency-header">
@@ -1196,11 +1323,11 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
         <!-- Slide Footer -->
         <div class="slide-footer">
             <span>Hadona Digital Media • CPAS Performance Report</span>
-            <span class="slide-number">Page 12</span>
+            <span class="slide-number">Page 13</span>
         </div>
     </div>
 
-    <!-- SLIDE 13: PAYDAY EVENT HIGHLIGHTS -->
+    <!-- SLIDE 14: PAYDAY EVENT HIGHLIGHTS -->
     <div class="slide">
         <!-- Agency Header -->
         <div class="agency-header">
@@ -1256,11 +1383,11 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
         <!-- Slide Footer -->
         <div class="slide-footer">
             <span>Hadona Digital Media • CPAS Performance Report</span>
-            <span class="slide-number">Page 13</span>
+            <span class="slide-number">Page 14</span>
         </div>
     </div>
 
-    <!-- SLIDE 14: CONCLUSION -->
+    <!-- SLIDE 15: CONCLUSION -->
     <div class="slide">
         <div class="agency-header">
             <div class="agency-logo">
@@ -1314,11 +1441,11 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
 
         <div class="slide-footer">
             <span>Hadona Digital Media • CPAS Performance Report</span>
-            <span class="slide-number">Page 14</span>
+            <span class="slide-number">Page 15</span>
         </div>
     </div>
 
-    <!-- SLIDE 15: NEXT STEPS -->
+    <!-- SLIDE 16: NEXT STEPS -->
     <div class="slide">
         <div class="agency-header">
             <div class="agency-logo">
@@ -1356,11 +1483,11 @@ const CPAS_TEMPLATE = `<!DOCTYPE html>
 
         <div class="slide-footer">
             <span>Hadona Digital Media • CPAS Performance Report</span>
-            <span class="slide-number">Page 15</span>
+            <span class="slide-number">Page 16</span>
         </div>
     </div>
 
-    <!-- SLIDE 16: THANK YOU -->
+    <!-- SLIDE 17: THANK YOU -->
     <div class="slide" style="text-align: center; padding: 120px 64px; background: linear-gradient(135deg, white 0%, var(--neutral-50) 100%);">
         <div class="agency-logo" style="justify-content: center; margin-bottom: 48px;">
             <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" class="agency-logo-icon" style="width: 200px;">
