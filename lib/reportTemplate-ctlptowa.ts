@@ -1,29 +1,11 @@
-export function generateReactTailwindReport(analysisData: any, reportName?: string, retentionType?: string, objectiveType: string = 'ctlptowa'): string {
+export function generateReactTailwindReport(analysisData: any, reportName?: string, retentionType?: string): string {
   console.log('[CTLPTOWA Template] Starting report generation...')
 
-  const data = typeof analysisData === 'string' ? JSON.parse(analysisData) : analysisData
-  const perf = data?.performanceSummary || {}
-  const thisWeek = perf.thisWeek || {}
-  const lastWeek = perf.lastWeek || {}
-  const breakdown = data?.breakdown || {}
+  const { thisWeek, lastWeek, breakdown, performanceSummary } = analysisData || {}
 
-  // Determine period labels based on retention type
-  const isMoM = retentionType === 'mom'
-  const periodLabel = isMoM ? 'Month' : 'Week'
-  const thisPeriodLabel = isMoM ? 'Bulan Ini (This Month)' : 'Minggu Ini (This Week)'
-  const lastPeriodLabel = isMoM ? 'Bulan Lalu (Last Month)' : 'Minggu Lalu (Last Week)'
-  const comparisonLabel = isMoM ? 'Month-on-Month' : 'Week-on-Week'
-
-  // Determine objective label
-  const objectiveLabels: Record<string, string> = {
-    'ctwa': 'CTWA (Click to WhatsApp)',
-    'cpas': 'CPAS (Collaborative Performance Advertising Solution)',
-    'ctlptowa': 'CTLP to WA (Click to Landing Page to WhatsApp)'
-  }
-  const objectiveLabel = objectiveLabels[objectiveType] || 'CTLP to WA (Click to Landing Page to WhatsApp)'
-
-  const thisWeekData = thisWeek || {}
-  const lastWeekData = lastWeek || {}
+  // Get data from performanceSummary or fallback to direct properties
+  const thisWeekData = performanceSummary?.thisWeek || thisWeek || {}
+  const lastWeekData = performanceSummary?.lastWeek || lastWeek || {}
   const breakdownThisWeek = breakdown?.thisWeek || {}
   const breakdownLastWeek = breakdown?.lastWeek || {}
 
@@ -57,13 +39,16 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   }
 
   // Labels
+  const comparisonLabel = retentionType === 'mom' ? 'Month-over-Month' : 'Week-over-Week'
+  const thisPeriodLabel = retentionType === 'mom' ? 'This Month' : 'This Week'
+  const lastPeriodLabel = retentionType === 'mom' ? 'Last Month' : 'Last Week'
   const defaultReportName = 'Meta Ads Performance Report'
 
-  // Extract metrics - match API field names for CTLPTOWA
+  // Extract metrics - match API field names for CTLPTOWA (Checkouts Initiated)
   const thisSpent = parseNum(thisWeekData.amountSpent)
   const lastSpent = parseNum(lastWeekData.amountSpent)
-  const thisResults = parseNum(thisWeekData.checkoutsInitiated || thisWeekData.checkoutInitiated || 0)
-  const lastResults = parseNum(lastWeekData.checkoutsInitiated || lastWeekData.checkoutInitiated || 0)
+  const thisResults = parseNum(thisWeekData.checkoutsInitiated || thisWeekData.results)
+  const lastResults = parseNum(lastWeekData.checkoutsInitiated || lastWeekData.results)
 
   // Calculate CPR manually: Amount Spent / Checkouts Initiated
   const thisCPR = thisResults > 0 ? thisSpent / thisResults : 0
@@ -97,7 +82,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${comparisonLabel} CTLPTOWA Report - ${reportName || defaultReportName}</title>
+    <title>${comparisonLabel} CTLP to WA Report - ${reportName || defaultReportName}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -458,24 +443,20 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             <img src="https://report.hadona.id/logo/logo-header-pdf.webp" alt="Hadona Digital Media" class="agency-logo-icon">
         </div>
 
-        <h1>CTLPTOWA Performance Report</h1>
-
-        <p style="font-size: 20px; color: var(--neutral-600); font-weight: 600; margin-bottom: 16px;">
-            ${objectiveLabel}
-        </p>
+        <h1>CTLP to WA Performance Report</h1>
 
         <p style="font-size: 24px; color: var(--neutral-600); font-weight: 600; margin-bottom: 32px;">
             ${reportName || defaultReportName}
         </p>
 
-        <div style="background: var(--neutral-100); padding: 20px 32px; border-radius: 24px; display: inline-flex; align-items: center; gap: 12px; box-shadow: 0 4px 12px rgba(43, 70, 187, 0.25);">
-            <span style="font-size: 20px;">�</span>
-            <span style="font-size: 16px; font-weight: 600; color: var(--primary-blue);">${retentionType === 'mom' ? 'Month-over-Month Comparison' : 'Week-over-Week Comparison'}</span>
+        <div class="period-badge">
+            <span>📊</span>
+            <span>${retentionType === 'mom' ? 'Month-over-Month Comparison' : 'Week-over-Week Comparison'}</span>
         </div>
 
         <div style="margin-top: 64px;">
             <div class="confidential-badge">
-                <span>�</span>
+                <span>🔒</span>
                 <span>Confidential Report</span>
             </div>
         </div>
@@ -557,7 +538,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         </div>
 
         <div class="slide-footer">
-            <span>Hadona Digital Media • CTLPTOWA Performance Report</span>
+            <span>Hadona Digital Media • CTLP to WA Performance Report</span>
             <span class="slide-number">Page 2</span>
         </div>
     </div>
@@ -642,7 +623,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                     <td class="text-right"><span class="badge ${calculateGrowth(thisCPC, lastCPC) <= 0 ? 'badge-green' : 'badge-red'}">${calculateGrowth(thisCPC, lastCPC) <= 0 ? '' : '+'}${formatPercent(calculateGrowth(thisCPC, lastCPC))}</span></td>
                 </tr>
                 <tr>
-                    <td><strong>OC → WA Landing Ratio</strong></td>
+                    <td><strong>OC → Checkout Ratio</strong></td>
                     <td class="text-right">${formatPercent((lastOutboundClicks && lastResults) ? (lastResults / lastOutboundClicks * 100) : 0)}</td>
                     <td class="text-right">${formatPercent((thisOutboundClicks && thisResults) ? (thisResults / thisOutboundClicks * 100) : 0)}</td>
                     <td class="text-right">${formatPercent(((thisOutboundClicks && thisResults) ? (thisResults / thisOutboundClicks * 100) : 0) - ((lastOutboundClicks && lastResults) ? (lastResults / lastOutboundClicks * 100) : 0))}</td>
@@ -656,7 +637,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         </div>
 
         <div class="slide-footer">
-            <span>Hadona Digital Media • CTLPTOWA Performance Report</span>
+            <span>Hadona Digital Media • CTLP to WA Performance Report</span>
             <span class="slide-number">Page 3</span>
         </div>
     </div>`
@@ -695,7 +676,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                         ${resultsGrowth > 0 ? `
                         <div style="padding-bottom: 12px; border-bottom: 1px solid #bbf7d0;">
                             <div style="font-size: 13px; color: #166534; font-weight: 600; margin-bottom: 4px;">Pertumbuhan Checkouts Initiated</div>
-                            <div style="font-size: 11px; color: #15803d;">Meningkat sebesar ${resultsGrowth.toFixed(1)}% dibanding ${isMoM ? 'bulan lalu' : 'minggu lalu'}, menunjukkan engagement pengguna yang kuat.</div>
+                            <div style="font-size: 11px; color: #15803d;">Meningkat sebesar ${resultsGrowth.toFixed(1)}% dibanding ${lastPeriodLabel === 'Last Month' ? 'bulan lalu' : 'minggu lalu'}, menunjukkan engagement pengguna yang kuat.</div>
                         </div>
                         ` : ''}
 
@@ -716,13 +697,13 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                         ${thisOutboundClicks > lastOutboundClicks ? `
                         <div style="padding-bottom: 12px; border-bottom: 1px solid #bbf7d0;">
                             <div style="font-size: 13px; color: #166534; font-weight: 600; margin-bottom: 4px;">Outbound Clicks Lebih Tinggi</div>
-                            <div style="font-size: 11px; color: #15803d;">Outbound clicks meningkat sebesar ${calculateGrowth(thisOutboundClicks, lastOutboundClicks).toFixed(1)}%, mengarahkan lebih banyak trafik ke WhatsApp.</div>
+                            <div style="font-size: 11px; color: #15803d;">Outbound clicks meningkat sebesar ${calculateGrowth(thisOutboundClicks, lastOutboundClicks).toFixed(1)}%, mengarahkan lebih banyak trafik ke Landing Page.</div>
                         </div>
                         ` : ''}
 
                         <div style="${resultsGrowth <= 0 && cprGrowth >= 0 && thisCTR <= 0.4 && thisOutboundClicks <= lastOutboundClicks ? '' : 'padding-bottom: 12px; border-bottom: 1px solid #bbf7d0;'}">
                             <div style="font-size: 13px; color: #166534; font-weight: 600; margin-bottom: 4px;">Performa Konsisten</div>
-                            <div style="font-size: 11px; color: #15803d;">Mempertahankan messaging conversations stabil dengan total ${formatNumber(thisResults)} hasil ${retentionType === 'mom' ? 'bulan ini' : 'minggu ini'}.</div>
+                            <div style="font-size: 11px; color: #15803d;">Mempertahankan checkouts initiated stabil dengan total ${formatNumber(thisResults)} hasil ${retentionType === 'mom' ? 'bulan ini' : 'minggu ini'}.</div>
                         </div>
                     </div>
                 </div>
@@ -779,7 +760,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         </div>
 
         <div class="slide-footer">
-            <span>Hadona Digital Media • CTLPTOWA Performance Report</span>
+            <span>Hadona Digital Media • CTLP to WA Performance Report</span>
             <span class="slide-number">Page 4</span>
         </div>
     </div>`
@@ -873,7 +854,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
 
     const objectiveRows = sortedObjectives.map((item) => {
       const objective = item['Objective'] || item['objective'] || item['Campaign objective'] || 'Unknown'
-      const results = parseNum(item['Messaging conversations started'] || item['Results'] || 0)
+      const results = parseNum(item['Checkouts initiated'] || item['Results'] || 0)
       const spend = parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0)
       const impressions = parseNum(item['Impressions'] || 0)
       const outboundClicks = parseNum(item['Outbound clicks'] || 0)
@@ -936,7 +917,7 @@ ${objectiveRows}
         </div>
 
         <div class="slide-footer">
-            <span>Hadona Digital Media • CTLPTOWA Performance Report</span>
+            <span>Hadona Digital Media • CTLP to WA Performance Report</span>
             <span class="slide-number">Page ${slideNumber++}</span>
         </div>
     </div>`
@@ -1012,7 +993,7 @@ ${creativeRows}
         </div>
 
         <div class="slide-footer">
-            <span>Hadona Digital Media • CTLPTOWA Performance Report</span>
+            <span>Hadona Digital Media • CTLP to WA Performance Report</span>
             <span class="slide-number">Page ${slideNumber++}</span>
         </div>
     </div>`
@@ -1048,7 +1029,7 @@ ${creativeRows}
                             <strong>Efisiensi Spend:</strong> CPR ${cprGrowth <= 0 ? 'meningkat sebesar' : 'sebesar'} ${Math.abs(cprGrowth).toFixed(1)}%
                         </li>
                         <li style="padding: 8px 0; border-bottom: 1px solid var(--neutral-200); font-size: 13px;">
-                            <strong>Engagement:</strong> Messaging conversations ${resultsGrowth >= 0 ? 'meningkat' : 'stabil'}
+                            <strong>Engagement:</strong> Checkouts initiated ${resultsGrowth >= 0 ? 'meningkat' : 'stabil'}
                         </li>
                         <li style="padding: 8px 0; font-size: 13px;">
                             <strong>Platform Terbaik:</strong> ${platformData.length > 0 ? platformData[0].Platform || platformData[0].platform || 'Facebook' : 'Facebook'} memimpin performa
@@ -1076,11 +1057,11 @@ ${creativeRows}
         </div>
 
         <div class="insight-box">
-            <p><strong>Rekomendasi Strategis:</strong> ${spendGrowth >= 0 && resultsGrowth >= 0 ? 'Lanjutkan scaling dengan strategi saat ini. Pertahankan pembagian 70/30 antara proven winners dan tes baru.' : 'Optimalkan iklan yang underperform. Fokus pada penurunan CPR sambil mempertahankan volume percakapan. Tinjau parameter targeting.'}</p>
+            <p><strong>Rekomendasi Strategis:</strong> ${spendGrowth >= 0 && resultsGrowth >= 0 ? 'Lanjutkan scaling dengan strategi saat ini. Pertahankan pembagian 70/30 antara proven winners dan tes baru.' : 'Optimalkan iklan yang underperform. Fokus pada penurunan CPR sambil mempertahankan volume checkouts. Tinjau parameter targeting.'}</p>
         </div>
 
         <div class="slide-footer">
-            <span>Hadona Digital Media • CTLPTOWA Performance Report</span>
+            <span>Hadona Digital Media • CTLP to WA Performance Report</span>
             <span class="slide-number">Page ${slideNumber++}</span>
         </div>
     </div>
@@ -1229,7 +1210,7 @@ ${tableRows}
         </div>
 
         <div class="slide-footer">
-            <span>Hadona Digital Media • CTLPTOWA Performance Report</span>
+            <span>Hadona Digital Media • CTLP to WA Performance Report</span>
             <span class="slide-number">Page ${slideNumber}</span>
         </div>
     </div>`

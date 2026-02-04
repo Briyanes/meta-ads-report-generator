@@ -60,7 +60,7 @@ function isValidRetentionType(value: string): boolean {
 }
 
 function isValidObjectiveType(value: string): boolean {
-  return ['ctwa', 'cpas', 'ctlptowa'].includes(value)
+  return ['ctwa', 'cpas', 'ctlptowa', 'ctlptopurchase'].includes(value)
 }
 
 export async function POST(request: NextRequest) {
@@ -182,6 +182,30 @@ export async function POST(request: NextRequest) {
         let str = String(val).replace(/,/g, '').replace(/\s+/g, '')
         const num = parseFloat(str)
         return isNaN(num) ? 0 : num
+      }
+      
+      // PRIORITY 1: Look for dedicated objective.csv file first (most accurate for totals)
+      for (const file of files) {
+        const fileName = file.name.toLowerCase()
+        const isObjectiveFile = fileName === 'objective.csv' ||
+          fileName.match(/^objective-.*\.csv$/) ||
+          (fileName.includes('-objective') && fileName.endsWith('.csv') &&
+           !fileName.includes('creative') &&
+           !fileName.includes('region') &&
+           !fileName.includes('age') &&
+           !fileName.includes('gender') &&
+           !fileName.includes('platform') &&
+           !fileName.includes('placement'))
+        
+        if (isObjectiveFile) {
+          const parsed = await parseCSV(file)
+          if (parsed.data.length > 0) {
+            // Use the first row from objective file (should be OUTCOME_SALES or similar)
+            const objectiveRow = parsed.data[0]
+            console.log('[DEBUG] Using objective file for main data:', file.name, 'Purchases:', objectiveRow['Purchases'])
+            return [objectiveRow]
+          }
+        }
       }
       
       // First, read the summary row (first row after header which usually contains totals)
@@ -788,9 +812,12 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         const recalcFieldPatterns = [
           'ctr (link click-through rate)', 'ctr (all)', 'cpc (cost per link click)', 
           'cpm (cost per 1,000 impressions)', 'cost per 1,000 accounts center accounts reached',
-          'cost /cv', 'cost /atc', 'cost /purchase', 'cost per result',
-          'frequency', 'purchase roas for shared items only', 'aov',
-          '* lc to cv', '* cv to atc', 'atc to purchase', 'conversion rate ranking'
+          'cost /cv', 'cost /atc', 'cost /purchase', 'cost per purchase', 'cost per result',
+          'cost per content view', 'cost per add to cart', 'cost per checkout initiated',
+          'cost per landing page view', 'average purchases conversion value',
+          'frequency', 'purchase roas for shared items only', 'purchase roas', 'aov',
+          '* lc to cv', '* cv to atc', 'atc to purchase', 'conversion rate ranking',
+          '* oc to lpv', '* lc to lpv', '* lpv to atc', '* atc to ic', '* api to purchase'
         ]
         return recalcFieldPatterns.some(pattern => keyLower.includes(pattern.toLowerCase()))
       }
@@ -847,13 +874,17 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       const amountSpentKey = keys.find(k => k === 'Amount spent (IDR)') ||
                             keys.find(k => k.toLowerCase().includes('amount spent'))
       const contentViewsKey = keys.find(k => k === 'Content views with shared items') ||
-                             keys.find(k => k.toLowerCase().includes('content views with shared items'))
+                             keys.find(k => k === 'Content views') ||
+                             keys.find(k => k.toLowerCase().includes('content views'))
       const addsToCartKey = keys.find(k => k === 'Adds to cart with shared items') ||
-                           keys.find(k => k.toLowerCase().includes('adds to cart with shared items'))
+                           keys.find(k => k === 'Adds to cart') ||
+                           keys.find(k => k.toLowerCase().includes('adds to cart'))
       const purchasesKey = keys.find(k => k === 'Purchases with shared items') ||
-                          keys.find(k => k.toLowerCase().includes('purchases with shared items'))
+                          keys.find(k => k === 'Purchases') ||
+                          keys.find(k => k.toLowerCase() === 'purchases')
       const purchasesCVKey = keys.find(k => k === 'Purchases conversion value for shared items only') ||
-                            keys.find(k => k.toLowerCase().includes('purchases conversion value for shared items only'))
+                            keys.find(k => k === 'Purchases conversion value') ||
+                            keys.find(k => k.toLowerCase().includes('purchases conversion value'))
       const ctrKey = keys.find(k => k === 'CTR (link click-through rate)') ||
                     keys.find(k => k.toLowerCase().includes('ctr (link click-through rate)'))
       const cpcKey = keys.find(k => k === 'CPC (cost per link click)') ||
@@ -933,7 +964,8 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       
       // Recalculate Cost per Purchase
       if (purchasesKey && amountSpentKey && aggregated[purchasesKey] > 0 && aggregated[amountSpentKey] > 0) {
-        const costPerPurchaseKey = keys.find(k => k.toLowerCase().includes('cost /purchase'))
+        const costPerPurchaseKey = keys.find(k => k.toLowerCase().includes('cost /purchase')) ||
+                                   keys.find(k => k.toLowerCase().includes('cost per purchase'))
         if (costPerPurchaseKey) {
           aggregated[costPerPurchaseKey] = aggregated[amountSpentKey] / aggregated[purchasesKey]
         }
@@ -941,7 +973,8 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       
       // Recalculate ROAS
       if (purchasesCVKey && amountSpentKey && aggregated[purchasesCVKey] > 0 && aggregated[amountSpentKey] > 0) {
-        const roasKey = keys.find(k => k.toLowerCase().includes('purchase roas for shared items only'))
+        const roasKey = keys.find(k => k.toLowerCase().includes('purchase roas for shared items only')) ||
+                       keys.find(k => k.toLowerCase().includes('purchase roas'))
         if (roasKey) {
           aggregated[roasKey] = aggregated[purchasesCVKey] / aggregated[amountSpentKey]
         }
@@ -976,6 +1009,29 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       thisWeekData = breakdownDataThisWeek.objective.find((o: any) => o.Objective === 'OUTCOME_SALES') || aggregatedMainThisWeek
       lastWeekData = breakdownDataLastWeek.objective?.find((o: any) => o.Objective === 'OUTCOME_SALES') || aggregatedMainLastWeek
     }
+    
+    // For CTLP to Purchase, use objective file data for accurate totals (33 purchases, not 17)
+    // Main file might be age-gender.csv which only shows partial data when not aggregated properly
+    console.log('[DEBUG CTLP] objectiveType:', objectiveType)
+    console.log('[DEBUG CTLP] breakdownDataThisWeek keys:', Object.keys(breakdownDataThisWeek))
+    console.log('[DEBUG CTLP] breakdownDataThisWeek.objective:', breakdownDataThisWeek.objective)
+    
+    if (objectiveType === 'ctlptopurchase' && breakdownDataThisWeek.objective?.length > 0) {
+      // For CTLP to Purchase, we need the OUTCOME_SALES objective specifically
+      const objectiveThisWeek = breakdownDataThisWeek.objective.find((o: any) => o.Objective === 'OUTCOME_SALES')
+      const objectiveLastWeek = breakdownDataLastWeek.objective?.find((o: any) => o.Objective === 'OUTCOME_SALES')
+      
+      console.log('[DEBUG CTLP] Found objectiveThisWeek:', objectiveThisWeek)
+      
+      if (objectiveThisWeek) {
+        // Merge objective data with aggregated main (objective has accurate totals, main might have conversion values)
+        thisWeekData = { ...aggregatedMainThisWeek, ...objectiveThisWeek }
+        console.log('[DEBUG CTLP] Updated thisWeekData purchases:', thisWeekData['Purchases'], thisWeekData['Purchases with shared items'])
+      }
+      if (objectiveLastWeek) {
+        lastWeekData = { ...aggregatedMainLastWeek, ...objectiveLastWeek }
+      }
+    }
 
     // Validate data exists
     if (!thisWeekData || Object.keys(thisWeekData).length === 0) {
@@ -1008,6 +1064,10 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       // CTLP to WA: Use checkouts initiated
       thisWeekResults = parseNum(thisWeekData['Checkouts initiated'] || 0)
       lastWeekResults = lastWeekData ? parseNum(lastWeekData['Checkouts initiated'] || 0) : 0
+    } else if (objectiveType === 'ctlptopurchase') {
+      // CTLP to Purchase: Use Purchases as primary result
+      thisWeekResults = parseNum(thisWeekData['Purchases with shared items'] || thisWeekData['Purchases'] || thisWeekData['Results'] || 0)
+      lastWeekResults = lastWeekData ? parseNum(lastWeekData['Purchases with shared items'] || lastWeekData['Purchases'] || lastWeekData['Results'] || 0) : 0
     } else {
       // CTWA: Use messaging conversations
       thisWeekResults = parseNum(thisWeekData['Messaging conversations started'] || 0)
@@ -1130,6 +1190,57 @@ Return the analysis as structured JSON data that can be used to generate the HTM
           ocToLPV: ocToLPV, // Ratio from CSV (0-1 format)
           lcToLPV: lcToLPV, // Ratio from CSV (0-1 format)
           lpvToIC: lpvToIC  // Ratio from CSV (0-1 format)
+        }
+      }
+      
+      // CTLP to Purchase fields - E-commerce Purchase Campaign
+      if (objectiveType === 'ctlptopurchase') {
+        const actualPurchases = parseNum(data['Purchases with shared items'] || data['Purchases'] || data['Results'] || 0)
+        const addsToCart = parseNum(data['Adds to cart with shared items'] || data['Adds to cart'] || 0)
+        const contentViews = parseNum(data['Content views with shared items'] || data['Content views'] || 0)
+        const landingPageViews = parseNum(data['Website landing page views'] || data['Landing page views'] || 0)
+        const checkoutsInitiated = parseNum(data['Checkouts initiated'] || 0)
+        const purchasesConvValue = parseNum(data['Purchases conversion value'] || data['Purchases conversion value for shared items only'] || 0)
+        
+        // Calculate derived metrics
+        const costPerPurchase = actualPurchases > 0 ? (amountSpent / actualPurchases) : 0
+        const costPerATC = addsToCart > 0 ? (amountSpent / addsToCart) : 0
+        const costPerCV = contentViews > 0 ? (amountSpent / contentViews) : 0
+        const roas = amountSpent > 0 ? (purchasesConvValue / amountSpent) : 0
+        const aov = actualPurchases > 0 ? (purchasesConvValue / actualPurchases) : 0
+        
+        // Conversion rates
+        const lcToCV = linkClicks > 0 ? ((contentViews / linkClicks) * 100) : 0
+        const cvToATC = contentViews > 0 ? ((addsToCart / contentViews) * 100) : 0
+        const atcToPurchase = addsToCart > 0 ? ((actualPurchases / addsToCart) * 100) : 0
+        
+        return {
+          ...base,
+          // Primary metrics for CTLP to Purchase
+          purchases: actualPurchases,
+          results: actualPurchases, // Alias for consistency
+          addsToCart: addsToCart,
+          contentViews: contentViews,
+          landingPageViews: landingPageViews,
+          checkoutsInitiated: checkoutsInitiated,
+          purchasesConversionValue: purchasesConvValue,
+          // Cost metrics
+          costPerPurchase: costPerPurchase,
+          costPerATC: costPerATC,
+          costPerCV: costPerCV,
+          // Revenue metrics
+          roas: roas,
+          aov: aov,
+          // Conversion rates (already calculated as percentage)
+          lcToCV: lcToCV,
+          cvToATC: cvToATC,
+          atcToPurchase: atcToPurchase,
+          // Additional metrics from CSV
+          clicksAll: parseNum(data['Clicks (all)'] || 0),
+          ctrAll: parseNum(getFieldValue(data, 'CTR (all)', ['CTR (all)'])),
+          // Instagram metrics
+          igProfileVisits: parseNum(data['Instagram profile visits'] || 0),
+          igFollows: parseNum(data['Instagram follows'] || 0),
         }
       }
       

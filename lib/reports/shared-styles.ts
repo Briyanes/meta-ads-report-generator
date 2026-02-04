@@ -429,7 +429,8 @@ export const generateCoverSlide = (
   const objectiveLabels: Record<string, string> = {
     'ctwa': 'CTWA (Click to WhatsApp)',
     'cpas': 'CPAS (Collaborative Performance Advertising Solution)',
-    'ctlptowa': 'CTLP to WA (Click to Landing Page to WhatsApp)'
+    'ctlptowa': 'CTLP to WA (Click to Landing Page to WhatsApp)',
+    'ctlptopurchase': 'CTLP to Purchase (Click to Landing Page to Purchase)'
   }
   const objectiveLabel = objectiveLabels[objectiveType] || objectiveType.toUpperCase()
 

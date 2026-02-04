@@ -20,7 +20,7 @@ export default function MetaAdsPage() {
   const [reportName, setReportName] = useState('')
   const [generationProgress, setGenerationProgress] = useState<string>('')
   const [retentionType, setRetentionType] = useState<'wow' | 'mom'>('wow')
-  const [objectiveType, setObjectiveType] = useState<'ctwa' | 'cpas' | 'ctlptowa'>('ctwa')
+  const [objectiveType, setObjectiveType] = useState<'ctwa' | 'cpas' | 'ctlptowa' | 'ctlptopurchase'>('ctwa')
   const [showDocumentation, setShowDocumentation] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
 
@@ -1050,7 +1050,7 @@ export default function MetaAdsPage() {
               </label>
               <select
                 value={objectiveType}
-                onChange={(e) => setObjectiveType(e.target.value as 'ctwa' | 'cpas' | 'ctlptowa')}
+                onChange={(e) => setObjectiveType(e.target.value as 'ctwa' | 'cpas' | 'ctlptowa' | 'ctlptopurchase')}
                 style={{
                   width: '100%',
                   padding: '12px 16px',
@@ -1080,6 +1080,7 @@ export default function MetaAdsPage() {
                 <option value="ctwa">CTWA</option>
                 <option value="cpas">CPAS</option>
                 <option value="ctlptowa">CTLP to WA</option>
+                <option value="ctlptopurchase">CTLP to Purchase</option>
               </select>
             </div>
           </div>

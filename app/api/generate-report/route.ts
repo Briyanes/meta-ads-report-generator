@@ -44,7 +44,7 @@ function isValidRetentionType(value: string): boolean {
 }
 
 function isValidObjectiveType(value: string): boolean {
-  return ['ctwa', 'cpas', 'ctlptowa'].includes(value)
+  return ['ctwa', 'cpas', 'ctlptowa', 'ctlptopurchase'].includes(value)
 }
 
 // Security: Sanitize report name to prevent XSS
@@ -138,6 +138,9 @@ export async function POST(request: NextRequest) {
       } else if (objectiveType === 'ctlptowa') {
         const { generateReactTailwindReport: generateCTLP } = await import('@/lib/reports/ctlptowa/template')
         generateReport = generateCTLP
+      } else if (objectiveType === 'ctlptopurchase') {
+        const { generateReactTailwindReport: generateCTLPPurchase } = await import('@/lib/reports/ctlptopurchase/template')
+        generateReport = generateCTLPPurchase
       } else {
         // Fallback to CTWA
         const { generateReactTailwindReport: generateCTWA } = await import('@/lib/reports/ctwa/template')
