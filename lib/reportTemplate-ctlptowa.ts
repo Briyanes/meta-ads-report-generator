@@ -882,10 +882,10 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     }).join('\n')
 
     // Calculate totals from ALL objective data (not just top 6)
-    const totalObjectiveResults = objectiveData.reduce((sum, item) => sum + parseNum(item['Checkouts initiated'] || item['Results'] || 0), 0)
-    const totalObjectiveSpend = objectiveData.reduce((sum, item) => sum + parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0), 0)
-    const totalObjectiveImpressions = objectiveData.reduce((sum, item) => sum + parseNum(item['Impressions'] || 0), 0)
-    const totalObjectiveOutboundClicks = objectiveData.reduce((sum, item) => sum + parseNum(item['Outbound clicks'] || 0), 0)
+    const totalObjectiveResults = objectiveData.reduce((sum: number, item: any) => sum + parseNum(item['Checkouts initiated'] || item['Results'] || 0), 0)
+    const totalObjectiveSpend = objectiveData.reduce((sum: number, item: any) => sum + parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0), 0)
+    const totalObjectiveImpressions = objectiveData.reduce((sum: number, item: any) => sum + parseNum(item['Impressions'] || 0), 0)
+    const totalObjectiveOutboundClicks = objectiveData.reduce((sum: number, item: any) => sum + parseNum(item['Outbound clicks'] || 0), 0)
     const totalObjectiveCPR = totalObjectiveResults > 0 ? totalObjectiveSpend / totalObjectiveResults : 0
 
     // Format helper
@@ -981,12 +981,12 @@ ${objectiveTotalRow}
     }).join('\n')
 
     // Calculate totals from ALL creative data (not just top 10)
-    const totalCreativeResults = creativeData.reduce((sum, item) => sum + parseNum(item['Checkouts initiated'] || 0), 0)
-    const totalCreativeImpressions = creativeData.reduce((sum, item) => sum + parseNum(item['Impressions'] || 0), 0)
-    const totalCreativeSpend = creativeData.reduce((sum, item) => sum + parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0), 0)
+    const totalCreativeResults = creativeData.reduce((sum: number, item: any) => sum + parseNum(item['Checkouts initiated'] || 0), 0)
+    const totalCreativeImpressions = creativeData.reduce((sum: number, item: any) => sum + parseNum(item['Impressions'] || 0), 0)
+    const totalCreativeSpend = creativeData.reduce((sum: number, item: any) => sum + parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0), 0)
     const totalCreativeCPR = totalCreativeResults > 0 ? totalCreativeSpend / totalCreativeResults : 0
     // Calculate CTR from total clicks / total impressions
-    const totalCreativeClicks = creativeData.reduce((sum, item) => sum + parseNum(item['Link clicks'] || 0), 0)
+    const totalCreativeClicks = creativeData.reduce((sum: number, item: any) => sum + parseNum(item['Link clicks'] || 0), 0)
     const totalCreativeCTR = totalCreativeImpressions > 0 ? (totalCreativeClicks / totalCreativeImpressions) * 100 : 0
 
     const creativeTotalRow = `                <tr style="background: linear-gradient(135deg, #2B46BB 0%, #3d5ee0 100%); color: white; font-weight: 700; border-top: 2px solid #2B46BB;">

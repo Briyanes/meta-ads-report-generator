@@ -1084,10 +1084,10 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   if (ageData.length > 0) {
     const sortedAge = [...ageData].sort((a, b) => extractMetrics(b).purchases - extractMetrics(a).purchases)
     // Calculate totals from ALL age data (not just top 8)
-    const totalPurchases = ageData.reduce((sum, item) => sum + extractMetrics(item).purchases, 0)
-    const totalSpent = ageData.reduce((sum, item) => sum + extractMetrics(item).spent, 0)
+    const totalPurchases = ageData.reduce((sum: number, item: any) => sum + extractMetrics(item).purchases, 0)
+    const totalSpent = ageData.reduce((sum: number, item: any) => sum + extractMetrics(item).spent, 0)
     const totalCPP = totalPurchases > 0 ? totalSpent / totalPurchases : 0
-    const totalPurchaseValue = ageData.reduce((sum, item) => sum + extractMetrics(item).purchaseValue, 0)
+    const totalPurchaseValue = ageData.reduce((sum: number, item: any) => sum + extractMetrics(item).revenue, 0)
     const totalROAS = totalSpent > 0 ? totalPurchaseValue / totalSpent : 0
 
     const topAge = sortedAge[0]
@@ -1167,7 +1167,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   // GENDER BREAKDOWN
   if (genderData.length > 0) {
     const sortedGender = [...genderData].sort((a, b) => extractMetrics(b).purchases - extractMetrics(a).purchases)
-    const totalGenderPurchases = sortedGender.reduce((sum, item) => sum + extractMetrics(item).purchases, 0)
+    const totalGenderPurchases = sortedGender.reduce((sum: number, item: any) => sum + extractMetrics(item).purchases, 0)
     const topGender = sortedGender[0]
     const topGenderMetrics = extractMetrics(topGender)
     const topGenderName = topGender?.Gender || topGender?.gender || 'N/A'
@@ -1246,10 +1246,10 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     const topRegionCTR = topRegionImpr > 0 ? (topRegionClicks / topRegionImpr) * 100 : 0
 
     // Calculate totals from ALL region data (not just top 10)
-    const totalRegionSpent = regionData.reduce((sum, item) => sum + parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0), 0)
-    const totalRegionReach = regionData.reduce((sum, item) => sum + parseNum(item['Reach'] || 0), 0)
-    const totalRegionImpr = regionData.reduce((sum, item) => sum + parseNum(item['Impressions'] || 0), 0)
-    const totalRegionClicks = regionData.reduce((sum, item) => sum + parseNum(item['Link clicks'] || item['Clicks (all)'] || 0), 0)
+    const totalRegionSpent = regionData.reduce((sum: number, item: any) => sum + parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0), 0)
+    const totalRegionReach = regionData.reduce((sum: number, item: any) => sum + parseNum(item['Reach'] || 0), 0)
+    const totalRegionImpr = regionData.reduce((sum: number, item: any) => sum + parseNum(item['Impressions'] || 0), 0)
+    const totalRegionClicks = regionData.reduce((sum: number, item: any) => sum + parseNum(item['Link clicks'] || item['Clicks (all)'] || 0), 0)
     const totalRegionCTR = totalRegionImpr > 0 ? (totalRegionClicks / totalRegionImpr) * 100 : 0
 
     html += `
@@ -1326,7 +1326,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   // PLATFORM BREAKDOWN
   if (platformData.length > 0) {
     const sortedPlatform = [...platformData].sort((a, b) => extractMetrics(b).purchases - extractMetrics(a).purchases)
-    const totalPlatformPurchases = sortedPlatform.reduce((sum, item) => sum + extractMetrics(item).purchases, 0)
+    const totalPlatformPurchases = sortedPlatform.reduce((sum: number, item: any) => sum + extractMetrics(item).purchases, 0)
     const topPlatform = sortedPlatform[0]
     const topPlatformMetrics = extractMetrics(topPlatform)
     const topPlatformName = (topPlatform?.Platform || topPlatform?.platform || 'N/A').toLowerCase()
@@ -1389,7 +1389,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   // PLACEMENT BREAKDOWN
   if (placementData.length > 0) {
     const sortedPlacement = [...placementData].sort((a, b) => extractMetrics(b).purchases - extractMetrics(a).purchases)
-    const totalPlacementPurchases = sortedPlacement.reduce((sum, item) => sum + extractMetrics(item).purchases, 0)
+    const totalPlacementPurchases = sortedPlacement.reduce((sum: number, item: any) => sum + extractMetrics(item).purchases, 0)
     const topPlacement = sortedPlacement[0]
     const topPlacementMetrics = extractMetrics(topPlacement)
     const topPlacementName = topPlacement?.Placement || topPlacement?.placement || 'N/A'
@@ -1465,13 +1465,13 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
       })
 
     // Calculate totals from ALL objective data (not just sorted)
-    const totalObjPurchases = objectiveData.reduce((sum, item) => {
+    const totalObjPurchases = objectiveData.reduce((sum: number, item: any) => {
       return sum + parseNum(item['Purchases'] || item['Purchases with shared items'] || item['Results'] || 0)
     }, 0)
-    const totalObjSpent = objectiveData.reduce((sum, item) => {
+    const totalObjSpent = objectiveData.reduce((sum: number, item: any) => {
       return sum + parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0)
     }, 0)
-    const totalObjReach = objectiveData.reduce((sum, item) => {
+    const totalObjReach = objectiveData.reduce((sum: number, item: any) => {
       return sum + parseNum(item['Reach'] || 0)
     }, 0)
 
@@ -1627,22 +1627,22 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             </div>
             <div style="text-align: center; padding: 20px; background: white; border: 1px solid var(--gray-200); border-radius: 12px;">
                 <div style="font-size: 11px; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Total Clicks</div>
-                <div style="font-size: 28px; font-weight: 800; color: var(--gray-800);">${formatNumber(adCreativeData.reduce((sum, c) => sum + parseNum(c['Link clicks'] || c['Clicks (all)'] || 0), 0))}</div>
+                <div style="font-size: 28px; font-weight: 800; color: var(--gray-800);">${formatNumber(adCreativeData.reduce((sum: number, c: any) => sum + parseNum(c['Link clicks'] || c['Clicks (all)'] || 0), 0))}</div>
             </div>
             <div style="text-align: center; padding: 20px; background: white; border: 1px solid var(--gray-200); border-radius: 12px;">
                 <div style="font-size: 11px; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Total Spent</div>
-                <div style="font-size: 28px; font-weight: 800; color: var(--gray-800);">${formatCurrency(adCreativeData.reduce((sum, c) => sum + extractMetrics(c).spent, 0))}</div>
+                <div style="font-size: 28px; font-weight: 800; color: var(--gray-800);">${formatCurrency(adCreativeData.reduce((sum: number, c: any) => sum + extractMetrics(c).spent, 0))}</div>
             </div>
             <div style="text-align: center; padding: 20px; background: white; border: 1px solid var(--gray-200); border-radius: 12px;">
                 <div style="font-size: 11px; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Avg CPP</div>
-                <div style="font-size: 28px; font-weight: 800; color: var(--gray-800);">${formatCurrency(adCreativeData.reduce((sum, c) => sum + extractMetrics(c).spent, 0) / Math.max(adCreativeData.reduce((sum, c) => sum + extractMetrics(c).purchases, 0), 1))}</div>
+                <div style="font-size: 28px; font-weight: 800; color: var(--gray-800);">${formatCurrency(adCreativeData.reduce((sum: number, c: any) => sum + extractMetrics(c).spent, 0) / Math.max(adCreativeData.reduce((sum: number, c: any) => sum + extractMetrics(c).purchases, 0), 1))}</div>
             </div>
         </div>
     </div>`
 
     // CONTENT PERFORMANCE ANALYSIS SLIDE
-    const totalCreativePurchases = sortedCreative.reduce((sum, c) => sum + extractMetrics(c).purchases, 0)
-    const avgCPP = sortedCreative.reduce((sum, c) => sum + extractMetrics(c).spent, 0) / Math.max(totalCreativePurchases, 1)
+    const totalCreativePurchases = sortedCreative.reduce((sum: number, c: any) => sum + extractMetrics(c).purchases, 0)
+    const avgCPP = sortedCreative.reduce((sum: number, c: any) => sum + extractMetrics(c).spent, 0) / Math.max(totalCreativePurchases, 1)
 
     html += `
     <div class="slide" data-slide="${++slideNumber}">

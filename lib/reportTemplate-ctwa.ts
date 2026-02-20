@@ -931,10 +931,10 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     }).join('\n')
 
     // Calculate totals from ALL objective data (not just top 6)
-    const totalObjectiveResults = objectiveData.reduce((sum, item) => sum + parseNum(item['Messaging conversations started'] || item['Results'] || 0), 0)
-    const totalObjectiveSpend = objectiveData.reduce((sum, item) => sum + parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0), 0)
-    const totalObjectiveImpressions = objectiveData.reduce((sum, item) => sum + parseNum(item['Impressions'] || 0), 0)
-    const totalObjectiveOutboundClicks = objectiveData.reduce((sum, item) => sum + parseNum(item['Outbound clicks'] || 0), 0)
+    const totalObjectiveResults = objectiveData.reduce((sum: number, item: any) => sum + parseNum(item['Messaging conversations started'] || item['Results'] || 0), 0)
+    const totalObjectiveSpend = objectiveData.reduce((sum: number, item: any) => sum + parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0), 0)
+    const totalObjectiveImpressions = objectiveData.reduce((sum: number, item: any) => sum + parseNum(item['Impressions'] || 0), 0)
+    const totalObjectiveOutboundClicks = objectiveData.reduce((sum: number, item: any) => sum + parseNum(item['Outbound clicks'] || 0), 0)
     const totalObjectiveCPR = totalObjectiveResults > 0 ? totalObjectiveSpend / totalObjectiveResults : 0
 
     // Format helper
@@ -1030,12 +1030,12 @@ ${objectiveTotalRow}
     }).join('\n')
 
     // Calculate totals from ALL creative data (not just top 10)
-    const totalCreativeResults = creativeData.reduce((sum, item) => sum + parseNum(item['Messaging conversations started'] || 0), 0)
-    const totalCreativeImpressions = creativeData.reduce((sum, item) => sum + parseNum(item['Impressions'] || 0), 0)
-    const totalCreativeSpend = creativeData.reduce((sum, item) => sum + parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0), 0)
+    const totalCreativeResults = creativeData.reduce((sum: number, item: any) => sum + parseNum(item['Messaging conversations started'] || 0), 0)
+    const totalCreativeImpressions = creativeData.reduce((sum: number, item: any) => sum + parseNum(item['Impressions'] || 0), 0)
+    const totalCreativeSpend = creativeData.reduce((sum: number, item: any) => sum + parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0), 0)
     const totalCreativeCPR = totalCreativeResults > 0 ? totalCreativeSpend / totalCreativeResults : 0
     // Calculate CTR from total clicks / total impressions
-    const totalCreativeClicks = creativeData.reduce((sum, item) => sum + parseNum(item['Link clicks'] || 0), 0)
+    const totalCreativeClicks = creativeData.reduce((sum: number, item: any) => sum + parseNum(item['Link clicks'] || 0), 0)
     const totalCreativeCTR = totalCreativeImpressions > 0 ? (totalCreativeClicks / totalCreativeImpressions) * 100 : 0
 
     const creativeTotalRow = `                <tr style="background: linear-gradient(135deg, #2B46BB 0%, #3d5ee0 100%); color: white; font-weight: 700; border-top: 2px solid #2B46BB;">
@@ -1085,7 +1085,7 @@ ${creativeTotalRow}
         </table>
 
         <div class="insight-box">
-            <p><strong>Insight Utama:</strong> Top 3 iklan berkontribusi ${Math.round(sortedCreative.slice(0, 3).reduce((sum, item) => sum + parseNum(item['Messaging conversations started'] || 0), 0) / Math.max(totalCreativeResults, 1) * 100)}% dari total messaging conversations (dari ${creativeData.length} iklan). Fokuskan budget pada top performers dan lakukan A/B test untuk format creative yang serupa.</p>
+            <p><strong>Insight Utama:</strong> Top 3 iklan berkontribusi ${Math.round(sortedCreative.slice(0, 3).reduce((sum: number, item: any) => sum + parseNum(item['Messaging conversations started'] || 0), 0) / Math.max(totalCreativeResults, 1) * 100)}% dari total messaging conversations (dari ${creativeData.length} iklan). Fokuskan budget pada top performers dan lakukan A/B test untuk format creative yang serupa.</p>
         </div>
 
         <div class="slide-footer">
@@ -1232,11 +1232,11 @@ function generateBreakdownSlide(
 
   // Calculate totals from ALL data, not just top 6 displayed items
   const datasetForTotals = allData && allData.length > 0 ? allData : thisWeekData
-  const totalValue = datasetForTotals.reduce((sum, item) => sum + parseNum(item[metricKey] || 0), 0)
+  const totalValue = datasetForTotals.reduce((sum: number, item: any) => sum + parseNum(item[metricKey] || 0), 0)
   const topPerformerPercentage = totalValue > 0 ? ((topPerformerValue / totalValue) * 100).toFixed(1) : '0'
 
   // Calculate average CTR
-  const avgCTR = sortedData.reduce((sum, item) => {
+  const avgCTR = sortedData.reduce((sum: number, item: any) => {
     const ctr = parseNum(item['CTR (link click-through rate)'] || 0)
     return sum + ctr
   }, 0) / Math.max(sortedData.length, 1)
@@ -1271,8 +1271,8 @@ function generateBreakdownSlide(
   }).join('\n')
 
   // Calculate totals from ALL data for Total row
-  const totalImpressions = datasetForTotals.reduce((sum, item) => sum + parseNum(item['Impressions'] || 0), 0)
-  const totalLinkClicks = datasetForTotals.reduce((sum, item) => sum + parseNum(item['Outbound clicks'] || 0), 0)
+  const totalImpressions = datasetForTotals.reduce((sum: number, item: any) => sum + parseNum(item['Impressions'] || 0), 0)
+  const totalLinkClicks = datasetForTotals.reduce((sum: number, item: any) => sum + parseNum(item['Outbound clicks'] || 0), 0)
   // NOTE: Don't total CTR % - calculate from total clicks / total impressions instead
   const totalCTR = totalImpressions > 0 ? (totalLinkClicks / totalImpressions) * 100 : 0
 
