@@ -1548,14 +1548,14 @@ const generateObjectiveBreakdownCPAS = (breakdownData: any[]): string => {
       return spendB - spendA
     })
 
-  // Calculate totals
-  const totalATC = sortedObjectives.reduce((sum, item) => {
+  // Calculate totals from ALL breakdown data (not just sorted)
+  const totalATC = breakdownData.reduce((sum, item) => {
     return sum + parseNum(item['Adds to cart with shared items'] || item['Adds to cart'] || 0)
   }, 0)
-  const totalSpent = sortedObjectives.reduce((sum, item) => {
+  const totalSpent = breakdownData.reduce((sum, item) => {
     return sum + parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0)
   }, 0)
-  const totalReach = sortedObjectives.reduce((sum, item) => {
+  const totalReach = breakdownData.reduce((sum, item) => {
     return sum + parseNum(item['Reach'] || 0)
   }, 0)
 
@@ -1720,6 +1720,27 @@ const generateComprehensiveBreakdown = (
     `
   }).join('')
 
+  // Calculate totals from ALL breakdown data (not just top N displayed)
+  const totalImpressions = breakdownData.reduce((sum, item) => sum + parseNum(item['Impressions'] || 0), 0)
+  const totalLinkClicks = breakdownData.reduce((sum, item) => sum + parseNum(item['Link clicks'] || item['Outbound clicks'] || 0), 0)
+  const totalCTR = totalImpressions > 0 ? (totalLinkClicks / totalImpressions * 100) : 0
+  const totalATC = breakdownData.reduce((sum, item) => sum + parseNum(item['Adds to cart with shared items'] || 0), 0)
+  const totalPurchases = breakdownData.reduce((sum, item) => sum + parseNum(item['Purchases with shared items'] || 0), 0)
+  const totalSpend = breakdownData.reduce((sum, item) => sum + parseNum(item['Amount spent (IDR)'] || item.spend || 0), 0)
+
+  const totalRow = `
+    <tr style="background: linear-gradient(135deg, #2B46BB 0%, #3d5ee0 100%); color: white; font-weight: 700; border-top: 2px solid #2B46BB;">
+      ${includeCreativeName ? '<td style="font-size: 11px;"><strong>TOTAL</strong></td>' : ''}
+      ${includeCreativeName ? '' : '<td style="font-size: 11px;"><strong>TOTAL</strong></td>'}
+      <td class="text-right" style="font-size: 11px;">${formatNumber(totalImpressions)}</td>
+      <td class="text-right" style="font-size: 11px;">${formatNumber(totalLinkClicks)}</td>
+      <td class="text-right" style="font-size: 11px;">${formatPercent(totalCTR)}</td>
+      <td class="text-right" style="font-size: 11px;">${totalATC > 0 ? formatNumber(totalATC) : '-'}</td>
+      <td class="text-right" style="font-size: 11px;">${totalPurchases > 0 ? formatNumber(totalPurchases) : '-'}</td>
+      <td class="text-right" style="font-size: 11px;">${formatCurrency(totalSpend)}</td>
+    </tr>
+  `
+
   return `
     <div style="overflow-x: auto;">
       <table class="compact-table">
@@ -1734,7 +1755,7 @@ const generateComprehensiveBreakdown = (
             <th class="text-right" style="width: ${includeCreativeName ? '12.5' : '12'}%;">Spend</th>
           </tr>
         </thead>
-        <tbody>${rows}</tbody>
+        <tbody>${rows}${totalRow}</tbody>
       </table>
     </div>
   `

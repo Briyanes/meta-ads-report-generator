@@ -1083,7 +1083,13 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   // AGE BREAKDOWN
   if (ageData.length > 0) {
     const sortedAge = [...ageData].sort((a, b) => extractMetrics(b).purchases - extractMetrics(a).purchases)
-    const totalPurchases = sortedAge.reduce((sum, item) => sum + extractMetrics(item).purchases, 0)
+    // Calculate totals from ALL age data (not just top 8)
+    const totalPurchases = ageData.reduce((sum, item) => sum + extractMetrics(item).purchases, 0)
+    const totalSpent = ageData.reduce((sum, item) => sum + extractMetrics(item).spent, 0)
+    const totalCPP = totalPurchases > 0 ? totalSpent / totalPurchases : 0
+    const totalPurchaseValue = ageData.reduce((sum, item) => sum + extractMetrics(item).purchaseValue, 0)
+    const totalROAS = totalSpent > 0 ? totalPurchaseValue / totalSpent : 0
+
     const topAge = sortedAge[0]
     const topAgeMetrics = extractMetrics(topAge)
     const topAgeName = topAge?.Age || topAge?.age || 'N/A'
@@ -1128,6 +1134,14 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                           <td class="${m.roas >= 2 ? 'growth-up' : m.roas < 1 ? 'growth-down' : ''}">${m.roas.toFixed(2)}x</td>
                       </tr>`
                     }).join('')}
+                    <tr style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; font-weight: 700; border-top: 2px solid #2563eb;">
+                        <td><strong>TOTAL</strong></td>
+                        <td>${formatNumber(totalPurchases)}</td>
+                        <td>100%</td>
+                        <td>${formatCurrency(totalSpent)}</td>
+                        <td>${formatCurrency(totalCPP)}</td>
+                        <td>${totalROAS.toFixed(2)}x</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -1231,6 +1245,13 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     const topRegionClicks = parseNum(topRegion?.['Link clicks'] || topRegion?.['Clicks (all)'] || 0)
     const topRegionCTR = topRegionImpr > 0 ? (topRegionClicks / topRegionImpr) * 100 : 0
 
+    // Calculate totals from ALL region data (not just top 10)
+    const totalRegionSpent = regionData.reduce((sum, item) => sum + parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0), 0)
+    const totalRegionReach = regionData.reduce((sum, item) => sum + parseNum(item['Reach'] || 0), 0)
+    const totalRegionImpr = regionData.reduce((sum, item) => sum + parseNum(item['Impressions'] || 0), 0)
+    const totalRegionClicks = regionData.reduce((sum, item) => sum + parseNum(item['Link clicks'] || item['Clicks (all)'] || 0), 0)
+    const totalRegionCTR = totalRegionImpr > 0 ? (totalRegionClicks / totalRegionImpr) * 100 : 0
+
     html += `
     <div class="slide" data-slide="${++slideNumber}">
         <div class="slide-header">
@@ -1272,6 +1293,14 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                           <td class="${ctr >= 1 ? 'growth-up' : ctr < 0.5 ? 'growth-down' : ''}">${ctr.toFixed(2)}%</td>
                       </tr>`
                     }).join('')}
+                    <tr style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; font-weight: 700; border-top: 2px solid #2563eb;">
+                        <td><strong>TOTAL</strong></td>
+                        <td>${formatCurrency(totalRegionSpent)}</td>
+                        <td>${formatNumber(totalRegionReach)}</td>
+                        <td>${formatNumber(totalRegionImpr)}</td>
+                        <td>${formatNumber(totalRegionClicks)}</td>
+                        <td>${totalRegionCTR.toFixed(2)}%</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -1435,13 +1464,14 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         return spendB - spendA
       })
 
-    const totalObjPurchases = sortedObjective.reduce((sum, item) => {
+    // Calculate totals from ALL objective data (not just sorted)
+    const totalObjPurchases = objectiveData.reduce((sum, item) => {
       return sum + parseNum(item['Purchases'] || item['Purchases with shared items'] || item['Results'] || 0)
     }, 0)
-    const totalObjSpent = sortedObjective.reduce((sum, item) => {
+    const totalObjSpent = objectiveData.reduce((sum, item) => {
       return sum + parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0)
     }, 0)
-    const totalObjReach = sortedObjective.reduce((sum, item) => {
+    const totalObjReach = objectiveData.reduce((sum, item) => {
       return sum + parseNum(item['Reach'] || 0)
     }, 0)
 
@@ -1593,19 +1623,19 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 24px;">
             <div style="text-align: center; padding: 20px; background: white; border: 1px solid var(--gray-200); border-radius: 12px;">
                 <div style="font-size: 11px; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Total Creatives</div>
-                <div style="font-size: 28px; font-weight: 800; color: var(--gray-800);">${sortedCreative.length}</div>
+                <div style="font-size: 28px; font-weight: 800; color: var(--gray-800);">${adCreativeData.length}</div>
             </div>
             <div style="text-align: center; padding: 20px; background: white; border: 1px solid var(--gray-200); border-radius: 12px;">
                 <div style="font-size: 11px; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Total Clicks</div>
-                <div style="font-size: 28px; font-weight: 800; color: var(--gray-800);">${formatNumber(sortedCreative.reduce((sum, c) => sum + parseNum(c['Link clicks'] || c['Clicks (all)'] || 0), 0))}</div>
+                <div style="font-size: 28px; font-weight: 800; color: var(--gray-800);">${formatNumber(adCreativeData.reduce((sum, c) => sum + parseNum(c['Link clicks'] || c['Clicks (all)'] || 0), 0))}</div>
             </div>
             <div style="text-align: center; padding: 20px; background: white; border: 1px solid var(--gray-200); border-radius: 12px;">
                 <div style="font-size: 11px; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Total Spent</div>
-                <div style="font-size: 28px; font-weight: 800; color: var(--gray-800);">${formatCurrency(sortedCreative.reduce((sum, c) => sum + extractMetrics(c).spent, 0))}</div>
+                <div style="font-size: 28px; font-weight: 800; color: var(--gray-800);">${formatCurrency(adCreativeData.reduce((sum, c) => sum + extractMetrics(c).spent, 0))}</div>
             </div>
             <div style="text-align: center; padding: 20px; background: white; border: 1px solid var(--gray-200); border-radius: 12px;">
                 <div style="font-size: 11px; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Avg CPP</div>
-                <div style="font-size: 28px; font-weight: 800; color: var(--gray-800);">${formatCurrency(sortedCreative.reduce((sum, c) => sum + extractMetrics(c).spent, 0) / Math.max(sortedCreative.reduce((sum, c) => sum + extractMetrics(c).purchases, 0), 1))}</div>
+                <div style="font-size: 28px; font-weight: 800; color: var(--gray-800);">${formatCurrency(adCreativeData.reduce((sum, c) => sum + extractMetrics(c).spent, 0) / Math.max(adCreativeData.reduce((sum, c) => sum + extractMetrics(c).purchases, 0), 1))}</div>
             </div>
         </div>
     </div>`

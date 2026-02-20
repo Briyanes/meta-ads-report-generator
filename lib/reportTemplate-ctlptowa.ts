@@ -785,7 +785,8 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
       'Checkouts initiated',
       'Age',
       formatNumber,
-      slideNumber++
+      slideNumber++,
+      ageData  // Pass complete data for accurate totals
     )
   }
 
@@ -798,7 +799,8 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
       'Checkouts initiated',
       'Gender',
       formatNumber,
-      slideNumber++
+      slideNumber++,
+      genderData  // Pass complete data for accurate totals
     )
   }
 
@@ -811,7 +813,8 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
       'Checkouts initiated',
       'Region',
       formatNumber,
-      slideNumber++
+      slideNumber++,
+      regionData  // Pass complete data for accurate totals
     )
   }
 
@@ -824,7 +827,8 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
       'Checkouts initiated',
       'Platform',
       formatNumber,
-      slideNumber++
+      slideNumber++,
+      platformData  // Pass complete data for accurate totals
     )
   }
 
@@ -837,7 +841,8 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
       'Checkouts initiated',
       'Placement',
       formatNumber,
-      slideNumber++
+      slideNumber++,
+      placementData  // Pass complete data for accurate totals
     )
   }
 
@@ -876,6 +881,28 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                 </tr>`
     }).join('\n')
 
+    // Calculate totals from ALL objective data (not just top 6)
+    const totalObjectiveResults = objectiveData.reduce((sum, item) => sum + parseNum(item['Checkouts initiated'] || item['Results'] || 0), 0)
+    const totalObjectiveSpend = objectiveData.reduce((sum, item) => sum + parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0), 0)
+    const totalObjectiveImpressions = objectiveData.reduce((sum, item) => sum + parseNum(item['Impressions'] || 0), 0)
+    const totalObjectiveOutboundClicks = objectiveData.reduce((sum, item) => sum + parseNum(item['Outbound clicks'] || 0), 0)
+    const totalObjectiveCPR = totalObjectiveResults > 0 ? totalObjectiveSpend / totalObjectiveResults : 0
+
+    // Format helper
+    const formatTraffic = (val: number): string => {
+      if (val === null || val === undefined || isNaN(val)) return '0'
+      return Math.round(val).toLocaleString('id-ID')
+    }
+
+    const objectiveTotalRow = `                <tr style="background: linear-gradient(135deg, #2B46BB 0%, #3d5ee0 100%); color: white; font-weight: 700; border-top: 2px solid #2B46BB;">
+                    <td><strong>TOTAL</strong></td>
+                    <td class="text-right">${formatNumber(totalObjectiveResults)}</td>
+                    <td class="text-right">${formatCurrency(totalObjectiveCPR)}</td>
+                    <td class="text-right">${formatCurrency(totalObjectiveSpend)}</td>
+                    <td class="text-right">${formatNumber(totalObjectiveImpressions)}</td>
+                    <td class="text-right">${formatTraffic(totalObjectiveOutboundClicks)}</td>
+                </tr>`
+
     html += `
     <!-- SLIDE: CAMPAIGN OBJECTIVE PERFORMANCE -->
     <div class="slide">
@@ -909,6 +936,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             </thead>
             <tbody>
 ${objectiveRows}
+${objectiveTotalRow}
             </tbody>
         </table>
 
@@ -952,6 +980,24 @@ ${objectiveRows}
                 </tr>`
     }).join('\n')
 
+    // Calculate totals from ALL creative data (not just top 10)
+    const totalCreativeResults = creativeData.reduce((sum, item) => sum + parseNum(item['Checkouts initiated'] || 0), 0)
+    const totalCreativeImpressions = creativeData.reduce((sum, item) => sum + parseNum(item['Impressions'] || 0), 0)
+    const totalCreativeSpend = creativeData.reduce((sum, item) => sum + parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0), 0)
+    const totalCreativeCPR = totalCreativeResults > 0 ? totalCreativeSpend / totalCreativeResults : 0
+    // Calculate CTR from total clicks / total impressions
+    const totalCreativeClicks = creativeData.reduce((sum, item) => sum + parseNum(item['Link clicks'] || 0), 0)
+    const totalCreativeCTR = totalCreativeImpressions > 0 ? (totalCreativeClicks / totalCreativeImpressions) * 100 : 0
+
+    const creativeTotalRow = `                <tr style="background: linear-gradient(135deg, #2B46BB 0%, #3d5ee0 100%); color: white; font-weight: 700; border-top: 2px solid #2B46BB;">
+                    <td><strong>TOTAL</strong></td>
+                    <td class="text-right">${formatNumber(totalCreativeResults)}</td>
+                    <td class="text-right">${formatNumber(totalCreativeImpressions)}</td>
+                    <td class="text-right">${formatPercent(totalCreativeCTR)}</td>
+                    <td class="text-right">${formatCurrency(totalCreativeSpend)}</td>
+                    <td class="text-right">${formatCurrency(totalCreativeCPR)}</td>
+                </tr>`
+
     html += `
     <!-- SLIDE: CREATIVE PERFORMANCE -->
     <div class="slide">
@@ -985,11 +1031,12 @@ ${objectiveRows}
             </thead>
             <tbody>
 ${creativeRows}
+${creativeTotalRow}
             </tbody>
         </table>
 
         <div class="insight-box">
-            <p><strong>Insight Utama:</strong> Top 3 iklan berkontribusi ${Math.round(sortedCreative.slice(0, 3).reduce((sum, item) => sum + (item['Checkouts initiated'] || 0), 0) / Math.max(thisResults, 1) * 100)}% dari total checkouts initiated. Fokuskan budget pada top performers dan lakukan A/B test untuk format creative yang serupa.</p>
+            <p><strong>Insight Utama:</strong> Top 3 iklan berkontribusi ${Math.round(sortedCreative.slice(0, 3).reduce((sum, item) => sum + parseNum(item['Checkouts initiated'] || 0), 0) / Math.max(totalCreativeResults, 1) * 100)}% dari total checkouts initiated (dari ${creativeData.length} iklan). Fokuskan budget pada top performers dan lakukan A/B test untuk format creative yang serupa.</p>
         </div>
 
         <div class="slide-footer">
@@ -1105,7 +1152,8 @@ function generateBreakdownSlide(
   metricKey: string,
   labelKey: string,
   formatFn: (val: number) => string,
-  slideNumber: number
+  slideNumber: number,
+  allData?: any[]
 ): string {
   // Parse numbers safely
   const parseNum = (val: any): number => {
@@ -1132,7 +1180,10 @@ function generateBreakdownSlide(
   const topPerformer = sortedData[0]
   const topPerformerName = topPerformer ? topPerformer[labelKey] : 'N/A'
   const topPerformerValue = topPerformer ? parseNum(topPerformer[metricKey] || 0) : 0
-  const totalValue = sortedData.reduce((sum, item) => sum + parseNum(item[metricKey] || 0), 0)
+
+  // Calculate totals from ALL data, not just top 6 displayed items
+  const datasetForTotals = allData && allData.length > 0 ? allData : thisWeekData
+  const totalValue = datasetForTotals.reduce((sum, item) => sum + parseNum(item[metricKey] || 0), 0)
   const topPerformerPercentage = totalValue > 0 ? ((topPerformerValue / totalValue) * 100).toFixed(1) : '0'
 
   // Calculate average CTR
@@ -1170,6 +1221,30 @@ function generateBreakdownSlide(
                 </tr>`
   }).join('\n')
 
+  // Calculate totals from ALL data for Total row
+  const totalImpressions = datasetForTotals.reduce((sum, item) => sum + parseNum(item['Impressions'] || 0), 0)
+  const totalLinkClicks = datasetForTotals.reduce((sum, item) => sum + parseNum(item['Outbound clicks'] || 0), 0)
+  // NOTE: Don't total CTR % - calculate from total clicks / total impressions instead
+  const totalCTR = totalImpressions > 0 ? (totalLinkClicks / totalImpressions) * 100 : 0
+
+  // Format helper functions (same as above)
+  const formatNum = (val: number): string => {
+    if (val === null || val === undefined || isNaN(val)) return '0'
+    return Math.round(val).toLocaleString('id-ID')
+  }
+  const formatPercentVal = (val: number): string => {
+    if (val === null || val === undefined || isNaN(val)) return '0%'
+    return val.toFixed(2) + '%'
+  }
+
+  const totalRow = `                <tr style="background: linear-gradient(135deg, #2B46BB 0%, #3d5ee0 100%); color: white; font-weight: 700; border-top: 2px solid #2B46BB;">
+                    <td><strong>TOTAL</strong></td>
+                    <td class="text-right">${formatFn(totalValue)}</td>
+                    <td class="text-right">${formatNum(totalImpressions)}</td>
+                    <td class="text-right">${formatNum(totalLinkClicks)}</td>
+                    <td class="text-right">${formatPercentVal(totalCTR)}</td>
+                </tr>`
+
   return `
     <!-- SLIDE: ${title} -->
     <div class="slide">
@@ -1202,6 +1277,7 @@ function generateBreakdownSlide(
             </thead>
             <tbody>
 ${tableRows}
+${totalRow}
             </tbody>
         </table>
 

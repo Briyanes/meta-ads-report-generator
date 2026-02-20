@@ -494,17 +494,31 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                     <div class="card-title">${thisPeriodLabel}</div>
                     <div class="card-badge">Current</div>
                 </div>
-                <div style="margin-top: 20px;">
-                    <div class="metric-label">Amount Spent</div>
-                    <div class="metric-value">${thisWeekSpent}</div>
-                </div>
-                <div style="margin-top: 20px;">
-                    <div class="metric-label">Messaging Conversations Started</div>
-                    <div class="metric-value">${thisWeekResults}</div>
-                </div>
-                <div style="margin-top: 20px;">
-                    <div class="metric-label">Cost per Messaging Conversation</div>
-                    <div class="metric-value">${thisWeekCPR}</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px;">
+                    <div>
+                        <div class="metric-label">Amount Spent</div>
+                        <div class="metric-value" style="font-size: 32px;">${thisWeekSpent}</div>
+                    </div>
+                    <div>
+                        <div class="metric-label">Messaging Conversations</div>
+                        <div class="metric-value" style="font-size: 32px;">${thisWeekResults}</div>
+                    </div>
+                    <div>
+                        <div class="metric-label">Cost per Conversation</div>
+                        <div class="metric-value" style="font-size: 32px;">${thisWeekCPR}</div>
+                    </div>
+                    <div>
+                        <div class="metric-label">Impressions</div>
+                        <div class="metric-value" style="font-size: 32px;">${formatNumber(thisImpr)}</div>
+                    </div>
+                    <div>
+                        <div class="metric-label">Reach</div>
+                        <div class="metric-value" style="font-size: 32px;">${formatNumber(thisWeekData.reach || 0)}</div>
+                    </div>
+                    <div>
+                        <div class="metric-label">CTR</div>
+                        <div class="metric-value" style="font-size: 32px;">${formatPercent(thisCTR)}</div>
+                    </div>
                 </div>
                 <div style="margin-top: 24px;">
                     <div class="growth-indicator ${spendGrowth >= 0 ? 'positive' : 'negative'}">
@@ -519,17 +533,31 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                     <div class="card-title">${lastPeriodLabel}</div>
                     <div class="card-badge">Previous</div>
                 </div>
-                <div style="margin-top: 20px;">
-                    <div class="metric-label">Amount Spent</div>
-                    <div class="metric-value">${lastWeekSpent}</div>
-                </div>
-                <div style="margin-top: 20px;">
-                    <div class="metric-label">Messaging Conversations Started</div>
-                    <div class="metric-value">${lastWeekResults}</div>
-                </div>
-                <div style="margin-top: 20px;">
-                    <div class="metric-label">Cost per Messaging Conversation</div>
-                    <div class="metric-value">${lastWeekCPR}</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px;">
+                    <div>
+                        <div class="metric-label">Amount Spent</div>
+                        <div class="metric-value" style="font-size: 32px;">${lastWeekSpent}</div>
+                    </div>
+                    <div>
+                        <div class="metric-label">Messaging Conversations</div>
+                        <div class="metric-value" style="font-size: 32px;">${lastWeekResults}</div>
+                    </div>
+                    <div>
+                        <div class="metric-label">Cost per Conversation</div>
+                        <div class="metric-value" style="font-size: 32px;">${lastWeekCPR}</div>
+                    </div>
+                    <div>
+                        <div class="metric-label">Impressions</div>
+                        <div class="metric-value" style="font-size: 32px;">${formatNumber(lastImpr)}</div>
+                    </div>
+                    <div>
+                        <div class="metric-label">Reach</div>
+                        <div class="metric-value" style="font-size: 32px;">${formatNumber(lastWeekData.reach || 0)}</div>
+                    </div>
+                    <div>
+                        <div class="metric-label">CTR</div>
+                        <div class="metric-value" style="font-size: 32px;">${formatPercent(lastCTR)}</div>
+                    </div>
                 </div>
                 <div style="margin-top: 24px; padding: 12px; background: var(--neutral-100); border-radius: 8px; font-size: 12px; color: var(--neutral-600);">
                     Comparison Period
@@ -628,6 +656,27 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                     <td class="text-right">${formatPercent((thisOutboundClicks && thisResults) ? (thisResults / thisOutboundClicks * 100) : 0)}</td>
                     <td class="text-right">${formatPercent(((thisOutboundClicks && thisResults) ? (thisResults / thisOutboundClicks * 100) : 0) - ((lastOutboundClicks && lastResults) ? (lastResults / lastOutboundClicks * 100) : 0))}</td>
                     <td class="text-right"><span class="badge ${((thisOutboundClicks && thisResults) ? (thisResults / thisOutboundClicks) : 0) >= ((lastOutboundClicks && lastResults) ? (lastResults / lastOutboundClicks) : 0) ? 'badge-green' : 'badge-red'}">${((thisOutboundClicks && thisResults) ? (thisResults / thisOutboundClicks) : 0) >= ((lastOutboundClicks && lastResults) ? (lastResults / lastOutboundClicks) : 0) ? '+' : ''}${formatPercent(calculateGrowth((thisOutboundClicks && thisResults) ? (thisResults / thisOutboundClicks) : 0, (lastOutboundClicks && lastResults) ? (lastResults / lastOutboundClicks) : 0))}</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Reach</strong></td>
+                    <td class="text-right">${formatNumber(lastWeekData.reach || 0)}</td>
+                    <td class="text-right">${formatNumber(thisWeekData.reach || 0)}</td>
+                    <td class="text-right">${formatNumber((thisWeekData.reach || 0) - (lastWeekData.reach || 0))}</td>
+                    <td class="text-right"><span class="badge ${calculateGrowth(thisWeekData.reach || 0, lastWeekData.reach || 0) >= 0 ? 'badge-green' : 'badge-red'}">${calculateGrowth(thisWeekData.reach || 0, lastWeekData.reach || 0) >= 0 ? '+' : ''}${formatPercent(calculateGrowth(thisWeekData.reach || 0, lastWeekData.reach || 0))}</span></td>
+                </tr>
+                <tr>
+                    <td><strong>CPM (Cost per 1,000 Impressions)</strong></td>
+                    <td class="text-right">${formatCurrency(lastWeekData.cpm || 0)}</td>
+                    <td class="text-right">${formatCurrency(thisWeekData.cpm || 0)}</td>
+                    <td class="text-right">${formatCurrency((thisWeekData.cpm || 0) - (lastWeekData.cpm || 0))}</td>
+                    <td class="text-right"><span class="badge ${calculateGrowth(thisWeekData.cpm || 0, lastWeekData.cpm || 0) <= 0 ? 'badge-green' : 'badge-red'}">${calculateGrowth(thisWeekData.cpm || 0, lastWeekData.cpm || 0) <= 0 ? '' : '+'}${formatPercent(calculateGrowth(thisWeekData.cpm || 0, lastWeekData.cpm || 0))}</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Frequency</strong></td>
+                    <td class="text-right">${(lastWeekData.frequency || 0).toFixed(2)}</td>
+                    <td class="text-right">${(thisWeekData.frequency || 0).toFixed(2)}</td>
+                    <td class="text-right">${((thisWeekData.frequency || 0) - (lastWeekData.frequency || 0)).toFixed(2)}</td>
+                    <td class="text-right"><span class="badge ${calculateGrowth(thisWeekData.frequency || 0, lastWeekData.frequency || 0) >= 0 ? 'badge-green' : 'badge-red'}">${calculateGrowth(thisWeekData.frequency || 0, lastWeekData.frequency || 0) >= 0 ? '+' : ''}${formatPercent(calculateGrowth(thisWeekData.frequency || 0, lastWeekData.frequency || 0))}</span></td>
                 </tr>
             </tbody>
         </table>
@@ -785,7 +834,8 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
       'Messaging conversations started',
       'Age',
       formatNumber,
-      slideNumber++
+      slideNumber++,
+      ageData  // Pass complete data for accurate totals
     )
   }
 
@@ -798,7 +848,8 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
       'Messaging conversations started',
       'Gender',
       formatNumber,
-      slideNumber++
+      slideNumber++,
+      genderData  // Pass complete data for accurate totals
     )
   }
 
@@ -811,7 +862,8 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
       'Messaging conversations started',
       'Region',
       formatNumber,
-      slideNumber++
+      slideNumber++,
+      regionData  // Pass complete data for accurate totals
     )
   }
 
@@ -824,7 +876,8 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
       'Messaging conversations started',
       'Platform',
       formatNumber,
-      slideNumber++
+      slideNumber++,
+      platformData  // Pass complete data for accurate totals
     )
   }
 
@@ -837,7 +890,8 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
       'Messaging conversations started',
       'Placement',
       formatNumber,
-      slideNumber++
+      slideNumber++,
+      placementData  // Pass complete data for accurate totals
     )
   }
 
@@ -876,6 +930,28 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                 </tr>`
     }).join('\n')
 
+    // Calculate totals from ALL objective data (not just top 6)
+    const totalObjectiveResults = objectiveData.reduce((sum, item) => sum + parseNum(item['Messaging conversations started'] || item['Results'] || 0), 0)
+    const totalObjectiveSpend = objectiveData.reduce((sum, item) => sum + parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0), 0)
+    const totalObjectiveImpressions = objectiveData.reduce((sum, item) => sum + parseNum(item['Impressions'] || 0), 0)
+    const totalObjectiveOutboundClicks = objectiveData.reduce((sum, item) => sum + parseNum(item['Outbound clicks'] || 0), 0)
+    const totalObjectiveCPR = totalObjectiveResults > 0 ? totalObjectiveSpend / totalObjectiveResults : 0
+
+    // Format helper
+    const formatTraffic = (val: number): string => {
+      if (val === null || val === undefined || isNaN(val)) return '0'
+      return Math.round(val).toLocaleString('id-ID')
+    }
+
+    const objectiveTotalRow = `                <tr style="background: linear-gradient(135deg, #2B46BB 0%, #3d5ee0 100%); color: white; font-weight: 700; border-top: 2px solid #2B46BB;">
+                    <td><strong>TOTAL</strong></td>
+                    <td class="text-right">${formatNumber(totalObjectiveResults)}</td>
+                    <td class="text-right">${formatCurrency(totalObjectiveCPR)}</td>
+                    <td class="text-right">${formatCurrency(totalObjectiveSpend)}</td>
+                    <td class="text-right">${formatNumber(totalObjectiveImpressions)}</td>
+                    <td class="text-right">${formatTraffic(totalObjectiveOutboundClicks)}</td>
+                </tr>`
+
     html += `
     <!-- SLIDE: CAMPAIGN OBJECTIVE PERFORMANCE -->
     <div class="slide">
@@ -909,6 +985,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             </thead>
             <tbody>
 ${objectiveRows}
+${objectiveTotalRow}
             </tbody>
         </table>
 
@@ -952,6 +1029,24 @@ ${objectiveRows}
                 </tr>`
     }).join('\n')
 
+    // Calculate totals from ALL creative data (not just top 10)
+    const totalCreativeResults = creativeData.reduce((sum, item) => sum + parseNum(item['Messaging conversations started'] || 0), 0)
+    const totalCreativeImpressions = creativeData.reduce((sum, item) => sum + parseNum(item['Impressions'] || 0), 0)
+    const totalCreativeSpend = creativeData.reduce((sum, item) => sum + parseNum(item['Amount spent (IDR)'] || item['Amount Spent'] || 0), 0)
+    const totalCreativeCPR = totalCreativeResults > 0 ? totalCreativeSpend / totalCreativeResults : 0
+    // Calculate CTR from total clicks / total impressions
+    const totalCreativeClicks = creativeData.reduce((sum, item) => sum + parseNum(item['Link clicks'] || 0), 0)
+    const totalCreativeCTR = totalCreativeImpressions > 0 ? (totalCreativeClicks / totalCreativeImpressions) * 100 : 0
+
+    const creativeTotalRow = `                <tr style="background: linear-gradient(135deg, #2B46BB 0%, #3d5ee0 100%); color: white; font-weight: 700; border-top: 2px solid #2B46BB;">
+                    <td><strong>TOTAL</strong></td>
+                    <td class="text-right">${formatNumber(totalCreativeResults)}</td>
+                    <td class="text-right">${formatNumber(totalCreativeImpressions)}</td>
+                    <td class="text-right">${formatPercent(totalCreativeCTR)}</td>
+                    <td class="text-right">${formatCurrency(totalCreativeSpend)}</td>
+                    <td class="text-right">${formatCurrency(totalCreativeCPR)}</td>
+                </tr>`
+
     html += `
     <!-- SLIDE: CREATIVE PERFORMANCE -->
     <div class="slide">
@@ -985,11 +1080,12 @@ ${objectiveRows}
             </thead>
             <tbody>
 ${creativeRows}
+${creativeTotalRow}
             </tbody>
         </table>
 
         <div class="insight-box">
-            <p><strong>Insight Utama:</strong> Top 3 iklan berkontribusi ${Math.round(sortedCreative.slice(0, 3).reduce((sum, item) => sum + (item['Messaging conversations started'] || 0), 0) / Math.max(thisResults, 1) * 100)}% dari total messaging conversations. Fokuskan budget pada top performers dan lakukan A/B test untuk format creative yang serupa.</p>
+            <p><strong>Insight Utama:</strong> Top 3 iklan berkontribusi ${Math.round(sortedCreative.slice(0, 3).reduce((sum, item) => sum + parseNum(item['Messaging conversations started'] || 0), 0) / Math.max(totalCreativeResults, 1) * 100)}% dari total messaging conversations (dari ${creativeData.length} iklan). Fokuskan budget pada top performers dan lakukan A/B test untuk format creative yang serupa.</p>
         </div>
 
         <div class="slide-footer">
@@ -1105,7 +1201,8 @@ function generateBreakdownSlide(
   metricKey: string,
   labelKey: string,
   formatFn: (val: number) => string,
-  slideNumber: number
+  slideNumber: number,
+  allData?: any[]
 ): string {
   // Parse numbers safely
   const parseNum = (val: any): number => {
@@ -1132,7 +1229,10 @@ function generateBreakdownSlide(
   const topPerformer = sortedData[0]
   const topPerformerName = topPerformer ? topPerformer[labelKey] : 'N/A'
   const topPerformerValue = topPerformer ? parseNum(topPerformer[metricKey] || 0) : 0
-  const totalValue = sortedData.reduce((sum, item) => sum + parseNum(item[metricKey] || 0), 0)
+
+  // Calculate totals from ALL data, not just top 6 displayed items
+  const datasetForTotals = allData && allData.length > 0 ? allData : thisWeekData
+  const totalValue = datasetForTotals.reduce((sum, item) => sum + parseNum(item[metricKey] || 0), 0)
   const topPerformerPercentage = totalValue > 0 ? ((topPerformerValue / totalValue) * 100).toFixed(1) : '0'
 
   // Calculate average CTR
@@ -1170,6 +1270,30 @@ function generateBreakdownSlide(
                 </tr>`
   }).join('\n')
 
+  // Calculate totals from ALL data for Total row
+  const totalImpressions = datasetForTotals.reduce((sum, item) => sum + parseNum(item['Impressions'] || 0), 0)
+  const totalLinkClicks = datasetForTotals.reduce((sum, item) => sum + parseNum(item['Outbound clicks'] || 0), 0)
+  // NOTE: Don't total CTR % - calculate from total clicks / total impressions instead
+  const totalCTR = totalImpressions > 0 ? (totalLinkClicks / totalImpressions) * 100 : 0
+
+  // Format helper functions (same as above)
+  const formatNum = (val: number): string => {
+    if (val === null || val === undefined || isNaN(val)) return '0'
+    return Math.round(val).toLocaleString('id-ID')
+  }
+  const formatPercentVal = (val: number): string => {
+    if (val === null || val === undefined || isNaN(val)) return '0%'
+    return val.toFixed(2) + '%'
+  }
+
+  const totalRow = `                <tr style="background: linear-gradient(135deg, #2B46BB 0%, #3d5ee0 100%); color: white; font-weight: 700; border-top: 2px solid #2B46BB;">
+                    <td><strong>TOTAL</strong></td>
+                    <td class="text-right">${formatFn(totalValue)}</td>
+                    <td class="text-right">${formatNum(totalImpressions)}</td>
+                    <td class="text-right">${formatNum(totalLinkClicks)}</td>
+                    <td class="text-right">${formatPercentVal(totalCTR)}</td>
+                </tr>`
+
   return `
     <!-- SLIDE: ${title} -->
     <div class="slide">
@@ -1202,6 +1326,7 @@ function generateBreakdownSlide(
             </thead>
             <tbody>
 ${tableRows}
+${totalRow}
             </tbody>
         </table>
 

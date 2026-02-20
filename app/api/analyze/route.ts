@@ -1020,9 +1020,9 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       // For CTLP to Purchase, we need the OUTCOME_SALES objective specifically
       const objectiveThisWeek = breakdownDataThisWeek.objective.find((o: any) => o.Objective === 'OUTCOME_SALES')
       const objectiveLastWeek = breakdownDataLastWeek.objective?.find((o: any) => o.Objective === 'OUTCOME_SALES')
-      
+
       console.log('[DEBUG CTLP] Found objectiveThisWeek:', objectiveThisWeek)
-      
+
       if (objectiveThisWeek) {
         // Merge objective data with aggregated main (objective has accurate totals, main might have conversion values)
         thisWeekData = { ...aggregatedMainThisWeek, ...objectiveThisWeek }
@@ -1030,6 +1030,116 @@ Return the analysis as structured JSON data that can be used to generate the HTM
       }
       if (objectiveLastWeek) {
         lastWeekData = { ...aggregatedMainLastWeek, ...objectiveLastWeek }
+      }
+    }
+
+    // For CTWA, calculate ALL metrics from objective breakdown if available
+    // This ensures consistency with Objective Performance slide (Slide 4)
+    // Objective breakdown has accurate totals that should be used instead of aggregatedMain
+    if (objectiveType === 'ctwa' && breakdownDataThisWeek.objective?.length > 0) {
+      // Sum all metrics from objective breakdown
+      const objectiveMetricsThis = breakdownDataThisWeek.objective.reduce((acc: any, obj: any) => {
+        const metricsToSum = [
+          'Amount spent (IDR)', 'Amount Spent',
+          'Impressions',
+          'Link clicks',
+          'Outbound clicks',
+          'Messaging conversations started',
+          'Instagram profile visits',
+          'Reach',
+          'Results'
+        ]
+
+        for (const metric of metricsToSum) {
+          const value = parseNum(obj[metric])
+          if (value > 0) {
+            acc[metric] = (acc[metric] || 0) + value
+          }
+        }
+        return acc
+      }, {})
+
+      console.log('[DEBUG CTWA] Metrics from objectives (This Week):', objectiveMetricsThis)
+      console.log('[DEBUG CTWA] Metrics from aggregatedMain:', {
+        amountSpent: aggregatedMainThisWeek['Amount spent (IDR)'],
+        impressions: aggregatedMainThisWeek['Impressions'],
+        linkClicks: aggregatedMainThisWeek['Link clicks'],
+        outboundClicks: aggregatedMainThisWeek['Outbound clicks'],
+        messagingConversations: aggregatedMainThisWeek['Messaging conversations started']
+      })
+
+      // Override aggregatedMainThisWeek with objective breakdown metrics
+      Object.keys(objectiveMetricsThis).forEach(key => {
+        if (objectiveMetricsThis[key] > 0) {
+          // Map field names
+          if (key === 'Amount Spent') {
+            aggregatedMainThisWeek['Amount spent (IDR)'] = objectiveMetricsThis[key]
+            thisWeekData['Amount spent (IDR)'] = objectiveMetricsThis[key]
+          } else if (key === 'Messaging conversations started') {
+            aggregatedMainThisWeek[key] = objectiveMetricsThis[key]
+            thisWeekData[key] = objectiveMetricsThis[key]
+          } else {
+            aggregatedMainThisWeek[key] = objectiveMetricsThis[key]
+          }
+        }
+      })
+
+      // Do the same for last week if objective breakdown is available
+      if (breakdownDataLastWeek.objective?.length > 0) {
+        const objectiveMetricsLast = breakdownDataLastWeek.objective.reduce((acc: any, obj: any) => {
+          const metricsToSum = [
+            'Amount spent (IDR)', 'Amount Spent',
+            'Impressions',
+            'Link clicks',
+            'Outbound clicks',
+            'Messaging conversations started',
+            'Instagram profile visits',
+            'Reach',
+            'Results'
+          ]
+
+          for (const metric of metricsToSum) {
+            const value = parseNum(obj[metric])
+            if (value > 0) {
+              acc[metric] = (acc[metric] || 0) + value
+            }
+          }
+          return acc
+        }, {})
+
+        console.log('[DEBUG CTWA] Metrics from objectives (Last Week):', objectiveMetricsLast)
+
+        Object.keys(objectiveMetricsLast).forEach(key => {
+          if (objectiveMetricsLast[key] > 0) {
+            if (key === 'Amount Spent') {
+              aggregatedMainLastWeek['Amount spent (IDR)'] = objectiveMetricsLast[key]
+              lastWeekData['Amount spent (IDR)'] = objectiveMetricsLast[key]
+            } else if (key === 'Messaging conversations started') {
+              aggregatedMainLastWeek[key] = objectiveMetricsLast[key]
+              lastWeekData[key] = objectiveMetricsLast[key]
+            } else {
+              aggregatedMainLastWeek[key] = objectiveMetricsLast[key]
+            }
+          }
+        })
+      }
+
+      // Recalculate Frequency from total Impressions / Reach for accurate value
+      const totalImpressionsThis = parseNum(aggregatedMainThisWeek['Impressions'] || 0)
+      const totalReachThis = parseNum(aggregatedMainThisWeek['Reach'] || 0)
+      if (totalImpressionsThis > 0 && totalReachThis > 0) {
+        aggregatedMainThisWeek['Frequency'] = totalImpressionsThis / totalReachThis
+        thisWeekData['Frequency'] = aggregatedMainThisWeek['Frequency']
+      }
+    }
+
+    // Recalculate Frequency for last week as well
+    if (breakdownDataLastWeek.objective?.length > 0) {
+      const totalImpressionsLast = parseNum(aggregatedMainLastWeek['Impressions'] || 0)
+      const totalReachLast = parseNum(aggregatedMainLastWeek['Reach'] || 0)
+      if (totalImpressionsLast > 0 && totalReachLast > 0) {
+        aggregatedMainLastWeek['Frequency'] = totalImpressionsLast / totalReachLast
+        lastWeekData['Frequency'] = aggregatedMainLastWeek['Frequency']
       }
     }
 
@@ -1138,23 +1248,20 @@ Return the analysis as structured JSON data that can be used to generate the HTM
         impressions: impressions,
         linkClicks: linkClicks,
         ctr: (() => {
-          const ctrValue = parseNum(getFieldValue(data, 'CTR (link click-through rate)'))
-          // CTR in CSV is already in percentage format (e.g., 1.3 means 1.3%)
-          // Return as-is to maintain consistency across all templates
-          return ctrValue
+          // Always recalculate CTR from base metrics for accuracy
+          // CTR = (Link clicks / Impressions) * 100
+          if (linkClicks > 0 && impressions > 0) {
+            return (linkClicks / impressions) * 100
+          }
+          // Fallback to CSV value if calculation not possible
+          return parseNum(getFieldValue(data, 'CTR (link click-through rate)'))
         })(),
-        // Calculate CPC manually if not in CSV
+        // Always calculate CPC from base metrics
         cpc: (() => {
-          const cpcValue = parseNum(getFieldValue(data, 'CPC (cost per link click)'))
-          if (cpcValue > 0) return cpcValue
-          // Calculate CPC from amount spent and link clicks
           return linkClicks > 0 ? (amountSpent / linkClicks) : 0
         })(),
-        // Calculate CPM manually if not in CSV
+        // Always calculate CPM from base metrics
         cpm: (() => {
-          const cpmValue = parseNum(getFieldValue(data, 'CPM (cost per 1,000 impressions)'))
-          if (cpmValue > 0) return cpmValue
-          // Calculate CPM from amount spent and impressions
           return impressions > 0 ? ((amountSpent / impressions) * 1000) : 0
         })(),
         outboundClicks: parseNum(getFieldValue(data, 'Outbound clicks')),
