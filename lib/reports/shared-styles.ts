@@ -5,6 +5,9 @@
 import { parseNum as csvParserParseNum } from '@/lib/csvParser'
 // BUG #19 FIX: Import rounding helper
 import { roundToDecimals } from '@/lib/medium-priority-helpers'
+// BUG #23 FIX: Import color constants and style helpers
+export { CSS_COLORS } from '@/lib/style-helpers'
+export { metricIconStyle, badgeStyle, textColorStyle, bgColorStyle } from '@/lib/style-helpers'
 
 export const parseNum = csvParserParseNum
 
