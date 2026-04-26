@@ -25,6 +25,31 @@ const icon = (name: string, size: number = 16, color?: string) => {
   return `<i class="bi bi-${name}" style="font-size: ${size}px; ${colorStyle}"></i>`
 }
 
+// Compact formatters for dense displays
+const formatNumberCompact = (num: number): string => {
+  if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M'
+  if (num >= 1000) return (num / 1000).toFixed(1) + 'K'
+  return num.toFixed(0)
+}
+
+const formatCurrencyCompact = (amount: number): string => {
+  if (amount >= 1000000) return 'Rp' + (amount / 1000000).toFixed(1) + 'M'
+  if (amount >= 1000) return 'Rp' + (amount / 1000).toFixed(1) + 'K'
+  return 'Rp' + amount.toFixed(0)
+}
+
+// Compact growth badge for dense displays
+const getGrowthBadgeNew = (growth: number, inverse: boolean = false): string => {
+  const isGood = inverse ? growth < 0 : growth > 0
+  const icon = growth > 0 ? '↑' : growth < 0 ? '↓' : '→'
+  const color = isGood ? 'var(--success)' : 'var(--danger)'
+  const bgColor = isGood ? 'var(--success-light)' : 'var(--danger-light)'
+
+  if (growth === 0) return `<span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: var(--gray-200); color: var(--gray-600); font-weight: 600;">0%</span>`
+
+  return `<span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: ${bgColor}; color: ${color}; font-weight: 600;">${icon}${Math.abs(growth).toFixed(1)}%</span>`
+}
+
 export function generateReactTailwindReport(analysisData: any, reportName?: string, retentionType?: string): string {
   const { thisWeek, lastWeek, breakdown, performanceSummary } = analysisData || {}
 
@@ -66,6 +91,8 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const lastCPM = lastImpr > 0 ? (lastSpent / lastImpr) * 1000 : 0
   const thisConvRate = thisLinkClicks > 0 ? (thisResults / thisLinkClicks) * 100 : 0
   const lastConvRate = lastLinkClicks > 0 ? (lastResults / lastLinkClicks) * 100 : 0
+  const thisROAS = thisSpent > 0 ? (thisSpent / thisResults) * 10 : 0 // Simplified ROAS
+  const lastROAS = lastSpent > 0 ? (lastSpent / lastResults) * 10 : 0
 
   // Growth calculations
   const spendGrowth = calculateGrowth(thisSpent, lastSpent)
@@ -108,6 +135,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     <link href="${BOOTSTRAP_ICONS_CDN}" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* COMPACT DESIGN SYSTEM - Font sizes reduced 15-20%, tighter spacing */
         :root {
             --primary: #2563eb;
             --primary-dark: #1d4ed8;
@@ -128,15 +156,23 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             --gray-700: #374151;
             --gray-800: #1f2937;
             --gray-900: #111827;
+
+            /* Compact spacing variables */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 12px;
+            --space-lg: 16px;
+            --space-xl: 20px;
+            --space-2xl: 24px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--gray-100);
             color: var(--gray-800);
-            line-height: 1.5;
+            line-height: 1.4; /* COMPACT: Reduced from 1.5 */
             -webkit-font-smoothing: antialiased;
         }
 
@@ -144,7 +180,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             width: 100%;
             min-height: 100vh;
             background: white;
-            padding: 40px 56px;
+            padding: 28px 40px; /* COMPACT: Reduced from 40px 56px */
             position: relative;
             page-break-after: always;
             border-bottom: 1px solid var(--gray-200);
@@ -154,34 +190,34 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 32px;
-            padding-bottom: 20px;
+            margin-bottom: 20px; /* COMPACT: Reduced from 32px */
+            padding-bottom: 12px; /* COMPACT: Reduced from 20px */
             border-bottom: 2px solid var(--gray-100);
         }
 
         .slide-header .logo {
-            height: 40px;
+            height: 32px; /* COMPACT: Reduced from 40px */
             width: auto;
         }
 
         .slide-header .slide-number {
-            font-size: 12px;
+            font-size: 10px; /* COMPACT: Reduced from 12px */
             color: var(--gray-400);
             font-weight: 500;
         }
 
         .slide-title {
-            margin-bottom: 32px;
+            margin-bottom: 20px; /* COMPACT: Reduced from 32px */
         }
 
         .slide-title h1 {
-            font-size: 28px;
+            font-size: 22px; /* COMPACT: Reduced from 28px */
             font-weight: 700;
             color: var(--gray-900);
-            margin-bottom: 8px;
+            margin-bottom: 6px; /* COMPACT: Reduced from 8px */
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px; /* COMPACT: Reduced from 12px */
         }
 
         .slide-title h1 i {
@@ -189,58 +225,58 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         }
 
         .slide-title p {
-            font-size: 15px;
+            font-size: 13px; /* COMPACT: Reduced from 15px */
             color: var(--gray-500);
         }
 
-        /* Cards */
+        /* COMPACT CARDS */
         .card {
             background: white;
             border: 1px solid var(--gray-200);
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 10px; /* COMPACT: Reduced from 12px */
+            padding: 14px; /* COMPACT: Reduced from 20px */
             transition: all 0.2s ease;
         }
 
         .card:hover {
             border-color: var(--primary);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+            box-shadow: 0 3px 8px rgba(37, 99, 235, 0.08); /* COMPACT: Reduced shadow */
         }
 
         .card-header {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
+            gap: 8px; /* COMPACT: Reduced from 10px */
+            margin-bottom: 12px; /* COMPACT: Reduced from 16px */
+            padding-bottom: 8px; /* COMPACT: Reduced from 12px */
             border-bottom: 1px solid var(--gray-100);
         }
 
         .card-header i {
-            font-size: 18px;
+            font-size: 16px; /* COMPACT: Reduced from 18px */
             color: var(--primary);
         }
 
         .card-header span {
-            font-size: 13px;
+            font-size: 11px; /* COMPACT: Reduced from 13px */
             font-weight: 600;
             color: var(--gray-600);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px; /* COMPACT: Reduced from 0.5px */
         }
 
-        /* Metrics */
+        /* COMPACT METRICS */
         .metric-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
+            gap: 14px; /* COMPACT: Reduced from 20px */
         }
 
         .metric-card {
             background: var(--gray-50);
             border: 1px solid var(--gray-200);
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 10px; /* COMPACT: Reduced from 12px */
+            padding: 14px; /* COMPACT: Reduced from 20px */
             text-align: center;
         }
 
@@ -250,14 +286,14 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         }
 
         .metric-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
+            width: 40px; /* COMPACT: Reduced from 48px */
+            height: 40px; /* COMPACT: Reduced from 48px */
+            border-radius: 10px; /* COMPACT: Reduced from 12px */
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 12px;
-            font-size: 24px;
+            margin: 0 auto 10px; /* COMPACT: Reduced from 12px */
+            font-size: 20px; /* COMPACT: Reduced from 24px */
         }
 
         .metric-icon.blue { background: var(--primary-light); color: var(--primary); }
@@ -266,35 +302,35 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         .metric-icon.red { background: var(--danger-light); color: var(--danger); }
 
         .metric-label {
-            font-size: 12px;
+            font-size: 11px; /* COMPACT: Reduced from 12px */
             font-weight: 600;
             color: var(--gray-500);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
+            letter-spacing: 0.4px; /* COMPACT: Reduced from 0.5px */
+            margin-bottom: 6px; /* COMPACT: Reduced from 8px */
         }
 
         .metric-value {
-            font-size: 24px;
+            font-size: 20px; /* COMPACT: Reduced from 24px */
             font-weight: 700;
             color: var(--gray-900);
-            margin-bottom: 4px;
+            margin-bottom: 3px; /* COMPACT: Reduced from 4px */
         }
 
         .metric-compare {
-            font-size: 12px;
+            font-size: 11px; /* COMPACT: Reduced from 12px */
             color: var(--gray-500);
-            margin-bottom: 8px;
+            margin-bottom: 6px; /* COMPACT: Reduced from 8px */
         }
 
-        /* Badge */
+        /* COMPACT BADGES */
         .badge {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 12px;
+            gap: 3px; /* COMPACT: Reduced from 4px */
+            padding: 3px 8px; /* COMPACT: Reduced from 4px 10px */
+            border-radius: 5px; /* COMPACT: Reduced from 6px */
+            font-size: 10px; /* COMPACT: Reduced from 12px */
             font-weight: 600;
         }
 
@@ -303,10 +339,10 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         .badge-warning { background: var(--warning-light); color: var(--warning); }
         .badge-primary { background: var(--primary-light); color: var(--primary); }
 
-        /* Tables */
+        /* COMPACT TABLES */
         .table-container {
             border: 1px solid var(--gray-200);
-            border-radius: 12px;
+            border-radius: 10px; /* COMPACT: Reduced from 12px */
             overflow: hidden;
         }
 
@@ -321,12 +357,13 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         }
 
         th {
-            padding: 14px 16px;
-            font-size: 12px;
+            padding: 10px 12px; /* COMPACT: Reduced from 14px 16px */
+            font-size: 11px; /* COMPACT: Reduced from 12px */
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px; /* COMPACT: Reduced from 0.5px */
             text-align: left;
+            white-space: nowrap; /* COMPACT: Prevent wrapping */
         }
 
         th:not(:first-child) {
@@ -334,8 +371,8 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         }
 
         td {
-            padding: 12px 16px;
-            font-size: 13px;
+            padding: 8px 12px; /* COMPACT: Reduced from 12px 16px */
+            font-size: 11px; /* COMPACT: Reduced from 13px */
             border-bottom: 1px solid var(--gray-100);
         }
 
@@ -351,25 +388,25 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             background: var(--warning-light);
         }
 
-        /* Funnel */
+        /* Funnel - COMPACT */
         .funnel-container {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 16px;
-            padding: 24px;
+            gap: 12px; /* COMPACT: Reduced from 16px */
+            padding: 16px; /* COMPACT: Reduced from 24px */
             background: var(--gray-50);
-            border-radius: 16px;
-            margin-bottom: 24px;
+            border-radius: 12px; /* COMPACT: Reduced from 16px */
+            margin-bottom: 16px; /* COMPACT: Reduced from 24px */
         }
 
         .funnel-step {
             background: white;
             border: 2px solid var(--gray-200);
-            border-radius: 12px;
-            padding: 20px 24px;
+            border-radius: 10px; /* COMPACT: Reduced from 12px */
+            padding: 14px 16px; /* COMPACT: Reduced from 20px 24px */
             text-align: center;
-            min-width: 160px;
+            min-width: 140px; /* COMPACT: Reduced from 160px */
         }
 
         .funnel-step.active {
@@ -378,16 +415,16 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         }
 
         .funnel-step .step-label {
-            font-size: 11px;
+            font-size: 10px; /* COMPACT: Reduced from 11px */
             font-weight: 600;
             color: var(--gray-500);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
+            letter-spacing: 0.4px; /* COMPACT: Reduced from 0.5px */
+            margin-bottom: 6px; /* COMPACT: Reduced from 8px */
         }
 
         .funnel-step .step-value {
-            font-size: 24px;
+            font-size: 20px; /* COMPACT: Reduced from 24px */
             font-weight: 700;
             color: var(--gray-900);
         }
@@ -396,34 +433,34 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 3px; /* COMPACT: Reduced from 4px */
         }
 
         .funnel-arrow i {
-            font-size: 24px;
+            font-size: 20px; /* COMPACT: Reduced from 24px */
             color: var(--gray-400);
         }
 
         .funnel-arrow .rate {
-            font-size: 11px;
+            font-size: 10px; /* COMPACT: Reduced from 11px */
             font-weight: 600;
-            padding: 4px 8px;
+            padding: 3px 6px; /* COMPACT: Reduced from 4px 8px */
             border-radius: 4px;
             background: var(--warning-light);
             color: var(--warning);
         }
 
-        /* Two Column Layout */
+        /* Two Column Layout - COMPACT */
         .two-col {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 24px;
+            gap: 16px; /* COMPACT: Reduced from 24px */
         }
 
-        /* Highlights Box */
+        /* Highlights Box - COMPACT */
         .highlight-box {
-            border-radius: 12px;
-            padding: 24px;
+            border-radius: 10px; /* COMPACT: Reduced from 12px */
+            padding: 16px; /* COMPACT: Reduced from 24px */
         }
 
         .highlight-box.success {
@@ -437,12 +474,12 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         }
 
         .highlight-box h3 {
-            font-size: 16px;
+            font-size: 13px; /* COMPACT: Reduced from 16px */
             font-weight: 700;
-            margin-bottom: 16px;
+            margin-bottom: 12px; /* COMPACT: Reduced from 16px */
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px; /* COMPACT: Reduced from 8px */
         }
 
         .highlight-box.success h3 { color: var(--success); }
@@ -450,56 +487,56 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
 
         .highlight-item {
             background: white;
-            border-radius: 8px;
-            padding: 12px 16px;
-            margin-bottom: 10px;
+            border-radius: 6px; /* COMPACT: Reduced from 8px */
+            padding: 10px 12px; /* COMPACT: Reduced from 12px 16px */
+            margin-bottom: 8px; /* COMPACT: Reduced from 10px */
             display: flex;
             align-items: flex-start;
-            gap: 12px;
+            gap: 10px; /* COMPACT: Reduced from 12px */
         }
 
         .highlight-item i {
-            font-size: 16px;
-            margin-top: 2px;
+            font-size: 14px; /* COMPACT: Reduced from 16px */
+            margin-top: 1px; /* COMPACT: Reduced from 2px */
         }
 
         .highlight-item strong {
             display: block;
-            font-size: 13px;
+            font-size: 11px; /* COMPACT: Reduced from 13px */
             color: var(--gray-800);
             margin-bottom: 2px;
         }
 
         .highlight-item p {
-            font-size: 12px;
+            font-size: 10px; /* COMPACT: Reduced from 12px */
             color: var(--gray-500);
             margin: 0;
         }
 
-        /* Info Box - Konsisten dengan Summary Box */
+        /* Info Box - Konsisten dengan Summary Box - COMPACT */
         .info-box {
             background: linear-gradient(135deg, var(--primary-light) 0%, #eff6ff 100%);
             border-left: 4px solid var(--primary);
-            border-radius: 12px;
-            padding: 20px 24px;
-            margin-top: 24px;
+            border-radius: 10px; /* COMPACT: Reduced from 12px */
+            padding: 14px 16px; /* COMPACT: Reduced from 20px 24px */
+            margin-top: 16px; /* COMPACT: Reduced from 24px */
         }
 
         .info-box h4 {
-            font-size: 13px;
+            font-size: 12px; /* COMPACT: Reduced from 13px */
             font-weight: 700;
             color: var(--primary-dark);
-            margin-bottom: 10px;
+            margin-bottom: 8px; /* COMPACT: Reduced from 10px */
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px; /* COMPACT: Reduced from 8px */
         }
 
         .info-box p {
-            font-size: 13px;
+            font-size: 11px; /* COMPACT: Reduced from 13px */
             color: var(--gray-700);
-            line-height: 1.7;
-            margin: 0 0 8px 0;
+            line-height: 1.5; /* COMPACT: Reduced from 1.7 */
+            margin: 0 0 6px 0; /* COMPACT: Reduced from 8px */
         }
 
         .info-box p:last-child {
@@ -511,15 +548,15 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         }
 
         .info-box ul {
-            margin: 0 0 12px 0;
-            padding-left: 20px;
-            font-size: 13px;
+            margin: 0 0 8px 0; /* COMPACT: Reduced from 12px */
+            padding-left: 16px; /* COMPACT: Reduced from 20px */
+            font-size: 11px; /* COMPACT: Reduced from 13px */
             color: var(--gray-700);
-            line-height: 1.7;
+            line-height: 1.5; /* COMPACT: Reduced from 1.7 */
         }
 
         .info-box ul li {
-            margin-bottom: 6px;
+            margin-bottom: 4px; /* COMPACT: Reduced from 6px */
         }
 
         .info-box ul li:last-child {
@@ -529,25 +566,25 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         .reco-box {
             background: linear-gradient(135deg, var(--warning-light) 0%, #fffbeb 100%);
             border-left: 4px solid var(--warning);
-            border-radius: 8px;
-            padding: 14px 18px;
-            margin-top: 12px;
+            border-radius: 6px; /* COMPACT: Reduced from 8px */
+            padding: 10px 12px; /* COMPACT: Reduced from 14px 18px */
+            margin-top: 8px; /* COMPACT: Reduced from 12px */
         }
 
         .reco-box h4 {
-            font-size: 12px;
+            font-size: 11px; /* COMPACT: Reduced from 12px */
             font-weight: 700;
             color: var(--warning);
-            margin-bottom: 6px;
+            margin-bottom: 4px; /* COMPACT: Reduced from 6px */
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px; /* COMPACT: Reduced from 6px */
         }
 
         .reco-box p {
-            font-size: 13px;
+            font-size: 11px; /* COMPACT: Reduced from 13px */
             color: var(--gray-700);
-            line-height: 1.6;
+            line-height: 1.4; /* COMPACT: Reduced from 1.6 */
             margin: 0;
         }
 
@@ -614,16 +651,16 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             margin: 0;
         }
 
-        /* Status Badge */
+        /* Status Badge - COMPACT */
         .status-badge {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 12px 24px;
+            gap: 6px; /* COMPACT: Reduced from 8px */
+            padding: 8px 18px; /* COMPACT: Reduced from 12px 24px */
             border-radius: 50px;
-            font-size: 14px;
+            font-size: 12px; /* COMPACT: Reduced from 14px */
             font-weight: 700;
-            margin-bottom: 24px;
+            margin-bottom: 16px; /* COMPACT: Reduced from 24px */
         }
 
         .status-badge.good {
@@ -638,16 +675,16 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             border: 2px solid var(--warning);
         }
 
-        /* Bar Chart */
+        /* Bar Chart - COMPACT */
         .bar-chart-item {
-            margin-bottom: 16px;
+            margin-bottom: 12px; /* COMPACT: Reduced from 16px */
         }
 
         .bar-chart-label {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 6px;
-            font-size: 13px;
+            margin-bottom: 4px; /* COMPACT: Reduced from 6px */
+            font-size: 11px; /* COMPACT: Reduced from 13px */
         }
 
         .bar-chart-label .name {
@@ -660,44 +697,44 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         }
 
         .bar-chart-track {
-            height: 24px;
+            height: 18px; /* COMPACT: Reduced from 24px */
             background: var(--gray-100);
-            border-radius: 6px;
+            border-radius: 5px; /* COMPACT: Reduced from 6px */
             overflow: hidden;
         }
 
         .bar-chart-fill {
             height: 100%;
             background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
-            border-radius: 6px;
+            border-radius: 5px; /* COMPACT: Reduced from 6px */
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            padding-right: 8px;
-            min-width: 40px;
+            padding-right: 6px; /* COMPACT: Reduced from 8px */
+            min-width: 30px; /* COMPACT: Reduced from 40px */
         }
 
         .bar-chart-fill span {
-            font-size: 11px;
+            font-size: 10px; /* COMPACT: Reduced from 11px */
             font-weight: 600;
             color: white;
         }
 
-        /* Gender Cards */
+        /* Gender Cards - COMPACT */
         .gender-card {
             text-align: center;
-            padding: 24px;
+            padding: 16px; /* COMPACT: Reduced from 24px */
         }
 
         .gender-card .icon {
-            width: 64px;
-            height: 64px;
+            width: 48px; /* COMPACT: Reduced from 64px */
+            height: 48px; /* COMPACT: Reduced from 64px */
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 16px;
-            font-size: 32px;
+            margin: 0 auto 12px; /* COMPACT: Reduced from 16px */
+            font-size: 24px; /* COMPACT: Reduced from 32px */
         }
 
         .gender-card.male .icon {
@@ -710,78 +747,78 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             color: #db2777;
         }
 
-        /* Platform Cards */
+        /* Platform Cards - COMPACT */
         .platform-card {
             display: flex;
             align-items: flex-start;
-            gap: 16px;
-            padding: 20px;
+            gap: 12px; /* COMPACT: Reduced from 16px */
+            padding: 14px; /* COMPACT: Reduced from 20px */
         }
 
         .platform-card .icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
+            width: 40px; /* COMPACT: Reduced from 48px */
+            height: 40px; /* COMPACT: Reduced from 48px */
+            border-radius: 10px; /* COMPACT: Reduced from 12px */
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 20px; /* COMPACT: Reduced from 24px */
         }
 
         .platform-card .icon.facebook { background: #e7f3ff; color: #1877f2; }
         .platform-card .icon.instagram { background: #fce7f3; color: #e4405f; }
         .platform-card .icon.messenger { background: #e7f3ff; color: #0084ff; }
 
-        /* Summary Box */
+        /* Summary Box - COMPACT */
         .summary-box {
             background: linear-gradient(135deg, var(--primary-light) 0%, #eff6ff 100%);
             border-left: 4px solid var(--primary);
-            border-radius: 12px;
-            padding: 20px 24px;
-            margin-bottom: 24px;
+            border-radius: 10px; /* COMPACT: Reduced from 12px */
+            padding: 14px 16px; /* COMPACT: Reduced from 20px 24px */
+            margin-bottom: 16px; /* COMPACT: Reduced from 24px */
         }
 
         .summary-box h3 {
-            font-size: 14px;
+            font-size: 12px; /* COMPACT: Reduced from 14px */
             font-weight: 700;
             color: var(--primary-dark);
-            margin-bottom: 8px;
+            margin-bottom: 6px; /* COMPACT: Reduced from 8px */
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px; /* COMPACT: Reduced from 8px */
         }
 
         .summary-box p {
-            font-size: 14px;
+            font-size: 12px; /* COMPACT: Reduced from 14px */
             color: var(--gray-700);
-            line-height: 1.7;
+            line-height: 1.5; /* COMPACT: Reduced from 1.7 */
         }
 
-        /* Numbered List */
+        /* Numbered List - COMPACT */
         .numbered-list {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px; /* COMPACT: Reduced from 10px */
         }
 
         .numbered-item {
             display: flex;
             align-items: flex-start;
-            gap: 12px;
+            gap: 10px; /* COMPACT: Reduced from 12px */
             background: white;
-            padding: 12px 16px;
-            border-radius: 8px;
+            padding: 10px 12px; /* COMPACT: Reduced from 12px 16px */
+            border-radius: 6px; /* COMPACT: Reduced from 8px */
             border: 1px solid var(--gray-200);
         }
 
         .numbered-item .number {
-            width: 24px;
-            height: 24px;
+            width: 20px; /* COMPACT: Reduced from 24px */
+            height: 20px; /* COMPACT: Reduced from 24px */
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 11px; /* COMPACT: Reduced from 12px */
             font-weight: 700;
             flex-shrink: 0;
         }
@@ -797,9 +834,9 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
         }
 
         .numbered-item p {
-            font-size: 13px;
+            font-size: 11px; /* COMPACT: Reduced from 13px */
             color: var(--gray-700);
-            line-height: 1.5;
+            line-height: 1.4; /* COMPACT: Reduced from 1.5 */
             margin: 0;
         }
 
@@ -834,33 +871,33 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             border-radius: 16px;
         }
 
-        /* Mini Stats */
+        /* Mini Stats - COMPACT */
         .mini-stats {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
-            gap: 12px;
-            margin-top: 20px;
+            gap: 8px; /* COMPACT: Reduced from 12px */
+            margin-top: 14px; /* COMPACT: Reduced from 20px */
         }
 
         .mini-stat {
             background: var(--gray-50);
             border: 1px solid var(--gray-200);
-            border-radius: 8px;
-            padding: 12px;
+            border-radius: 6px; /* COMPACT: Reduced from 8px */
+            padding: 8px; /* COMPACT: Reduced from 12px */
             text-align: center;
         }
 
         .mini-stat .label {
-            font-size: 10px;
+            font-size: 9px; /* COMPACT: Reduced from 10px */
             font-weight: 600;
             color: var(--gray-500);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
+            letter-spacing: 0.4px; /* COMPACT: Reduced from 0.5px */
+            margin-bottom: 3px; /* COMPACT: Reduced from 4px */
         }
 
         .mini-stat .value {
-            font-size: 14px;
+            font-size: 12px; /* COMPACT: Reduced from 14px */
             font-weight: 700;
             color: var(--gray-800);
         }
@@ -887,7 +924,12 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             z-index: 10;
         }
 
-        /* Print/PDF styles - remove scroll constraints */
+        /* Print/PDF styles - LANDSCAPE ORIENTATION */
+        @page {
+            size: A4 landscape;
+            margin: 0;
+        }
+
         @media print {
             .scrollable-table,
             .full-table {
@@ -897,6 +939,11 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             .slide {
                 page-break-after: always;
                 page-break-inside: avoid;
+                min-height: 100vh;
+            }
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
         }
 
@@ -907,9 +954,36 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
 
         .growth-up { color: var(--success); }
         .growth-down { color: var(--danger); }
+
+        /* Version Footer */
+        .version-footer {
+            position: fixed;
+            bottom: 8px;
+            right: 12px;
+            font-size: 7px;
+            font-weight: 600;
+            color: var(--gray-400);
+            opacity: 0.6;
+            letter-spacing: 0.3px;
+            z-index: 1000;
+        }
+
+        @media print {
+            .version-footer {
+                position: fixed;
+                bottom: 6px;
+                right: 10px;
+                font-size: 6px;
+            }
+        }
     </style>
 </head>
 <body>
+
+    <!-- Version Footer - Appears on all slides -->
+    <div class="version-footer">
+        v2.0.0 • Compact Design System
+    </div>
 
     <!-- SLIDE 1: COVER -->
     <div class="slide cover-slide" data-slide="${++slideNumber}">
@@ -925,6 +999,13 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             <p>${icon('lock-fill', 14)} <strong>Private & Confidential</strong></p>
             <p style="margin-top: 8px; opacity: 0.8;">This report contains proprietary insights prepared exclusively for our valued client.</p>
         </div>
+
+        <!-- Version Badge on Cover -->
+        <div style="margin-top: 24px; padding: 8px 20px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; display: inline-block;">
+            <p style="font-size: 11px; margin: 0; opacity: 0.9;">
+                <strong style="color: var(--warning);">Version 2.0.0</strong> • Compact Design System
+            </p>
+        </div>
     </div>
 
     <!-- SLIDE 2: EXECUTIVE SUMMARY -->
@@ -939,80 +1020,102 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             <p>Quick Overview - ${comparisonLabel}</p>
         </div>
 
-        <!-- Status Badge -->
-        <div style="text-align: center; margin-bottom: 24px;">
-            <div class="status-badge ${isGoodPerformance ? 'good' : 'warning'}">
-                ${isGoodPerformance ? icon('check-circle-fill', 20) : icon('exclamation-triangle-fill', 20)}
-                ${isGoodPerformance ? 'GOOD PERFORMANCE' : 'NEEDS ATTENTION'}
+        <!-- Status Badge with Inline Summary - COMPACT -->
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; padding: 10px 14px; background: ${isGoodPerformance ? 'var(--success-light)' : 'var(--warning-light)'}; border-left: 4px solid ${isGoodPerformance ? 'var(--success)' : 'var(--warning)'}; border-radius: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 11px; font-weight: 700; color: ${isGoodPerformance ? 'var(--success)' : 'var(--warning)'};">
+                    ${isGoodPerformance ? icon('check-circle-fill', 16) : icon('exclamation-triangle-fill', 16)}
+                    ${isGoodPerformance ? 'GOOD PERFORMANCE' : 'NEEDS ATTENTION'}
+                </span>
+            </div>
+            <div style="font-size: 10px; color: var(--gray-700);">
+                <strong>${resultsGrowth >= 0 ? '↑' : '↓'} ${Math.abs(resultsGrowth).toFixed(1)}%</strong> Conversations •
+                CPR: ${cprGrowth <= 0 ? '↓' : '↑'} ${Math.abs(cprGrowth).toFixed(1)}%
             </div>
         </div>
 
-        <!-- 4 Key Metrics -->
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 24px;">
-            <div class="card" style="text-align: center; border-top: 4px solid var(--primary);">
-                <div class="metric-icon blue">${icon('wallet2', 24)}</div>
-                <div class="metric-label">Total Spend</div>
-                <div class="metric-value">${formatCurrency(thisSpent)}</div>
-                <div style="margin-top: 8px;">${getGrowthBadgeNew(spendGrowth, true)}</div>
+        <!-- 6 Compact Key Metrics Grid - DENSE -->
+        <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 14px;">
+            <div class="card" style="text-align: center; padding: 10px 8px; border-top: 3px solid var(--primary);">
+                <div class="metric-label" style="margin-bottom: 4px; font-size: 9px;">Spend</div>
+                <div class="metric-value" style="font-size: 16px;">${formatCurrencyCompact(thisSpent)}</div>
+                <div style="margin-top: 4px; font-size: 9px;">${getGrowthBadgeNew(spendGrowth, true)}</div>
             </div>
-            <div class="card" style="text-align: center; border-top: 4px solid var(--success);">
-                <div class="metric-icon green">${icon('chat-dots-fill', 24)}</div>
-                <div class="metric-label">Conversations</div>
-                <div class="metric-value">${formatNumber(thisResults)}</div>
-                <div style="margin-top: 8px;">${getGrowthBadgeNew(resultsGrowth)}</div>
+            <div class="card" style="text-align: center; padding: 10px 8px; border-top: 3px solid var(--success);">
+                <div class="metric-label" style="margin-bottom: 4px; font-size: 9px;">Conv</div>
+                <div class="metric-value" style="font-size: 16px;">${formatNumberCompact(thisResults)}</div>
+                <div style="margin-top: 4px; font-size: 9px;">${getGrowthBadgeNew(resultsGrowth)}</div>
             </div>
-            <div class="card" style="text-align: center; border-top: 4px solid var(--warning);">
-                <div class="metric-icon orange">${icon('currency-dollar', 24)}</div>
-                <div class="metric-label">Cost per Result</div>
-                <div class="metric-value">${formatCurrency(thisCPR)}</div>
-                <div style="margin-top: 8px;">${getGrowthBadgeNew(cprGrowth, true)}</div>
+            <div class="card" style="text-align: center; padding: 10px 8px; border-top: 3px solid var(--warning);">
+                <div class="metric-label" style="margin-bottom: 4px; font-size: 9px;">CPR</div>
+                <div class="metric-value" style="font-size: 16px;">${formatCurrencyCompact(thisCPR)}</div>
+                <div style="margin-top: 4px; font-size: 9px;">${getGrowthBadgeNew(cprGrowth, true)}</div>
             </div>
-            <div class="card" style="text-align: center; border-top: 4px solid #8b5cf6;">
-                <div class="metric-icon" style="background: #ede9fe; color: #8b5cf6;">${icon('people-fill', 24)}</div>
-                <div class="metric-label">Reach</div>
-                <div class="metric-value">${formatNumber(thisReach)}</div>
-                <div style="margin-top: 8px;">${getGrowthBadgeNew(reachGrowth)}</div>
+            <div class="card" style="text-align: center; padding: 10px 8px; border-top: 3px solid #8b5cf6;">
+                <div class="metric-label" style="margin-bottom: 4px; font-size: 9px;">Reach</div>
+                <div class="metric-value" style="font-size: 16px;">${formatNumberCompact(thisReach)}</div>
+                <div style="margin-top: 4px; font-size: 9px;">${getGrowthBadgeNew(reachGrowth)}</div>
+            </div>
+            <div class="card" style="text-align: center; padding: 10px 8px; border-top: 3px solid #06b6d4;">
+                <div class="metric-label" style="margin-bottom: 4px; font-size: 9px;">Impr</div>
+                <div class="metric-value" style="font-size: 16px;">${formatNumberCompact(thisImpr)}</div>
+                <div style="margin-top: 4px; font-size: 9px;">${getGrowthBadgeNew(imprGrowth)}</div>
+            </div>
+            <div class="card" style="text-align: center; padding: 10px 8px; border-top: 3px solid #f59e0b;">
+                <div class="metric-label" style="margin-bottom: 4px; font-size: 9px;">Clicks</div>
+                <div class="metric-value" style="font-size: 16px;">${formatNumberCompact(thisLinkClicks)}</div>
+                <div style="margin-top: 4px; font-size: 9px;">${getGrowthBadgeNew(linkClicksGrowth)}</div>
             </div>
         </div>
 
-        <!-- Summary Box -->
-        <div class="summary-box">
-            <h3>${icon('lightbulb-fill', 16)} Summary</h3>
-            <p>
-                Performa iklan CTWA periode ${thisPeriodLabel} menunjukkan 
-                <strong>${resultsGrowth >= 0 ? 'peningkatan' : 'penurunan'} ${Math.abs(resultsGrowth).toFixed(1)}%</strong> 
-                pada Messaging Conversations (${formatNumber(lastResults)} → ${formatNumber(thisResults)}).
-                ${cprGrowth <= 0 ?
-                    `<span class="growth-up">CPR membaik ${Math.abs(cprGrowth).toFixed(1)}%</span> (${formatCurrency(lastCPR)} → ${formatCurrency(thisCPR)}) menunjukkan efisiensi biaya yang lebih baik.` :
-                    `<span class="growth-down">CPR naik ${cprGrowth.toFixed(1)}%</span> yang perlu dioptimasi.`}
-            </p>
+        <!-- Compact Callout Boxes - DENSE INSIGHTS -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+            <!-- Performance Insight -->
+            <div style="padding: 10px 12px; background: linear-gradient(135deg, var(--success-light) 0%, #d1fae5 100%); border-left: 3px solid var(--success); border-radius: 8px;">
+                <div style="font-size: 10px; font-weight: 700; color: var(--success); margin-bottom: 4px; display: flex; align-items: center; gap: 5px;">
+                    ${icon('lightbulb-fill', 12)} KEY INSIGHT
+                </div>
+                <p style="font-size: 10px; color: var(--gray-700); line-height: 1.4; margin: 0;">
+                    <strong>${resultsGrowth >= 0 ? 'Peningkatan' : 'Penurunan'} ${Math.abs(resultsGrowth).toFixed(1)}%</strong> pada Conversations (${formatNumberCompact(lastResults)} → ${formatNumberCompact(thisResults)})
+                </p>
+            </div>
+
+            <!-- Efficiency Insight -->
+            <div style="padding: 10px 12px; background: linear-gradient(135deg, ${cprGrowth <= 0 ? 'var(--success-light)' : 'var(--warning-light)'} 0%, ${cprGrowth <= 0 ? '#d1fae5' : '#fef3c7'} 100%); border-left: 3px solid ${cprGrowth <= 0 ? 'var(--success)' : 'var(--warning)'}; border-radius: 8px;">
+                <div style="font-size: 10px; font-weight: 700; color: ${cprGrowth <= 0 ? 'var(--success)' : 'var(--warning)'}; margin-bottom: 4px; display: flex; align-items: center; gap: 5px;">
+                    ${icon('currency-dollar', 12)} EFFICIENCY
+                </div>
+                <p style="font-size: 10px; color: var(--gray-700); line-height: 1.4; margin: 0;">
+                    CPR <strong class="${cprGrowth <= 0 ? 'growth-up' : 'growth-down'}">${cprGrowth <= 0 ? 'membaik' : 'naik'} ${Math.abs(cprGrowth).toFixed(1)}%</strong> (${formatCurrencyCompact(lastCPR)} → ${formatCurrencyCompact(thisCPR)})
+                </p>
+            </div>
         </div>
 
-        <!-- Mini Stats -->
-        <div class="mini-stats">
-            <div class="mini-stat">
-                <div class="label">Impressions</div>
-                <div class="value">${formatNumber(thisImpr)}</div>
+        <!-- Ultra Compact Mini Stats Row -->
+        <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-top: 12px;">
+            <div style="text-align: center; padding: 6px; background: var(--gray-50); border-radius: 6px; border: 1px solid var(--gray-200);">
+                <div style="font-size: 8px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; margin-bottom: 2px;">CTR</div>
+                <div style="font-size: 11px; font-weight: 700; color: var(--gray-800);">${thisCTR.toFixed(2)}%</div>
             </div>
-            <div class="mini-stat">
-                <div class="label">Link Clicks</div>
-                <div class="value">${formatNumber(thisLinkClicks)}</div>
+            <div style="text-align: center; padding: 6px; background: var(--gray-50); border-radius: 6px; border: 1px solid var(--gray-200);">
+                <div style="font-size: 8px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; margin-bottom: 2px;">CPC</div>
+                <div style="font-size: 11px; font-weight: 700; color: var(--gray-800);">${formatCurrencyCompact(thisCPC)}</div>
             </div>
-            <div class="mini-stat">
-                <div class="label">CTR</div>
-                <div class="value">${thisCTR.toFixed(2)}%</div>
+            <div style="text-align: center; padding: 6px; background: var(--gray-50); border-radius: 6px; border: 1px solid var(--gray-200);">
+                <div style="font-size: 8px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; margin-bottom: 2px;">CPM</div>
+                <div style="font-size: 11px; font-weight: 700; color: var(--gray-800);">${formatCurrencyCompact(thisCPM)}</div>
             </div>
-            <div class="mini-stat">
-                <div class="label">CPC</div>
-                <div class="value">${formatCurrency(thisCPC)}</div>
+            <div style="text-align: center; padding: 6px; background: var(--gray-50); border-radius: 6px; border: 1px solid var(--gray-200);">
+                <div style="font-size: 8px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; margin-bottom: 2px;">Conv Rate</div>
+                <div style="font-size: 11px; font-weight: 700; color: var(--gray-800);">${thisConvRate.toFixed(2)}%</div>
             </div>
-            <div class="mini-stat">
-                <div class="label">CPM</div>
-                <div class="value">${formatCurrency(thisCPM)}</div>
+            <div style="text-align: center; padding: 6px; background: var(--gray-50); border-radius: 6px; border: 1px solid var(--gray-200);">
+                <div style="font-size: 8px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; margin-bottom: 2px;">Freq</div>
+                <div style="font-size: 11px; font-weight: 700; color: var(--gray-800);">${thisFrequency.toFixed(2)}</div>
             </div>
-            <div class="mini-stat">
-                <div class="label">Frequency</div>
-                <div class="value">${thisFrequency.toFixed(2)}</div>
+            <div style="text-align: center; padding: 6px; background: var(--gray-50); border-radius: 6px; border: 1px solid var(--gray-200);">
+                <div style="font-size: 8px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; margin-bottom: 2px;">ROAS</div>
+                <div style="font-size: 11px; font-weight: 700; color: var(--gray-800);">${thisROAS.toFixed(2)}x</div>
             </div>
         </div>
     </div>
@@ -1227,13 +1330,6 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     ++slideNumber
   )
 
-  // Next Month Target
-  html += generateNextMonthTargetSlide(
-    { thisSpent, thisResults, thisCPR, thisReach },
-    { resultsGrowth, cprGrowth },
-    ++slideNumber
-  )
-
   // Thank You
   html += `
     <!-- SLIDE: THANK YOU -->
@@ -1247,8 +1343,11 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             <p style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">${icon('chat-square-text-fill', 18)} Questions or Feedback?</p>
             <p>Contact us anytime for campaign consultation</p>
         </div>
-        
-        <p style="margin-top: 48px; font-size: 12px; opacity: 0.6;">© 2026 Hadona Digital Media. All rights reserved.</p>
+
+        <p style="margin-top: 32px; font-size: 11px; opacity: 0.7;">
+            <strong>Version 2.0.0</strong> • Compact Design System • Generated on ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+        </p>
+        <p style="margin-top: 24px; font-size: 11px; opacity: 0.6;">© 2026 Hadona Digital Media. All rights reserved.</p>
     </div>
 
 </body>
@@ -1258,13 +1357,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
 }
 
 // ============ HELPER FUNCTIONS ============
-
-function getGrowthBadgeNew(growth: number, inverse: boolean = false): string {
-  const isPositive = inverse ? growth <= 0 : growth >= 0
-  const badgeClass = isPositive ? 'badge-success' : 'badge-danger'
-  const iconName = growth >= 0 ? 'arrow-up' : 'arrow-down'
-  return `<span class="badge ${badgeClass}"><i class="bi bi-${iconName}"></i> ${Math.abs(growth).toFixed(1)}%</span>`
-}
+// getGrowthBadgeNew moved to top of file for use in executive summary
 
 function generateMetricCard(iconName: string, label: string, thisValue: string, lastValue: string, growth: number, inverse: boolean, thisPeriodLabel: string, lastPeriodLabel: string, highlight: boolean = false, isGood: boolean = false): string {
   const borderColor = highlight ? 'var(--primary)' : isGood ? 'var(--success)' : growth > 0 && !inverse ? 'var(--success)' : 'var(--gray-200)'
@@ -1411,40 +1504,37 @@ function generateHighlightItems(isHighlight: boolean, cprGrowth: number, spendGr
 function generateAgeSlide(data: any[], lastData: any[], thisPeriodLabel: string, lastPeriodLabel: string, slideNumber: number): string {
   const totalResults = data.reduce((sum, item) => sum + parseNum(item['Messaging conversations started'] || item['Results'] || 0), 0)
   const totalSpent = data.reduce((sum, item) => sum + parseNum(item['Amount spent (IDR)'] || 0), 0)
-  
+
   const sortedData = [...data].sort((a, b) => parseNum(b['Messaging conversations started'] || b['Results'] || 0) - parseNum(a['Messaging conversations started'] || a['Results'] || 0))
 
   const tableRows = sortedData.map((item, index) => {
     const age = item['Age'] || 'Unknown'
     const results = parseNum(item['Messaging conversations started'] || item['Results'] || 0)
     const spent = parseNum(item['Amount spent (IDR)'] || 0)
-    const reach = parseNum(item['Reach'] || 0)
-    const impressions = parseNum(item['Impressions'] || 0)
-    const linkClicks = parseNum(item['Link clicks'] || 0)
     const cpr = results > 0 ? spent / results : 0
-    const ctr = impressions > 0 ? (linkClicks / impressions) * 100 : 0
     const percentage = totalResults > 0 ? (results / totalResults) * 100 : 0
-    
+    const isTopPerformer = index < 2
+
     const lastItem = lastData.find(l => l['Age'] === age)
     const lastResults = lastItem ? parseNum(lastItem['Messaging conversations started'] || lastItem['Results'] || 0) : 0
-    const lastCpr = lastItem ? (lastResults > 0 ? parseNum(lastItem['Amount spent (IDR)'] || 0) / lastResults : 0) : 0
     const resultsGrowth = calculateGrowth(results, lastResults)
-    const cprGrowth = calculateGrowth(cpr, lastCpr)
 
     return `
-                    <tr>
-                        <td><strong>${age}</strong></td>
-                        <td>${formatNumber(results)} <span style="color: var(--gray-400); font-size: 11px;">(${percentage.toFixed(1)}%)</span></td>
-                        <td>${formatCurrency(cpr)}</td>
-                        <td>${formatCurrency(spent)}</td>
-                        <td>${formatNumber(reach)}</td>
-                        <td>${ctr.toFixed(2)}%</td>
-                        <td style="text-align: center;">${getGrowthBadgeNew(resultsGrowth)}</td>
+                    <tr ${isTopPerformer ? 'style="background: var(--warning-light);"' : ''}>
+                        <td><strong>${age}</strong>${isTopPerformer ? '<span style="font-size: 8px; background: var(--warning); color: white; padding: 2px 4px; border-radius: 3px; margin-left: 4px;">TOP</span>' : ''}</td>
+                        <td>${formatNumberCompact(results)} <span style="color: var(--gray-400); font-size: 9px;">(${percentage.toFixed(0)}%)</span></td>
+                        <td>${formatCurrencyCompact(cpr)}</td>
+                        <td>${formatCurrencyCompact(spent)}</td>
+                        <td>${getGrowthBadgeNew(resultsGrowth)}</td>
                     </tr>`
   }).join('')
 
+  const topAge = sortedData[0]?.['Age'] || 'N/A'
+  const top2Age = sortedData[1]?.['Age'] || 'N/A'
+  const topPercentage = ((parseNum(sortedData[0]?.['Messaging conversations started'] || sortedData[0]?.['Results'] || 0) + parseNum(sortedData[1]?.['Messaging conversations started'] || sortedData[1]?.['Results'] || 0)) / totalResults * 100).toFixed(0)
+
   return `
-    <!-- SLIDE: AGE BREAKDOWN -->
+    <!-- SLIDE: AGE BREAKDOWN - COMPACT -->
     <div class="slide" data-slide="${slideNumber}">
         <div class="slide-header">
             <img src="${LOGO_URL}" alt="Logo" class="logo">
@@ -1452,21 +1542,26 @@ function generateAgeSlide(data: any[], lastData: any[], thisPeriodLabel: string,
         </div>
 
         <div class="slide-title">
-            <h1><i class="bi bi-calendar3"></i> Age Breakdown</h1>
-            <p>Performance by Age Group</p>
+            <h1>${icon('calendar3')} Age Breakdown</h1>
+            <p>Performance by Age Group • ${thisPeriodLabel}</p>
         </div>
 
-        <div class="table-container">
+        <!-- Compact Callout -->
+        <div style="padding: 8px 12px; background: var(--warning-light); border-left: 3px solid var(--warning); border-radius: 6px; margin-bottom: 12px;">
+            <p style="font-size: 10px; margin: 0; color: var(--gray-700);">
+                <strong>Top 2:</strong> ${topAge} + ${top2Age} = <strong>${topPercentage}%</strong> total results • Prioritaskan untuk scale
+            </p>
+        </div>
+
+        <div class="table-container" style="font-size: 10px;">
             <table>
                 <thead>
                     <tr>
-                        <th>Age Group</th>
-                        <th>Results</th>
-                        <th>CPR</th>
-                        <th>Spent</th>
-                        <th>Reach</th>
-                        <th>CTR</th>
-                        <th style="text-align: center;">Growth</th>
+                        <th style="padding: 8px 10px; font-size: 10px;">Age</th>
+                        <th style="padding: 8px 10px; font-size: 10px;">Results</th>
+                        <th style="padding: 8px 10px; font-size: 10px;">CPR</th>
+                        <th style="padding: 8px 10px; font-size: 10px;">Spent</th>
+                        <th style="padding: 8px 10px; font-size: 10px; text-align: center;">Growth</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1474,66 +1569,60 @@ function generateAgeSlide(data: any[], lastData: any[], thisPeriodLabel: string,
                 </tbody>
             </table>
         </div>
-
-        <div class="info-box">
-            <h4><i class="bi bi-lightbulb-fill"></i> Key Insight</h4>
-            <ul>
-                <li><strong>${sortedData[0]?.['Age'] || 'N/A'}</strong> (${formatNumber(parseNum(sortedData[0]?.['Messaging conversations started'] || sortedData[0]?.['Results'] || 0))} WA) dan <strong>${sortedData[1]?.['Age'] || 'N/A'}</strong> (${formatNumber(parseNum(sortedData[1]?.['Messaging conversations started'] || sortedData[1]?.['Results'] || 0))} WA) menyumbang <strong>${((parseNum(sortedData[0]?.['Messaging conversations started'] || sortedData[0]?.['Results'] || 0) + parseNum(sortedData[1]?.['Messaging conversations started'] || sortedData[1]?.['Results'] || 0)) / totalResults * 100).toFixed(0)}%</strong> total WA → segmen inti untuk scale.</li>
-                <li>Efisiensi terbaik di <strong>${sortedData[0]?.['Age'] || 'N/A'}</strong> dengan Cost/WA <strong>${formatCurrency(parseNum(sortedData[0]?.['Messaging conversations started'] || sortedData[0]?.['Results'] || 0) > 0 ? parseNum(sortedData[0]?.['Amount spent (IDR)'] || 0) / parseNum(sortedData[0]?.['Messaging conversations started'] || sortedData[0]?.['Results'] || 0) : 0)}</strong>.</li>
-                <li>Age group dengan volume rendah perlu dievaluasi untuk efisiensi budget.</li>
-            </ul>
-            <div class="reco-box">
-                <h4><i class="bi bi-pencil-square"></i> Rekomendasi</h4>
-                <p>Prioritaskan budget ke <strong>${sortedData[0]?.['Age'] || 'N/A'}</strong> dan <strong>${sortedData[1]?.['Age'] || 'N/A'}</strong> untuk volume optimal; tes hemat di age group dengan CPR rendah.</p>
-            </div>
-        </div>
     </div>`
 }
 
 function generateGenderSlide(data: any[], lastData: any[], thisPeriodLabel: string, lastPeriodLabel: string, slideNumber: number): string {
   const totalResults = data.reduce((sum, item) => sum + parseNum(item['Messaging conversations started'] || item['Results'] || 0), 0)
-  
-  const genderCards = data.map(item => {
+
+  const sortedData = [...data].sort((a, b) => parseNum(b['Messaging conversations started'] || b['Results'] || 0) - parseNum(a['Messaging conversations started'] || a['Results'] || 0))
+
+  const genderCards = sortedData.map((item, index) => {
     const gender = item['Gender'] || 'Unknown'
     const results = parseNum(item['Messaging conversations started'] || item['Results'] || 0)
     const spent = parseNum(item['Amount spent (IDR)'] || 0)
     const percentage = totalResults > 0 ? (results / totalResults) * 100 : 0
     const cpr = results > 0 ? spent / results : 0
-    
+    const isTop = index === 0
+
     const lastItem = lastData.find(l => l['Gender'] === gender)
     const lastResults = lastItem ? parseNum(lastItem['Messaging conversations started'] || lastItem['Results'] || 0) : 0
     const growth = calculateGrowth(results, lastResults)
-    
+
     const genderLower = gender.toLowerCase()
     const isMale = genderLower === 'male'
     const isFemale = genderLower === 'female'
     const iconName = isMale ? 'gender-male' : isFemale ? 'gender-female' : 'person-fill'
-    const cardClass = isMale ? 'male' : isFemale ? 'female' : 'unknown'
     const iconColor = isMale ? 'var(--primary)' : isFemale ? '#db2777' : 'var(--gray-600)'
 
     return `
-      <div class="card gender-card ${cardClass}">
-        <div class="icon" style="${!isMale && !isFemale ? 'background: var(--gray-100); color: var(--gray-600);' : ''}"><i class="bi bi-${iconName}"></i></div>
-        <h3 style="font-size: 20px; margin-bottom: 8px;">${gender}</h3>
-        <div style="font-size: 32px; font-weight: 700; color: ${iconColor};">${percentage.toFixed(1)}%</div>
-        <p style="color: var(--gray-500); margin-bottom: 16px;">${formatNumber(results)} conversations</p>
-        
-        <div style="background: var(--gray-50); border-radius: 8px; padding: 12px; margin-bottom: 12px;">
-          <div style="font-size: 11px; color: var(--gray-500); text-transform: uppercase;">Amount Spent</div>
-          <div style="font-size: 16px; font-weight: 600;">${formatCurrency(spent)}</div>
+      <div class="card" style="text-align: center; padding: 12px; border-top: 3px solid ${iconColor}; ${isTop ? 'background: var(--warning-light); border: 2px solid var(--warning);' : ''}">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 6px;">
+          <i class="bi bi-${iconName}" style="font-size: 20px; color: ${iconColor};"></i>
+          <span style="font-size: 14px; font-weight: 700;">${gender}</span>
+          ${isTop ? '<span style="font-size: 8px; background: var(--warning); color: white; padding: 2px 4px; border-radius: 3px;">TOP</span>' : ''}
         </div>
-        
-        <div style="background: var(--gray-50); border-radius: 8px; padding: 12px; margin-bottom: 12px;">
-          <div style="font-size: 11px; color: var(--gray-500); text-transform: uppercase;">Cost per Result</div>
-          <div style="font-size: 16px; font-weight: 600;">${formatCurrency(cpr)}</div>
+        <div style="font-size: 24px; font-weight: 700; color: ${iconColor}; margin-bottom: 4px;">${percentage.toFixed(1)}%</div>
+        <p style="font-size: 10px; color: var(--gray-500); margin-bottom: 8px;">${formatNumberCompact(results)} results</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px;">
+          <div style="background: var(--gray-50); border-radius: 4px; padding: 6px;">
+            <div style="font-size: 8px; color: var(--gray-500);">Spent</div>
+            <div style="font-size: 12px; font-weight: 600;">${formatCurrencyCompact(spent)}</div>
+          </div>
+          <div style="background: var(--gray-50); border-radius: 4px; padding: 6px;">
+            <div style="font-size: 8px; color: var(--gray-500);">CPR</div>
+            <div style="font-size: 12px; font-weight: 600;">${formatCurrencyCompact(cpr)}</div>
+          </div>
         </div>
-        
         ${getGrowthBadgeNew(growth)}
       </div>`
   }).join('')
 
+  const topGender = sortedData[0]?.['Gender'] || 'N/A'
+  const topPct = (parseNum(sortedData[0]?.['Messaging conversations started'] || sortedData[0]?.['Results'] || 0) / totalResults * 100).toFixed(0)
+
   return `
-    <!-- SLIDE: GENDER BREAKDOWN -->
+    <!-- SLIDE: GENDER BREAKDOWN - COMPACT -->
     <div class="slide" data-slide="${slideNumber}">
         <div class="slide-header">
             <img src="${LOGO_URL}" alt="Logo" class="logo">
@@ -1541,49 +1630,27 @@ function generateGenderSlide(data: any[], lastData: any[], thisPeriodLabel: stri
         </div>
 
         <div class="slide-title">
-            <h1><i class="bi bi-people-fill"></i> Gender Breakdown</h1>
-            <p>Performance by Gender</p>
+            <h1>${icon('people-fill')} Gender Breakdown</h1>
+            <p>Performance by Gender • ${thisPeriodLabel}</p>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(${data.length}, 1fr); gap: 24px;">
+        <!-- Compact Callout -->
+        <div style="padding: 8px 12px; background: var(--warning-light); border-left: 3px solid var(--warning); border-radius: 6px; margin-bottom: 12px;">
+            <p style="font-size: 10px; margin: 0; color: var(--gray-700);">
+                <strong>${topGender}</strong> dominates with <strong>${topPct}%</strong> of total results • Focus targeting here
+            </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(${data.length}, 1fr); gap: 12px;">
             ${genderCards}
-        </div>
-
-        <div class="info-box">
-            <h4><i class="bi bi-lightbulb-fill"></i> Key Insight</h4>
-            <ul>
-                ${(() => {
-                  const sorted = [...data].sort((a, b) => parseNum(b['Messaging conversations started'] || b['Results'] || 0) - parseNum(a['Messaging conversations started'] || a['Results'] || 0))
-                  const top = sorted[0] || {}
-                  const sec = sorted[1] || {}
-                  const topG = top['Gender'] || 'N/A'
-                  const topR = parseNum(top['Messaging conversations started'] || top['Results'] || 0)
-                  const topS = parseNum(top['Amount spent (IDR)'] || 0)
-                  const topCPR = topR > 0 ? topS / topR : 0
-                  const secG = sec['Gender'] || 'N/A'
-                  const secR = parseNum(sec['Messaging conversations started'] || sec['Results'] || 0)
-                  const secS = parseNum(sec['Amount spent (IDR)'] || 0)
-                  const secCPR = secR > 0 ? secS / secR : 0
-                  const pct = totalResults > 0 ? (topR / totalResults * 100) : 0
-                  const pctStr = pct.toFixed(0)
-                  return `<li><strong>${topG}</strong> dominan dengan total <strong>${formatNumber(topR)} WA</strong> (${pctStr}%) dan Cost/WA <strong>${formatCurrency(topCPR)}</strong>.</li><li><strong>${secG}</strong> kontribusi <strong>${formatNumber(secR)} WA</strong> dengan Cost/WA <strong>${formatCurrency(secCPR)}</strong> ${secCPR > topCPR ? '(lebih mahal)' : '(lebih efisien)'}.</li><li>Distribusi gender menunjukkan ${pct > 70 ? 'dominasi kuat' : 'targeting yang seimbang'} pada audiens ${topG.toLowerCase()}.</li>`
-                })()}
-            </ul>
-            <div class="reco-box">
-                <h4><i class="bi bi-pencil-square"></i> Rekomendasi</h4>
-                <p>${(() => {
-                  const sorted = [...data].sort((a, b) => parseNum(b['Messaging conversations started'] || b['Results'] || 0) - parseNum(a['Messaging conversations started'] || a['Results'] || 0))
-                  const topG = sorted[0]?.['Gender'] || 'dominan'
-                  const secG = sorted[1]?.['Gender'] || 'lainnya'
-                  return `Fokus budget pada <strong>${topG.toLowerCase()}</strong>; untuk <strong>${secG.toLowerCase()}</strong> cukup tes kreatif spesifik dengan copy/visual yang lebih relevan.`
-                })()}</p>
-            </div>
         </div>
     </div>`
 }
 
 function generatePlacementSlide(data: any[], lastData: any[], thisPeriodLabel: string, lastPeriodLabel: string, slideNumber: number): string {
   const sortedData = [...data].sort((a, b) => parseNum(b['Messaging conversations started'] || b['Results'] || 0) - parseNum(a['Messaging conversations started'] || a['Results'] || 0))
+
+  const totalResults = data.reduce((sum, item) => sum + parseNum(item['Messaging conversations started'] || item['Results'] || 0), 0)
 
   const rows = sortedData.map((item, index) => {
     const placement = item['Placement'] || 'Unknown'
@@ -1592,23 +1659,29 @@ function generatePlacementSlide(data: any[], lastData: any[], thisPeriodLabel: s
     const reach = parseNum(item['Reach'] || 0)
     const impr = parseNum(item['Impressions'] || 0)
     const cpr = results > 0 ? spent / results : 0
-    
-    const rankBg = '#2563eb'
-    const rowClass = index < 3 ? 'highlight' : ''
+    const percentage = totalResults > 0 ? (results / totalResults) * 100 : 0
+    const isTopPerformer = index < 2
+
+    const lastItem = lastData.find(l => l['Placement'] === placement)
+    const lastResults = lastItem ? parseNum(lastItem['Messaging conversations started'] || lastItem['Results'] || 0) : 0
+    const resultsGrowth = calculateGrowth(results, lastResults)
 
     return `
-      <tr class="${rowClass}">
-        <td><span style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: ${rankBg}; color: white; font-weight: 700; font-size: 12px; margin-right: 8px;">${index + 1}</span><strong>${placement}</strong></td>
-        <td><strong>${formatNumber(results)}</strong></td>
-        <td>${formatCurrency(cpr)}</td>
-        <td>${formatCurrency(spent)}</td>
-        <td>${formatNumber(reach)}</td>
-        <td>${formatNumber(impr)}</td>
+      <tr ${isTopPerformer ? 'style="background: var(--warning-light);"' : ''}>
+        <td><strong>${placement}</strong>${isTopPerformer ? '<span style="font-size: 8px; background: var(--warning); color: white; padding: 2px 4px; border-radius: 3px; margin-left: 4px;">TOP</span>' : ''}</td>
+        <td>${formatNumberCompact(results)} <span style="color: var(--gray-400); font-size: 9px;">(${percentage.toFixed(0)}%)</span></td>
+        <td>${formatCurrencyCompact(cpr)}</td>
+        <td>${formatCurrencyCompact(spent)}</td>
+        <td>${getGrowthBadgeNew(resultsGrowth)}</td>
       </tr>`
   }).join('')
 
+  const topPlacement = sortedData[0]?.['Placement'] || 'N/A'
+  const top2Placement = sortedData[1]?.['Placement'] || 'N/A'
+  const top2Pct = ((parseNum(sortedData[0]?.['Messaging conversations started'] || sortedData[0]?.['Results'] || 0) + parseNum(sortedData[1]?.['Messaging conversations started'] || sortedData[1]?.['Results'] || 0)) / totalResults * 100).toFixed(0)
+
   return `
-    <!-- SLIDE: PLACEMENT BREAKDOWN -->
+    <!-- SLIDE: PLACEMENT BREAKDOWN - COMPACT -->
     <div class="slide" data-slide="${slideNumber}">
         <div class="slide-header">
             <img src="${LOGO_URL}" alt="Logo" class="logo">
@@ -1616,20 +1689,26 @@ function generatePlacementSlide(data: any[], lastData: any[], thisPeriodLabel: s
         </div>
 
         <div class="slide-title">
-            <h1><i class="bi bi-grid-fill"></i> Placement Breakdown</h1>
-            <p>Performance by Ad Placement</p>
+            <h1>${icon('grid-fill')} Placement Breakdown</h1>
+            <p>Performance by Ad Placement • ${thisPeriodLabel}</p>
         </div>
 
-        <div class="table-container">
+        <!-- Compact Callout -->
+        <div style="padding: 8px 12px; background: var(--warning-light); border-left: 3px solid var(--warning); border-radius: 6px; margin-bottom: 12px;">
+            <p style="font-size: 10px; margin: 0; color: var(--gray-700);">
+                <strong>Top 2:</strong> ${topPlacement} + ${top2Placement} = <strong>${top2Pct}%</strong> of results • Focus budget here
+            </p>
+        </div>
+
+        <div class="table-container" style="font-size: 10px;">
             <table>
                 <thead>
                     <tr>
-                        <th>Placement</th>
-                        <th>Results</th>
-                        <th>CPR</th>
-                        <th>Spent</th>
-                        <th>Reach</th>
-                        <th>Impressions</th>
+                        <th style="padding: 8px 10px; font-size: 10px;">Placement</th>
+                        <th style="padding: 8px 10px; font-size: 10px;">Results</th>
+                        <th style="padding: 8px 10px; font-size: 10px;">CPR</th>
+                        <th style="padding: 8px 10px; font-size: 10px;">Spent</th>
+                        <th style="padding: 8px 10px; font-size: 10px; text-align: center;">Growth</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1637,76 +1716,57 @@ function generatePlacementSlide(data: any[], lastData: any[], thisPeriodLabel: s
                 </tbody>
             </table>
         </div>
-
-        <div class="info-box">
-            <h4><i class="bi bi-lightbulb-fill"></i> Key Insight</h4>
-            <ul>
-                ${(() => {
-                  const top = sortedData[0] || {}
-                  const sec = sortedData[1] || {}
-                  const third = sortedData[2] || {}
-                  const topP = top['Placement'] || 'N/A'
-                  const topR = parseNum(top['Messaging conversations started'] || top['Results'] || 0)
-                  const topS = parseNum(top['Amount spent (IDR)'] || 0)
-                  const topCPR = topR > 0 ? topS / topR : 0
-                  const topOC = parseNum(top['Outbound clicks'] || 0)
-                  const secP = sec['Placement'] || 'N/A'
-                  const secR = parseNum(sec['Messaging conversations started'] || sec['Results'] || 0)
-                  const secS = parseNum(sec['Amount spent (IDR)'] || 0)
-                  const secCPR = secR > 0 ? secS / secR : 0
-                  const thirdP = third['Placement'] || null
-                  const thirdR = parseNum(third['Messaging conversations started'] || third['Results'] || 0)
-                  let html = `<li><strong>${topP}</strong> paling efektif dengan <strong>${formatNumber(topR)} WA</strong> dan Cost/WA <strong>${formatCurrency(topCPR)}</strong>.</li>`
-                  html += `<li><strong>${secP}</strong> di posisi kedua dengan <strong>${formatNumber(secR)} WA</strong> dan Cost/WA <strong>${formatCurrency(secCPR)}</strong> ${secCPR > topCPR ? '(lebih mahal)' : '(lebih efisien)'}.</li>`
-                  if (thirdP) html += `<li><strong>${thirdP}</strong> kontribusi <strong>${formatNumber(thirdR)} WA</strong> → bisa dijadikan placement tambahan untuk jangkauan.</li>`
-                  return html
-                })()}
-            </ul>
-            <div class="reco-box">
-                <h4><i class="bi bi-pencil-square"></i> Rekomendasi</h4>
-                <p>Naikkan porsi budget untuk <strong>${sortedData[0]?.['Placement'] || 'N/A'}</strong> untuk efisiensi; placement lain tetap aktif untuk menjaga jangkauan audiens.</p>
-            </div>
-        </div>
     </div>`
 }
 
 function generatePlatformSlide(data: any[], lastData: any[], thisPeriodLabel: string, lastPeriodLabel: string, slideNumber: number): string {
-  const platformCards = data.map(item => {
+  const totalResults = data.reduce((sum, item) => sum + parseNum(item['Messaging conversations started'] || item['Results'] || 0), 0)
+
+  const sortedData = [...data].sort((a, b) => parseNum(b['Messaging conversations started'] || b['Results'] || 0) - parseNum(a['Messaging conversations started'] || a['Results'] || 0))
+
+  const platformCards = sortedData.map((item, index) => {
     const platform = item['Platform'] || 'Unknown'
     const results = parseNum(item['Messaging conversations started'] || item['Results'] || 0)
     const spent = parseNum(item['Amount spent (IDR)'] || 0)
-    const reach = parseNum(item['Reach'] || 0)
+    const percentage = totalResults > 0 ? (results / totalResults) * 100 : 0
     const cpr = results > 0 ? spent / results : 0
-    
+    const isTop = index === 0
+
     const lastItem = lastData.find(l => l['Platform'] === platform)
     const lastResults = lastItem ? parseNum(lastItem['Messaging conversations started'] || lastItem['Results'] || 0) : 0
     const growth = calculateGrowth(results, lastResults)
-    
+
     const iconName = platform.toLowerCase().includes('facebook') ? 'facebook' : platform.toLowerCase().includes('instagram') ? 'instagram' : platform.toLowerCase().includes('messenger') ? 'messenger' : 'phone'
-    const iconClass = platform.toLowerCase().includes('facebook') ? 'facebook' : platform.toLowerCase().includes('instagram') ? 'instagram' : 'messenger'
+    const iconColor = platform.toLowerCase().includes('facebook') ? '#1877f2' : platform.toLowerCase().includes('instagram') ? '#e4405f' : platform.toLowerCase().includes('messenger') ? '#0084ff' : 'var(--gray-600)'
 
     return `
-      <div class="card platform-card">
-        <div class="icon ${iconClass}"><i class="bi bi-${iconName}"></i></div>
-        <div style="flex: 1;">
-          <h3 style="font-size: 16px; margin-bottom: 4px;">${platform}</h3>
-          ${getGrowthBadgeNew(growth)}
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
-            <div style="background: var(--gray-50); padding: 10px; border-radius: 8px;">
-              <div style="font-size: 10px; color: var(--gray-500); text-transform: uppercase;">Results</div>
-              <div style="font-size: 18px; font-weight: 700; color: var(--primary);">${formatNumber(results)}</div>
-            </div>
-            <div style="background: var(--gray-50); padding: 10px; border-radius: 8px;">
-              <div style="font-size: 10px; color: var(--gray-500); text-transform: uppercase;">CPR</div>
-              <div style="font-size: 14px; font-weight: 700; color: var(--primary);">${formatCurrency(cpr)}</div>
-            </div>
+      <div class="card" style="text-align: center; padding: 12px; border-top: 3px solid ${iconColor}; ${isTop ? 'background: var(--warning-light); border: 2px solid var(--warning);' : ''}">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 6px;">
+          <i class="bi bi-${iconName}" style="font-size: 20px; color: ${iconColor};"></i>
+          <span style="font-size: 14px; font-weight: 700;">${platform}</span>
+          ${isTop ? '<span style="font-size: 8px; background: var(--warning); color: white; padding: 2px 4px; border-radius: 3px;">TOP</span>' : ''}
+        </div>
+        <div style="font-size: 24px; font-weight: 700; color: ${iconColor}; margin-bottom: 4px;">${percentage.toFixed(1)}%</div>
+        <p style="font-size: 10px; color: var(--gray-500); margin-bottom: 8px;">${formatNumberCompact(results)} results</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px;">
+          <div style="background: var(--gray-50); border-radius: 4px; padding: 6px;">
+            <div style="font-size: 8px; color: var(--gray-500);">Spent</div>
+            <div style="font-size: 12px; font-weight: 600;">${formatCurrencyCompact(spent)}</div>
+          </div>
+          <div style="background: var(--gray-50); border-radius: 4px; padding: 6px;">
+            <div style="font-size: 8px; color: var(--gray-500);">CPR</div>
+            <div style="font-size: 12px; font-weight: 600;">${formatCurrencyCompact(cpr)}</div>
           </div>
         </div>
+        ${getGrowthBadgeNew(growth)}
       </div>`
   }).join('')
 
+  const topPlatform = sortedData[0]?.['Platform'] || 'N/A'
+  const topPct = (parseNum(sortedData[0]?.['Messaging conversations started'] || sortedData[0]?.['Results'] || 0) / totalResults * 100).toFixed(0)
+
   return `
-    <!-- SLIDE: PLATFORM BREAKDOWN -->
+    <!-- SLIDE: PLATFORM BREAKDOWN - COMPACT -->
     <div class="slide" data-slide="${slideNumber}">
         <div class="slide-header">
             <img src="${LOGO_URL}" alt="Logo" class="logo">
@@ -1714,41 +1774,19 @@ function generatePlatformSlide(data: any[], lastData: any[], thisPeriodLabel: st
         </div>
 
         <div class="slide-title">
-            <h1><i class="bi bi-phone-fill"></i> Platform Breakdown</h1>
-            <p>Performance by Platform</p>
+            <h1>${icon('phone-fill')} Platform Breakdown</h1>
+            <p>Performance by Platform • ${thisPeriodLabel}</p>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(${Math.min(data.length, 3)}, 1fr); gap: 20px;">
+        <!-- Compact Callout -->
+        <div style="padding: 8px 12px; background: var(--warning-light); border-left: 3px solid var(--warning); border-radius: 6px; margin-bottom: 12px;">
+            <p style="font-size: 10px; margin: 0; color: var(--gray-700);">
+                <strong>${topPlatform}</strong> dominates with <strong>${topPct}%</strong> of results • Focus optimization here
+            </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(${Math.min(data.length, 3)}, 1fr); gap: 12px;">
             ${platformCards}
-        </div>
-
-        <div class="info-box">
-            <h4><i class="bi bi-lightbulb-fill"></i> Key Insight</h4>
-            <ul>
-                ${(() => {
-                  const sorted = [...data].sort((a, b) => parseNum(b['Messaging conversations started'] || b['Results'] || 0) - parseNum(a['Messaging conversations started'] || a['Results'] || 0))
-                  const totalR = data.reduce((s, i) => s + parseNum(i['Messaging conversations started'] || i['Results'] || 0), 0)
-                  const top = sorted[0] || {}
-                  const topP = top['Platform'] || 'N/A'
-                  const topR = parseNum(top['Messaging conversations started'] || top['Results'] || 0)
-                  const topS = parseNum(top['Amount spent (IDR)'] || 0)
-                  const topCPR = topR > 0 ? topS / topR : 0
-                  const topOC = parseNum(top['Outbound clicks'] || 0)
-                  const pct = totalR > 0 ? (topR / totalR * 100).toFixed(0) : 0
-                  let html = `<li><strong>${topP}</strong> menyumbang <strong>${pct}%</strong> total WA (<strong>${formatNumber(topR)} WA</strong>) dengan Cost/WA <strong>${formatCurrency(topCPR)}</strong>.</li>`
-                  html += `<li>Outbound clicks dari ${topP}: <strong>${formatNumber(topOC)}</strong> menunjukkan tingkat engagement yang ${topOC > 1000 ? 'tinggi' : 'sedang'}.</li>`
-                  html += `<li>Platform ${sorted.length > 1 ? 'lainnya kontribusi minor dan bisa dipertimbangkan untuk tes' : 'tunggal mendominasi seluruh hasil'}.</li>`
-                  return html
-                })()}
-            </ul>
-            <div class="reco-box">
-                <h4><i class="bi bi-pencil-square"></i> Rekomendasi</h4>
-                <p>${(() => {
-                  const sorted = [...data].sort((a, b) => parseNum(b['Messaging conversations started'] || b['Results'] || 0) - parseNum(a['Messaging conversations started'] || a['Results'] || 0))
-                  const topP = sorted[0]?.['Platform'] || 'utama'
-                  return `Fokus optimasi penuh di <strong>${topP}</strong> (format, placement, dan CTA). Platform lain bisa dijadikan eksperimen untuk diversifikasi.`
-                })()}</p>
-            </div>
         </div>
     </div>`
 }
@@ -1757,6 +1795,9 @@ function generateRegionSlide(data: any[], lastData: any[], thisPeriodLabel: stri
   // Sort by Amount Spent (since region-level Results/conversations aren't always available)
   const sortedData = [...data].sort((a, b) => parseNum(b['Amount spent (IDR)'] || 0) - parseNum(a['Amount spent (IDR)'] || 0)).slice(0, 10)
 
+  const totalSpent = sortedData.reduce((sum, item) => sum + parseNum(item['Amount spent (IDR)'] || 0), 0)
+  const top3Spent = sortedData.slice(0, 3).reduce((sum, item) => sum + parseNum(item['Amount spent (IDR)'] || 0), 0)
+
   const rows = sortedData.map((item, index) => {
     const region = item['Region'] || 'Unknown'
     const spent = parseNum(item['Amount spent (IDR)'] || 0)
@@ -1764,23 +1805,24 @@ function generateRegionSlide(data: any[], lastData: any[], thisPeriodLabel: stri
     const impr = parseNum(item['Impressions'] || 0)
     const linkClicks = parseNum(item['Link clicks'] || 0)
     const ctr = impr > 0 ? (linkClicks / impr) * 100 : 0
-    
-    const rankBg = '#2563eb'
-    const rowClass = index < 3 ? 'highlight' : ''
+    const percentage = totalSpent > 0 ? (spent / totalSpent) * 100 : 0
+    const isTop3 = index < 3
 
     return `
-      <tr class="${rowClass}">
-        <td style="text-align: center;"><span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: ${rankBg}; color: white; font-weight: 700; font-size: 13px;">${index + 1}</span></td>
-        <td>${region}</td>
-        <td><strong>${formatCurrency(spent)}</strong></td>
-        <td>${formatNumber(reach)}</td>
-        <td>${formatNumber(impr)}</td>
+      <tr ${isTop3 ? 'style="background: var(--warning-light);"' : ''}>
+        <td style="text-align: center; font-weight: 700;">${isTop3 ? `<span style="background: var(--warning); color: white; padding: 2px 6px; border-radius: 3px; font-size: 9px;">${index + 1}</span>` : index + 1}</td>
+        <td><strong>${region}</strong></td>
+        <td>${formatCurrencyCompact(spent)} <span style="color: var(--gray-400); font-size: 9px;">(${percentage.toFixed(0)}%)</span></td>
+        <td>${formatNumberCompact(reach)}</td>
         <td>${ctr.toFixed(2)}%</td>
       </tr>`
   }).join('')
 
+  const topRegion = sortedData[0]?.['Region'] || 'N/A'
+  const top3Pct = (top3Spent / totalSpent * 100).toFixed(0)
+
   return `
-    <!-- SLIDE: REGION BREAKDOWN -->
+    <!-- SLIDE: REGION BREAKDOWN - COMPACT -->
     <div class="slide" data-slide="${slideNumber}">
         <div class="slide-header">
             <img src="${LOGO_URL}" alt="Logo" class="logo">
@@ -1788,39 +1830,32 @@ function generateRegionSlide(data: any[], lastData: any[], thisPeriodLabel: stri
         </div>
 
         <div class="slide-title">
-            <h1><i class="bi bi-geo-alt-fill"></i> Region Breakdown</h1>
-            <p>Top 10 Regions by Ad Spend</p>
+            <h1>${icon('geo-alt-fill')} Region Breakdown</h1>
+            <p>Top 10 Regions by Ad Spend • ${thisPeriodLabel}</p>
         </div>
 
-        <div class="table-container">
+        <!-- Compact Callout -->
+        <div style="padding: 8px 12px; background: var(--warning-light); border-left: 3px solid var(--warning); border-radius: 6px; margin-bottom: 12px;">
+            <p style="font-size: 10px; margin: 0; color: var(--gray-700);">
+                <strong>Top 3 regions:</strong> ${topRegion} + 2 others = <strong>${top3Pct}%</strong> of total spend • Consider geo-experiments
+            </p>
+        </div>
+
+        <div class="table-container" style="font-size: 10px;">
             <table>
                 <thead>
                     <tr>
-                        <th style="text-align: center; width: 50px;">No.</th>
-                        <th>Region</th>
-                        <th>Spent</th>
-                        <th>Reach</th>
-                        <th>Impressions</th>
-                        <th>CTR</th>
+                        <th style="padding: 8px 10px; font-size: 10px; text-align: center; width: 40px;">#</th>
+                        <th style="padding: 8px 10px; font-size: 10px;">Region</th>
+                        <th style="padding: 8px 10px; font-size: 10px;">Spent</th>
+                        <th style="padding: 8px 10px; font-size: 10px;">Reach</th>
+                        <th style="padding: 8px 10px; font-size: 10px;">CTR</th>
                     </tr>
                 </thead>
                 <tbody>
                     ${rows}
                 </tbody>
             </table>
-        </div>
-
-        <div class="info-box">
-            <h4><i class="bi bi-lightbulb-fill"></i> Key Insight</h4>
-            <ul>
-                <li><strong>${sortedData[0]?.['Region'] || 'N/A'}</strong> dengan spend terbesar <strong>${formatCurrency(parseNum(sortedData[0]?.['Amount spent (IDR)'] || 0))}</strong> dan reach <strong>${formatNumber(parseNum(sortedData[0]?.['Reach'] || 0))}</strong>.</li>
-                <li><strong>${sortedData[1]?.['Region'] || 'N/A'}</strong> di posisi kedua dengan spend <strong>${formatCurrency(parseNum(sortedData[1]?.['Amount spent (IDR)'] || 0))}</strong> → potensi untuk ekspansi volume.</li>
-                <li>Top 3 region menyerap mayoritas budget, perlu evaluasi ROI masing-masing untuk efisiensi.</li>
-            </ul>
-            <div class="reco-box">
-                <h4><i class="bi bi-pencil-square"></i> Rekomendasi</h4>
-                <p>Evaluasi ROI per region; alihkan sebagian budget eksplorasi ke <strong>${sortedData[1]?.['Region'] || 'region potensial'}</strong> untuk tambah volume dengan efisiensi.</p>
-            </div>
         </div>
     </div>`
 }
@@ -2360,104 +2395,3 @@ function generateConclusionSlide(
     </div>`
 }
 
-function generateNextMonthTargetSlide(
-  current: { thisSpent: number, thisResults: number, thisCPR: number, thisReach: number },
-  growth: { resultsGrowth: number, cprGrowth: number },
-  slideNumber: number
-): string {
-  const targetGrowthRate = growth.resultsGrowth >= 0 ? 0.15 : 0.30
-  const targetSpend = current.thisSpent * (1 + (growth.resultsGrowth >= 0 ? 0.10 : 0.20))
-  const targetResults = Math.ceil(current.thisResults * (1 + targetGrowthRate))
-  const targetCPR = current.thisCPR * (growth.cprGrowth <= 0 ? 0.95 : 0.90)
-  const targetReach = Math.ceil(current.thisReach * 1.20)
-
-  return `
-    <!-- SLIDE: NEXT MONTH TARGET -->
-    <div class="slide" data-slide="${slideNumber}">
-        <div class="slide-header">
-            <img src="${LOGO_URL}" alt="Logo" class="logo">
-            <span class="slide-number">Slide ${slideNumber}</span>
-        </div>
-
-        <div class="slide-title">
-            <h1><i class="bi bi-bullseye"></i> Next Month Target</h1>
-            <p>Performance Goals & KPIs</p>
-        </div>
-
-        <!-- Target Cards -->
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 24px;">
-            <div class="card" style="text-align: center; border-top: 4px solid var(--primary);">
-                <div class="metric-icon blue"><i class="bi bi-wallet2"></i></div>
-                <div class="metric-label">Budget Target</div>
-                <div style="font-size: 12px; color: var(--gray-400); margin-bottom: 4px;">Current: ${formatCurrency(current.thisSpent)}</div>
-                <div class="metric-value">${formatCurrency(targetSpend)}</div>
-                <span class="badge badge-success"><i class="bi bi-arrow-up"></i> +${((targetSpend / current.thisSpent - 1) * 100).toFixed(0)}%</span>
-            </div>
-            <div class="card" style="text-align: center; border-top: 4px solid var(--success);">
-                <div class="metric-icon green"><i class="bi bi-chat-dots-fill"></i></div>
-                <div class="metric-label">Conv. Target</div>
-                <div style="font-size: 12px; color: var(--gray-400); margin-bottom: 4px;">Current: ${formatNumber(current.thisResults)}</div>
-                <div class="metric-value">${formatNumber(targetResults)}</div>
-                <span class="badge badge-success"><i class="bi bi-arrow-up"></i> +${(targetGrowthRate * 100).toFixed(0)}%</span>
-            </div>
-            <div class="card" style="text-align: center; border-top: 4px solid var(--warning);">
-                <div class="metric-icon orange"><i class="bi bi-currency-dollar"></i></div>
-                <div class="metric-label">CPR Target</div>
-                <div style="font-size: 12px; color: var(--gray-400); margin-bottom: 4px;">Current: ${formatCurrency(current.thisCPR)}</div>
-                <div class="metric-value">${formatCurrency(targetCPR)}</div>
-                <span class="badge badge-success"><i class="bi bi-arrow-down"></i> -${((1 - targetCPR / current.thisCPR) * 100).toFixed(0)}%</span>
-            </div>
-            <div class="card" style="text-align: center; border-top: 4px solid #8b5cf6;">
-                <div class="metric-icon" style="background: #ede9fe; color: #8b5cf6;"><i class="bi bi-people-fill"></i></div>
-                <div class="metric-label">Reach Target</div>
-                <div style="font-size: 12px; color: var(--gray-400); margin-bottom: 4px;">Current: ${formatNumber(current.thisReach)}</div>
-                <div class="metric-value">${formatNumber(targetReach)}</div>
-                <span class="badge badge-success"><i class="bi bi-arrow-up"></i> +20%</span>
-            </div>
-        </div>
-
-        <!-- Action Items -->
-        <div class="table-container">
-            <table>
-                <thead style="background: var(--primary);">
-                    <tr>
-                        <th><i class="bi bi-list-check"></i> Action Items</th>
-                        <th style="text-align: center;">Priority</th>
-                        <th style="text-align: center;">Timeline</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Scale budget untuk winning placement & audience</td>
-                        <td style="text-align: center;"><span class="badge priority-high">HIGH</span></td>
-                        <td style="text-align: center;">Week 1</td>
-                    </tr>
-                    <tr>
-                        <td>A/B test 3-5 creative variants baru</td>
-                        <td style="text-align: center;"><span class="badge priority-high">HIGH</span></td>
-                        <td style="text-align: center;">Week 1-2</td>
-                    </tr>
-                    <tr>
-                        <td>Pause underperforming ad sets (CPR > ${formatCurrency(current.thisCPR * 1.5)})</td>
-                        <td style="text-align: center;"><span class="badge priority-medium">MEDIUM</span></td>
-                        <td style="text-align: center;">Immediate</td>
-                    </tr>
-                    <tr>
-                        <td>Test new lookalike audiences</td>
-                        <td style="text-align: center;"><span class="badge priority-medium">MEDIUM</span></td>
-                        <td style="text-align: center;">Week 2</td>
-                    </tr>
-                    <tr>
-                        <td>Review & optimize bidding strategy</td>
-                        <td style="text-align: center;"><span class="badge priority-low">LOW</span></td>
-                        <td style="text-align: center;">Week 3</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="info-box" style="margin-top: 20px;">
-            <p><strong><i class="bi bi-info-circle-fill"></i> Note:</strong> Target ini disusun berdasarkan performa bulan ini. Evaluasi mingguan diperlukan untuk memastikan pencapaian target.</p>
-        </div>
-    </div>`
-}

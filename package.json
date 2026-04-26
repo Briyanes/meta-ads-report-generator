@@ -1,6 +1,6 @@
 {
   "name": "meta-ads-report-generator",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "postinstall": "cp -r node_modules/bootstrap-icons/font/fonts public/fonts 2>/dev/null || true",
@@ -8,7 +8,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "dev:reset": "bash scripts/dev-reset.sh"
+    "dev:reset": "bash scripts/dev-reset.sh",
+    "automate:rmoda": "playwright test --config=app/playwright.config.ts e2e/rmoda-workshop-ctwa.spec.ts --headed",
+    "automate:rmoda:headless": "playwright test --config=app/playwright.config.ts e2e/rmoda-workshop-ctwa.spec.ts",
+    "automate:all": "playwright test --config=app/playwright.config.ts e2e/generate-all-objectives.spec.ts --headed",
+    "automate:all:headless": "playwright test --config=app/playwright.config.ts e2e/generate-all-objectives.spec.ts",
+    "test:playwright": "playwright test --config=app/playwright.config.ts",
+    "test:playwright:debug": "playwright test --config=app/playwright.config.ts --debug",
+    "test:playwright:ui": "playwright test --config=app/playwright.config.ts --ui"
   },
   "dependencies": {
     "bootstrap-icons": "^1.13.1",
@@ -20,6 +27,7 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "@tailwindcss/postcss": "^4.1.18",
     "@types/node": "^20.14.10",
     "@types/papaparse": "^5.3.14",
@@ -30,6 +38,7 @@
     "eslint-config-next": "14.2.35",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.18",
+    "ts-node": "^10.9.2",
     "typescript": "^5.5.3"
   }
 }
