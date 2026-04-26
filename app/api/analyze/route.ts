@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 // import { analyzeCSVWithZAI } from '@/lib/zai'
 import { parseCSV, analyzeDataStructure } from '@/lib/csvParser'
+// BUG #11 FIX: Import analysis types for proper type safety
+import type { AnalysisData, isValidAnalysisData } from '@/lib/types/analysis'
 
 // Security: Check origin
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS?.split(',') || [

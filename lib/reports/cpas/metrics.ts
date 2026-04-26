@@ -1,6 +1,9 @@
 // lib/reports/cpas/metrics.ts
 // Semua rumus dan kalkulasi metrics untuk CPAS report
 
+// BUG #10 FIX: Import centralized parseNum from csvParser
+import { parseNum } from '@/lib/csvParser'
+
 export interface CPASMonthData {
   amountSpent?: any
   addToCart?: any
@@ -91,15 +94,7 @@ export interface CalculatedMetrics {
 
 // ===== HELPER FUNCTIONS =====
 
-/**
- * Parse any value to number safely
- */
-export const parseNum = (val: any): number => {
-  if (typeof val === 'number') return val
-  if (!val) return 0
-  const parsed = parseFloat(String(val).replace(/,/g, ''))
-  return isNaN(parsed) ? 0 : parsed
-}
+// BUG #10 FIX: parseNum imported from centralized csvParser module
 
 /**
  * Calculate growth percentage

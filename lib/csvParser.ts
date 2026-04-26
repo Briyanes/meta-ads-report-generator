@@ -143,6 +143,31 @@ export interface ParsedData {
   }
 }
 
+// NEW: BUG #13 FIX - Sanitize CSV headers
+// Remove/normalize problematic characters that could cause issues
+export function sanitizeHeaders(headers: string[]): string[] {
+  return headers.map(header => {
+    if (!header || typeof header !== 'string') return ''
+    
+    // Trim whitespace
+    let sanitized = header.trim()
+    
+    // Remove leading/trailing special characters
+    sanitized = sanitized.replace(/^[^\w\s]+|[^\w\s]+$/g, '')
+    
+    // Normalize whitespace (multiple spaces -> single space)
+    sanitized = sanitized.replace(/\s+/g, ' ')
+    
+    // Remove potentially dangerous characters but keep common ones (spaces, hyphens, parentheses)
+    sanitized = sanitized.replace(/[<>:"\/\\|?*\x00-\x1F]/g, '')
+    
+    // Limit length to 200 characters
+    sanitized = sanitized.substring(0, 200)
+    
+    return sanitized
+  })
+}
+
 export async function parseCSV(file: File | string): Promise<ParsedData> {
   // BUG #1 FIX: Check cache first to prevent race condition
   const cacheKey = getCacheKey(file)
@@ -173,7 +198,10 @@ export async function parseCSV(file: File | string): Promise<ParsedData> {
         skipEmptyLines: true,
         complete: (results) => {
           const data = results.data as MetaAdsData[]
-          const headers = results.meta.fields || []
+          const rawHeaders = results.meta.fields || []
+          
+          // BUG #13 FIX: Sanitize headers to prevent XSS and parsing issues
+          const headers = sanitizeHeaders(rawHeaders)
           
           // BUG #14 FIX: Validate parsed data
           if (!Array.isArray(data)) {

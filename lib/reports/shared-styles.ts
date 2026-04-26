@@ -1,6 +1,11 @@
 // Shared CSS styles for all report templates
 // Based on cpas-reference-template.html design
 
+// BUG #10 FIX: Import centralized parseNum from csvParser
+import { parseNum as csvParserParseNum } from '@/lib/csvParser'
+
+export const parseNum = csvParserParseNum
+
 export const SHARED_CSS = `
         :root {
             --primary-blue: #2B46BB;
@@ -374,14 +379,6 @@ export const formatCurrency = (num: number): string => {
 export const formatPercent = (num: number): string => {
   if (num === null || num === undefined || isNaN(num)) return '0%'
   return num.toFixed(2) + '%'
-}
-
-export const parseNum = (val: any): number => {
-  if (typeof val === 'number') return val
-  if (!val || val === '-' || val === 'N/A') return 0
-  const cleanStr = String(val).replace(/[,\s]/g, '').replace(/^Rp\s*/i, '')
-  const parsed = parseFloat(cleanStr)
-  return isNaN(parsed) ? 0 : parsed
 }
 
 export const calculateGrowth = (current: number, previous: number): number => {

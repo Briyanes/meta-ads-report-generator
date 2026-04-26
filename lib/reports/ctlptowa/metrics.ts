@@ -1,6 +1,7 @@
 // lib/reports/ctlptowa/metrics.ts
 // Semua rumus dan kalkulasi metrics untuk CTLPTOWA report
-
+// BUG #10 FIX: Import centralized parseNum from csvParser
+import { parseNum } from '@/lib/csvParser'
 export interface CTLPTOWAWeekData {
   amountSpent?: any
   checkoutsInitiated?: any
@@ -61,12 +62,6 @@ export interface CalculatedMetrics {
 }
 
 // Helper functions
-export const parseNum = (val: any): number => {
-  if (typeof val === 'number') return val
-  if (!val) return 0
-  const parsed = parseFloat(String(val).replace(/,/g, ''))
-  return isNaN(parsed) ? 0 : parsed
-}
 
 export const calculateGrowth = (current: number, previous: number): number => {
   if (!previous || previous === 0) return 0

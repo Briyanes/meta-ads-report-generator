@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 // import { generateHTMLReportWithZAI } from '@/lib/zai'
 // Supabase import commented out - not needed for now
 // import { supabaseAdmin } from '@/lib/supabase'
+// BUG #11 FIX: Import analysis types for proper type safety
+import type { AnalysisData } from '@/lib/types/analysis'
 
 // Security: Check origin
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS?.split(',') || [
