@@ -1,5 +1,7 @@
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
+// BUG #17 FIX: Import async retry helper
+import { asyncRetryWithTimeout } from '@/lib/medium-priority-helpers'
 
 export async function generatePDFFromHTML(htmlContent: string, filename: string = 'meta-ads-report.pdf'): Promise<Blob> {
   // Try to find existing iframe first (if report is already displayed)
@@ -89,16 +91,30 @@ export async function generatePDFFromHTML(htmlContent: string, filename: string 
 
     targetElement = iframeDoc.body || iframeDoc.documentElement
     
-    // Wait for React root to be populated
-    let retries = 0
-    while (retries < 10) {
+    // BUG #17 FIX: Wait for React root with timeout and early exit
+    const checkRootElement = async () => {
       const rootElement = iframeDoc.getElementById('root')
-      if (rootElement && rootElement.children.length > 0 && rootElement.scrollHeight > 0) {
-        targetElement = rootElement
-        break
+      if (!rootElement || rootElement.children.length === 0 || rootElement.scrollHeight === 0) {
+        throw new Error('Root element not ready')
       }
-      await new Promise(resolve => setTimeout(resolve, 300))  // Reduced from 500ms
-      retries++
+      return rootElement
+    }
+
+    try {
+      targetElement = await asyncRetryWithTimeout(
+        checkRootElement,
+        10,    // max retries
+        5000,  // timeout 5 seconds
+        300    // delay 300ms between retries
+      )
+    } catch (error: any) {
+      // If timeout/retries fail, fall back to body element
+      const body = iframeDoc.body
+      if (body && body.scrollHeight > 0) {
+        targetElement = body
+      } else {
+        throw new Error(`Content rendering timeout: ${error.message}`)
+      }
     }
     
     // Ensure element has valid dimensions

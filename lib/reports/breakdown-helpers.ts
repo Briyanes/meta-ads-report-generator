@@ -3,6 +3,14 @@
 
 // BUG #10 FIX: Import centralized parseNum from csvParser
 import { parseNum as centralizedParseNum } from '@/lib/csvParser'
+// BUG #18-20 FIX: Import medium priority helpers
+import {
+  safeArrayOperation,
+  safeSortAndSlice as utilSafeSortAndSlice,
+  roundToDecimals,
+  safeSlice,
+  getTopItems as utilGetTopItems
+} from '@/lib/medium-priority-helpers'
 
 // Use centralized parseNum everywhere for consistency
 const parseNum = centralizedParseNum
@@ -84,6 +92,7 @@ export function getTopItems(
 
 /**
  * Safely calculate breakdown statistics
+ * BUG #19 FIX: Round floating point results for display
  */
 export function getBreakdownStats(
   breakdown: BreakdownItem[] | undefined | null,
@@ -115,7 +124,14 @@ export function getBreakdownStats(
     const min = Math.min(...values)
     const max = Math.max(...values)
 
-    return { total, count: data.length, average, min, max }
+    // BUG #19 FIX: Round all values for display precision
+    return {
+      total: roundToDecimals(total, 2),
+      count: data.length,
+      average: roundToDecimals(average, 2),
+      min: roundToDecimals(min, 2),
+      max: roundToDecimals(max, 2)
+    }
   } catch (error) {
     console.error('[SAFE BREAKDOWN] Error calculating stats:', error)
     return { total: 0, count: data.length, average: 0, min: 0, max: 0 }

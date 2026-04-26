@@ -3,6 +3,8 @@
 
 // BUG #10 FIX: Import centralized parseNum from csvParser
 import { parseNum as csvParserParseNum } from '@/lib/csvParser'
+// BUG #19 FIX: Import rounding helper
+import { roundToDecimals } from '@/lib/medium-priority-helpers'
 
 export const parseNum = csvParserParseNum
 
@@ -366,19 +368,23 @@ export const LOGO_URL = 'https://hadona.id/wp-content/uploads/2024/12/cropped-Ha
 export const HEADER_LOGO_URL = 'https://report.hadona.id/logo/logo-header-pdf.webp'
 
 // Helper functions for templates
+// BUG #19 FIX: Use centralized rounding for consistent precision
 export const formatNumber = (num: number): string => {
   if (num === null || num === undefined || isNaN(num)) return '0'
-  return Math.round(num).toLocaleString('id-ID')
+  const rounded = roundToDecimals(num, 0) // No decimals for counts
+  return Math.round(rounded).toLocaleString('id-ID')
 }
 
 export const formatCurrency = (num: number): string => {
   if (num === null || num === undefined || isNaN(num)) return 'Rp 0'
-  return 'Rp ' + Math.round(num).toLocaleString('id-ID')
+  const rounded = roundToDecimals(num, 0) // No decimals for currency
+  return 'Rp ' + Math.round(rounded).toLocaleString('id-ID')
 }
 
 export const formatPercent = (num: number): string => {
   if (num === null || num === undefined || isNaN(num)) return '0%'
-  return num.toFixed(2) + '%'
+  const rounded = roundToDecimals(num, 2) // 2 decimals for percentages
+  return rounded + '%'
 }
 
 export const calculateGrowth = (current: number, previous: number): number => {
