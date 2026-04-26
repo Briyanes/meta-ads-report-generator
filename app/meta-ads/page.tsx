@@ -824,6 +824,17 @@ export default function MetaAdsPage() {
                 lineHeight: '1.4'
               }}>
                 Powered by <span style={{ fontWeight: '600' }}>Hadona Digital Media</span>
+                <span style={{ margin: '0 8px', color: '#d1d5db' }}>•</span>
+                <span style={{
+                  fontSize: '11px',
+                  fontWeight: '600',
+                  color: '#059669',
+                  backgroundColor: '#d1fae5',
+                  padding: '2px 8px',
+                  borderRadius: '4px'
+                }}>
+                  v2.0.0
+                </span>
               </p>
             </div>
           </Link>
@@ -1054,40 +1065,375 @@ export default function MetaAdsPage() {
               }}>
                 Pemilihan Iklan Objective
               </label>
-              <select
-                value={objectiveType}
-                onChange={(e) => setObjectiveType(e.target.value as 'ctwa' | 'cpas' | 'ctlptowa' | 'ctlptopurchase')}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  paddingRight: '40px',
-                  border: '2px solid #e5e7eb',
-                  borderRadius: '10px',
-                  fontSize: '14px',
-                  backgroundColor: '#ffffff',
-                  cursor: 'pointer',
-                  outline: 'none',
-                  transition: 'all 0.2s ease',
-                  appearance: 'none',
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23374151' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'right 12px center',
-                  backgroundSize: '12px'
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = '#2B46BB'
-                  e.currentTarget.style.boxShadow = '0 0 0 4px rgba(43, 70, 187, 0.1)'
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = '#e5e7eb'
-                  e.currentTarget.style.boxShadow = 'none'
-                }}
-              >
-                <option value="ctwa">CTWA</option>
-                <option value="cpas">CPAS</option>
-                <option value="ctlptowa">CTLP to WA</option>
-                <option value="ctlptopurchase">CTLP to Purchase</option>
-              </select>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, 1fr)',
+                gap: '12px'
+              }}>
+                {/* CTWA Card */}
+                <div
+                  onClick={() => setObjectiveType('ctwa')}
+                  style={{
+                    padding: '16px',
+                    border: `2px solid ${objectiveType === 'ctwa' ? '#2B46BB' : '#e5e7eb'}`,
+                    borderRadius: '12px',
+                    backgroundColor: objectiveType === 'ctwa' ? '#eff6ff' : '#ffffff',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (objectiveType !== 'ctwa') {
+                      e.currentTarget.style.borderColor = '#2B46BB'
+                      e.currentTarget.style.backgroundColor = '#f9fafb'
+                      e.currentTarget.style.transform = 'translateY(-2px)'
+                      e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (objectiveType !== 'ctwa') {
+                      e.currentTarget.style.borderColor = '#e5e7eb'
+                      e.currentTarget.style.backgroundColor = '#ffffff'
+                      e.currentTarget.style.transform = 'translateY(0)'
+                      e.currentTarget.style.boxShadow = 'none'
+                    }
+                  }}
+                >
+                  {objectiveType === 'ctwa' && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '8px',
+                      right: '8px',
+                      backgroundColor: '#2B46BB',
+                      color: '#ffffff',
+                      borderRadius: '50%',
+                      width: '20px',
+                      height: '20px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '12px'
+                    }}>
+                      <i className="bi bi-check-lg"></i>
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <div style={{
+                      backgroundColor: objectiveType === 'ctwa' ? '#2B46BB' : '#dbeafe',
+                      borderRadius: '8px',
+                      padding: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <i className="bi bi-megaphone" style={{
+                        fontSize: '18px',
+                        color: objectiveType === 'ctwa' ? '#ffffff' : '#2B46BB'
+                      }}></i>
+                    </div>
+                    <div>
+                      <p style={{
+                        fontSize: '14px',
+                        fontWeight: '700',
+                        color: '#111827',
+                        margin: 0,
+                        lineHeight: '1.2'
+                      }}>
+                        CTWA
+                      </p>
+                      <p style={{
+                        fontSize: '11px',
+                        color: '#6b7280',
+                        margin: '4px 0 0 0'
+                      }}>
+                        Click to WhatsApp
+                      </p>
+                    </div>
+                  </div>
+                  <p style={{
+                    fontSize: '12px',
+                    color: '#6b7280',
+                    margin: '8px 0 0 0',
+                    lineHeight: '1.4'
+                  }}>
+                    Optimize for WhatsApp conversations
+                  </p>
+                </div>
+
+                {/* CPAS Card */}
+                <div
+                  onClick={() => setObjectiveType('cpas')}
+                  style={{
+                    padding: '16px',
+                    border: `2px solid ${objectiveType === 'cpas' ? '#2B46BB' : '#e5e7eb'}`,
+                    borderRadius: '12px',
+                    backgroundColor: objectiveType === 'cpas' ? '#eff6ff' : '#ffffff',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (objectiveType !== 'cpas') {
+                      e.currentTarget.style.borderColor = '#2B46BB'
+                      e.currentTarget.style.backgroundColor = '#f9fafb'
+                      e.currentTarget.style.transform = 'translateY(-2px)'
+                      e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (objectiveType !== 'cpas') {
+                      e.currentTarget.style.borderColor = '#e5e7eb'
+                      e.currentTarget.style.backgroundColor = '#ffffff'
+                      e.currentTarget.style.transform = 'translateY(0)'
+                      e.currentTarget.style.boxShadow = 'none'
+                    }
+                  }}
+                >
+                  {objectiveType === 'cpas' && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '8px',
+                      right: '8px',
+                      backgroundColor: '#2B46BB',
+                      color: '#ffffff',
+                      borderRadius: '50%',
+                      width: '20px',
+                      height: '20px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '12px'
+                    }}>
+                      <i className="bi bi-check-lg"></i>
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <div style={{
+                      backgroundColor: objectiveType === 'cpas' ? '#2B46BB' : '#dbeafe',
+                      borderRadius: '8px',
+                      padding: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <i className="bi bi-cart3" style={{
+                        fontSize: '18px',
+                        color: objectiveType === 'cpas' ? '#ffffff' : '#2B46BB'
+                      }}></i>
+                    </div>
+                    <div>
+                      <p style={{
+                        fontSize: '14px',
+                        fontWeight: '700',
+                        color: '#111827',
+                        margin: 0,
+                        lineHeight: '1.2'
+                      }}>
+                        CPAS
+                      </p>
+                      <p style={{
+                        fontSize: '11px',
+                        color: '#6b7280',
+                        margin: '4px 0 0 0'
+                      }}>
+                        Collab Ads
+                      </p>
+                    </div>
+                  </div>
+                  <p style={{
+                    fontSize: '12px',
+                    color: '#6b7280',
+                    margin: '8px 0 0 0',
+                    lineHeight: '1.4'
+                  }}>
+                    Collaborative advertising with creators
+                  </p>
+                </div>
+
+                {/* CTLP to WA Card */}
+                <div
+                  onClick={() => setObjectiveType('ctlptowa')}
+                  style={{
+                    padding: '16px',
+                    border: `2px solid ${objectiveType === 'ctlptowa' ? '#2B46BB' : '#e5e7eb'}`,
+                    borderRadius: '12px',
+                    backgroundColor: objectiveType === 'ctlptowa' ? '#eff6ff' : '#ffffff',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (objectiveType !== 'ctlptowa') {
+                      e.currentTarget.style.borderColor = '#2B46BB'
+                      e.currentTarget.style.backgroundColor = '#f9fafb'
+                      e.currentTarget.style.transform = 'translateY(-2px)'
+                      e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (objectiveType !== 'ctlptowa') {
+                      e.currentTarget.style.borderColor = '#e5e7eb'
+                      e.currentTarget.style.backgroundColor = '#ffffff'
+                      e.currentTarget.style.transform = 'translateY(0)'
+                      e.currentTarget.style.boxShadow = 'none'
+                    }
+                  }}
+                >
+                  {objectiveType === 'ctlptowa' && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '8px',
+                      right: '8px',
+                      backgroundColor: '#2B46BB',
+                      color: '#ffffff',
+                      borderRadius: '50%',
+                      width: '20px',
+                      height: '20px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '12px'
+                    }}>
+                      <i className="bi bi-check-lg"></i>
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <div style={{
+                      backgroundColor: objectiveType === 'ctlptowa' ? '#2B46BB' : '#dbeafe',
+                      borderRadius: '8px',
+                      padding: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <i className="bi bi-link-45deg" style={{
+                        fontSize: '18px',
+                        color: objectiveType === 'ctlptowa' ? '#ffffff' : '#2B46BB'
+                      }}></i>
+                    </div>
+                    <div>
+                      <p style={{
+                        fontSize: '14px',
+                        fontWeight: '700',
+                        color: '#111827',
+                        margin: 0,
+                        lineHeight: '1.2'
+                      }}>
+                        CTLP to WA
+                      </p>
+                      <p style={{
+                        fontSize: '11px',
+                        color: '#6b7280',
+                        margin: '4px 0 0 0'
+                      }}>
+                        Click Link to WhatsApp
+                      </p>
+                    </div>
+                  </div>
+                  <p style={{
+                    fontSize: '12px',
+                    color: '#6b7280',
+                    margin: '8px 0 0 0',
+                    lineHeight: '1.4'
+                  }}>
+                    Link clicks to WhatsApp conversations
+                  </p>
+                </div>
+
+                {/* CTLP to Purchase Card */}
+                <div
+                  onClick={() => setObjectiveType('ctlptopurchase')}
+                  style={{
+                    padding: '16px',
+                    border: `2px solid ${objectiveType === 'ctlptopurchase' ? '#2B46BB' : '#e5e7eb'}`,
+                    borderRadius: '12px',
+                    backgroundColor: objectiveType === 'ctlptopurchase' ? '#eff6ff' : '#ffffff',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (objectiveType !== 'ctlptopurchase') {
+                      e.currentTarget.style.borderColor = '#2B46BB'
+                      e.currentTarget.style.backgroundColor = '#f9fafb'
+                      e.currentTarget.style.transform = 'translateY(-2px)'
+                      e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (objectiveType !== 'ctlptopurchase') {
+                      e.currentTarget.style.borderColor = '#e5e7eb'
+                      e.currentTarget.style.backgroundColor = '#ffffff'
+                      e.currentTarget.style.transform = 'translateY(0)'
+                      e.currentTarget.style.boxShadow = 'none'
+                    }
+                  }}
+                >
+                  {objectiveType === 'ctlptopurchase' && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '8px',
+                      right: '8px',
+                      backgroundColor: '#2B46BB',
+                      color: '#ffffff',
+                      borderRadius: '50%',
+                      width: '20px',
+                      height: '20px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '12px'
+                    }}>
+                      <i className="bi bi-check-lg"></i>
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <div style={{
+                      backgroundColor: objectiveType === 'ctlptopurchase' ? '#2B46BB' : '#dbeafe',
+                      borderRadius: '8px',
+                      padding: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <i className="bi bi-bag-check" style={{
+                        fontSize: '18px',
+                        color: objectiveType === 'ctlptopurchase' ? '#ffffff' : '#2B46BB'
+                      }}></i>
+                    </div>
+                    <div>
+                      <p style={{
+                        fontSize: '14px',
+                        fontWeight: '700',
+                        color: '#111827',
+                        margin: 0,
+                        lineHeight: '1.2'
+                      }}>
+                        CTLP to Purchase
+                      </p>
+                      <p style={{
+                        fontSize: '11px',
+                        color: '#6b7280',
+                        margin: '4px 0 0 0'
+                      }}>
+                        Click Link to Purchase
+                      </p>
+                    </div>
+                  </div>
+                  <p style={{
+                    fontSize: '12px',
+                    color: '#6b7280',
+                    margin: '8px 0 0 0',
+                    lineHeight: '1.4'
+                  }}>
+                    Link clicks to website purchases
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1790,6 +2136,280 @@ export default function MetaAdsPage() {
           </div>
         </div>
 
+        {/* Loading State - Analyzing */}
+        {isAnalyzing && (
+          <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '16px',
+            padding: '32px',
+            marginBottom: '24px',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            border: '2px solid #e5e7eb'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '16px',
+              marginBottom: '20px'
+            }}>
+              <div style={{
+                backgroundColor: '#2B46BB',
+                borderRadius: '12px',
+                padding: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+              }}>
+                <i className="bi bi-cpu" style={{ fontSize: '24px', color: '#ffffff' }}></i>
+              </div>
+              <div style={{ flex: 1 }}>
+                <h3 style={{
+                  fontSize: '18px',
+                  fontWeight: 'bold',
+                  color: '#111827',
+                  margin: 0,
+                  marginBottom: '4px'
+                }}>
+                  Analyzing Your Data...
+                </h3>
+                <p style={{
+                  fontSize: '14px',
+                  color: '#6b7280',
+                  margin: 0
+                }}>
+                  Please wait while we process your CSV files
+                </p>
+              </div>
+            </div>
+
+            {/* Progress Steps */}
+            <div style={{
+              backgroundColor: '#f9fafb',
+              borderRadius: '12px',
+              padding: '20px',
+              marginTop: '16px'
+            }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    backgroundColor: '#059669',
+                    borderRadius: '50%',
+                    width: '24px',
+                    height: '24px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    <i className="bi bi-check" style={{ fontSize: '14px', color: '#ffffff' }}></i>
+                  </div>
+                  <span style={{
+                    fontSize: '14px',
+                    color: '#374151',
+                    fontWeight: '500'
+                  }}>
+                    Files uploaded successfully
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    backgroundColor: '#2B46BB',
+                    borderRadius: '50%',
+                    width: '24px',
+                    height: '24px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                  }}>
+                    <i className="bi bi-arrow-repeat" style={{ fontSize: '14px', color: '#ffffff', animation: 'spin 1s linear infinite' }}></i>
+                  </div>
+                  <span style={{
+                    fontSize: '14px',
+                    color: '#2B46BB',
+                    fontWeight: '500'
+                  }}>
+                    Processing data...
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    backgroundColor: '#e5e7eb',
+                    borderRadius: '50%',
+                    width: '24px',
+                    height: '24px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    <i className="bi bi-hourglass" style={{ fontSize: '14px', color: '#9ca3af' }}></i>
+                  </div>
+                  <span style={{
+                    fontSize: '14px',
+                    color: '#9ca3af',
+                    fontWeight: '500'
+                  }}>
+                    Generating insights...
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <style>{`
+              @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.5; }
+              }
+              @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+              }
+            `}</style>
+          </div>
+        )}
+
+        {/* Loading State - Generating Report */}
+        {isGenerating && (
+          <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '16px',
+            padding: '32px',
+            marginBottom: '24px',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            border: '2px solid #fbbf24'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '16px',
+              marginBottom: '20px'
+            }}>
+              <div style={{
+                backgroundColor: '#fbbf24',
+                borderRadius: '12px',
+                padding: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+              }}>
+                <i className="bi bi-file-earmark-text" style={{ fontSize: '24px', color: '#000000' }}></i>
+              </div>
+              <div style={{ flex: 1 }}>
+                <h3 style={{
+                  fontSize: '18px',
+                  fontWeight: 'bold',
+                  color: '#111827',
+                  margin: 0,
+                  marginBottom: '4px'
+                }}>
+                  Generating Your Report...
+                </h3>
+                <p style={{
+                  fontSize: '14px',
+                  color: '#6b7280',
+                  margin: 0
+                }}>
+                  Creating comprehensive insights and visualizations
+                </p>
+              </div>
+            </div>
+
+            {/* Progress Steps */}
+            <div style={{
+              backgroundColor: '#fffbeb',
+              borderRadius: '12px',
+              padding: '20px',
+              marginTop: '16px'
+            }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    backgroundColor: '#059669',
+                    borderRadius: '50%',
+                    width: '24px',
+                    height: '24px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    <i className="bi bi-check" style={{ fontSize: '14px', color: '#ffffff' }}></i>
+                  </div>
+                  <span style={{
+                    fontSize: '14px',
+                    color: '#374151',
+                    fontWeight: '500'
+                  }}>
+                    Data analysis complete
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    backgroundColor: '#fbbf24',
+                    borderRadius: '50%',
+                    width: '24px',
+                    height: '24px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                  }}>
+                    <i className="bi bi-arrow-repeat" style={{ fontSize: '14px', color: '#000000', animation: 'spin 1s linear infinite' }}></i>
+                  </div>
+                  <span style={{
+                    fontSize: '14px',
+                    color: '#b45309',
+                    fontWeight: '500'
+                  }}>
+                    Building report slides...
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    backgroundColor: '#e5e7eb',
+                    borderRadius: '50%',
+                    width: '24px',
+                    height: '24px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    <i className="bi bi-hourglass" style={{ fontSize: '14px', color: '#9ca3af' }}></i>
+                  </div>
+                  <span style={{
+                    fontSize: '14px',
+                    color: '#9ca3af',
+                    fontWeight: '500'
+                  }}>
+                    Finalizing report...
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <style>{`
+              @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.5; }
+              }
+              @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+              }
+            `}</style>
+          </div>
+        )}
+
         {/* Error Display */}
         {error && (
           <div style={{
@@ -1853,77 +2473,296 @@ export default function MetaAdsPage() {
 
         {/* Analysis Results */}
         {analysis && (
-          <div style={{
-            backgroundColor: '#f0fdf4',
-            borderLeft: '4px solid #16a34a',
-            padding: '16px',
-            borderRadius: '8px',
-            marginBottom: '24px'
-          }}>
-            <p style={{
-              color: '#15803d',
-              fontWeight: '600',
-              marginBottom: '8px'
-            }}>
-              <i className="bi bi-check-circle" style={{ marginRight: '8px' }}></i>
-              Analysis Complete!
-            </p>
+          <>
+            {/* Quick Stats Preview Card */}
             <div style={{
-              marginTop: '8px',
-              fontSize: '14px',
-              color: '#16a34a'
+              background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+              borderRadius: '16px',
+              padding: '24px',
+              marginBottom: '24px',
+              boxShadow: '0 20px 25px -5px rgba(5, 150, 105, 0.3), 0 10px 10px -5px rgba(5, 150, 105, 0.2)'
             }}>
-              <p>This Period: {analysis.summary?.thisWeek?.totalRows || analysis.summary?.thisWeek?.rows || 0} rows</p>
-              <p>Last Period: {analysis.summary?.lastWeek?.totalRows || analysis.summary?.lastWeek?.rows || 0} rows</p>
-              {((analysis.summary?.thisWeek?.breakdownFiles && analysis.summary.thisWeek.breakdownFiles > 0) || 
-                (analysis.summary?.lastWeek?.breakdownFiles && analysis.summary.lastWeek.breakdownFiles > 0)) && (
-                <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #86efac' }}>
-                  <p style={{ fontWeight: '600', marginBottom: '4px' }}>Breakdown Files:</p>
-                  <p style={{ fontSize: '12px', margin: '2px 0' }}>
-                    This Period: {analysis.summary?.thisWeek?.breakdownFiles || 0} files 
-                    ({analysis.summary?.thisWeek?.breakdownRows || 0} breakdown rows)
-                  </p>
-                  <p style={{ fontSize: '12px', margin: '2px 0' }}>
-                    Last Period: {analysis.summary?.lastWeek?.breakdownFiles || 0} files 
-                    ({analysis.summary?.lastWeek?.breakdownRows || 0} breakdown rows)
-                  </p>
-                  {analysis.summary?.thisWeek?.breakdownTypes && 
-                   Array.isArray(analysis.summary.thisWeek.breakdownTypes) && 
-                   analysis.summary.thisWeek.breakdownTypes.length > 0 && (
-                    <p style={{ fontSize: '11px', marginTop: '4px', color: '#6b7280' }}>
-                      Types: {analysis.summary.thisWeek.breakdownTypes
-                        .map((type: string) => {
-                          // Format breakdown type names nicely
-                          return type
-                            .replace(/-/g, ' ')
-                            .replace(/\b\w/g, (l: string) => l.toUpperCase())
-                            .replace(/Age/g, 'Age')
-                            .replace(/Gender/g, 'Gender')
-                            .replace(/Region/g, 'Region')
-                            .replace(/Platform/g, 'Platform')
-                            .replace(/Placement/g, 'Placement')
-                            .replace(/Objective/g, 'Objective')
-                            .replace(/Ad Creative/g, 'Ad Creative')
-                        })
-                        .join(', ')}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '20px',
+                flexWrap: 'wrap',
+                gap: '12px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    borderRadius: '12px',
+                    padding: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <i className="bi bi-graph-up-arrow" style={{ fontSize: '24px', color: '#ffffff' }}></i>
+                  </div>
+                  <div>
+                    <h3 style={{
+                      fontSize: '20px',
+                      fontWeight: 'bold',
+                      color: '#ffffff',
+                      margin: 0,
+                      marginBottom: '4px'
+                    }}>
+                      Analysis Complete!
+                    </h3>
+                    <p style={{
+                      fontSize: '14px',
+                      color: 'rgba(255, 255, 255, 0.9)',
+                      margin: 0
+                    }}>
+                      Your data is ready for report generation
                     </p>
-                  )}
-                  {analysis.summary?.lastWeek?.breakdownTypes && 
-                   Array.isArray(analysis.summary.lastWeek.breakdownTypes) && 
-                   analysis.summary.lastWeek.breakdownTypes.length > 0 &&
-                   JSON.stringify(analysis.summary.lastWeek.breakdownTypes) !== JSON.stringify(analysis.summary.thisWeek.breakdownTypes) && (
-                    <p style={{ fontSize: '11px', marginTop: '2px', color: '#6b7280' }}>
-                      Last Period Types: {analysis.summary.lastWeek.breakdownTypes
-                        .map((type: string) => {
-                          return type
-                            .replace(/-/g, ' ')
-                            .replace(/\b\w/g, (l: string) => l.toUpperCase())
-                        })
-                        .join(', ')}
-                    </p>
-                  )}
+                  </div>
                 </div>
-              )}
+                <div style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  padding: '8px 16px',
+                  borderRadius: '20px',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: '#ffffff'
+                }}>
+                  v2.0.0
+                </div>
+              </div>
+
+              {/* Quick Stats Grid */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: '16px',
+                marginTop: '20px'
+              }}>
+                <div style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                  backdropFilter: 'blur(10px)',
+                  borderRadius: '12px',
+                  padding: '16px',
+                  border: '1px solid rgba(255, 255, 255, 0.2)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <i className="bi bi-calendar-check" style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '16px' }}></i>
+                    <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.8)', fontWeight: '500' }}>
+                      This Period
+                    </span>
+                  </div>
+                  <p style={{
+                    fontSize: '24px',
+                    fontWeight: 'bold',
+                    color: '#ffffff',
+                    margin: 0,
+                    lineHeight: '1.2'
+                  }}>
+                    {analysis.summary?.thisWeek?.totalRows || analysis.summary?.thisWeek?.rows || 0}
+                  </p>
+                  <p style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.8)', margin: '4px 0 0 0' }}>
+                    rows loaded
+                  </p>
+                </div>
+
+                <div style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                  backdropFilter: 'blur(10px)',
+                  borderRadius: '12px',
+                  padding: '16px',
+                  border: '1px solid rgba(255, 255, 255, 0.2)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <i className="bi bi-calendar-range" style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '16px' }}></i>
+                    <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.8)', fontWeight: '500' }}>
+                      Last Period
+                    </span>
+                  </div>
+                  <p style={{
+                    fontSize: '24px',
+                    fontWeight: 'bold',
+                    color: '#ffffff',
+                    margin: 0,
+                    lineHeight: '1.2'
+                  }}>
+                    {analysis.summary?.lastWeek?.totalRows || analysis.summary?.lastWeek?.rows || 0}
+                  </p>
+                  <p style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.8)', margin: '4px 0 0 0' }}>
+                    rows loaded
+                  </p>
+                </div>
+
+                {((analysis.summary?.thisWeek?.breakdownFiles && analysis.summary.thisWeek.breakdownFiles > 0) ||
+                  (analysis.summary?.lastWeek?.breakdownFiles && analysis.summary.lastWeek.breakdownFiles > 0)) && (
+                  <>
+                    <div style={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                      backdropFilter: 'blur(10px)',
+                      borderRadius: '12px',
+                      padding: '16px',
+                      border: '1px solid rgba(255, 255, 255, 0.2)'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                        <i className="bi bi-files" style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '16px' }}></i>
+                        <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.8)', fontWeight: '500' }}>
+                          Breakdown Files
+                        </span>
+                      </div>
+                      <p style={{
+                        fontSize: '24px',
+                        fontWeight: 'bold',
+                        color: '#ffffff',
+                        margin: 0,
+                        lineHeight: '1.2'
+                      }}>
+                        {analysis.summary?.thisWeek?.breakdownFiles || 0}
+                      </p>
+                      <p style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.8)', margin: '4px 0 0 0' }}>
+                        {analysis.summary?.thisWeek?.breakdownRows || 0} breakdown rows
+                      </p>
+                    </div>
+
+                    {analysis.summary?.thisWeek?.breakdownTypes &&
+                     Array.isArray(analysis.summary.thisWeek.breakdownTypes) &&
+                     analysis.summary.thisWeek.breakdownTypes.length > 0 && (
+                      <div style={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                        backdropFilter: 'blur(10px)',
+                        borderRadius: '12px',
+                        padding: '16px',
+                        border: '1px solid rgba(255, 255, 255, 0.2)'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                          <i className="bi bi-layers" style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '16px' }}></i>
+                          <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.8)', fontWeight: '500' }}>
+                            Breakdown Types
+                          </span>
+                        </div>
+                        <p style={{
+                          fontSize: '16px',
+                          fontWeight: '600',
+                          color: '#ffffff',
+                          margin: 0,
+                          lineHeight: '1.3'
+                        }}>
+                          {analysis.summary.thisWeek.breakdownTypes
+                            .map((type: string) => {
+                              return type
+                                .replace(/-/g, ' ')
+                                .replace(/\b\w/g, (l: string) => l.toUpperCase())
+                                .replace(/Age/g, 'Age')
+                                .replace(/Gender/g, 'Gender')
+                                .replace(/Region/g, 'Region')
+                                .replace(/Platform/g, 'Platform')
+                                .replace(/Placement/g, 'Placement')
+                                .replace(/Objective/g, 'Objective')
+                                .replace(/Ad Creative/g, 'Ad Creative')
+                            })
+                            .join(', ')}
+                        </p>
+                        <p style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.8)', margin: '4px 0 0 0' }}>
+                          {analysis.summary.thisWeek.breakdownTypes.length} dimension{analysis.summary.thisWeek.breakdownTypes.length > 1 ? 's' : ''} detected
+                        </p>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Report Success Card */}
+        {htmlReport && (
+          <div style={{
+            background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+            borderRadius: '16px',
+            padding: '24px',
+            marginBottom: '24px',
+            boxShadow: '0 20px 25px -5px rgba(5, 150, 105, 0.3), 0 10px 10px -5px rgba(5, 150, 105, 0.2)'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '16px'
+            }}>
+              <div style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                borderRadius: '12px',
+                padding: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <i className="bi bi-check-circle-fill" style={{ fontSize: '32px', color: '#ffffff' }}></i>
+              </div>
+              <div style={{ flex: 1 }}>
+                <h3 style={{
+                  fontSize: '20px',
+                  fontWeight: 'bold',
+                  color: '#ffffff',
+                  margin: 0,
+                  marginBottom: '4px'
+                }}>
+                  Report Generated Successfully!
+                </h3>
+                <p style={{
+                  fontSize: '14px',
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  margin: 0,
+                  marginBottom: '12px'
+                }}>
+                  Your report is ready for preview and download
+                </p>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  flexWrap: 'wrap'
+                }}>
+                  <div style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    padding: '4px 12px',
+                    borderRadius: '12px',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    color: '#ffffff'
+                  }}>
+                    v2.0.0
+                  </div>
+                  <div style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    padding: '4px 12px',
+                    borderRadius: '12px',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    color: '#ffffff'
+                  }}>
+                    {objectiveType.toUpperCase()}
+                  </div>
+                  <div style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    padding: '4px 12px',
+                    borderRadius: '12px',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    color: '#ffffff'
+                  }}>
+                    {retentionType === 'wow' ? 'Week-over-Week' : 'Month-over-Month'}
+                  </div>
+                  <div style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    padding: '4px 12px',
+                    borderRadius: '12px',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    color: '#ffffff'
+                  }}>
+                    {new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
