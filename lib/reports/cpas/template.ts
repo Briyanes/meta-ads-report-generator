@@ -129,9 +129,36 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         ${SHARED_CSS}
+
+        /* Version Footer */
+        .version-footer {
+            position: fixed;
+            bottom: 8px;
+            right: 12px;
+            font-size: 7px;
+            font-weight: 600;
+            color: var(--gray-400);
+            opacity: 0.6;
+            letter-spacing: 0.3px;
+            z-index: 1000;
+        }
+
+        @media print {
+            .version-footer {
+                position: fixed;
+                bottom: 6px;
+                right: 10px;
+                font-size: 6px;
+            }
+        }
     </style>
 </head>
 <body>
+
+    <!-- Version Footer - Appears on all slides -->
+    <div class="version-footer">
+        v2.0.0 • Compact Design System
+    </div>
 
     ${generateCoverSlide(defaultReportName, `${shortLastPeriod} vs ${shortThisPeriod}`, 'cpas', comparisonLabel)}
 
@@ -586,7 +613,10 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                     padding: 32px; border-radius: 16px; color: white; max-width: 500px; margin: 0 auto; box-shadow: 0 8px 24px rgba(43, 70, 187, 0.25);">
             <p style="font-size: 18px; margin-bottom: 8px; font-weight: 700;">Questions or Feedback?</p>
             <p style="font-size: 14px; opacity: 0.9;">Contact us anytime for campaign consultation</p>
-            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.3); font-size: 12px; opacity: 0.8;">
+            <p style="margin-top: 20px; font-size: 11px; opacity: 0.7;">
+                <strong>Version 2.0.0</strong> • Compact Design System • Generated on ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+            </p>
+            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.3); font-size: 11px; opacity: 0.8;">
                 © 2026 Hadona Digital Media. All rights reserved.
             </div>
         </div>

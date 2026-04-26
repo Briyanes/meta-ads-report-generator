@@ -887,7 +887,12 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             z-index: 10;
         }
 
-        /* Print/PDF styles - remove scroll constraints */
+        /* Print/PDF styles - LANDSCAPE ORIENTATION */
+        @page {
+            size: A4 landscape;
+            margin: 0;
+        }
+
         @media print {
             .scrollable-table,
             .full-table {
@@ -898,6 +903,10 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                 page-break-after: always;
                 page-break-inside: avoid;
             }
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
         }
 
         /* Priority Badge */
@@ -907,9 +916,36 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
 
         .growth-up { color: var(--success); }
         .growth-down { color: var(--danger); }
+
+        /* Version Footer */
+        .version-footer {
+            position: fixed;
+            bottom: 8px;
+            right: 12px;
+            font-size: 7px;
+            font-weight: 600;
+            color: var(--gray-400);
+            opacity: 0.6;
+            letter-spacing: 0.3px;
+            z-index: 1000;
+        }
+
+        @media print {
+            .version-footer {
+                position: fixed;
+                bottom: 6px;
+                right: 10px;
+                font-size: 6px;
+            }
+        }
     </style>
 </head>
 <body>
+
+    <!-- Version Footer - Appears on all slides -->
+    <div class="version-footer">
+        v2.0.0 • Compact Design System
+    </div>
 
     <!-- SLIDE 1: COVER -->
     <div class="slide cover-slide" data-slide="${++slideNumber}">
@@ -1247,8 +1283,11 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             <p style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">${icon('chat-square-text-fill', 18)} Questions or Feedback?</p>
             <p>Contact us anytime for campaign consultation</p>
         </div>
-        
-        <p style="margin-top: 48px; font-size: 12px; opacity: 0.6;">© 2026 Hadona Digital Media. All rights reserved.</p>
+
+        <p style="margin-top: 32px; font-size: 11px; opacity: 0.7;">
+            <strong>Version 2.0.0</strong> • Compact Design System • Generated on ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+        </p>
+        <p style="margin-top: 24px; font-size: 11px; opacity: 0.6;">© 2026 Hadona Digital Media. All rights reserved.</p>
     </div>
 
 </body>
