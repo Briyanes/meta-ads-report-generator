@@ -43,13 +43,49 @@ export async function generatePDFFromHTML(htmlContent: string, filename: string 
       iframe!.srcdoc = htmlContent
     })
 
-    // Wait for React to render (Babel transformation takes time)
-    await new Promise(resolve => setTimeout(resolve, 3000))
-
+    // Wait for React to render - use MutationObserver instead of fixed timeout (BUG #5 FIX)
     const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document
     if (!iframeDoc) {
       throw new Error('Cannot access iframe document')
     }
+
+    // Use MutationObserver to wait for content instead of arbitrary timeout
+    let contentReady = false
+    let timeoutId: NodeJS.Timeout | null = null
+    
+    const waitForContent = new Promise<void>((resolve) => {
+      const checkContent = () => {
+        const rootElement = iframeDoc.getElementById('root')
+        if (rootElement && rootElement.children.length > 0 && rootElement.scrollHeight > 0) {
+          contentReady = true
+          if (timeoutId) clearTimeout(timeoutId)
+          resolve()
+        }
+      }
+
+      // Initial check
+      checkContent()
+      if (contentReady) return
+
+      // Set up observer for DOM changes
+      const observer = new MutationObserver(() => {
+        checkContent()
+      })
+
+      observer.observe(iframeDoc.body, {
+        childList: true,
+        subtree: true,
+        attributes: true
+      })
+
+      // Timeout safety valve (max 15 seconds instead of relying on arbitrary waits)
+      timeoutId = setTimeout(() => {
+        observer.disconnect()
+        resolve()  // Proceed anyway after timeout
+      }, 15000)
+    })
+
+    await waitForContent
 
     targetElement = iframeDoc.body || iframeDoc.documentElement
     
@@ -61,7 +97,7 @@ export async function generatePDFFromHTML(htmlContent: string, filename: string 
         targetElement = rootElement
         break
       }
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 300))  // Reduced from 500ms
       retries++
     }
     

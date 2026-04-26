@@ -52,24 +52,67 @@ export const FIELD_NAMES = {
   OBJECTIVE: ['Objective', 'objective', 'Campaign objective'],
 } as const
 
-// Helper function to get field value with multiple fallback names
+// Helper function to get field value with multiple fallback names (STRICT MATCHING - BUG #6 FIX)
 export function getFieldByName(data: Record<string, any>, fieldNames: readonly string[]): any {
+  if (!data || typeof data !== 'object') return undefined
+  
   for (const name of fieldNames) {
-    if (data[name] !== undefined && data[name] !== null && data[name] !== '') {
+    // Exact match first
+    if (name in data && data[name] !== undefined && data[name] !== null && data[name] !== '') {
       return data[name]
     }
   }
+  
+  // Case-insensitive exact match as fallback
+  const dataKeys = Object.keys(data)
+  for (const name of fieldNames) {
+    const caseInsensitiveMatch = dataKeys.find(key => key.toLowerCase() === name.toLowerCase())
+    if (caseInsensitiveMatch && data[caseInsensitiveMatch] !== undefined && data[caseInsensitiveMatch] !== null && data[caseInsensitiveMatch] !== '') {
+      return data[caseInsensitiveMatch]
+    }
+  }
+  
   return undefined
 }
 
 // Centralized parseNum function - single source of truth
 export function parseNum(val: any): number {
-  if (typeof val === 'number') return val
+  if (val === null || val === undefined) return 0
+  if (typeof val === 'number') {
+    // Fix: Check for NaN and Infinity
+    if (isNaN(val) || !isFinite(val)) return 0
+    return val
+  }
   if (!val || val === '-' || val === 'N/A') return 0
   // Remove commas, whitespace, currency symbols
   const cleanStr = String(val).replace(/[,\s]/g, '').replace(/^Rp\s*/i, '')
   const parsed = parseFloat(cleanStr)
-  return isNaN(parsed) ? 0 : parsed
+  // Fix: Check for NaN and Infinity
+  return isNaN(parsed) || !isFinite(parsed) ? 0 : parsed
+}
+
+// NEW: Safe division helper - prevents division by zero (BUG #4 FIX)
+export function safeDivide(numerator: number, denominator: number, fallback: number = 0): number {
+  if (!denominator || denominator === 0 || !isFinite(denominator)) return fallback
+  const result = numerator / denominator
+  // Ensure result is valid number
+  if (isNaN(result) || !isFinite(result)) return fallback
+  return result
+}
+
+// NEW: Safe array access - prevents undefined errors (BUG #2 & #3 FIX)
+export function safeGetArrayItem<T>(arr: T[] | null | undefined, index: number, fallback: T | null = null): T | null {
+  if (!arr || !Array.isArray(arr)) return fallback
+  if (index < 0 || index >= arr.length) return fallback
+  const item = arr[index]
+  return item !== null && item !== undefined ? item : fallback
+}
+
+// NEW: Safe object property access (BUG #3 FIX)
+export function safeGetProperty<T>(obj: Record<string, any> | null | undefined, key: string, fallback: T | null = null): T | null {
+  if (!obj || typeof obj !== 'object') return fallback
+  const value = obj[key]
+  return value !== null && value !== undefined ? value : fallback
 }
 
 export interface MetaAdsData {
