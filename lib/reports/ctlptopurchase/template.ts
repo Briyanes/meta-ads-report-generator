@@ -8,6 +8,12 @@ import {
   getGrowthBadge,
   getGrowthClass
 } from '../shared-styles'
+import {
+  getSafeBreakdownData,
+  getTopPerformer,
+  getTopItems,
+  getDimensionValue
+} from '../breakdown-helpers'
 
 // Bootstrap Icons CDN
 const BOOTSTRAP_ICONS_CDN = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css'
@@ -129,16 +135,16 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const freqGrowth = calculateGrowth(thisFrequency, lastFrequency)
   const convRateGrowth = calculateGrowth(thisConvRate, lastConvRate)
 
-  // Breakdown data
-  const ageData = breakdownThisWeek.age || []
-  const genderData = breakdownThisWeek.gender || []
-  const regionData = breakdownThisWeek.region || []
-  const platformData = breakdownThisWeek.platform || []
-  const placementData = breakdownThisWeek.placement || []
-  const adCreativeData = breakdownThisWeek['ad-creative'] || breakdownThisWeek.adCreative || []
-  const objectiveData = breakdownThisWeek.objective || []
-  const ageDataLast = breakdownLastWeek.age || []
-  const genderDataLast = breakdownLastWeek.gender || []
+  // Breakdown data - BUG #3 FIX: Safe breakdown access
+  const ageData = getSafeBreakdownData(breakdownThisWeek.age)
+  const genderData = getSafeBreakdownData(breakdownThisWeek.gender)
+  const regionData = getSafeBreakdownData(breakdownThisWeek.region)
+  const platformData = getSafeBreakdownData(breakdownThisWeek.platform)
+  const placementData = getSafeBreakdownData(breakdownThisWeek.placement)
+  const adCreativeData = getSafeBreakdownData(breakdownThisWeek['ad-creative'] || breakdownThisWeek.adCreative)
+  const objectiveData = getSafeBreakdownData(breakdownThisWeek.objective)
+  const ageDataLast = getSafeBreakdownData(breakdownLastWeek.age)
+  const genderDataLast = getSafeBreakdownData(breakdownLastWeek.gender)
 
   const isGoodPerformance = cppGrowth <= 0 || (purchasesGrowth > 0 && cppGrowth < 10)
 

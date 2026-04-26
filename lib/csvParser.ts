@@ -1,6 +1,18 @@
 import Papa from 'papaparse'
 
 // =====================================
+// FILE PARSING CACHE - BUG #1 FIX
+// Prevent race condition from multiple file reads
+// =====================================
+const fileParsingCache = new Map<string, Promise<ParsedData>>()
+
+// Cache key generation from file
+function getCacheKey(file: File | string): string {
+  if (typeof file === 'string') return `str_${file.length}_${file.charCodeAt(0)}`
+  return `file_${file.name}_${file.size}_${file.lastModified}`
+}
+
+// =====================================
 // FIELD NAME CONSTANTS
 // Centralized mapping for Meta Ads CSV field names
 // Handle variations in column naming across different CSV exports
@@ -132,38 +144,67 @@ export interface ParsedData {
 }
 
 export async function parseCSV(file: File | string): Promise<ParsedData> {
+  // BUG #1 FIX: Check cache first to prevent race condition
+  const cacheKey = getCacheKey(file)
+  const cachedPromise = fileParsingCache.get(cacheKey)
+  if (cachedPromise) {
+    return cachedPromise
+  }
+
   // If file is a string (CSV text), parse directly
   // If file is a File object, read it as text first
-  let csvText: string
-  
-  if (typeof file === 'string') {
-    csvText = file
-  } else {
-    // Read file as text (works in both browser and Node.js)
-    csvText = await file.text()
-  }
-  
-  return new Promise((resolve, reject) => {
-    Papa.parse(csvText, {
-      header: true,
-      skipEmptyLines: true,
-      complete: (results) => {
-        const data = results.data as MetaAdsData[]
-        const headers = results.meta.fields || []
-        
-        resolve({
-          data,
-          headers,
-          summary: {
-            totalRows: data.length
-          }
-        })
-      },
-      error: (error: any) => {
-        reject(new Error(`Failed to parse CSV: ${error.message}`))
+  const parsePromise = (async () => {
+    let csvText: string
+    
+    if (typeof file === 'string') {
+      csvText = file
+    } else {
+      // Read file as text (works in both browser and Node.js)
+      try {
+        csvText = await file.text()
+      } catch (error: any) {
+        throw new Error(`Failed to read file: ${error.message}`)
       }
+    }
+    
+    return new Promise<ParsedData>((resolve, reject) => {
+      Papa.parse(csvText, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          const data = results.data as MetaAdsData[]
+          const headers = results.meta.fields || []
+          
+          // BUG #14 FIX: Validate parsed data
+          if (!Array.isArray(data)) {
+            reject(new Error('Parsed data is not an array'))
+            return
+          }
+          
+          resolve({
+            data,
+            headers,
+            summary: {
+              totalRows: data.length
+            }
+          })
+        },
+        error: (error: any) => {
+          reject(new Error(`Failed to parse CSV: ${error.message}`))
+        }
+      })
     })
-  })
+  })()
+
+  // Cache the promise to prevent multiple reads of same file
+  fileParsingCache.set(cacheKey, parsePromise)
+  
+  return parsePromise
+}
+
+// NEW: Clear cache (useful for testing or if file is updated)
+export function clearCSVCache(): void {
+  fileParsingCache.clear()
 }
 
 export function analyzeDataStructure(data: MetaAdsData[]): {

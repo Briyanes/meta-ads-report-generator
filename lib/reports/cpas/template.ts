@@ -10,6 +10,12 @@ import {
   getGrowthClass,
   generateCoverSlide
 } from '../shared-styles'
+import {
+  getSafeBreakdownData,
+  getTopPerformer,
+  getTopItems,
+  getDimensionValue
+} from '../breakdown-helpers'
 
 export function generateReactTailwindReport(analysisData: any, reportName?: string, retentionType?: string, objectiveType: string = 'cpas'): string {
   console.log('[CPAS Template] Starting report generation...')
@@ -102,13 +108,13 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const lastPurchaseRate = lastLinkClicks > 0 ? (lastPurchases / lastLinkClicks) * 100 : 0
 
   // Breakdown data
-  const ageData = breakdownThisWeek.age || []
-  const genderData = breakdownThisWeek.gender || []
-  const regionData = breakdownThisWeek.region || []
-  const platformData = breakdownThisWeek.platform || []
-  const placementData = breakdownThisWeek.placement || []
-  const objectiveData = breakdownThisWeek.objective || []
-  const adCreativeData = breakdownThisWeek['ad-creative'] || breakdownThisWeek.adCreative || []
+  const ageData = getSafeBreakdownData(breakdownThisWeek.age)
+  const genderData = getSafeBreakdownData(breakdownThisWeek.gender)
+  const regionData = getSafeBreakdownData(breakdownThisWeek.region)
+  const platformData = getSafeBreakdownData(breakdownThisWeek.platform)
+  const placementData = getSafeBreakdownData(breakdownThisWeek.placement)
+  const objectiveData = getSafeBreakdownData(breakdownThisWeek.objective)
+  const adCreativeData = getSafeBreakdownData(breakdownThisWeek['ad-creative'] || breakdownThisWeek.adCreative)
 
   let slideNumber = 1
 

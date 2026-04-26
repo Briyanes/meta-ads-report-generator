@@ -9,6 +9,12 @@ import {
   getGrowthBadge,
   getGrowthClass
 } from '../shared-styles'
+import {
+  getSafeBreakdownData,
+  getTopPerformer,
+  getTopItems,
+  getDimensionValue
+} from '../breakdown-helpers'
 
 // Bootstrap Icons CDN
 const BOOTSTRAP_ICONS_CDN = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css'
@@ -74,20 +80,20 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   const convRateGrowth = calculateGrowth(thisConvRate, lastConvRate)
   const freqGrowth = calculateGrowth(thisFrequency, lastFrequency)
 
-  // Breakdown data
-  const ageData = breakdownThisWeek.age || []
-  const genderData = breakdownThisWeek.gender || []
-  const regionData = breakdownThisWeek.region || []
-  const platformData = breakdownThisWeek.platform || []
-  const placementData = breakdownThisWeek.placement || []
-  const objectiveData = breakdownThisWeek.objective || []
-  const adCreativeData = breakdownThisWeek['ad-creative'] || breakdownThisWeek.adCreative || []
+  // Breakdown data - BUG #3 FIX: Safe breakdown access
+  const ageData = getSafeBreakdownData(breakdownThisWeek.age)
+  const genderData = getSafeBreakdownData(breakdownThisWeek.gender)
+  const regionData = getSafeBreakdownData(breakdownThisWeek.region)
+  const platformData = getSafeBreakdownData(breakdownThisWeek.platform)
+  const placementData = getSafeBreakdownData(breakdownThisWeek.placement)
+  const objectiveData = getSafeBreakdownData(breakdownThisWeek.objective)
+  const adCreativeData = getSafeBreakdownData(breakdownThisWeek['ad-creative'] || breakdownThisWeek.adCreative)
 
-  const ageDataLast = breakdownLastWeek.age || []
-  const genderDataLast = breakdownLastWeek.gender || []
-  const regionDataLast = breakdownLastWeek.region || []
-  const platformDataLast = breakdownLastWeek.platform || []
-  const placementDataLast = breakdownLastWeek.placement || []
+  const ageDataLast = getSafeBreakdownData(breakdownLastWeek.age)
+  const genderDataLast = getSafeBreakdownData(breakdownLastWeek.gender)
+  const regionDataLast = getSafeBreakdownData(breakdownLastWeek.region)
+  const platformDataLast = getSafeBreakdownData(breakdownLastWeek.platform)
+  const placementDataLast = getSafeBreakdownData(breakdownLastWeek.placement)
 
   const isGoodPerformance = cprGrowth <= 0 || (resultsGrowth > 0 && cprGrowth < 10)
 
