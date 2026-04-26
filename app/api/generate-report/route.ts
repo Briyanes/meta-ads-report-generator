@@ -122,10 +122,42 @@ export async function POST(request: NextRequest) {
     }
 
     // Security: Sanitize report name
+    // Security: Sanitize report name to prevent XSS
     const sanitizedName = sanitizeReportName(reportName || '')
     
+    // BUG #9 FIX: Safely parse analysisData with proper error handling
+    let parsedAnalysisData: any
+    try {
+      if (typeof analysisData === 'string') {
+        // Only try to parse if it looks like JSON
+        if (analysisData.startsWith('{') || analysisData.startsWith('[')) {
+          parsedAnalysisData = JSON.parse(analysisData)
+        } else {
+          throw new Error('Invalid JSON format - does not start with { or [')
+        }
+      } else if (typeof analysisData === 'object' && analysisData !== null) {
+        parsedAnalysisData = analysisData
+      } else {
+        throw new Error(`Invalid analysisData type: ${typeof analysisData}`)
+      }
+    } catch (parseError: any) {
+      console.error('[Generate Report] Failed to parse analysisData:', parseError)
+      return NextResponse.json(
+        {
+          error: 'Invalid analysis data format',
+          details: parseError.message,
+          hint: 'Analysis data must be a JSON object'
+        },
+        { status: 400 }
+      )
+    }
 
-    // Import template based on objective type
+    if (!parsedAnalysisData || (typeof parsedAnalysisData === 'object' && Object.keys(parsedAnalysisData).length === 0)) {
+      return NextResponse.json(
+        { error: 'Analysis data is empty' },
+        { status: 400 }
+      )
+    }
     let generateReport: (analysisData: any, reportName?: string, retentionType?: string, objectiveType?: string) => string | Promise<string>
 
     try {
@@ -157,7 +189,7 @@ export async function POST(request: NextRequest) {
     // This ensures each objective type has its own isolated template and doesn't affect others
     let htmlReport: string
     try {
-      htmlReport = await generateReport(analysisData, sanitizedName, retentionType, objectiveType)
+      htmlReport = await generateReport(parsedAnalysisData, sanitizedName, retentionType, objectiveType)
 
       if (!htmlReport || htmlReport.length < 100) {
         console.error('[Generate Report] HTML report too short or empty')

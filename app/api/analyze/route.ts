@@ -80,10 +80,32 @@ export async function POST(request: NextRequest) {
     const retentionType = (formData.get('retentionType') as string) || 'wow'
     const objectiveType = (formData.get('objectiveType') as string) || 'ctwa'
 
-    // Validate inputs
-    if (!fileThisWeek || !fileLastWeek) {
+    // BUG #8 FIX: Validate FormData structure explicitly
+    if (!fileThisWeek || !(fileThisWeek instanceof File)) {
       return NextResponse.json(
-        { error: 'Please provide both main CSV files (This Week & Last Week)' },
+        { error: 'Invalid or missing "fileThisWeek" - must be a File' },
+        { status: 400 }
+      )
+    }
+
+    if (!fileLastWeek || !(fileLastWeek instanceof File)) {
+      return NextResponse.json(
+        { error: 'Invalid or missing "fileLastWeek" - must be a File' },
+        { status: 400 }
+      )
+    }
+
+    // Validate FormData types
+    if (typeof retentionType !== 'string') {
+      return NextResponse.json(
+        { error: 'Invalid retentionType - must be a string' },
+        { status: 400 }
+      )
+    }
+
+    if (typeof objectiveType !== 'string') {
+      return NextResponse.json(
+        { error: 'Invalid objectiveType - must be a string' },
         { status: 400 }
       )
     }

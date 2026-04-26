@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -32,6 +32,12 @@ export default function MetaAdsPage() {
 
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // NEW: Memoized scroll handler to prevent memory leak (BUG #7 FIX)
+  const memoizedHandleScroll = useCallback(() => {
+    const scrollPosition = window.scrollY
+    setIsScrolled(scrollPosition > 10)
   }, [])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'thisWeek' | 'lastWeek') => {
