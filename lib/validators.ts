@@ -3,7 +3,7 @@
  * BUG #12 FIX: Comprehensive input validation and sanitization
  */
 
-import { AnalysisData, isValidAnalysisData } from './analysis'
+import { AnalysisData, isValidAnalysisData } from './types/analysis'
 
 export interface ValidationResult {
   isValid: boolean

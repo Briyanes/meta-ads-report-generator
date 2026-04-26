@@ -1490,7 +1490,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
     }).filter(item => item.calculatedPurchases > 0)
 
     const winner = objWithCPP.length > 0 ? objWithCPP.reduce((a, b) => a.calculatedCPP < b.calculatedCPP ? a : b) : null
-    const winnerName = winner ? (winner['Objective'] || winner['objective'] || 'N/A') : 'N/A'
+    const winnerName = winner ? ((winner as any)['Objective'] || (winner as any)['objective'] || 'N/A') : 'N/A'
 
     html += `
     <div class="slide" data-slide="${++slideNumber}">
