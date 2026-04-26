@@ -2,7 +2,10 @@
 // Semua rumus dan kalkulasi metrics untuk CPAS report
 
 // BUG #10 FIX: Import centralized parseNum from csvParser
-import { parseNum } from '@/lib/csvParser'
+import { parseNum as _parseNum } from '@/lib/csvParser'
+
+// Re-export parseNum for other modules to use
+export const parseNum = _parseNum
 
 export interface CPASMonthData {
   amountSpent?: any
