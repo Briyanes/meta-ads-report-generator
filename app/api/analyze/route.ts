@@ -395,18 +395,30 @@ export async function POST(request: NextRequest) {
         
         // Sum numeric fields, keep first value for non-numeric
         for (const fieldKey of Object.keys(firstRow)) {
-          if (fieldKey === dimensionKey || 
-              fieldKey === 'Reporting starts' || 
+          if (fieldKey === dimensionKey ||
+              fieldKey === 'Reporting starts' ||
               fieldKey === 'Reporting ends' ||
               fieldKey === 'Day' ||
               fieldKey === 'Date') {
             aggregatedRow[fieldKey] = firstRow[fieldKey]
             continue
           }
-          
+
+          // CRITICAL: Don't sum ID fields - keep first value
+          // Ad IDs, campaign IDs, etc. should not be aggregated
+          const isIdField = fieldKey.toLowerCase().includes('id') ||
+                           fieldKey.toLowerCase() === 'ad id' ||
+                           fieldKey.toLowerCase() === 'campaign id' ||
+                           fieldKey.toLowerCase() === 'adset id'
+
+          if (isIdField) {
+            aggregatedRow[fieldKey] = firstRow[fieldKey]
+            continue
+          }
+
           const values = rows.map(r => r[fieldKey])
           const numericValues = values.map(v => parseNum(v)).filter(v => !isNaN(v))
-          
+
           if (numericValues.length > 0) {
             aggregatedRow[fieldKey] = numericValues.reduce((sum, val) => sum + val, 0)
           } else {
@@ -447,14 +459,31 @@ export async function POST(request: NextRequest) {
       }
       // Aggregate each breakdown type
       for (const [type, data] of Object.entries(breakdownDataThisWeek)) {
-        const dimensionKey = type === 'age' ? 'Age' :
-                            type === 'gender' ? 'Gender' :
-                            type === 'region' ? 'Region' :
-                            type === 'platform' ? 'Platform' :
-                            type === 'placement' ? 'Placement' :
-                            type === 'objective' ? 'Objective' :
-                            type === 'ad-creative' ? 'Ads' : type
-        breakdownDataThisWeek[type] = aggregateBreakdownData(data, dimensionKey)
+        // CRITICAL: For ad-creative, check if we have Ad ID column
+        // If yes, don't aggregate - each row is unique by Ad ID
+        if (type === 'ad-creative' && data.length > 0) {
+          const hasAdId = Object.keys(data[0]).some(k =>
+            k.toLowerCase() === 'ad id' || k.toLowerCase().includes('ad id')
+          )
+
+          if (hasAdId) {
+            // Keep data as-is, don't aggregate
+            continue
+          }
+
+          // Old format without Ad ID: aggregate by ad name
+          const dimensionKey = 'Ads'
+          breakdownDataThisWeek[type] = aggregateBreakdownData(data, dimensionKey)
+        } else {
+          // Other breakdown types: aggregate normally
+          const dimensionKey = type === 'age' ? 'Age' :
+                              type === 'gender' ? 'Gender' :
+                              type === 'region' ? 'Region' :
+                              type === 'platform' ? 'Platform' :
+                              type === 'placement' ? 'Placement' :
+                              type === 'objective' ? 'Objective' : type
+          breakdownDataThisWeek[type] = aggregateBreakdownData(data, dimensionKey)
+        }
       }
 
       // IMPORTANT: Also check for dedicated objective.csv file and use it (better data quality)
@@ -498,11 +527,33 @@ export async function POST(request: NextRequest) {
           if (parsed.data.length > 0) {
             // console.log('[DEBUG] Found dedicated ad-creative file (This Week):', file.name)
             // console.log('[DEBUG] Ad Creative file sample:', JSON.stringify(parsed.data[0], null, 2))
-            // Use 'Ads' or 'Ad name' as the dimension key
-            const adNameKey = Object.keys(parsed.data[0]).find(k =>
+
+            // CRITICAL: Use Ad ID as dimension key to avoid duplicate ad names being aggregated
+            // Each ad is unique by Ad ID, not by name
+            const adIdKey = Object.keys(parsed.data[0]).find(k =>
+              k.toLowerCase() === 'ad id' || k.toLowerCase().includes('ad id')
+            )
+
+            // If Ad ID column exists, use it as the dimension key to keep each ad separate
+            // Otherwise fall back to ad name
+            const dimensionKey = adIdKey || Object.keys(parsed.data[0]).find(k =>
               k.toLowerCase() === 'ads' || k.toLowerCase() === 'ad name' || k.toLowerCase().includes('ad name')
             ) || 'Ads'
-            const aggregatedCreatives = aggregateBreakdownData(parsed.data, adNameKey)
+
+            // Don't aggregate if using Ad ID - each row is already unique
+            // Only aggregate if using ad name (old format without Ad IDs)
+            let aggregatedCreatives
+            if (adIdKey) {
+              // Filter out summary rows and keep each ad as-is
+              aggregatedCreatives = parsed.data.filter(row => {
+                const adId = row[adIdKey]
+                return adId && String(adId).trim() !== '' && adId !== 'Unknown'
+              })
+            } else {
+              // Old format: aggregate by ad name
+              aggregatedCreatives = aggregateBreakdownData(parsed.data, dimensionKey)
+            }
+
             breakdownDataThisWeek['ad-creative'] = aggregatedCreatives
           }
         }
@@ -586,14 +637,31 @@ export async function POST(request: NextRequest) {
       }
       // Aggregate each breakdown type
       for (const [type, data] of Object.entries(breakdownDataLastWeek)) {
-        const dimensionKey = type === 'age' ? 'Age' :
-                            type === 'gender' ? 'Gender' :
-                            type === 'region' ? 'Region' :
-                            type === 'platform' ? 'Platform' :
-                            type === 'placement' ? 'Placement' :
-                            type === 'objective' ? 'Objective' :
-                            type === 'ad-creative' ? 'Ads' : type
-        breakdownDataLastWeek[type] = aggregateBreakdownData(data, dimensionKey)
+        // CRITICAL: For ad-creative, check if we have Ad ID column
+        // If yes, don't aggregate - each row is unique by Ad ID
+        if (type === 'ad-creative' && data.length > 0) {
+          const hasAdId = Object.keys(data[0]).some(k =>
+            k.toLowerCase() === 'ad id' || k.toLowerCase().includes('ad id')
+          )
+
+          if (hasAdId) {
+            // Keep data as-is, don't aggregate
+            continue
+          }
+
+          // Old format without Ad ID: aggregate by ad name
+          const dimensionKey = 'Ads'
+          breakdownDataLastWeek[type] = aggregateBreakdownData(data, dimensionKey)
+        } else {
+          // Other breakdown types: aggregate normally
+          const dimensionKey = type === 'age' ? 'Age' :
+                              type === 'gender' ? 'Gender' :
+                              type === 'region' ? 'Region' :
+                              type === 'platform' ? 'Platform' :
+                              type === 'placement' ? 'Placement' :
+                              type === 'objective' ? 'Objective' : type
+          breakdownDataLastWeek[type] = aggregateBreakdownData(data, dimensionKey)
+        }
       }
       
       // IMPORTANT: Also check for dedicated objective.csv file and use it (better data quality)
@@ -635,11 +703,34 @@ export async function POST(request: NextRequest) {
           if (parsed.data.length > 0) {
             // console.log('[DEBUG] Found dedicated ad-creative file (Last Week):', file.name)
             // console.log('[DEBUG] Ad Creative file sample:', JSON.stringify(parsed.data[0], null, 2))
-            // Use 'Ads' or 'Ad name' as the dimension key
-            const adNameKey = Object.keys(parsed.data[0]).find(k => 
+
+            // CRITICAL: Use Ad ID as dimension key to avoid duplicate ad names being aggregated
+            // Each ad is unique by Ad ID, not by name
+            const adIdKey = Object.keys(parsed.data[0]).find(k =>
+              k.toLowerCase() === 'ad id' || k.toLowerCase().includes('ad id')
+            )
+
+            // If Ad ID column exists, use it as the dimension key to keep each ad separate
+            // Otherwise fall back to ad name
+            const dimensionKey = adIdKey || Object.keys(parsed.data[0]).find(k =>
               k.toLowerCase() === 'ads' || k.toLowerCase() === 'ad name' || k.toLowerCase().includes('ad name')
             ) || 'Ads'
-            breakdownDataLastWeek['ad-creative'] = aggregateBreakdownData(parsed.data, adNameKey)
+
+            // Don't aggregate if using Ad ID - each row is already unique
+            // Only aggregate if using ad name (old format without Ad IDs)
+            let aggregatedCreatives
+            if (adIdKey) {
+              // Filter out summary rows and keep each ad as-is
+              aggregatedCreatives = parsed.data.filter(row => {
+                const adId = row[adIdKey]
+                return adId && String(adId).trim() !== '' && adId !== 'Unknown'
+              })
+            } else {
+              // Old format: aggregate by ad name
+              aggregatedCreatives = aggregateBreakdownData(parsed.data, dimensionKey)
+            }
+
+            breakdownDataLastWeek['ad-creative'] = aggregatedCreatives
           }
         }
 
