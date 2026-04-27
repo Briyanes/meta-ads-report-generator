@@ -826,6 +826,13 @@ a {
   }
 }
 
+/* Hide fixed back to home button on mobile and tablet */
+@media (max-width: 768px) {
+  .back-to-home-fixed {
+    display: none !important;
+  }
+}
+
 .social-link {
   transition: all 0.2s ease;
   display: block;
