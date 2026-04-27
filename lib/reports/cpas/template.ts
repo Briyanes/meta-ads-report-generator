@@ -860,17 +860,23 @@ function generateAdCreativeSlide(
 
   // Find the creative name column (could be various names)
   const firstItem = thisWeekData[0] || {}
-  const creativeNameKey = Object.keys(firstItem).find(k => 
+  const creativeNameKey = Object.keys(firstItem).find(k =>
     k.toLowerCase() === 'ads' ||
     k.toLowerCase() === 'ad name' ||
-    k.toLowerCase().includes('ad name') || 
+    k.toLowerCase().includes('ad name') ||
     k.toLowerCase().includes('creative') ||
     k.toLowerCase().includes('ad creative') ||
     k.toLowerCase() === 'name'
   ) || 'Ads'
 
+  // Find Ad ID column
+  const adIdKey = Object.keys(firstItem).find(k =>
+    k.toLowerCase() === 'ad id' || k.toLowerCase().includes('ad id')
+  ) || 'Ad ID'
+
   console.log('[Ad Creative] First item keys:', Object.keys(firstItem))
   console.log('[Ad Creative] Detected name key:', creativeNameKey)
+  console.log('[Ad Creative] Detected Ad ID key:', adIdKey)
   console.log('[Ad Creative] Total items:', thisWeekData.length)
 
   // Show ALL creatives, sorted by results
@@ -893,6 +899,7 @@ function generateAdCreativeSlide(
 
   const tableRows = sortedData.map((item, index) => {
     const creativeName = String(item[creativeNameKey] || 'Unknown').slice(0, 50) + (String(item[creativeNameKey] || '').length > 50 ? '...' : '')
+    const adId = item[adIdKey] || ''
     const spent = parseNum(item['Amount spent (IDR)'] || 0)
     const atc = parseNum(item[metricKey] || item['Adds to cart with shared items'] || item['Results'] || 0)
     const cpr = atc > 0 ? spent / atc : 0
@@ -904,6 +911,7 @@ function generateAdCreativeSlide(
 
     return `                    <tr ${rowBg}>
                         <td><strong>${creativeName}${medal}</strong></td>
+                        <td class="text-right" style="font-family: monospace; font-size: 9px;">${adId || '-'}</td>
                         <td class="text-right">${formatFn(atc)}</td>
                         <td class="text-right">${formatCurrency(cpr)}</td>
                         <td class="text-right">${formatCurrency(spent)}</td>
@@ -930,6 +938,7 @@ function generateAdCreativeSlide(
                     <thead style="position: sticky; top: 0; z-index: 10;">
                         <tr>
                             <th>Ad Name</th>
+                            <th class="text-right">Ad ID</th>
                             <th class="text-right">Results (ATC)</th>
                             <th class="text-right">CPR</th>
                             <th class="text-right">Amount Spent</th>

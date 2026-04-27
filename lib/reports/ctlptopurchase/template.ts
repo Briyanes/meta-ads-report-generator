@@ -1621,6 +1621,12 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
   if (adCreativeData.length > 0) {
     const sortedCreative = [...adCreativeData].sort((a, b) => extractMetrics(b).purchases - extractMetrics(a).purchases)
 
+    // Find Ad ID column
+    const firstCreative = adCreativeData[0] || {}
+    const adIdKey = Object.keys(firstCreative).find(k =>
+      k.toLowerCase() === 'ad id' || k.toLowerCase().includes('ad id')
+    ) || 'Ad ID'
+
     html += `
     <div class="slide" data-slide="${++slideNumber}">
         <div class="slide-header">
@@ -1637,7 +1643,8 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 40%;">Creative</th>
+                        <th style="width: 35%;">Creative</th>
+                        <th style="width: 15%;">Ad ID</th>
                         <th>Purchases</th>
                         <th>Spent</th>
                         <th>CPP</th>
@@ -1649,9 +1656,11 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                       const m = extractMetrics(item)
                       const name = item.Ads || item.ads || item['Ad name'] || 'N/A'
                       const displayName = name.length > 50 ? name.substring(0, 47) + '...' : name
+                      const adId = item[adIdKey] || '-'
                       return `
                       <tr ${idx < 3 ? 'class="highlight"' : ''}>
                           <td title="${name}"><strong>${displayName}</strong></td>
+                          <td style="font-family: monospace; font-size: 9px;">${adId}</td>
                           <td>${formatNumber(m.purchases)}</td>
                           <td>${formatCurrency(m.spent)}</td>
                           <td>${formatCurrency(m.cpp)}</td>
@@ -1710,7 +1719,8 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
               const purchaseShare = totalCreativePurchases > 0 ? (m.purchases / totalCreativePurchases) * 100 : 0
               const isTopPerformer = idx === 0
               const isBelowAvg = m.cpp > avgCPP * 1.2
-              
+              const adId = item[adIdKey] || ''
+
               let recommendation = ''
               if (isTopPerformer) {
                 recommendation = 'Paling tinggi volume purchase dengan biaya efisien. <strong>Scale dengan penyesuaian hook</strong> untuk tingkatkan konversi.'
@@ -1721,12 +1731,15 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
               } else {
                 recommendation = 'Performa stabil. Monitor dan <strong>test variasi</strong> untuk improvement.'
               }
-              
+
               const bgStyle = isTopPerformer ? 'linear-gradient(135deg, #fefce8 0%, #fef9c3 100%)' : 'var(--gray-50)'
               const borderColor = isTopPerformer ? '#eab308' : 'var(--primary)'
               const rankBg = isTopPerformer ? '#eab308' : 'var(--primary)'
               const cppColor = m.cpp <= avgCPP ? 'var(--success)' : 'var(--danger)'
-              
+
+              // Show Ad ID for easy copy-paste to search in Meta Ads dashboard
+              const adIdText = adId ? '<div style="font-size: 11px; color: var(--gray-400); font-family: monospace; margin-top: 4px;">→ Ad ID: ' + adId + '</div>' : ''
+
               return '<div style="background: ' + bgStyle + '; padding: 20px; border-radius: 16px; border-left: 4px solid ' + borderColor + ';">' +
                   '<div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">' +
                       '<div style="width: 32px; height: 32px; background: ' + rankBg + '; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">' + (idx + 1) + '</div>' +
@@ -1735,9 +1748,10 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                   '<div style="font-size: 13px; color: var(--gray-600); margin-bottom: 8px;">' +
                       '→ <strong style="color: var(--primary);">' + formatNumber(m.purchases) + ' Purchases</strong> / ' + formatNumber(clicks) + ' OC (' + purchaseShare.toFixed(1) + '%), CTR ' + ctr.toFixed(2) + '%, CPP <strong style="color: ' + cppColor + ';">' + formatCurrency(m.cpp) + '</strong>' +
                   '</div>' +
-                  '<div style="font-size: 12px; color: var(--gray-500);">' +
+                  '<div style="font-size: 12px; color: var(--gray-500); margin-bottom: 8px;">' +
                       '→ ' + recommendation +
                   '</div>' +
+                  adIdText +
               '</div>'
             }).join('')}
         </div>

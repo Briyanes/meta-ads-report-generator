@@ -2125,6 +2125,7 @@ function generateAdCreativeSlide(data: any[], slideNumber: number): string {
 function generateContentPerformanceSlide(data: any[], slideNumber: number): string {
   const firstItem = data[0] || {}
   const creativeNameKey = Object.keys(firstItem).find(k => k.toLowerCase() === 'ads' || k.toLowerCase() === 'ad name' || k.toLowerCase().includes('ad name') || k.toLowerCase().includes('creative')) || 'Ads'
+  const adIdKey = Object.keys(firstItem).find(k => k.toLowerCase() === 'ad id' || k.toLowerCase().includes('ad id')) || 'Ad ID'
 
   // Sort by WA results (Messaging checkouts started ONLY - no fallback to Results to avoid bad data)
   const sortedData = [...data].filter(item => {
@@ -2194,7 +2195,11 @@ function generateContentPerformanceSlide(data: any[], slideNumber: number): stri
     const name = String(item[creativeNameKey] || 'Unknown')
     const displayName = name.length > 50 ? name.slice(0, 50) + '…' : name
     const { metrics, analysis } = generateAnalysis(item, index + 1)
-    
+    const adId = item[adIdKey] || ''
+
+    // Show Ad ID for easy copy-paste to search in Meta Ads dashboard
+    const adIdText = adId ? `<div class="content-analysis" style="font-family: monospace; font-size: 10px; opacity: 0.8;">→ Ad ID: ${adId}</div>` : ''
+
     return `
       <div class="content-item">
         <div class="content-header">
@@ -2203,6 +2208,7 @@ function generateContentPerformanceSlide(data: any[], slideNumber: number): stri
         </div>
         <div class="content-metrics">${metrics}</div>
         <div class="content-analysis">→ ${analysis}</div>
+        ${adIdText}
       </div>`
   }).join('')
 
