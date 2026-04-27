@@ -2832,16 +2832,20 @@ export default function MetaAdsPage() {
             </div>
 
             {/* Progress Bar */}
-            <ProgressBar progress={analyzeProgress} color="#2B46BB" />
-            <p style={{
-              fontSize: '12px',
-              color: '#6b7280',
-              marginTop: '8px',
-              textAlign: 'center',
-              fontWeight: '500'
-            }}>
-              {analyzeProgress}% Complete
-            </p>
+            {analyzeProgress > 0 && (
+              <>
+                <ProgressBar progress={analyzeProgress} color="#2B46BB" />
+                <p style={{
+                  fontSize: '12px',
+                  color: '#6b7280',
+                  marginTop: '8px',
+                  textAlign: 'center',
+                  fontWeight: '500'
+                }}>
+                  {analyzeProgress}% Complete
+                </p>
+              </>
+            )}
 
             <style>{`
               @keyframes pulse {
@@ -3008,16 +3012,20 @@ export default function MetaAdsPage() {
             </div>
 
             {/* Progress Bar */}
-            <ProgressBar progress={generateProgress} color="#fbbf24" />
-            <p style={{
-              fontSize: '12px',
-              color: '#6b7280',
-              marginTop: '8px',
-              textAlign: 'center',
-              fontWeight: '500'
-            }}>
-              {generateProgress}% Complete
-            </p>
+            {generateProgress > 0 && (
+              <>
+                <ProgressBar progress={generateProgress} color="#fbbf24" />
+                <p style={{
+                  fontSize: '12px',
+                  color: '#6b7280',
+                  marginTop: '8px',
+                  textAlign: 'center',
+                  fontWeight: '500'
+                }}>
+                  {generateProgress}% Complete
+                </p>
+              </>
+            )}
 
             <style>{`
               @keyframes pulse {
