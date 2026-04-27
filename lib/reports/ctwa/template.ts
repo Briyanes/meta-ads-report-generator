@@ -2193,8 +2193,8 @@ function generateContentPerformanceSlide(data: any[], slideNumber: number): stri
     const { metrics, analysis } = generateAnalysis(item, index + 1)
     const adId = item[adIdKey] || ''
 
-    // Generate preview URL text if Ad ID is available
-    const previewUrlText = adId ? `<div class="content-preview-url">→ https://www.facebook.com/ads/preview/?adid=${adId}</div>` : ''
+    // Generate preview URL text if Ad ID is available - use Facebook Ads Library
+    const previewUrlText = adId ? `<div class="content-preview-url">→ https://www.facebook.com/ads/library/?id=${adId}</div>` : ''
 
     return `
       <div class="content-item" style="position: relative;">
