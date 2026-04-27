@@ -770,15 +770,11 @@ a {
     white-space: nowrap !important;
     max-width: 100% !important;
   }
-  
+
   .footer-hadona {
     margin-left: 4px !important;
   }
-  
-  .back-to-home-fixed {
-    display: none !important;
-  }
-  
+
   .back-to-home-desktop {
     display: inline-flex !important;
   }
