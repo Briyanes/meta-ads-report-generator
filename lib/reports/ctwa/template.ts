@@ -2193,25 +2193,18 @@ function generateContentPerformanceSlide(data: any[], slideNumber: number): stri
     const { metrics, analysis } = generateAnalysis(item, index + 1)
     const adId = item[adIdKey] || ''
 
-    // Generate preview link if Ad ID is available - use Facebook Ads Library URL
-    const previewLink = adId ? `
-      <a href="https://www.facebook.com/ads/library/?id=${adId}" target="_blank" rel="noopener noreferrer" style="color: #2563eb; text-decoration: none; font-size: 11px; font-weight: 500; margin-left: 8px; display: inline-flex; align-items: center; gap: 4px;" onmouseover="this.style.textDecoration='underline'; this.style.color='#1d4ed8';" onmouseout="this.style.textDecoration='none'; this.style.color='#2563eb';">
-        <i class="bi bi-box-arrow-up-right"></i>
-        View Ad
-      </a>
-    ` : ''
+    // Generate preview URL text if Ad ID is available
+    const previewUrlText = adId ? `<div class="content-preview-url">→ https://www.facebook.com/ads/preview/?adid=${adId}</div>` : ''
 
     return `
       <div class="content-item" style="position: relative;">
-        <div class="content-header" style="justify-content: space-between;">
-          <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-            <span class="content-rank">${index + 1}</span>
-            <span class="content-name">${displayName}</span>
-            ${previewLink}
-          </div>
+        <div class="content-header">
+          <span class="content-rank">${index + 1}</span>
+          <span class="content-name">${displayName}</span>
         </div>
         <div class="content-metrics">${metrics}</div>
         <div class="content-analysis">→ ${analysis}</div>
+        ${previewUrlText}
       </div>`
   }).join('')
 
@@ -2278,6 +2271,13 @@ function generateContentPerformanceSlide(data: any[], slideNumber: number): stri
                 color: var(--gray-700);
                 margin-left: 40px;
                 line-height: 1.5;
+            }
+            .content-preview-url {
+                font-size: 11px;
+                color: #2563eb;
+                margin-left: 40px;
+                margin-top: 4px;
+                word-break: break-all;
             }
         </style>
 
