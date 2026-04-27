@@ -1619,16 +1619,14 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
 
   // AD CREATIVE BREAKDOWN
   if (adCreativeData.length > 0) {
-    // Filter to only show ads with actual spending (> 0) to avoid showing inactive/not_delivering ads
+    // Filter to only show ads with actual spending (> 0) to avoid showing ads that never ran
     const filteredCreative = adCreativeData.filter(item => {
       const amountSpent = parseNum(item['Amount spent (IDR)'] || 0)
-      const deliveryStatus = String(item['Delivery status'] || '').toLowerCase()
 
       // Only include ads that:
-      // 1. Have actual spending (> 0)
-      // 2. Are currently active (optional - remove if you want to include inactive ads with spend)
-      return amountSpent > 0 &&
-             (deliveryStatus === 'active' || deliveryStatus === 'learning' || deliveryStatus === '')
+      // 1. Have actual spending (> 0) - regardless of delivery status
+      // This allows showing inactive/not_delivering ads that still had budget spent
+      return amountSpent > 0
     })
 
     const sortedCreative = [...filteredCreative].sort((a, b) => extractMetrics(b).purchases - extractMetrics(a).purchases)
