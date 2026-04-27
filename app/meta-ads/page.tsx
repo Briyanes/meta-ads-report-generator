@@ -1071,7 +1071,7 @@ export default function MetaAdsPage() {
               }}>
                 Pemilihan Iklan Objective
               </label>
-              <div style={{
+              <div className="objective-cards-grid" style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(4, 1fr)',
                 gap: '12px'

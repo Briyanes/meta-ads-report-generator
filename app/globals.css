@@ -1388,57 +1388,81 @@ a {
 
 /* Meta Ads Page - Objective Cards Responsive */
 @media (max-width: 1024px) and (min-width: 769px) {
-  .responsive-card div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"] {
+  .objective-cards-grid {
     grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .objective-cards-grid > div {
+    padding: 14px !important;
+  }
+
+  .objective-cards-grid > div > div {
+    gap: 6px !important;
+  }
+
+  .objective-cards-grid > div p {
+    font-size: 12px !important;
   }
 }
 
 @media (max-width: 768px) {
-  .responsive-card div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"] {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 10px !important;
+  .objective-cards-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
   }
 
-  .responsive-card div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"] > div {
+  .objective-cards-grid > div {
     padding: 12px !important;
   }
 
-  .responsive-card div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"] > div > div {
+  .objective-cards-grid > div > div {
     flex-direction: column !important;
     align-items: flex-start !important;
     gap: 6px !important;
   }
 
-  .responsive-card div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"] > div > div > div {
+  .objective-cards-grid > div > div > div {
     margin-bottom: 0 !important;
   }
 
-  .responsive-card div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"] > div p:last-child {
+  .objective-cards-grid > div p {
+    font-size: 12px !important;
+  }
+
+  .objective-cards-grid > div p:last-child {
     font-size: 11px !important;
     margin: 6px 0 0 0 !important;
   }
 }
 
 @media (max-width: 480px) {
-  .responsive-card div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"] {
+  .objective-cards-grid {
     grid-template-columns: 1fr !important;
-    gap: 12px !important;
+    gap: 10px !important;
   }
 
-  .responsive-card div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"] > div {
+  .objective-cards-grid > div {
     padding: 14px !important;
   }
 
-  .responsive-card div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"] > div > div {
+  .objective-cards-grid > div > div {
     gap: 8px !important;
+    flex-direction: row !important;
+    align-items: center !important;
   }
 
-  .responsive-card div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"] > div > div > div p {
-    font-size: 14px !important;
+  .objective-cards-grid > div > div > div {
+    margin-bottom: 0 !important;
   }
 
-  .responsive-card div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"] > div > div > div p:last-child {
-    font-size: 11px !important;
+  .objective-cards-grid > div p {
+    font-size: 13px !important;
+  }
+
+  .objective-cards-grid > div p:last-child {
+    font-size: 12px !important;
+    margin: 6px 0 0 0 !important;
   }
 }
 
