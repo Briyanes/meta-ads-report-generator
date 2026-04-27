@@ -2128,9 +2128,20 @@ function generateContentPerformanceSlide(data: any[], slideNumber: number): stri
   const adIdKey = Object.keys(firstItem).find(k => k.toLowerCase() === 'ad id' || k.toLowerCase().includes('ad id')) || 'Ad ID'
 
   // Sort by WA results (Messaging checkouts started ONLY - no fallback to Results to avoid bad data)
+  // Filter to only show ads with actual spending (> 0) to avoid showing inactive/not_delivering ads
   const sortedData = [...data].filter(item => {
     const name = item[creativeNameKey]
-    return name && String(name).trim() !== ''
+    const amountSpent = parseNum(item['Amount spent (IDR)'] || 0)
+    const deliveryStatus = String(item['Delivery status'] || '').toLowerCase()
+
+    // Only include ads that:
+    // 1. Have a valid name
+    // 2. Have actual spending (> 0)
+    // 3. Are currently active (optional - remove if you want to include inactive ads with spend)
+    return name &&
+           String(name).trim() !== '' &&
+           amountSpent > 0 &&
+           (deliveryStatus === 'active' || deliveryStatus === 'learning' || deliveryStatus === '')
   }).sort((a, b) => parseNum(b['Messaging checkouts started'] || 0) - parseNum(a['Messaging checkouts started'] || 0))
 
   // Get top 5 creatives

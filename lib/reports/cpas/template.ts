@@ -879,17 +879,31 @@ function generateAdCreativeSlide(
   console.log('[Ad Creative] Detected Ad ID key:', adIdKey)
   console.log('[Ad Creative] Total items:', thisWeekData.length)
 
-  // Show ALL creatives, sorted by results
+  // Show ALL creatives with actual spending, sorted by results
+  // Filter to only show ads with actual spending (> 0) to avoid showing inactive/not_delivering ads
   const sortedData = [...thisWeekData]
     .filter(item => {
       const name = item[creativeNameKey]
-      return name && String(name).trim() && String(name).trim() !== ''
+      const amountSpent = parseNum(item['Amount spent (IDR)'] || 0)
+      const deliveryStatus = String(item['Delivery status'] || '').toLowerCase()
+
+      // Only include ads that:
+      // 1. Have a valid name
+      // 2. Have actual spending (> 0)
+      // 3. Are currently active (optional - remove if you want to include inactive ads with spend)
+      return name &&
+             String(name).trim() &&
+             String(name).trim() !== '' &&
+             amountSpent > 0 &&
+             (deliveryStatus === 'active' || deliveryStatus === 'learning' || deliveryStatus === '')
     })
     .sort((a, b) => {
       const resultA = parseNum(a[metricKey] || a['Adds to cart with shared items'] || a['Results'] || 0)
       const resultB = parseNum(b[metricKey] || b['Adds to cart with shared items'] || b['Results'] || 0)
       return resultB - resultA
     })
+
+  console.log('[Ad Creative] Filtered items (with spend):', sortedData.length)
 
   const totalSpent = sortedData.reduce((sum, item) => sum + parseNum(item['Amount spent (IDR)'] || 0), 0)
   const totalATC = sortedData.reduce((sum, item) => sum + parseNum(item[metricKey] || item['Adds to cart with shared items'] || item['Results'] || 0), 0)
