@@ -411,7 +411,7 @@ export default function HomePage() {
                   color: '#111827',
                   marginBottom: '4px'
                 }}>
-                  What's New
+                  What&apos;s New
                 </h3>
                 <p style={{ margin: 0, fontSize: '14px', color: '#78716c' }}>
                   Latest updates to improve your reporting experience
