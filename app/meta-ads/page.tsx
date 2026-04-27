@@ -331,6 +331,11 @@ export default function MetaAdsPage() {
       setTimeout(() => {
         addToast('success', 'Analysis Complete', 'Your data has been analyzed successfully. You can now generate the report!')
       }, 300)
+
+      // Reset progress after a short delay
+      setTimeout(() => {
+        setAnalyzeProgress(0)
+      }, 1000)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Analysis failed'
       setError(errorMessage)
@@ -474,6 +479,11 @@ export default function MetaAdsPage() {
         setTimeout(() => {
           addToast('success', 'Report Generated', 'Your report has been generated successfully! You can preview and download it now.')
         }, 300)
+
+        // Reset progress after a short delay
+        setTimeout(() => {
+          setGenerateProgress(0)
+        }, 1000)
       } else {
         throw new Error('No HTML report received')
       }
