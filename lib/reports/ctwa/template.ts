@@ -2121,6 +2121,7 @@ function generateAdCreativeSlide(data: any[], slideNumber: number): string {
 function generateContentPerformanceSlide(data: any[], slideNumber: number): string {
   const firstItem = data[0] || {}
   const creativeNameKey = Object.keys(firstItem).find(k => k.toLowerCase() === 'ads' || k.toLowerCase() === 'ad name' || k.toLowerCase().includes('ad name') || k.toLowerCase().includes('creative')) || 'Ads'
+  const adIdKey = Object.keys(firstItem).find(k => k.toLowerCase() === 'ad id' || k.toLowerCase().includes('ad id')) || 'Ad ID'
 
   // Sort by WA results (Messaging conversations started ONLY - no fallback to Results to avoid bad data)
   const sortedData = [...data].filter(item => {
@@ -2130,7 +2131,7 @@ function generateContentPerformanceSlide(data: any[], slideNumber: number): stri
 
   // Get top 5 creatives
   const top5 = sortedData.slice(0, 5)
-  
+
   // Calculate averages for comparison (use Messaging conversations started ONLY)
   const totalWA = sortedData.reduce((sum, item) => sum + parseNum(item['Messaging conversations started'] || 0), 0)
   const totalOC = sortedData.reduce((sum, item) => sum + parseNum(item['Outbound clicks'] || 0), 0)
@@ -2190,12 +2191,24 @@ function generateContentPerformanceSlide(data: any[], slideNumber: number): stri
     const name = String(item[creativeNameKey] || 'Unknown')
     const displayName = name.length > 50 ? name.slice(0, 50) + '…' : name
     const { metrics, analysis } = generateAnalysis(item, index + 1)
-    
+    const adId = item[adIdKey] || ''
+
+    // Generate preview link if Ad ID is available
+    const previewButton = adId ? `
+      <a href="https://www.facebook.com/ads/preview/?adid=${adId}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 4px; margin-left: auto; padding: 4px 10px; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; border-radius: 6px; font-size: 10px; font-weight: 600; text-decoration: none; transition: all 0.2s ease;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 2px 8px rgba(37,99,235,0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+        <i class="bi bi-eye-fill"></i>
+        Preview
+      </a>
+    ` : ''
+
     return `
-      <div class="content-item">
-        <div class="content-header">
-          <span class="content-rank">${index + 1}</span>
-          <span class="content-name">${displayName}</span>
+      <div class="content-item" style="position: relative;">
+        <div class="content-header" style="justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+            <span class="content-rank">${index + 1}</span>
+            <span class="content-name">${displayName}</span>
+          </div>
+          ${previewButton}
         </div>
         <div class="content-metrics">${metrics}</div>
         <div class="content-analysis">→ ${analysis}</div>
