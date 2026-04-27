@@ -2305,64 +2305,55 @@ function generateContentPerformanceSlide(data: any[], slideNumber: number): stri
   function generateStrategicRecommendations(topCreatives: any[], avgCostPerWA: number, avgConvRate: number, totalWA: number): string {
     const recommendations: string[] = []
 
-    // Analyze top performers
+    // Get top performer
     const topPerformer = topCreatives[0]
     const topWA = parseNum(topPerformer['Messaging conversations started'] || 0)
-    const topCostPerWA = parseNum(topPerformer['Amount spent (IDR)'] || 0) / topWA
-    const topOC = parseNum(topPerformer['Outbound clicks'] || 0)
-    const topConvRate = topOC > 0 ? (topWA / topOC) * 100 : 0
+    const topCostPerWA = topWA > 0 ? parseNum(topPerformer['Amount spent (IDR)'] || 0) / topWA : 0
 
-    // Recommendation 1: Scale top performers
-    if (topCostPerWA <= avgCostPerWA && topConvRate >= avgConvRate) {
-      recommendations.push(`🚀 <strong>Scale Agresif #${topCreatives.indexOf(topPerformer) + 1}</strong> - Berperforma tinggi dengan biaya efisien. Pertimbangkan duplikasi ke Stories/Reels atau increase budget 20-30%.`)
-    } else if (topCostPerWA > avgCostPerWA * 1.2) {
-      recommendations.push(`⚠️ <strong>Optimasi #${topCreatives.indexOf(topPerformer) + 1}</strong> - Volume tertinggi tapi biaya di atas rata-rata. Coba adjust targeting, refresh creative, atau test varian baru sebelum scale up.`)
+    // Recommendation 1: Scale or optimize top performer
+    if (topCostPerWA <= avgCostPerWA) {
+      recommendations.push(`🚀 <strong>Scale Ads #1</strong> - Performa tinggi dengan biaya efisien. Increase budget 20-30% atau duplikasi ke Stories/Reels.`)
+    } else {
+      recommendations.push(`🔧 <strong>Optimasi Ads #1</strong> - Volume tinggi tapi biaya mahal. Test new creative atau adjust targeting sebelum scale.`)
     }
 
-    // Recommendation 2: Look for hidden gems
-    const efficientAds = topCreatives.filter((item, idx) => {
+    // Recommendation 2: Budget allocation based on efficiency
+    const efficientAds = topCreatives.slice(0, 5).filter((item) => {
       const spent = parseNum(item['Amount spent (IDR)'] || 0)
       const wa = parseNum(item['Messaging conversations started'] || 0)
       const costPerWA = wa > 0 ? spent / wa : 0
-      return idx >= 3 && costPerWA < avgCostPerWA * 0.8 && wa > 0
+      return costPerWA < avgCostPerWA * 0.9
     })
 
-    if (efficientAds.length > 0) {
-      recommendations.push(`💎 <strong>Hidden Gems Found</strong> - Ads #${efficientAds.map((item, idx) => topCreatives.indexOf(item) + 1).join(', #')} punya biaya per WA sangat efisien (<80% rata-rata). Pertimbangkan untuk increase budget dan test wider audience.`)
+    if (efficientAds.length >= 3) {
+      recommendations.push(`💰 <strong>Fokus ke Top 5 Efisien</strong> - ${efficientAds.length} dari 5 top ads punya CPR di bawah rata-rata. Shift 70-80% budget ke ads ini.`)
     }
 
-    // Recommendation 3: Underperformers action
-    const underperformers = topCreatives.filter((item, idx) => {
-      const spent = parseNum(item['Amount spent (IDR)'] || 0)
-      const wa = parseNum(item['Messaging conversations started'] || 0)
-      const costPerWA = wa > 0 ? spent / wa : 0
-      const oc = parseNum(item['Outbound clicks'] || 0)
-      const convRate = oc > 0 ? (wa / oc) * 100 : 0
-      return idx >= 5 && (costPerWA > avgCostPerWA * 1.3 || convRate < avgConvRate * 0.5)
-    })
-
-    if (underperformers.length > 0) {
-      recommendations.push(`🔧 <strong>Review Underperformers</strong> - Ads #${underperformers.map((item, idx) => topCreatives.indexOf(item) + 1).join(', #')} perlu attention: analyze audience, creative fatigue, atau consider pause jika tidak setelah optimasi.`)
+    // Recommendation 3: Conversion rate optimization
+    if (avgConvRate < 20) {
+      recommendations.push(`📈 <strong>Improve Konversi</strong> - OC→WA rate ${avgConvRate.toFixed(1)}% masih rendah. Test prefilled WhatsApp messages dan simplify CTA.`)
     }
 
-    // Recommendation 4: Overall strategy based on averages
-    if (avgCostPerWA > 50000) {
-      recommendations.push(`📊 <strong>Fokus Efisiensi Biaya</strong> - Rata-rata Cost/WA di atas Rp50K. Prioritaskan optimasi: (1) Segment audience berdasarkan performa, (2) Test creative dengan hook berbeda, (3) Consider narrowing age/location targeting.`)
-    } else if (avgCostPerWA < 20000) {
-      recommendations.push(`✅ <strong>Room untuk Scale</strong> - Biaya per WA cukup efisien (<Rp20K). Ini saat yang tepat untuk scale up winning ads dan test new audiences sebelum competition meningkat.`)
+    // Recommendation 4: Underperformers action
+    const bottomAds = topCreatives.slice(7, 10)
+    const totalBottomSpent = bottomAds.reduce((sum, item) => sum + parseNum(item['Amount spent (IDR)'] || 0), 0)
+    const totalBottomWA = bottomAds.reduce((sum, item) => sum + parseNum(item['Messaging conversations started'] || 0), 0)
+    const bottomCPR = totalBottomWA > 0 ? totalBottomSpent / totalBottomWA : 0
+
+    if (bottomCPR > avgCostPerWA * 1.5 && totalBottomSpent > 500000) {
+      recommendations.push(`⏸️ <strong>Pause Bottom 3-5</strong> - Ads ranking buncit spend >500K dengan CPR tinggi. Pause dan realokasi budget ke top performers.`)
     }
 
-    if (avgConvRate < 15) {
-      recommendations.push(`📈 <strong>Improve OC→WA Conversion</strong> - Konversi di bawah 15% mengindikasikan landing page atau CTA perlu improvement: (1) Test prefilled WhatsApp messages, (2) Simplify form, (3) Stronger value proposition di first screen.`)
+    // Default recommendation
+    if (recommendations.length < 3) {
+      recommendations.push(`📊 <strong>Maintain & Monitor</strong> - Performa stabil. Test 2-3 new creatives, scale winners 20%, dan pause ads dengan CPR >150% rata-rata.`)
     }
 
-    // Default recommendation if no specific insights
-    if (recommendations.length === 0) {
-      recommendations.push(`📈 <strong>Maintain & Monitor</strong> - Performa ads cukup seimbang. Fokus pada: (1) Monitor frequency fatigue, (2) Test 2-3 new creatives per minggu, (3) Scale up performers 20% saat stabil, (4) Deep dive pada top 3 ads untuk cari common elements.`)
-    }
+    // Limit to 5 recommendations max
+    const finalRecommendations = recommendations.slice(0, 5)
 
-    return `<ul style="margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.7; color: #064e3b;">
-        ${recommendations.map(rec => `<li style="margin-bottom: 10px;">${rec}</li>`).join('')}
+    return `<ul style="margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.8; color: #064e3b;">
+        ${finalRecommendations.map(rec => `<li style="margin-bottom: 12px;">${rec}</li>`).join('')}
       </ul>`
   }
 }
