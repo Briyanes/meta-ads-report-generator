@@ -2140,8 +2140,8 @@ function generateContentPerformanceSlide(data: any[], slideNumber: number): stri
     return name && String(name).trim() !== '' && amountSpent > 0
   }).sort((a, b) => parseNum(b['Messaging checkouts started'] || 0) - parseNum(a['Messaging checkouts started'] || 0))
 
-  // Get top 5 creatives
-  const top5 = sortedData.slice(0, 5)
+  // Get top 10 creatives
+  const top10 = sortedData.slice(0, 10)
   
   // Calculate averages for comparison (use Messaging checkouts started ONLY)
   const totalWA = sortedData.reduce((sum, item) => sum + parseNum(item['Messaging checkouts started'] || 0), 0)
@@ -2198,7 +2198,7 @@ function generateContentPerformanceSlide(data: any[], slideNumber: number): stri
     return { metrics, analysis }
   }
 
-  const creativeItems = top5.map((item, index) => {
+  const creativeItems = top10.map((item, index) => {
     const name = String(item[creativeNameKey] || 'Unknown')
     const displayName = name.length > 50 ? name.slice(0, 50) + '…' : name
     const { metrics, analysis } = generateAnalysis(item, index + 1)
@@ -2229,7 +2229,7 @@ function generateContentPerformanceSlide(data: any[], slideNumber: number): stri
 
         <div class="slide-title">
             <h1><i class="bi bi-bar-chart-line-fill"></i> Content Performance Analisis</h1>
-            <p>Top 5 Creatives by WhatsApp Results</p>
+            <p>Top 10 Creatives by WhatsApp Results</p>
         </div>
 
         <style>

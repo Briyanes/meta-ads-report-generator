@@ -1507,7 +1507,10 @@ function generateAgeSlide(data: any[], lastData: any[], thisPeriodLabel: string,
 
   const sortedData = [...data].sort((a, b) => parseNum(b['Messaging conversations started'] || b['Results'] || 0) - parseNum(a['Messaging conversations started'] || a['Results'] || 0))
 
-  const tableRows = sortedData.map((item, index) => {
+  // Show only top 10 in table
+  const top10Data = sortedData.slice(0, 10)
+
+  const tableRows = top10Data.map((item, index) => {
     const age = item['Age'] || 'Unknown'
     const results = parseNum(item['Messaging conversations started'] || item['Results'] || 0)
     const spent = parseNum(item['Amount spent (IDR)'] || 0)
@@ -2136,8 +2139,8 @@ function generateContentPerformanceSlide(data: any[], slideNumber: number): stri
     return name && String(name).trim() !== '' && amountSpent > 0
   }).sort((a, b) => parseNum(b['Messaging conversations started'] || 0) - parseNum(a['Messaging conversations started'] || 0))
 
-  // Get top 5 creatives
-  const top5 = sortedData.slice(0, 5)
+  // Get top 10 creatives
+  const top10 = sortedData.slice(0, 10)
 
   // Calculate averages for comparison (use Messaging conversations started ONLY)
   const totalWA = sortedData.reduce((sum, item) => sum + parseNum(item['Messaging conversations started'] || 0), 0)
@@ -2194,7 +2197,7 @@ function generateContentPerformanceSlide(data: any[], slideNumber: number): stri
     return { metrics, analysis }
   }
 
-  const creativeItems = top5.map((item, index) => {
+  const creativeItems = top10.map((item, index) => {
     const name = String(item[creativeNameKey] || 'Unknown')
     const displayName = name.length > 50 ? name.slice(0, 50) + '…' : name
     const { metrics, analysis } = generateAnalysis(item, index + 1)
@@ -2225,7 +2228,7 @@ function generateContentPerformanceSlide(data: any[], slideNumber: number): stri
 
         <div class="slide-title">
             <h1><i class="bi bi-bar-chart-line-fill"></i> Content Performance Analisis</h1>
-            <p>Top 5 Creatives by WhatsApp Results</p>
+            <p>Top 10 Creatives by WhatsApp Results</p>
         </div>
 
         <style>
@@ -2287,9 +2290,81 @@ function generateContentPerformanceSlide(data: any[], slideNumber: number): stri
 
         <div class="info-box" style="margin-top: 20px;">
             <h4><i class="bi bi-lightbulb-fill"></i> Summary</h4>
-            <p>Dari <strong>${sortedData.length} creative</strong> aktif, top 5 menghasilkan <strong>${formatNumber(top5.reduce((sum, item) => sum + parseNum(item['Messaging conversations started'] || item['Results'] || 0), 0))} WA</strong> (${totalWA > 0 ? ((top5.reduce((sum, item) => sum + parseNum(item['Messaging conversations started'] || item['Results'] || 0), 0) / totalWA) * 100).toFixed(1) : 0}% dari total). Rata-rata Cost/WA: <strong>${formatCurrency(avgCostPerWA)}</strong>, Rata-rata konversi OC→WA: <strong>${avgConvRate.toFixed(1)}%</strong>.</p>
+            <p>Dari <strong>${sortedData.length} creative</strong> aktif, top 10 menghasilkan <strong>${formatNumber(top10.reduce((sum, item) => sum + parseNum(item['Messaging conversations started'] || item['Results'] || 0), 0))} WA</strong> (${totalWA > 0 ? ((top10.reduce((sum, item) => sum + parseNum(item['Messaging conversations started'] || item['Results'] || 0), 0) / totalWA) * 100).toFixed(1) : 0}% dari total). Rata-rata Cost/WA: <strong>${formatCurrency(avgCostPerWA)}</strong>, Rata-rata konversi OC→WA: <strong>${avgConvRate.toFixed(1)}%</strong>.</p>
+        </div>
+
+        <div class="strategy-box" style="margin-top: 16px; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-left: 4px solid #10b981; border-radius: 12px; padding: 20px;">
+            <h4 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 700; color: #065f46; display: flex; align-items: center; gap: 8px;">
+                <i class="bi bi-lightbulb-fill" style="font-size: 20px;"></i>
+                Rekomendasi Strategi
+            </h4>
+            ${generateStrategicRecommendations(top10, avgCostPerWA, avgConvRate, totalWA)}
         </div>
     </div>`
+
+  function generateStrategicRecommendations(topCreatives: any[], avgCostPerWA: number, avgConvRate: number, totalWA: number): string {
+    const recommendations: string[] = []
+
+    // Analyze top performers
+    const topPerformer = topCreatives[0]
+    const topWA = parseNum(topPerformer['Messaging conversations started'] || 0)
+    const topCostPerWA = parseNum(topPerformer['Amount spent (IDR)'] || 0) / topWA
+    const topOC = parseNum(topPerformer['Outbound clicks'] || 0)
+    const topConvRate = topOC > 0 ? (topWA / topOC) * 100 : 0
+
+    // Recommendation 1: Scale top performers
+    if (topCostPerWA <= avgCostPerWA && topConvRate >= avgConvRate) {
+      recommendations.push(`🚀 <strong>Scale Agresif #${topCreatives.indexOf(topPerformer) + 1}</strong> - Berperforma tinggi dengan biaya efisien. Pertimbangkan duplikasi ke Stories/Reels atau increase budget 20-30%.`)
+    } else if (topCostPerWA > avgCostPerWA * 1.2) {
+      recommendations.push(`⚠️ <strong>Optimasi #${topCreatives.indexOf(topPerformer) + 1}</strong> - Volume tertinggi tapi biaya di atas rata-rata. Coba adjust targeting, refresh creative, atau test varian baru sebelum scale up.`)
+    }
+
+    // Recommendation 2: Look for hidden gems
+    const efficientAds = topCreatives.filter((item, idx) => {
+      const spent = parseNum(item['Amount spent (IDR)'] || 0)
+      const wa = parseNum(item['Messaging conversations started'] || 0)
+      const costPerWA = wa > 0 ? spent / wa : 0
+      return idx >= 3 && costPerWA < avgCostPerWA * 0.8 && wa > 0
+    })
+
+    if (efficientAds.length > 0) {
+      recommendations.push(`💎 <strong>Hidden Gems Found</strong> - Ads #${efficientAds.map((item, idx) => topCreatives.indexOf(item) + 1).join(', #')} punya biaya per WA sangat efisien (<80% rata-rata). Pertimbangkan untuk increase budget dan test wider audience.`)
+    }
+
+    // Recommendation 3: Underperformers action
+    const underperformers = topCreatives.filter((item, idx) => {
+      const spent = parseNum(item['Amount spent (IDR)'] || 0)
+      const wa = parseNum(item['Messaging conversations started'] || 0)
+      const costPerWA = wa > 0 ? spent / wa : 0
+      const oc = parseNum(item['Outbound clicks'] || 0)
+      const convRate = oc > 0 ? (wa / oc) * 100 : 0
+      return idx >= 5 && (costPerWA > avgCostPerWA * 1.3 || convRate < avgConvRate * 0.5)
+    })
+
+    if (underperformers.length > 0) {
+      recommendations.push(`🔧 <strong>Review Underperformers</strong> - Ads #${underperformers.map((item, idx) => topCreatives.indexOf(item) + 1).join(', #')} perlu attention: analyze audience, creative fatigue, atau consider pause jika tidak setelah optimasi.`)
+    }
+
+    // Recommendation 4: Overall strategy based on averages
+    if (avgCostPerWA > 50000) {
+      recommendations.push(`📊 <strong>Fokus Efisiensi Biaya</strong> - Rata-rata Cost/WA di atas Rp50K. Prioritaskan optimasi: (1) Segment audience berdasarkan performa, (2) Test creative dengan hook berbeda, (3) Consider narrowing age/location targeting.`)
+    } else if (avgCostPerWA < 20000) {
+      recommendations.push(`✅ <strong>Room untuk Scale</strong> - Biaya per WA cukup efisien (<Rp20K). Ini saat yang tepat untuk scale up winning ads dan test new audiences sebelum competition meningkat.`)
+    }
+
+    if (avgConvRate < 15) {
+      recommendations.push(`📈 <strong>Improve OC→WA Conversion</strong> - Konversi di bawah 15% mengindikasikan landing page atau CTA perlu improvement: (1) Test prefilled WhatsApp messages, (2) Simplify form, (3) Stronger value proposition di first screen.`)
+    }
+
+    // Default recommendation if no specific insights
+    if (recommendations.length === 0) {
+      recommendations.push(`📈 <strong>Maintain & Monitor</strong> - Performa ads cukup seimbang. Fokus pada: (1) Monitor frequency fatigue, (2) Test 2-3 new creatives per minggu, (3) Scale up performers 20% saat stabil, (4) Deep dive pada top 3 ads untuk cari common elements.`)
+    }
+
+    return `<ul style="margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.7; color: #064e3b;">
+        ${recommendations.map(rec => `<li style="margin-bottom: 10px;">${rec}</li>`).join('')}
+      </ul>`
+  }
 }
 
 function generateConclusionSlide(

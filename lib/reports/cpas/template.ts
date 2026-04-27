@@ -910,7 +910,10 @@ function generateAdCreativeSlide(
   const totalImpressions = sortedData.reduce((sum, item) => sum + parseNum(item['Impressions'] || 0), 0)
   const totalLinkClicks = sortedData.reduce((sum, item) => sum + parseNum(item['Link clicks'] || item['Link Clicks'] || 0), 0)
 
-  const tableRows = sortedData.map((item, index) => {
+  // Show only top 10 in table
+  const top10Data = sortedData.slice(0, 10)
+
+  const tableRows = top10Data.map((item, index) => {
     const creativeName = String(item[creativeNameKey] || 'Unknown').slice(0, 50) + (String(item[creativeNameKey] || '').length > 50 ? '...' : '')
     const adId = item[adIdKey] || ''
     const spent = parseNum(item['Amount spent (IDR)'] || 0)
@@ -945,7 +948,7 @@ function generateAdCreativeSlide(
         </div>
 
         <div style="margin-bottom: 20px;">
-            <h3 style="margin-bottom: 12px;">🎨 All Ad Creatives Performance (${sortedData.length} Creatives)</h3>
+            <h3 style="margin-bottom: 12px;">🎨 Top 10 Ad Creatives Performance</h3>
             <div style="overflow-x: auto; max-height: 400px; overflow-y: auto;">
                 <table style="font-size: 10px;">
                     <thead style="position: sticky; top: 0; z-index: 10;">

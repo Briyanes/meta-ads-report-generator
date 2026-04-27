@@ -1662,7 +1662,7 @@ export function generateReactTailwindReport(analysisData: any, reportName?: stri
                     </tr>
                 </thead>
                 <tbody>
-                    ${sortedCreative.slice(0, 8).map((item, idx) => {
+                    ${sortedCreative.slice(0, 10).map((item, idx) => {
                       const m = extractMetrics(item)
                       const name = item.Ads || item.ads || item['Ad name'] || 'N/A'
                       const displayName = name.length > 50 ? name.substring(0, 47) + '...' : name
