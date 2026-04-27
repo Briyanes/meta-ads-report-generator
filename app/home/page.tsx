@@ -369,6 +369,185 @@ export default function HomePage() {
           </div>
         </div>
 
+        {/* What's New Section - Latest Features */}
+        <div style={{
+          background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+          borderRadius: '16px',
+          padding: '32px',
+          border: '2px solid #f59e0b',
+          marginBottom: '48px',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          {/* Decorative background icon */}
+          <i className="bi bi-stars" style={{
+            position: 'absolute',
+            top: '-20px',
+            right: '-20px',
+            fontSize: '120px',
+            color: 'rgba(245, 158, 11, 0.1)',
+            transform: 'rotate(15deg)'
+          }}></i>
+
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
+              <div style={{
+                width: '56px',
+                height: '56px',
+                backgroundColor: '#f59e0b',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
+              }}>
+                <i className="bi bi-stars" style={{ fontSize: '28px', color: '#ffffff' }}></i>
+              </div>
+              <div>
+                <h3 style={{
+                  margin: 0,
+                  fontSize: '28px',
+                  fontWeight: 'bold',
+                  color: '#111827',
+                  marginBottom: '4px'
+                }}>
+                  What's New
+                </h3>
+                <p style={{ margin: 0, fontSize: '14px', color: '#78716c' }}>
+                  Latest updates to improve your reporting experience
+                </p>
+              </div>
+              <span style={{
+                marginLeft: 'auto',
+                padding: '6px 16px',
+                backgroundColor: '#f59e0b',
+                color: '#ffffff',
+                fontSize: '12px',
+                fontWeight: '700',
+                borderRadius: '20px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}>
+                Just Released
+              </span>
+            </div>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: '24px',
+              marginTop: '24px'
+            }}>
+              {/* Feature 1 */}
+              <div style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.6)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                borderRadius: '12px',
+                padding: '20px',
+                border: '1px solid rgba(245, 158, 11, 0.2)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    backgroundColor: '#f59e0b',
+                    borderRadius: '10px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    <i className="bi bi-search" style={{ fontSize: '20px', color: '#ffffff' }}></i>
+                  </div>
+                  <div>
+                    <h4 style={{
+                      margin: '0 0 8px 0',
+                      fontSize: '18px',
+                      fontWeight: '700',
+                      color: '#111827'
+                    }}>
+                      🎯 Ad ID Display
+                    </h4>
+                    <p style={{
+                      margin: 0,
+                      fontSize: '14px',
+                      color: '#57534e',
+                      lineHeight: '1.6'
+                    }}>
+                      Setiap creative di report sekarang dilengkapi dengan <strong>Ad ID</strong>.
+                      Copy-paste langsung dari report dan cari iklan spesifik di Meta Ads Manager dalam hitungan detik!
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Feature 2 */}
+              <div style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.6)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                borderRadius: '12px',
+                padding: '20px',
+                border: '1px solid rgba(245, 158, 11, 0.2)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    backgroundColor: '#10b981',
+                    borderRadius: '10px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    <i className="bi bi-check-circle-fill" style={{ fontSize: '20px', color: '#ffffff' }}></i>
+                  </div>
+                  <div>
+                    <h4 style={{
+                      margin: '0 0 8px 0',
+                      fontSize: '18px',
+                      fontWeight: '700',
+                      color: '#111827'
+                    }}>
+                      ✨ Accurate Data
+                    </h4>
+                    <p style={{
+                      margin: 0,
+                      fontSize: '14px',
+                      color: '#57534e',
+                      lineHeight: '1.6'
+                    }}>
+                      Perbaikan akurasi Ad ID extraction. Sekarang 100% akurat dan sesuai dengan data di Meta Ads Manager.
+                      Tidak ada lagi ID yang tidak bisa ditemukan!
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{
+              marginTop: '20px',
+              padding: '16px',
+              backgroundColor: 'rgba(245, 158, 11, 0.1)',
+              borderRadius: '8px',
+              border: '1px dashed #f59e0b',
+              textAlign: 'center'
+            }}>
+              <p style={{
+                margin: 0,
+                fontSize: '13px',
+                color: '#92400e',
+                fontWeight: '500'
+              }}>
+                💡 <strong>Tip:</strong> Gunakan Ad ID dari report untuk quickly find top-performing ads
+                dan duplikasi ke campaign baru di Meta Ads Manager!
+              </p>
+            </div>
+          </div>
+        </div>
+
         <div style={{ textAlign: 'center', marginBottom: '48px' }}>
           <h2 className="responsive-platform-title" style={{
             fontSize: '40px',
@@ -1692,119 +1871,157 @@ export default function HomePage() {
           </h3>
           <div className="responsive-features" style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '24px'
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '20px'
           }}>
-            <div className="feature-card" style={{ 
+            <div className="feature-card" style={{
               textAlign: 'center',
-              padding: '24px',
+              padding: '20px',
               borderRadius: '12px',
               transition: 'all 0.3s ease',
               cursor: 'default'
             }}>
               <div style={{
-                width: '64px',
-                height: '64px',
+                width: '56px',
+                height: '56px',
                 backgroundColor: '#dbeafe',
                 borderRadius: '50%',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                margin: '0 auto 20px auto',
+                margin: '0 auto 16px auto',
                 transition: 'transform 0.3s ease'
               }}>
-                <i className="bi bi-robot" style={{ fontSize: '28px', color: '#2563eb' }}></i>
+                <i className="bi bi-robot" style={{ fontSize: '24px', color: '#2563eb' }}></i>
               </div>
               <h4 style={{
                 fontWeight: '600',
                 color: '#111827',
-                marginBottom: '12px',
-                margin: '0 0 12px 0',
-                fontSize: '18px'
+                marginBottom: '10px',
+                margin: '0 0 10px 0',
+                fontSize: '16px'
               }}>
                 AI-Powered Analysis
               </h4>
               <p style={{
-                fontSize: '14px',
+                fontSize: '13px',
                 color: '#6b7280',
                 margin: 0,
-                lineHeight: '1.6'
+                lineHeight: '1.5'
               }}>
                 Advanced AI technology analyzes your Meta Ads data to provide actionable insights and recommendations
               </p>
             </div>
-            <div className="feature-card" style={{ 
+            <div className="feature-card" style={{
               textAlign: 'center',
-              padding: '24px',
+              padding: '20px',
               borderRadius: '12px',
               transition: 'all 0.3s ease',
               cursor: 'default'
             }}>
               <div style={{
-                width: '64px',
-                height: '64px',
+                width: '56px',
+                height: '56px',
                 backgroundColor: '#d1fae5',
                 borderRadius: '50%',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                margin: '0 auto 20px auto',
+                margin: '0 auto 16px auto',
                 transition: 'transform 0.3s ease'
               }}>
-                <i className="bi bi-graph-up" style={{ fontSize: '28px', color: '#10b981' }}></i>
+                <i className="bi bi-graph-up" style={{ fontSize: '24px', color: '#10b981' }}></i>
               </div>
               <h4 style={{
                 fontWeight: '600',
                 color: '#111827',
-                marginBottom: '12px',
-                margin: '0 0 12px 0',
-                fontSize: '18px'
+                marginBottom: '10px',
+                margin: '0 0 10px 0',
+                fontSize: '16px'
               }}>
                 Comprehensive Reports
               </h4>
               <p style={{
-                fontSize: '14px',
+                fontSize: '13px',
                 color: '#6b7280',
                 margin: 0,
-                lineHeight: '1.6'
+                lineHeight: '1.5'
               }}>
                 13 detailed slides covering performance metrics, audience insights, and strategic recommendations
               </p>
             </div>
-            <div className="feature-card" style={{ 
+            <div className="feature-card" style={{
               textAlign: 'center',
-              padding: '24px',
+              padding: '20px',
               borderRadius: '12px',
               transition: 'all 0.3s ease',
               cursor: 'default'
             }}>
               <div style={{
-                width: '64px',
-                height: '64px',
+                width: '56px',
+                height: '56px',
+                backgroundColor: '#fef3c7',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 16px auto',
+                transition: 'transform 0.3s ease'
+              }}>
+                <i className="bi bi-search" style={{ fontSize: '24px', color: '#f59e0b' }}></i>
+              </div>
+              <h4 style={{
+                fontWeight: '600',
+                color: '#111827',
+                marginBottom: '10px',
+                margin: '0 0 10px 0',
+                fontSize: '16px'
+              }}>
+                Easy Ad Lookup
+              </h4>
+              <p style={{
+                fontSize: '13px',
+                color: '#6b7280',
+                margin: 0,
+                lineHeight: '1.5'
+              }}>
+                Each creative includes Ad ID for quick search in Meta Ads Manager - no more manual browsing!
+              </p>
+            </div>
+            <div className="feature-card" style={{
+              textAlign: 'center',
+              padding: '20px',
+              borderRadius: '12px',
+              transition: 'all 0.3s ease',
+              cursor: 'default'
+            }}>
+              <div style={{
+                width: '56px',
+                height: '56px',
                 backgroundColor: '#f3e8ff',
                 borderRadius: '50%',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                margin: '0 auto 20px auto',
+                margin: '0 auto 16px auto',
                 transition: 'transform 0.3s ease'
               }}>
-                <i className="bi bi-lightning-fill" style={{ fontSize: '28px', color: '#9333ea' }}></i>
+                <i className="bi bi-lightning-fill" style={{ fontSize: '24px', color: '#9333ea' }}></i>
               </div>
               <h4 style={{
                 fontWeight: '600',
                 color: '#111827',
-                marginBottom: '12px',
-                margin: '0 0 12px 0',
-                fontSize: '18px'
+                marginBottom: '10px',
+                margin: '0 0 10px 0',
+                fontSize: '16px'
               }}>
                 Fast & Easy
               </h4>
               <p style={{
-                fontSize: '14px',
+                fontSize: '13px',
                 color: '#6b7280',
                 margin: 0,
-                lineHeight: '1.6'
+                lineHeight: '1.5'
               }}>
                 Upload your CSV file and get professional reports in minutes - no technical skills required
               </p>
@@ -1863,6 +2080,10 @@ export default function HomePage() {
               {
                 q: 'What advertising objectives are supported?',
                 a: 'We currently support CTWA (Click to WhatsApp), CPAS (Collaborative Performance Advertising Solution), and CTLP to WA (Click to Landing Page to WhatsApp). More objectives coming soon!'
+              },
+              {
+                q: 'Bagaimana cara mencari iklan spesifik di Meta Ads Manager?',
+                a: 'Setiap creative di report dilengkapi dengan Ad ID. Copy ID tersebut dari report dan paste langsung di search bar Meta Ads Manager untuk menemukan iklan yang dimaksud dalam hitungan detik!'
               },
               {
                 q: 'Can I customize the report format?',
