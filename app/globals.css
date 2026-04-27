@@ -1586,11 +1586,30 @@ a {
 
 /* Meta Ads Page - Action Buttons Responsive */
 @media (max-width: 768px) {
+  .action-buttons-wrapper {
+    flex-direction: row !important;
+    gap: 12px !important;
+    align-items: stretch !important;
+    justify-content: space-between !important;
+  }
+
+  .action-buttons-container {
+    width: auto !important;
+    justify-content: flex-end !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .back-to-home-desktop {
+    width: auto !important;
+    flex-shrink: 0 !important;
+  }
+
   .action-buttons-container button {
-    width: 100% !important;
+    width: auto !important;
     justify-content: center !important;
     padding: 12px 20px !important;
     font-size: 14px !important;
+    white-space: nowrap !important;
   }
 
   .action-buttons-container button i {
@@ -1599,7 +1618,25 @@ a {
 }
 
 @media (max-width: 480px) {
+  .action-buttons-wrapper {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  .action-buttons-container {
+    width: 100% !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+  }
+
+  .back-to-home-desktop {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
   .action-buttons-container button {
+    width: 100% !important;
+    justify-content: center !important;
     padding: 10px 16px !important;
     font-size: 13px !important;
   }
