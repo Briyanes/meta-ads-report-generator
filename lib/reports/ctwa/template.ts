@@ -2193,11 +2193,11 @@ function generateContentPerformanceSlide(data: any[], slideNumber: number): stri
     const { metrics, analysis } = generateAnalysis(item, index + 1)
     const adId = item[adIdKey] || ''
 
-    // Generate preview link if Ad ID is available
-    const previewButton = adId ? `
-      <a href="https://www.facebook.com/ads/preview/?adid=${adId}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 4px; margin-left: auto; padding: 4px 10px; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; border-radius: 6px; font-size: 10px; font-weight: 600; text-decoration: none; transition: all 0.2s ease;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 2px 8px rgba(37,99,235,0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
-        <i class="bi bi-eye-fill"></i>
-        Preview
+    // Generate preview link if Ad ID is available - use Facebook Ads Library URL
+    const previewLink = adId ? `
+      <a href="https://www.facebook.com/ads/library/?id=${adId}" target="_blank" rel="noopener noreferrer" style="color: #2563eb; text-decoration: none; font-size: 11px; font-weight: 500; margin-left: 8px; display: inline-flex; align-items: center; gap: 4px;" onmouseover="this.style.textDecoration='underline'; this.style.color='#1d4ed8';" onmouseout="this.style.textDecoration='none'; this.style.color='#2563eb';">
+        <i class="bi bi-box-arrow-up-right"></i>
+        View Ad
       </a>
     ` : ''
 
@@ -2207,8 +2207,8 @@ function generateContentPerformanceSlide(data: any[], slideNumber: number): stri
           <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
             <span class="content-rank">${index + 1}</span>
             <span class="content-name">${displayName}</span>
+            ${previewLink}
           </div>
-          ${previewButton}
         </div>
         <div class="content-metrics">${metrics}</div>
         <div class="content-analysis">→ ${analysis}</div>
