@@ -520,8 +520,8 @@ export const SHARED_CSS = `
         }
     `
 
-export const LOGO_URL = 'https://hadona.id/wp-content/uploads/2024/12/cropped-Hadona-Logo-1-300x300.png'
-export const HEADER_LOGO_URL = 'https://report.hadona.id/logo/logo-header-pdf.webp'
+export const LOGO_URL = '/logo/logo-hadona.png'
+export const HEADER_LOGO_URL = '/logo/logo-header-pdf.webp'
 
 // Helper functions for templates
 // BUG #19 FIX: Use centralized rounding for consistent precision

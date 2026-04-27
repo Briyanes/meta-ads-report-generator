@@ -1,11 +1,14 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { parseCSV } from '@/lib/csvParser'
 import { generatePDFFromHTML, downloadPDF } from '@/lib/pdfGenerator'
+
+// Lazy load ReportPreview component for better performance
+const ReportPreview = lazy(() => import('./components/ReportPreview'))
 
 export default function MetaAdsPage() {
   const router = useRouter()
@@ -23,6 +26,22 @@ export default function MetaAdsPage() {
   const [objectiveType, setObjectiveType] = useState<'ctwa' | 'cpas' | 'ctlptowa' | 'ctlptopurchase'>('ctwa')
   const [showMetrics, setShowMetrics] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [isUploadingThisWeek, setIsUploadingThisWeek] = useState(false)
+  const [isUploadingLastWeek, setIsUploadingLastWeek] = useState(false)
+  const [analyzeProgress, setAnalyzeProgress] = useState(0)
+  const [generateProgress, setGenerateProgress] = useState(0)
+  const [toasts, setToasts] = useState<Array<{
+    id: string
+    type: 'success' | 'error' | 'warning' | 'info'
+    title: string
+    message: string
+    duration?: number
+  }>>([])
+  const [validationErrors, setValidationErrors] = useState<{
+    thisWeek?: string
+    lastWeek?: string
+    reportName?: string
+  }>({})
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,36 +53,52 @@ export default function MetaAdsPage() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // NEW: Memoized scroll handler to prevent memory leak (BUG #7 FIX)
-  const memoizedHandleScroll = useCallback(() => {
-    const scrollPosition = window.scrollY
-    setIsScrolled(scrollPosition > 10)
-  }, [])
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'thisWeek' | 'lastWeek') => {
     const selectedFiles = Array.from(e.target.files || [])
+
     // More robust CSV detection - check MIME type or file extension
     const csvFiles = selectedFiles.filter(file => {
       const fileName = file.name.toLowerCase()
       const fileType = file.type.toLowerCase()
-      return fileType === 'text/csv' || 
+      return fileType === 'text/csv' ||
              fileType === 'application/csv' ||
              fileType === 'text/comma-separated-values' ||
              fileType === 'application/vnd.ms-excel' ||
              fileName.endsWith('.csv')
     })
-    
+
     if (csvFiles.length > 0) {
+      // Reset input immediately to allow selecting the same file again
+      e.target.value = ''
+
+      // Show skeleton loading briefly
+      if (type === 'thisWeek') {
+        setIsUploadingThisWeek(true)
+      } else {
+        setIsUploadingLastWeek(true)
+      }
+
+      // Add files immediately without delay
       if (type === 'thisWeek') {
         setFilesThisWeek(prev => [...prev, ...csvFiles])
       } else {
         setFilesLastWeek(prev => [...prev, ...csvFiles])
       }
-      setError(null)
-      // Reset input to allow selecting the same file again
-      e.target.value = ''
+
+      // Hide skeleton after brief delay
+      setTimeout(() => {
+        if (type === 'thisWeek') {
+          setIsUploadingThisWeek(false)
+        } else {
+          setIsUploadingLastWeek(false)
+        }
+        setError(null)
+
+        // Show success toast
+        addToast('success', 'Files Uploaded', `${csvFiles.length} CSV file${csvFiles.length > 1 ? 's have' : 'has'} been uploaded successfully`, 3000)
+      }, 300)
     } else {
-      setError('Please upload valid CSV files')
+      addToast('error', 'Invalid File', 'Please upload valid CSV files only')
     }
   }
   
@@ -75,40 +110,66 @@ export default function MetaAdsPage() {
     }
   }
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOver = (e: React.DragEvent<HTMLElement>) => {
     e.preventDefault()
     e.currentTarget.classList.add('dragover')
+    // Add pulse animation and scale effect
+    e.currentTarget.style.animation = 'pulse 1s ease-in-out infinite'
+    e.currentTarget.style.transform = 'scale(1.02)'
   }
 
-  const handleDragLeave = (e: React.DragEvent) => {
+  const handleDragLeave = (e: React.DragEvent<HTMLElement>) => {
     e.preventDefault()
     e.currentTarget.classList.remove('dragover')
+    // Remove animations
+    e.currentTarget.style.animation = 'none'
+    e.currentTarget.style.transform = 'scale(1)'
   }
 
-  const handleDrop = (e: React.DragEvent, type: 'thisWeek' | 'lastWeek') => {
+  const handleDrop = (e: React.DragEvent<HTMLElement>, type: 'thisWeek' | 'lastWeek') => {
     e.preventDefault()
     e.stopPropagation()
     e.currentTarget.classList.remove('dragover')
-    
+    e.currentTarget.style.animation = 'none'
+    e.currentTarget.style.transform = 'scale(1)'
+
+    // Add success animation
+    e.currentTarget.style.animation = 'successPulse 0.5s ease'
+    setTimeout(() => {
+      e.currentTarget.style.animation = 'none'
+    }, 500)
+
     const droppedFiles = Array.from(e.dataTransfer.files)
     // More robust CSV detection - check MIME type or file extension
     const csvFiles = droppedFiles.filter(file => {
       const fileName = file.name.toLowerCase()
       const fileType = file.type.toLowerCase()
-      return fileType === 'text/csv' || 
+      return fileType === 'text/csv' ||
              fileType === 'application/csv' ||
              fileType === 'text/comma-separated-values' ||
              fileType === 'application/vnd.ms-excel' ||
              fileName.endsWith('.csv')
     })
-    
+
     if (csvFiles.length > 0) {
+      // Show skeleton loading briefly
       if (type === 'thisWeek') {
-        setFilesThisWeek(prev => [...prev, ...csvFiles])
+        setIsUploadingThisWeek(true)
       } else {
-        setFilesLastWeek(prev => [...prev, ...csvFiles])
+        setIsUploadingLastWeek(true)
       }
-      setError(null)
+
+      // Simulate brief processing delay for visual feedback
+      setTimeout(() => {
+        if (type === 'thisWeek') {
+          setFilesThisWeek(prev => [...prev, ...csvFiles])
+          setIsUploadingThisWeek(false)
+        } else {
+          setFilesLastWeek(prev => [...prev, ...csvFiles])
+          setIsUploadingLastWeek(false)
+        }
+        setError(null)
+      }, 300)
     } else {
       setError('Please drop valid CSV files')
     }
@@ -121,28 +182,32 @@ export default function MetaAdsPage() {
     }
 
     setIsAnalyzing(true)
+    setAnalyzeProgress(0)
     setError(null)
 
     try {
+      // Progress 10%: Validation started
+      setAnalyzeProgress(10)
+
       const formData = new FormData()
-      
+
       // Check if we have combined files (new format from rmoda workshop)
       const combinedPatterns = ['age-gender', 'platform-placement', 'campaign-name-ad-creative']
       const isCombinedFile = (fileName: string) => {
         const nameLower = fileName.toLowerCase()
         return combinedPatterns.some(pattern => nameLower.includes(pattern))
       }
-      
+
       const hasCombinedFilesThisWeek = filesThisWeek.some(f => isCombinedFile(f.name))
       const hasCombinedFilesLastWeek = filesLastWeek.some(f => isCombinedFile(f.name))
-      
+
       // Find main CSV files (files without breakdown keywords)
       // Main file is typically the one without breakdown dimension keywords
       const breakdownKeywords = ['-age', '-gender', '-region', '-platform', '-placement', '-objective', '-ad-creative', '-creative', '-adcreative']
-      
+
       let finalMainThisWeek: File | null = null
       let finalMainLastWeek: File | null = null
-      
+
       if (hasCombinedFilesThisWeek) {
         // For combined format, use the first combined file as main (will be processed specially in API)
         finalMainThisWeek = filesThisWeek.find(f => isCombinedFile(f.name)) || filesThisWeek[0]
@@ -152,7 +217,7 @@ export default function MetaAdsPage() {
           const hasBreakdownKeyword = breakdownKeywords.some(keyword => name.includes(keyword))
           return !hasBreakdownKeyword
         })
-        
+
         // If no main file found, try to find the largest file or file with most common name pattern
         const findMainFileFallback = (files: File[]) => {
           if (files.length === 0) return null
@@ -161,14 +226,14 @@ export default function MetaAdsPage() {
             const found = files.find(f => f.name.toLowerCase().includes(pattern))
             if (found) return found
           }
-          return files.reduce((prev, current) => 
+          return files.reduce((prev, current) =>
             current.name.length > prev.name.length ? current : prev
           )
         }
-        
+
         finalMainThisWeek = mainThisWeek || findMainFileFallback(filesThisWeek)
       }
-      
+
       if (hasCombinedFilesLastWeek) {
         // For combined format, use the first combined file as main (will be processed specially in API)
         finalMainLastWeek = filesLastWeek.find(f => isCombinedFile(f.name)) || filesLastWeek[0]
@@ -178,7 +243,7 @@ export default function MetaAdsPage() {
           const hasBreakdownKeyword = breakdownKeywords.some(keyword => name.includes(keyword))
           return !hasBreakdownKeyword
         })
-        
+
         const findMainFileFallback = (files: File[]) => {
           if (files.length === 0) return null
           const mainPatterns = ['main', 'data', 'report', 'summary']
@@ -186,36 +251,35 @@ export default function MetaAdsPage() {
             const found = files.find(f => f.name.toLowerCase().includes(pattern))
             if (found) return found
           }
-          return files.reduce((prev, current) => 
+          return files.reduce((prev, current) =>
             current.name.length > prev.name.length ? current : prev
           )
         }
-        
+
         finalMainLastWeek = mainLastWeek || findMainFileFallback(filesLastWeek)
       }
 
       if (!finalMainThisWeek || !finalMainLastWeek) {
         setError('Please upload CSV files for both periods')
         setIsAnalyzing(false)
+        setAnalyzeProgress(0)
         return
       }
 
-      // Debug: Log detected files
-      console.log('[DEBUG] Main file this week:', finalMainThisWeek.name)
-      console.log('[DEBUG] Main file last week:', finalMainLastWeek.name)
-      console.log('[DEBUG] Combined format detected - This Week:', hasCombinedFilesThisWeek, 'Last Week:', hasCombinedFilesLastWeek)
+      // Progress 30%: Files validated
+      setAnalyzeProgress(30)
 
       // Add main CSV files
       formData.append('fileThisWeek', finalMainThisWeek)
       formData.append('fileLastWeek', finalMainLastWeek)
-      
+
       // Add breakdown files for this week (all files except main)
       filesThisWeek.forEach((file, index) => {
         if (file !== finalMainThisWeek) {
           formData.append(`breakdownThisWeek_${index}`, file)
         }
       })
-      
+
       // Add breakdown files for last week (all files except main)
       filesLastWeek.forEach((file, index) => {
         if (file !== finalMainLastWeek) {
@@ -226,10 +290,16 @@ export default function MetaAdsPage() {
       formData.append('retentionType', retentionType)
       formData.append('objectiveType', objectiveType)
 
+      // Progress 50%: Sending to API
+      setAnalyzeProgress(50)
+
       const response = await fetch('/api/analyze', {
         method: 'POST',
         body: formData
       })
+
+      // Progress 70%: API response received
+      setAnalyzeProgress(70)
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Analysis failed' }))
@@ -237,12 +307,15 @@ export default function MetaAdsPage() {
       }
 
       const data = await response.json()
-      
+
+      // Progress 90%: Processing complete
+      setAnalyzeProgress(90)
+
       // Validate response structure
       if (!data || typeof data !== 'object') {
         throw new Error('Invalid response from server')
       }
-      
+
       // Ensure summary structure exists
       if (!data.summary) {
         data.summary = {
@@ -250,10 +323,19 @@ export default function MetaAdsPage() {
           lastWeek: { totalRows: 0, rows: 0, breakdownFiles: 0, breakdownRows: 0, breakdownTypes: [] }
         }
       }
-      
+
       setAnalysis(data)
+      setAnalyzeProgress(100)
+
+      // Show success toast
+      setTimeout(() => {
+        addToast('success', 'Analysis Complete', 'Your data has been analyzed successfully. You can now generate the report!')
+      }, 300)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Analysis failed')
+      const errorMessage = err instanceof Error ? err.message : 'Analysis failed'
+      setError(errorMessage)
+      setAnalyzeProgress(0)
+      addToast('error', 'Analysis Failed', errorMessage)
     } finally {
       setIsAnalyzing(false)
     }
@@ -315,10 +397,14 @@ export default function MetaAdsPage() {
     }
 
     setIsGenerating(true)
+    setGenerateProgress(0)
     setError(null)
     setGenerationProgress('Generating report...')
 
     try {
+      // Progress 10%: Starting
+      setGenerateProgress(10)
+
       // Extract analysis data - handle both structures: {analysis: {...}} or direct analysis object
       const rawData = (analysis.analysis && typeof analysis.analysis === 'object')
         ? analysis.analysis
@@ -326,8 +412,14 @@ export default function MetaAdsPage() {
         ? JSON.parse(analysis.analysis)
         : analysis
 
+      // Progress 20%: Data extracted
+      setGenerateProgress(20)
+
       // Sanitize data to remove non-serializable values (functions, undefined, circular refs)
       const analysisData = sanitizeAnalysisData(rawData)
+
+      // Progress 30%: Data sanitized
+      setGenerateProgress(30)
 
       // Prepare request body with error handling
       let requestBody
@@ -342,9 +434,13 @@ export default function MetaAdsPage() {
         console.error('Failed to stringify request body:', stringifyError)
         setError(`Data serialization error: ${stringifyError.message}. Please try re-uploading your CSV.`)
         setGenerationProgress('')
+        setGenerateProgress(0)
         setIsGenerating(false)
         return
       }
+
+      // Progress 50%: Sending to API
+      setGenerateProgress(50)
 
       const response = await fetch('/api/generate-report', {
         method: 'POST',
@@ -355,23 +451,38 @@ export default function MetaAdsPage() {
       })
 
       const contentType = response.headers.get('content-type')
-      
+
+      // Progress 70%: API response received
+      setGenerateProgress(70)
+
       if (!contentType?.includes('application/json')) {
         const text = await response.text()
         throw new Error(`Expected JSON, got: ${text.substring(0, 100)}`)
       }
 
       const data = await response.json()
-      
+
+      // Progress 90%: Processing complete
+      setGenerateProgress(90)
+
       if (data.html) {
         setHtmlReport(data.html)
         setGenerationProgress('Report generated successfully!')
+        setGenerateProgress(100)
+
+        // Show success toast
+        setTimeout(() => {
+          addToast('success', 'Report Generated', 'Your report has been generated successfully! You can preview and download it now.')
+        }, 300)
       } else {
         throw new Error('No HTML report received')
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Report generation failed')
+      const errorMessage = err instanceof Error ? err.message : 'Report generation failed'
+      setError(errorMessage)
       setGenerationProgress('')
+      setGenerateProgress(0)
+      addToast('error', 'Generation Failed', errorMessage)
     } finally {
       setIsGenerating(false)
     }
@@ -410,6 +521,8 @@ export default function MetaAdsPage() {
     setError(null)
     setReportName('')
     setGenerationProgress('')
+    setAnalyzeProgress(0)
+    setGenerateProgress(0)
 
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -773,6 +886,371 @@ export default function MetaAdsPage() {
 
   const requirements = getExportRequirements()
 
+  // Skeleton Loading Component for File Upload
+  const FileUploadSkeleton = () => (
+    <div style={{
+      padding: '40px',
+      border: '2px dashed #e5e7eb',
+      borderRadius: '12px',
+      backgroundColor: '#f9fafb',
+      animation: 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+    }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+        <div style={{
+          width: '48px',
+          height: '48px',
+          borderRadius: '8px',
+          backgroundColor: '#e5e7eb'
+        }} />
+        <div style={{
+          width: '200px',
+          height: '16px',
+          borderRadius: '4px',
+          backgroundColor: '#e5e7eb'
+        }} />
+        <div style={{
+          width: '120px',
+          height: '12px',
+          borderRadius: '4px',
+          backgroundColor: '#e5e7eb'
+        }} />
+      </div>
+    </div>
+  )
+
+  // Progress Bar Component
+  const ProgressBar = ({ progress, color }: { progress: number, color: string }) => (
+    <div style={{
+      width: '100%',
+      height: '8px',
+      backgroundColor: '#e5e7eb',
+      borderRadius: '4px',
+      overflow: 'hidden',
+      marginTop: '16px'
+    }}>
+      <div style={{
+        width: `${progress}%`,
+        height: '100%',
+        backgroundColor: color,
+        borderRadius: '4px',
+        transition: 'width 0.3s ease',
+        animation: progress < 100 ? 'pulse 1.5s infinite' : 'none'
+      }} />
+    </div>
+  )
+
+  // Enhanced Loading Spinner Component with 3 Concentric Rings
+  const EnhancedSpinner = ({ color, size, icon = 'bi-cpu' }: { color: string, size: number, icon?: string }) => (
+    <div style={{
+      position: 'relative',
+      width: size,
+      height: size,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }}>
+      {/* Outer ring */}
+      <div style={{
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        border: `3px solid ${color}20`,
+        borderRadius: '50%',
+        animation: 'spin 3s linear infinite'
+      }} />
+      {/* Middle ring */}
+      <div style={{
+        position: 'absolute',
+        width: '75%',
+        height: '75%',
+        border: `3px solid ${color}40`,
+        borderRadius: '50%',
+        animation: 'spin 2s linear infinite reverse'
+      }} />
+      {/* Inner ring */}
+      <div style={{
+        position: 'absolute',
+        width: '50%',
+        height: '50%',
+        border: `3px solid ${color}`,
+        borderRadius: '50%',
+        borderTopColor: 'transparent',
+        animation: 'spin 1s linear infinite'
+      }} />
+      {/* Center icon */}
+      <i className={`bi ${icon}`} style={{ fontSize: size * 0.4, color: '#ffffff' }} />
+    </div>
+  )
+
+  // Toast Management Functions
+  const addToast = (type: 'success' | 'error' | 'warning' | 'info', title: string, message: string, duration = 5000) => {
+    const id = Date.now().toString()
+    setToasts(prev => [...prev, { id, type, title, message, duration }])
+
+    if (duration > 0) {
+      setTimeout(() => removeToast(id), duration)
+    }
+  }
+
+  const removeToast = (id: string) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id))
+  }
+
+  // Error Message Helper with Recovery Suggestions
+  const getErrorMessage = (error: string): { title: string; message: string; suggestion?: string } => {
+    const errorLower = error.toLowerCase()
+
+    if (errorLower.includes('csv') || errorLower.includes('file') || errorLower.includes('upload')) {
+      return {
+        title: 'Invalid File Format',
+        message: error,
+        suggestion: 'Ensure your CSV files are exported from Meta Ads Manager with proper headers.'
+      }
+    }
+
+    if (errorLower.includes('network') || errorLower.includes('fetch') || errorLower.includes('connection')) {
+      return {
+        title: 'Connection Error',
+        message: error,
+        suggestion: 'Check your internet connection and try again. If the problem persists, contact support.'
+      }
+    }
+
+    if (errorLower.includes('analysis') || errorLower.includes('analyze')) {
+      return {
+        title: 'Analysis Failed',
+        message: error,
+        suggestion: 'Verify that your CSV files contain all required metrics for the selected objective type.'
+      }
+    }
+
+    if (errorLower.includes('generation') || errorLower.includes('generate') || errorLower.includes('report')) {
+      return {
+        title: 'Report Generation Failed',
+        message: error,
+        suggestion: 'Please try analyzing your data again or contact support if the problem persists.'
+      }
+    }
+
+    return {
+      title: 'Error',
+      message: error,
+      suggestion: 'Please try again or contact support if the problem persists.'
+    }
+  }
+
+  // Enhanced Error Display Component
+  const ErrorDisplay = ({ error, onDismiss }: { error: string, onDismiss: () => void }) => {
+    const errorDetails = getErrorMessage(error)
+
+    return (
+      <div style={{
+        backgroundColor: '#fef2f2',
+        borderLeft: '4px solid #ef4444',
+        padding: '20px',
+        borderRadius: '12px',
+        marginBottom: '24px',
+        boxShadow: '0 4px 6px -1px rgba(239, 68, 68, 0.1)',
+        animation: 'fadeIn 0.3s ease'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '12px'
+        }}>
+          <i className="bi bi-exclamation-triangle-fill" style={{
+            color: '#ef4444',
+            fontSize: '20px',
+            flexShrink: 0,
+            marginTop: '2px'
+          }} />
+          <div style={{ flex: 1 }}>
+            <p style={{
+              color: '#b91c1c',
+              fontWeight: '700',
+              margin: '0 0 6px 0',
+              fontSize: '15px'
+            }}>
+              {errorDetails.title}
+            </p>
+            <p style={{
+              color: '#991b1b',
+              margin: '0 0 8px 0',
+              fontSize: '14px',
+              lineHeight: '1.5'
+            }}>
+              {errorDetails.message}
+            </p>
+            {errorDetails.suggestion && (
+              <div style={{
+                backgroundColor: '#ffffff',
+                padding: '10px 12px',
+                borderRadius: '6px',
+                border: '1px solid #fecaca'
+              }}>
+                <p style={{
+                  fontSize: '12px',
+                  color: '#7f1d1d',
+                  margin: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}>
+                  <i className="bi bi-lightbulb" style={{ fontSize: '14px' }} />
+                  <strong>Tip:</strong> {errorDetails.suggestion}
+                </p>
+              </div>
+            )}
+          </div>
+          <button
+            onClick={onDismiss}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#b91c1c',
+              cursor: 'pointer',
+              fontSize: '18px',
+              padding: '0',
+              lineHeight: 1,
+              flexShrink: 0
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+          >
+            <i className="bi bi-x" />
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // Validation Indicator Component
+  const ValidationIndicator = ({ status, message }: { status: 'valid' | 'invalid' | 'warning', message?: string }) => (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '6px',
+      padding: '6px 10px',
+      borderRadius: '6px',
+      fontSize: '12px',
+      fontWeight: '500',
+      backgroundColor: status === 'valid' ? '#f0fdf4' : status === 'invalid' ? '#fef2f2' : '#fffbeb',
+      color: status === 'valid' ? '#15803d' : status === 'invalid' ? '#b91c1c' : '#b45309',
+      border: `1px solid ${status === 'valid' ? '#86efac' : status === 'invalid' ? '#fecaca' : '#fde68a'}`,
+      marginTop: '8px',
+      animation: 'fadeIn 0.2s ease'
+    }}>
+      <i className={`bi bi-${status === 'valid' ? 'check-circle' : status === 'invalid' ? 'x-circle' : 'exclamation-circle'}`} />
+      <span>{message || (status === 'valid' ? 'Valid' : status === 'invalid' ? 'Invalid' : 'Warning')}</span>
+    </div>
+  )
+
+  // Reusable Hover Styles
+  const hoverStyles = {
+    button: {
+      default: {
+        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+        transform: 'translateY(0)',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+      },
+      hover: {
+        transform: 'translateY(-2px)',
+        boxShadow: '0 6px 8px -1px rgba(0, 0, 0, 0.15)'
+      }
+    },
+    card: {
+      default: {
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        transform: 'translateY(0) scale(1)',
+        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+      },
+      hover: {
+        transform: 'translateY(-4px) scale(1.02)',
+        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.15)'
+      }
+    }
+  }
+
+  // Toast Container Component
+  const ToastContainer = () => (
+    <div style={{
+      position: 'fixed',
+      top: '100px',
+      right: '24px',
+      zIndex: 9999,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '12px',
+      maxWidth: '400px'
+    }}>
+      {toasts.map(toast => (
+        <div
+          key={toast.id}
+          style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '12px',
+            padding: '16px',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+            borderLeft: `4px solid ${
+              toast.type === 'success' ? '#059669' :
+              toast.type === 'error' ? '#ef4444' :
+              toast.type === 'warning' ? '#f59e0b' : '#3b82f6'
+            }`,
+            animation: 'slideInRight 0.3s ease',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '12px'
+          }}
+        >
+          <i className={`bi bi-${
+            toast.type === 'success' ? 'check-circle-fill' :
+            toast.type === 'error' ? 'exclamation-triangle-fill' :
+            toast.type === 'warning' ? 'exclamation-circle-fill' : 'info-circle-fill'
+          }`} style={{
+            fontSize: '20px',
+            color: toast.type === 'success' ? '#059669' :
+                   toast.type === 'error' ? '#ef4444' :
+                   toast.type === 'warning' ? '#f59e0b' : '#3b82f6',
+            flexShrink: 0,
+            marginTop: '2px'
+          }} />
+          <div style={{ flex: 1 }}>
+            <p style={{
+              fontSize: '14px',
+              fontWeight: '700',
+              color: '#111827',
+              margin: '0 0 4px 0'
+            }}>
+              {toast.title}
+            </p>
+            <p style={{
+              fontSize: '13px',
+              color: '#6b7280',
+              margin: 0,
+              lineHeight: '1.4'
+            }}>
+              {toast.message}
+            </p>
+          </div>
+          <button
+            onClick={() => removeToast(toast.id)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#9ca3af',
+              cursor: 'pointer',
+              fontSize: '16px',
+              padding: '0',
+              lineHeight: 1
+            }}
+          >
+            <i className="bi bi-x" />
+          </button>
+        </div>
+      ))}
+    </div>
+  )
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -804,10 +1282,14 @@ export default function MetaAdsPage() {
           alignItems: 'center',
           justifyContent: 'space-between'
         }}>
-          <Link href="/home" style={{ textDecoration: 'none', cursor: 'pointer' }}>
+          <Link
+            href="/home"
+            style={{ textDecoration: 'none', cursor: 'pointer' }}
+            aria-label="Navigate back to home page"
+            role="link"
+          >
             <div>
               <h1 className="responsive-header-title" style={{
-                fontSize: '26px',
                 fontWeight: '700',
                 color: '#111827',
                 margin: 0,
@@ -868,8 +1350,10 @@ export default function MetaAdsPage() {
                 className="responsive-header-logo"
                 width={200}
                 height={80}
+                priority
+                quality={90}
+                sizes="(max-width: 768px) 120px, 200px"
                 style={{
-                  height: '80px',
                   width: 'auto',
                   objectFit: 'contain'
                 }}
@@ -882,88 +1366,17 @@ export default function MetaAdsPage() {
       {/* Spacer for fixed header */}
       <div className="header-spacer" style={{ height: '120px' }}></div>
 
-      {/* Back to Home Button - Fixed Position */}
-      <button
-        className="back-to-home-fixed"
-        onClick={() => router.push('/home')}
-        style={{
-          position: 'fixed',
-          top: '120px',
-          left: '24px',
-          zIndex: 999,
-          color: '#000000',
-          background: '#ECDC43',
-          border: 'none',
-          cursor: 'pointer',
-          fontSize: '14px',
-          fontWeight: '600',
-          padding: '10px 20px',
-          borderRadius: '8px',
-          transition: 'all 0.2s ease',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '6px',
-          boxShadow: '0 4px 6px -1px rgba(236, 220, 67, 0.3)'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = '#d4c539'
-          e.currentTarget.style.transform = 'translateY(-2px)'
-          e.currentTarget.style.boxShadow = '0 6px 8px -1px rgba(236, 220, 67, 0.4)'
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = '#ECDC43'
-          e.currentTarget.style.transform = 'translateY(0)'
-          e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(236, 220, 67, 0.3)'
-        }}
-      >
-        <i className="bi bi-arrow-left"></i>
-        <span className="back-to-home-text">Back to Home</span>
-      </button>
-
       <main className="responsive-container" style={{
         maxWidth: '1400px',
         margin: '0 auto',
         padding: '48px',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
       }}>
-        {/* Back to Home Button - Mobile Position (above hero) */}
-        <div className="back-to-home-mobile-container" style={{ display: 'none' }}>
-          <button
-            className="back-to-home-mobile"
-            onClick={() => router.push('/home')}
-            style={{
-              color: '#000000',
-              background: '#ECDC43',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '600',
-              padding: '10px 20px',
-              borderRadius: '8px',
-              transition: 'all 0.2s ease',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              boxShadow: '0 4px 6px -1px rgba(236, 220, 67, 0.3)',
-              marginBottom: '16px'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#d4c539'
-              e.currentTarget.style.transform = 'translateY(-2px)'
-              e.currentTarget.style.boxShadow = '0 6px 8px -1px rgba(236, 220, 67, 0.4)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#ECDC43'
-              e.currentTarget.style.transform = 'translateY(0)'
-              e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(236, 220, 67, 0.3)'
-            }}
-          >
-            <i className="bi bi-arrow-left"></i>
-            <span className="back-to-home-text">Back to Home</span>
-          </button>
-        </div>
-        
-        {/* Report Configuration */}
+        <div style={{
+          opacity: 0,
+          animation: 'fadeInPage 0.6s ease forwards'
+        }}>
+          {/* Report Configuration */}
         <div className="responsive-card" style={{
           backgroundColor: '#ffffff',
           borderRadius: '12px',
@@ -1016,19 +1429,25 @@ export default function MetaAdsPage() {
               />
             </div>
             <div>
-              <label className="form-label" style={{
-                display: 'block',
-                fontSize: '13px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '8px',
-                letterSpacing: '0.01em'
-              }}>
+              <label
+                className="form-label"
+                htmlFor="retention-type-select"
+                style={{
+                  display: 'block',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '8px',
+                  letterSpacing: '0.01em'
+                }}
+              >
                 Pemilihan Retensi
               </label>
               <select
                 value={retentionType}
                 onChange={(e) => setRetentionType(e.target.value as 'wow' | 'mom')}
+                aria-label="Select retention comparison type"
+                id="retention-type-select"
                 style={{
                   width: '100%',
                   padding: '10px 14px',
@@ -1079,30 +1498,36 @@ export default function MetaAdsPage() {
                 {/* CTWA Card */}
                 <div
                   onClick={() => setObjectiveType('ctwa')}
+                  role="radio"
+                  aria-checked={objectiveType === 'ctwa'}
+                  aria-label="Click to WhatsApp objective"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      setObjectiveType('ctwa')
+                    }
+                  }}
                   style={{
                     padding: '16px',
                     border: `2px solid ${objectiveType === 'ctwa' ? '#2B46BB' : '#e5e7eb'}`,
                     borderRadius: '12px',
                     backgroundColor: objectiveType === 'ctwa' ? '#eff6ff' : '#ffffff',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    position: 'relative',
-                    overflow: 'hidden'
+                    ...hoverStyles.card.default
                   }}
                   onMouseEnter={(e) => {
                     if (objectiveType !== 'ctwa') {
+                      Object.assign(e.currentTarget.style, hoverStyles.card.hover)
                       e.currentTarget.style.borderColor = '#2B46BB'
                       e.currentTarget.style.backgroundColor = '#f9fafb'
-                      e.currentTarget.style.transform = 'translateY(-2px)'
-                      e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (objectiveType !== 'ctwa') {
+                      Object.assign(e.currentTarget.style, hoverStyles.card.default)
                       e.currentTarget.style.borderColor = '#e5e7eb'
                       e.currentTarget.style.backgroundColor = '#ffffff'
-                      e.currentTarget.style.transform = 'translateY(0)'
-                      e.currentTarget.style.boxShadow = 'none'
                     }
                   }}
                 >
@@ -1173,30 +1598,36 @@ export default function MetaAdsPage() {
                 {/* CPAS Card */}
                 <div
                   onClick={() => setObjectiveType('cpas')}
+                  role="radio"
+                  aria-checked={objectiveType === 'cpas'}
+                  aria-label="Collaborative Ads with creators objective"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      setObjectiveType('cpas')
+                    }
+                  }}
                   style={{
                     padding: '16px',
                     border: `2px solid ${objectiveType === 'cpas' ? '#2B46BB' : '#e5e7eb'}`,
                     borderRadius: '12px',
                     backgroundColor: objectiveType === 'cpas' ? '#eff6ff' : '#ffffff',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    position: 'relative',
-                    overflow: 'hidden'
+                    ...hoverStyles.card.default
                   }}
                   onMouseEnter={(e) => {
                     if (objectiveType !== 'cpas') {
+                      Object.assign(e.currentTarget.style, hoverStyles.card.hover)
                       e.currentTarget.style.borderColor = '#2B46BB'
                       e.currentTarget.style.backgroundColor = '#f9fafb'
-                      e.currentTarget.style.transform = 'translateY(-2px)'
-                      e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (objectiveType !== 'cpas') {
+                      Object.assign(e.currentTarget.style, hoverStyles.card.default)
                       e.currentTarget.style.borderColor = '#e5e7eb'
                       e.currentTarget.style.backgroundColor = '#ffffff'
-                      e.currentTarget.style.transform = 'translateY(0)'
-                      e.currentTarget.style.boxShadow = 'none'
                     }
                   }}
                 >
@@ -1267,30 +1698,36 @@ export default function MetaAdsPage() {
                 {/* CTLP to WA Card */}
                 <div
                   onClick={() => setObjectiveType('ctlptowa')}
+                  role="radio"
+                  aria-checked={objectiveType === 'ctlptowa'}
+                  aria-label="Click to Link to WhatsApp objective"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      setObjectiveType('ctlptowa')
+                    }
+                  }}
                   style={{
                     padding: '16px',
                     border: `2px solid ${objectiveType === 'ctlptowa' ? '#2B46BB' : '#e5e7eb'}`,
                     borderRadius: '12px',
                     backgroundColor: objectiveType === 'ctlptowa' ? '#eff6ff' : '#ffffff',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    position: 'relative',
-                    overflow: 'hidden'
+                    ...hoverStyles.card.default
                   }}
                   onMouseEnter={(e) => {
                     if (objectiveType !== 'ctlptowa') {
+                      Object.assign(e.currentTarget.style, hoverStyles.card.hover)
                       e.currentTarget.style.borderColor = '#2B46BB'
                       e.currentTarget.style.backgroundColor = '#f9fafb'
-                      e.currentTarget.style.transform = 'translateY(-2px)'
-                      e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (objectiveType !== 'ctlptowa') {
+                      Object.assign(e.currentTarget.style, hoverStyles.card.default)
                       e.currentTarget.style.borderColor = '#e5e7eb'
                       e.currentTarget.style.backgroundColor = '#ffffff'
-                      e.currentTarget.style.transform = 'translateY(0)'
-                      e.currentTarget.style.boxShadow = 'none'
                     }
                   }}
                 >
@@ -1361,30 +1798,36 @@ export default function MetaAdsPage() {
                 {/* CTLP to Purchase Card */}
                 <div
                   onClick={() => setObjectiveType('ctlptopurchase')}
+                  role="radio"
+                  aria-checked={objectiveType === 'ctlptopurchase'}
+                  aria-label="Click to Link to Purchase objective"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      setObjectiveType('ctlptopurchase')
+                    }
+                  }}
                   style={{
                     padding: '16px',
                     border: `2px solid ${objectiveType === 'ctlptopurchase' ? '#2B46BB' : '#e5e7eb'}`,
                     borderRadius: '12px',
                     backgroundColor: objectiveType === 'ctlptopurchase' ? '#eff6ff' : '#ffffff',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    position: 'relative',
-                    overflow: 'hidden'
+                    ...hoverStyles.card.default
                   }}
                   onMouseEnter={(e) => {
                     if (objectiveType !== 'ctlptopurchase') {
+                      Object.assign(e.currentTarget.style, hoverStyles.card.hover)
                       e.currentTarget.style.borderColor = '#2B46BB'
                       e.currentTarget.style.backgroundColor = '#f9fafb'
-                      e.currentTarget.style.transform = 'translateY(-2px)'
-                      e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (objectiveType !== 'ctlptopurchase') {
+                      Object.assign(e.currentTarget.style, hoverStyles.card.default)
                       e.currentTarget.style.borderColor = '#e5e7eb'
                       e.currentTarget.style.backgroundColor = '#ffffff'
-                      e.currentTarget.style.transform = 'translateY(0)'
-                      e.currentTarget.style.boxShadow = 'none'
                     }
                   }}
                 >
@@ -1713,107 +2156,147 @@ export default function MetaAdsPage() {
                 <i className="bi bi-calendar" style={{ marginRight: '8px', color: '#2B46BB', fontSize: '14px' }}></i>
                 {retentionType === 'wow' ? 'Minggu Ini (This Week)' : 'Bulan Ini (This Month)'} - {filesThisWeek.length} file(s)
               </label>
-              <label
-                htmlFor="fileInputThisWeek"
-                style={{
-                  display: 'block',
-                  border: '2px dashed #2B46BB',
-                  borderRadius: '12px',
-                  padding: '40px',
-                  textAlign: 'center',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  backgroundColor: '#f8fafc'
-                }}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, 'thisWeek')}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#eff6ff'
-                  e.currentTarget.style.borderColor = '#1e35a0'
-                  e.currentTarget.style.transform = 'scale(1.01)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f8fafc'
-                  e.currentTarget.style.borderColor = '#2B46BB'
-                  e.currentTarget.style.transform = 'scale(1)'
-                }}
-              >
-                <input
-                  id="fileInputThisWeek"
-                  type="file"
-                  accept=".csv,text/csv"
-                  multiple
-                  onChange={(e) => handleFileChange(e, 'thisWeek')}
-                  style={{ display: 'none' }}
-                />
-                <div>
-                  <p style={{
-                    color: '#374151',
-                    fontWeight: '600',
-                    fontSize: '15px',
-                    marginBottom: '8px',
-                    letterSpacing: '0.01em'
-                  }}>
-                    <i className="bi bi-file-earmark" style={{ marginRight: '8px', fontSize: '18px' }}></i>
-                    Drag & Drop atau click untuk upload
-                  </p>
-                  <p style={{
-                    fontSize: '13px',
-                    color: '#6b7280',
-                    fontWeight: '400'
-                  }}>
-                    CSV files (bisa multiple)
-                  </p>
-                </div>
-                {filesThisWeek.length > 0 && (
-                  <div style={{ marginTop: '16px' }}>
-                    {filesThisWeek.map((file, index) => (
-                      <div key={index} style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'flex-start',
-                        gap: '8px',
-                        backgroundColor: '#f9fafb',
-                        padding: '8px 12px',
-                        borderRadius: '6px',
-                        marginBottom: '8px',
-                        textAlign: 'left'
-                      }}>
-                        <i className="bi bi-check-circle" style={{ color: '#16a34a', flexShrink: 0 }}></i>
-                        <span style={{
-                          fontSize: '14px',
-                          color: '#374151',
-                          flex: 1,
-                          textAlign: 'left',
-                          wordBreak: 'break-word'
-                        }}>
-                          {file.name}
-                        </span>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            removeFile(index, 'thisWeek')
-                          }}
-                          style={{
-                            color: '#ef4444',
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            fontSize: '14px',
-                            padding: '4px',
-                            flexShrink: 0
-                          }}
-                          onMouseEnter={(e) => e.currentTarget.style.color = '#dc2626'}
-                          onMouseLeave={(e) => e.currentTarget.style.color = '#ef4444'}
-                        >
-                          <i className="bi bi-x-circle"></i>
-                        </button>
-                      </div>
-                    ))}
+              {isUploadingThisWeek ? (
+                <FileUploadSkeleton />
+              ) : (
+                <label
+                  htmlFor="fileInputThisWeek"
+                  style={{
+                    display: 'block',
+                    border: '2px dashed #2B46BB',
+                    borderRadius: '12px',
+                    padding: '40px',
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    backgroundColor: '#f8fafc',
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, 'thisWeek')}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#eff6ff'
+                    e.currentTarget.style.borderColor = '#1e35a0'
+                    e.currentTarget.style.transform = 'scale(1.01)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#f8fafc'
+                    e.currentTarget.style.borderColor = '#2B46BB'
+                    e.currentTarget.style.transform = 'scale(1)'
+                  }}
+                >
+                  <input
+                    id="fileInputThisWeek"
+                    type="file"
+                    accept=".csv,text/csv"
+                    multiple
+                    onChange={(e) => handleFileChange(e, 'thisWeek')}
+                    aria-label="Upload CSV files for this week"
+                    style={{ display: 'none' }}
+                  />
+                  <div>
+                    <p style={{
+                      color: '#374151',
+                      fontWeight: '600',
+                      fontSize: '15px',
+                      marginBottom: '8px',
+                      letterSpacing: '0.01em'
+                    }}>
+                      <i className="bi bi-file-earmark" style={{ marginRight: '8px', fontSize: '18px' }}></i>
+                      Drag & Drop atau click untuk upload
+                    </p>
+                    <p style={{
+                      fontSize: '13px',
+                      color: '#6b7280',
+                      fontWeight: '400'
+                    }}>
+                      CSV files (bisa multiple)
+                    </p>
                   </div>
-                )}
-              </label>
+
+                  {/* Drag Overlay Indicator */}
+                  <div className="drag-overlay" style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(43, 70, 187, 0.05)',
+                    borderRadius: '12px',
+                    opacity: 0,
+                    transition: 'opacity 0.2s ease',
+                    pointerEvents: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <div style={{
+                      fontSize: '48px',
+                      color: '#2B46BB',
+                      animation: 'bounce 1s infinite'
+                    }}>
+                      <i className="bi bi-cloud-upload" />
+                    </div>
+                  </div>
+                  {filesThisWeek.length > 0 && (
+                    <div style={{ marginTop: '16px' }}>
+                      {filesThisWeek.map((file, index) => (
+                        <div key={index} style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'flex-start',
+                          gap: '8px',
+                          backgroundColor: '#f9fafb',
+                          padding: '8px 12px',
+                          borderRadius: '6px',
+                          marginBottom: '8px',
+                          textAlign: 'left'
+                        }}>
+                          <i className="bi bi-check-circle" style={{ color: '#16a34a', flexShrink: 0 }}></i>
+                          <span style={{
+                            fontSize: '14px',
+                            color: '#374151',
+                            flex: 1,
+                            textAlign: 'left',
+                            wordBreak: 'break-word'
+                          }}>
+                            {file.name}
+                          </span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              removeFile(index, 'thisWeek')
+                            }}
+                            style={{
+                              color: '#ef4444',
+                              background: 'none',
+                              border: 'none',
+                              cursor: 'pointer',
+                              fontSize: '14px',
+                              padding: '4px',
+                              flexShrink: 0
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.color = '#dc2626'}
+                            onMouseLeave={(e) => e.currentTarget.style.color = '#ef4444'}
+                          >
+                            <i className="bi bi-x-circle"></i>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Validation Indicator */}
+                  {filesThisWeek.length > 0 && (
+                    <ValidationIndicator
+                      status={filesThisWeek.every(f => f.name.endsWith('.csv')) ? 'valid' : 'invalid'}
+                      message={`${filesThisWeek.length} file${filesThisWeek.length > 1 ? 's' : ''} selected`}
+                    />
+                  )}
+                </label>
+              )}
             </div>
 
             {/* Last Week/Month */}
@@ -1829,107 +2312,147 @@ export default function MetaAdsPage() {
                 <i className="bi bi-calendar" style={{ marginRight: '8px', color: '#2B46BB', fontSize: '14px' }}></i>
                 {retentionType === 'wow' ? 'Minggu Lalu (Last Week)' : 'Bulan Lalu (Last Month)'} - {filesLastWeek.length} file(s)
               </label>
-              <label
-                htmlFor="fileInputLastWeek"
-                style={{
-                  display: 'block',
-                  border: '2px dashed #2B46BB',
-                  borderRadius: '12px',
-                  padding: '40px',
-                  textAlign: 'center',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  backgroundColor: '#f8fafc'
-                }}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, 'lastWeek')}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#eff6ff'
-                  e.currentTarget.style.borderColor = '#1e35a0'
-                  e.currentTarget.style.transform = 'scale(1.01)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f8fafc'
-                  e.currentTarget.style.borderColor = '#2B46BB'
-                  e.currentTarget.style.transform = 'scale(1)'
-                }}
-              >
-                <input
-                  id="fileInputLastWeek"
-                  type="file"
-                  accept=".csv,text/csv"
-                  multiple
-                  onChange={(e) => handleFileChange(e, 'lastWeek')}
-                  style={{ display: 'none' }}
-                />
-                <div>
-                  <p style={{
-                    color: '#374151',
-                    fontWeight: '600',
-                    fontSize: '15px',
-                    marginBottom: '8px',
-                    letterSpacing: '0.01em'
-                  }}>
-                    <i className="bi bi-file-earmark" style={{ marginRight: '8px', fontSize: '18px' }}></i>
-                    Drag & Drop atau click untuk upload
-                  </p>
-                  <p style={{
-                    fontSize: '13px',
-                    color: '#6b7280',
-                    fontWeight: '400'
-                  }}>
-                    CSV files (bisa multiple)
-                  </p>
-                </div>
-                {filesLastWeek.length > 0 && (
-                  <div style={{ marginTop: '16px' }}>
-                    {filesLastWeek.map((file, index) => (
-                      <div key={index} style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'flex-start',
-                        gap: '8px',
-                        backgroundColor: '#f9fafb',
-                        padding: '8px 12px',
-                        borderRadius: '6px',
-                        marginBottom: '8px',
-                        textAlign: 'left'
-                      }}>
-                        <i className="bi bi-check-circle" style={{ color: '#16a34a', flexShrink: 0 }}></i>
-                        <span style={{
-                          fontSize: '14px',
-                          color: '#374151',
-                          flex: 1,
-                          textAlign: 'left',
-                          wordBreak: 'break-word'
-                        }}>
-                          {file.name}
-                        </span>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            removeFile(index, 'lastWeek')
-                          }}
-                          style={{
-                            color: '#ef4444',
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            fontSize: '14px',
-                            padding: '4px',
-                            flexShrink: 0
-                          }}
-                          onMouseEnter={(e) => e.currentTarget.style.color = '#dc2626'}
-                          onMouseLeave={(e) => e.currentTarget.style.color = '#ef4444'}
-                        >
-                          <i className="bi bi-x-circle"></i>
-                        </button>
-                      </div>
-                    ))}
+              {isUploadingLastWeek ? (
+                <FileUploadSkeleton />
+              ) : (
+                <label
+                  htmlFor="fileInputLastWeek"
+                  style={{
+                    display: 'block',
+                    border: '2px dashed #2B46BB',
+                    borderRadius: '12px',
+                    padding: '40px',
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    backgroundColor: '#f8fafc',
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, 'lastWeek')}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#eff6ff'
+                    e.currentTarget.style.borderColor = '#1e35a0'
+                    e.currentTarget.style.transform = 'scale(1.01)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#f8fafc'
+                    e.currentTarget.style.borderColor = '#2B46BB'
+                    e.currentTarget.style.transform = 'scale(1)'
+                  }}
+                >
+                  <input
+                    id="fileInputLastWeek"
+                    type="file"
+                    accept=".csv,text/csv"
+                    multiple
+                    onChange={(e) => handleFileChange(e, 'lastWeek')}
+                    aria-label="Upload CSV files for last week"
+                    style={{ display: 'none' }}
+                  />
+                  <div>
+                    <p style={{
+                      color: '#374151',
+                      fontWeight: '600',
+                      fontSize: '15px',
+                      marginBottom: '8px',
+                      letterSpacing: '0.01em'
+                    }}>
+                      <i className="bi bi-file-earmark" style={{ marginRight: '8px', fontSize: '18px' }}></i>
+                      Drag & Drop atau click untuk upload
+                    </p>
+                    <p style={{
+                      fontSize: '13px',
+                      color: '#6b7280',
+                      fontWeight: '400'
+                    }}>
+                      CSV files (bisa multiple)
+                    </p>
                   </div>
-                )}
-              </label>
+
+                  {/* Drag Overlay Indicator */}
+                  <div className="drag-overlay" style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(43, 70, 187, 0.05)',
+                    borderRadius: '12px',
+                    opacity: 0,
+                    transition: 'opacity 0.2s ease',
+                    pointerEvents: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <div style={{
+                      fontSize: '48px',
+                      color: '#2B46BB',
+                      animation: 'bounce 1s infinite'
+                    }}>
+                      <i className="bi bi-cloud-upload" />
+                    </div>
+                  </div>
+                  {filesLastWeek.length > 0 && (
+                    <div style={{ marginTop: '16px' }}>
+                      {filesLastWeek.map((file, index) => (
+                        <div key={index} style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'flex-start',
+                          gap: '8px',
+                          backgroundColor: '#f9fafb',
+                          padding: '8px 12px',
+                          borderRadius: '6px',
+                          marginBottom: '8px',
+                          textAlign: 'left'
+                        }}>
+                          <i className="bi bi-check-circle" style={{ color: '#16a34a', flexShrink: 0 }}></i>
+                          <span style={{
+                            fontSize: '14px',
+                            color: '#374151',
+                            flex: 1,
+                            textAlign: 'left',
+                            wordBreak: 'break-word'
+                          }}>
+                            {file.name}
+                          </span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              removeFile(index, 'lastWeek')
+                            }}
+                            style={{
+                              color: '#ef4444',
+                              background: 'none',
+                              border: 'none',
+                              cursor: 'pointer',
+                              fontSize: '14px',
+                              padding: '4px',
+                              flexShrink: 0
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.color = '#dc2626'}
+                            onMouseLeave={(e) => e.currentTarget.style.color = '#ef4444'}
+                          >
+                            <i className="bi bi-x-circle"></i>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Validation Indicator */}
+                  {filesLastWeek.length > 0 && (
+                    <ValidationIndicator
+                      status={filesLastWeek.every(f => f.name.endsWith('.csv')) ? 'valid' : 'invalid'}
+                      message={`${filesLastWeek.length} file${filesLastWeek.length > 1 ? 's' : ''} selected`}
+                    />
+                  )}
+                </label>
+              )}
             </div>
           </div>
         </div>
@@ -1987,6 +2510,9 @@ export default function MetaAdsPage() {
             <button
               onClick={handleAnalyze}
               disabled={isAnalyzing || filesThisWeek.length === 0 || filesLastWeek.length === 0}
+              aria-label="Analyze uploaded CSV files"
+              aria-busy={isAnalyzing}
+              aria-describedby={filesThisWeek.length === 0 || filesLastWeek.length === 0 ? 'analyze-error' : undefined}
               style={{
                 padding: '12px 24px',
                 backgroundColor: (isAnalyzing || filesThisWeek.length === 0 || filesLastWeek.length === 0) ? '#9ca3af' : '#000000',
@@ -2035,6 +2561,8 @@ export default function MetaAdsPage() {
             <button
               onClick={handleGenerateReport}
               disabled={isGenerating}
+              aria-label="Generate PDF report from analysis"
+              aria-busy={isGenerating}
               style={{
                 padding: '12px 24px',
                 backgroundColor: isGenerating ? '#9ca3af' : '#fbbf24',
@@ -2084,6 +2612,8 @@ export default function MetaAdsPage() {
               <button
                 onClick={handleDownloadPDF}
                 disabled={isDownloadingPDF}
+                aria-label="Download report as PDF file"
+                aria-busy={isDownloadingPDF}
                 style={{
                   padding: '12px 24px',
                   backgroundColor: isDownloadingPDF ? '#9ca3af' : '#059669',
@@ -2188,10 +2718,9 @@ export default function MetaAdsPage() {
                 padding: '16px',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                justifyContent: 'center'
               }}>
-                <i className="bi bi-cpu" style={{ fontSize: '24px', color: '#ffffff' }}></i>
+                <EnhancedSpinner color="#2B46BB" size={48} />
               </div>
               <div style={{ flex: 1 }}>
                 <h3 style={{
@@ -2292,6 +2821,18 @@ export default function MetaAdsPage() {
               </div>
             </div>
 
+            {/* Progress Bar */}
+            <ProgressBar progress={analyzeProgress} color="#2B46BB" />
+            <p style={{
+              fontSize: '12px',
+              color: '#6b7280',
+              marginTop: '8px',
+              textAlign: 'center',
+              fontWeight: '500'
+            }}>
+              {analyzeProgress}% Complete
+            </p>
+
             <style>{`
               @keyframes pulse {
                 0%, 100% { opacity: 1; }
@@ -2300,6 +2841,34 @@ export default function MetaAdsPage() {
               @keyframes spin {
                 from { transform: rotate(0deg); }
                 to { transform: rotate(360deg); }
+              }
+              @keyframes slideInRight {
+                from {
+                  transform: translateX(100%);
+                  opacity: 0;
+                }
+                to {
+                  transform: translateX(0);
+                  opacity: 1;
+                }
+              }
+              @keyframes fadeIn {
+                from {
+                  opacity: 0;
+                  transform: translateY(-10px);
+                }
+                to {
+                  opacity: 1;
+                  transform: translateY(0);
+                }
+              }
+              @keyframes successPulse {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.05); background-color: #f0fdf4; }
+              }
+              @keyframes bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
               }
             `}</style>
           </div>
@@ -2327,10 +2896,9 @@ export default function MetaAdsPage() {
                 padding: '16px',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                justifyContent: 'center'
               }}>
-                <i className="bi bi-file-earmark-text" style={{ fontSize: '24px', color: '#000000' }}></i>
+                <EnhancedSpinner color="#fbbf24" size={48} icon="bi-file-earmark-text" />
               </div>
               <div style={{ flex: 1 }}>
                 <h3 style={{
@@ -2429,6 +2997,18 @@ export default function MetaAdsPage() {
               </div>
             </div>
 
+            {/* Progress Bar */}
+            <ProgressBar progress={generateProgress} color="#fbbf24" />
+            <p style={{
+              fontSize: '12px',
+              color: '#6b7280',
+              marginTop: '8px',
+              textAlign: 'center',
+              fontWeight: '500'
+            }}>
+              {generateProgress}% Complete
+            </p>
+
             <style>{`
               @keyframes pulse {
                 0%, 100% { opacity: 1; }
@@ -2438,71 +3018,40 @@ export default function MetaAdsPage() {
                 from { transform: rotate(0deg); }
                 to { transform: rotate(360deg); }
               }
+              @keyframes slideInRight {
+                from {
+                  transform: translateX(100%);
+                  opacity: 0;
+                }
+                to {
+                  transform: translateX(0);
+                  opacity: 1;
+                }
+              }
+              @keyframes fadeIn {
+                from {
+                  opacity: 0;
+                  transform: translateY(-10px);
+                }
+                to {
+                  opacity: 1;
+                  transform: translateY(0);
+                }
+              }
+              @keyframes successPulse {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.05); background-color: #f0fdf4; }
+              }
+              @keyframes bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+              }
             `}</style>
           </div>
         )}
 
         {/* Error Display */}
-        {error && (
-          <div style={{
-            backgroundColor: '#fef2f2',
-            borderLeft: '4px solid #ef4444',
-            padding: '20px',
-            borderRadius: '12px',
-            marginBottom: '24px',
-            boxShadow: '0 4px 6px -1px rgba(239, 68, 68, 0.1)'
-          }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: '12px'
-            }}>
-              <i className="bi bi-exclamation-triangle-fill" style={{
-                color: '#ef4444',
-                fontSize: '20px',
-                flexShrink: 0,
-                marginTop: '2px'
-              }}></i>
-              <div style={{ flex: 1 }}>
-                <p style={{
-                  color: '#b91c1c',
-                  fontWeight: '700',
-                  margin: 0,
-                  marginBottom: '6px',
-                  fontSize: '15px',
-                  letterSpacing: '0.01em'
-                }}>
-                  Error
-                </p>
-                <p style={{
-                  color: '#991b1b',
-                  margin: 0,
-                  fontSize: '14px',
-                  lineHeight: '1.5'
-                }}>
-                  {error}
-                </p>
-              </div>
-              <button
-                onClick={() => setError(null)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#b91c1c',
-                  cursor: 'pointer',
-                  fontSize: '18px',
-                  padding: '0',
-                  lineHeight: 1,
-                  flexShrink: 0
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
-                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-              >
-                <i className="bi bi-x"></i>
-              </button>
-            </div>
-          </div>
-        )}
+        {error && <ErrorDisplay error={error} onDismiss={() => setError(null)} />}
 
         {/* Analysis Results */}
         {analysis && (
@@ -2800,83 +3349,95 @@ export default function MetaAdsPage() {
           </div>
         )}
 
-        {/* Report Preview */}
+        {/* Report Preview - Lazy Loaded */}
         {htmlReport && (
-          <div className="responsive-card" style={{
-            backgroundColor: '#ffffff',
-            borderRadius: '16px',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-            border: 'none',
-            padding: '32px',
-            transition: 'transform 0.2s ease, box-shadow 0.2s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px)'
-            e.currentTarget.style.boxShadow = '0 25px 30px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.06)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)'
-            e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
-          }}>
-            <h2 style={{
-              fontSize: '22px',
-              fontWeight: 'bold',
-              color: '#111827',
-              marginBottom: '20px'
+          <Suspense fallback={
+            <div className="responsive-card" style={{
+              backgroundColor: '#ffffff',
+              borderRadius: '16px',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+              border: 'none',
+              padding: '32px',
+              minHeight: '600px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}>
-              Preview Report
-            </h2>
-            <div style={{
-              border: '2px solid #e5e7eb',
-              borderRadius: '12px',
-              overflow: 'hidden',
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-            }}>
-              <iframe
-                srcDoc={htmlReport}
-                style={{
-                  width: '100%',
-                  height: '600px',
-                  border: 'none'
-                }}
-                title="Report Preview"
-              />
+              <div style={{
+                textAlign: 'center',
+                color: '#6b7280'
+              }}>
+                <EnhancedSpinner color="#2B46BB" size={60} icon="bi-eye" />
+                <p style={{
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  marginTop: '16px'
+                }}>
+                  Loading preview...
+                </p>
+              </div>
             </div>
-          </div>
+          }>
+            <ReportPreview htmlReport={htmlReport} />
+          </Suspense>
         )}
+
+        {/* Footer */}
+        <footer style={{
+          backgroundColor: '#ffffff',
+          borderTop: '1px solid #e5e7eb',
+          marginTop: '12px'
+        }}>
+          <div className="responsive-footer" style={{
+            maxWidth: '1400px',
+            margin: '0 auto',
+            padding: '24px 48px',
+            textAlign: 'center'
+          }}>
+            <p className="footer-line-1" style={{
+              fontSize: '14px',
+              color: '#6b7280',
+              margin: 0,
+              marginBottom: '8px'
+            }}>
+              <span className="footer-text-1">© 2025 Ads Report Generator. Powered by</span>
+              <span className="footer-hadona" style={{ fontWeight: '600', color: '#2563eb', marginLeft: '4px' }}>Hadona Digital Media</span>
+            </p>
+            <p style={{
+              fontSize: '12px',
+              color: '#9ca3af',
+              margin: 0
+            }}>
+              Designed & Developed by <span style={{ fontWeight: '600', color: '#6b7280' }}>Briyanes</span>
+            </p>
+          </div>
+        </footer>
+        </div>
       </main>
 
-      {/* Footer */}
-      <footer style={{
-        backgroundColor: '#ffffff',
-        borderTop: '1px solid #e5e7eb',
-        marginTop: '12px'
-      }}>
-        <div className="responsive-footer" style={{
-          maxWidth: '1400px',
-          margin: '0 auto',
-          padding: '24px 48px',
-          textAlign: 'center'
-        }}>
-          <p className="footer-line-1" style={{
-            fontSize: '14px',
-            color: '#6b7280',
-            margin: 0,
-            marginBottom: '8px'
-          }}>
-            <span className="footer-text-1">© 2025 Ads Report Generator. Powered by</span>
-            <span className="footer-hadona" style={{ fontWeight: '600', color: '#2563eb', marginLeft: '4px' }}>Hadona Digital Media</span>
-          </p>
-          <p style={{
-            fontSize: '12px',
-            color: '#9ca3af',
-            margin: 0
-          }}>
-            Designed & Developed by <span style={{ fontWeight: '600', color: '#6b7280' }}>Briyanes</span>
-          </p>
-        </div>
-      </footer>
+    {/* Screen Reader Live Region for Announcements */}
+    <div
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      style={{
+        position: 'absolute',
+        left: '-10000px',
+        width: '1px',
+        height: '1px',
+        overflow: 'hidden'
+      }}
+    >
+      {isAnalyzing && 'Analyzing your CSV files, please wait.'}
+      {isGenerating && 'Generating your report, please wait.'}
+      {isDownloadingPDF && 'Downloading PDF report, please wait.'}
+      {analysis && !isGenerating && !htmlReport && 'Analysis complete. You can now generate your report.'}
+      {htmlReport && 'Report generated successfully. You can preview or download it.'}
+      {error && `Error: ${error}`}
     </div>
+
+    {/* Toast Container */}
+    <ToastContainer />
+  </div>
   )
 }
-
