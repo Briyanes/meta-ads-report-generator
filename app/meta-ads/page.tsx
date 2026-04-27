@@ -979,7 +979,7 @@ export default function MetaAdsPage() {
             marginBottom: '16px'
           }}>
             <div>
-              <label style={{
+              <label className="form-label" style={{
                 display: 'block',
                 fontSize: '13px',
                 fontWeight: '600',
@@ -1016,7 +1016,7 @@ export default function MetaAdsPage() {
               />
             </div>
             <div>
-              <label style={{
+              <label className="form-label" style={{
                 display: 'block',
                 fontSize: '13px',
                 fontWeight: '600',
@@ -1061,7 +1061,7 @@ export default function MetaAdsPage() {
               </select>
             </div>
             <div style={{ gridColumn: 'span 2' }}>
-              <label style={{
+              <label className="form-label" style={{
                 display: 'block',
                 fontSize: '13px',
                 fontWeight: '600',
@@ -1482,7 +1482,7 @@ export default function MetaAdsPage() {
             marginBottom: showMetrics ? '24px' : '0px',
             transition: 'margin-bottom 0.2s ease'
           }}>
-            <h2 style={{
+            <h2 className="section-heading" style={{
               fontSize: '17px',
               fontWeight: '700',
               color: '#111827',
@@ -1675,7 +1675,7 @@ export default function MetaAdsPage() {
           e.currentTarget.style.transform = 'translateY(0)'
           e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
         }}>
-          <h2 style={{
+          <h2 className="section-heading" style={{
             fontSize: '18px',
             fontWeight: '700',
             color: '#111827',
@@ -1686,7 +1686,7 @@ export default function MetaAdsPage() {
             <br />
             {retentionType === 'wow' ? 'Week-on-Week' : 'Month-on-Month'} Analysis
           </h2>
-          <p style={{
+          <p className="section-description" style={{
             fontSize: '14px',
             color: '#6b7280',
             marginBottom: '24px',
@@ -1702,7 +1702,7 @@ export default function MetaAdsPage() {
           }}>
             {/* This Week/Month */}
             <div>
-              <label style={{
+              <label className="upload-label" style={{
                 display: 'block',
                 fontSize: '14px',
                 fontWeight: '600',
@@ -1818,7 +1818,7 @@ export default function MetaAdsPage() {
 
             {/* Last Week/Month */}
             <div>
-              <label style={{
+              <label className="upload-label" style={{
                 display: 'block',
                 fontSize: '14px',
                 fontWeight: '600',
