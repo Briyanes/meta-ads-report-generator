@@ -2121,7 +2121,6 @@ function generateAdCreativeSlide(data: any[], slideNumber: number): string {
 function generateContentPerformanceSlide(data: any[], slideNumber: number): string {
   const firstItem = data[0] || {}
   const creativeNameKey = Object.keys(firstItem).find(k => k.toLowerCase() === 'ads' || k.toLowerCase() === 'ad name' || k.toLowerCase().includes('ad name') || k.toLowerCase().includes('creative')) || 'Ads'
-  const adIdKey = Object.keys(firstItem).find(k => k.toLowerCase() === 'ad id' || k.toLowerCase().includes('ad id')) || 'Ad ID'
 
   // Sort by WA results (Messaging conversations started ONLY - no fallback to Results to avoid bad data)
   const sortedData = [...data].filter(item => {
@@ -2191,10 +2190,6 @@ function generateContentPerformanceSlide(data: any[], slideNumber: number): stri
     const name = String(item[creativeNameKey] || 'Unknown')
     const displayName = name.length > 50 ? name.slice(0, 50) + '…' : name
     const { metrics, analysis } = generateAnalysis(item, index + 1)
-    const adId = item[adIdKey] || ''
-
-    // Generate preview URL text if Ad ID is available - use Facebook Ads Library
-    const previewUrlText = adId ? `<div class="content-preview-url">→ https://www.facebook.com/ads/library/?id=${adId}</div>` : ''
 
     return `
       <div class="content-item" style="position: relative;">
@@ -2204,7 +2199,6 @@ function generateContentPerformanceSlide(data: any[], slideNumber: number): stri
         </div>
         <div class="content-metrics">${metrics}</div>
         <div class="content-analysis">→ ${analysis}</div>
-        ${previewUrlText}
       </div>`
   }).join('')
 
@@ -2271,13 +2265,6 @@ function generateContentPerformanceSlide(data: any[], slideNumber: number): stri
                 color: var(--gray-700);
                 margin-left: 40px;
                 line-height: 1.5;
-            }
-            .content-preview-url {
-                font-size: 11px;
-                color: #2563eb;
-                margin-left: 40px;
-                margin-top: 4px;
-                word-break: break-all;
             }
         </style>
 
