@@ -162,6 +162,17 @@ a {
   100% { transform: rotate(360deg); }
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .alert {
   padding: 1rem;
   border-radius: 6px;
@@ -1372,5 +1383,182 @@ a {
   .back-to-home-desktop {
     width: 100% !important;
     justify-content: center !important;
+  }
+}
+
+/* Meta Ads Page - Objective Cards Responsive */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .responsive-card div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .responsive-card div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"] {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+  }
+
+  .responsive-card div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"] > div {
+    padding: 12px !important;
+  }
+
+  .responsive-card div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"] > div > div {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 6px !important;
+  }
+
+  .responsive-card div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"] > div > div > div {
+    margin-bottom: 0 !important;
+  }
+
+  .responsive-card div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"] > div p:last-child {
+    font-size: 11px !important;
+    margin: 6px 0 0 0 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .responsive-card div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"] {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .responsive-card div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"] > div {
+    padding: 14px !important;
+  }
+
+  .responsive-card div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"] > div > div {
+    gap: 8px !important;
+  }
+
+  .responsive-card div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"] > div > div > div p {
+    font-size: 14px !important;
+  }
+
+  .responsive-card div[style*="gridTemplateColumns: 'repeat(4, 1fr)'"] > div > div > div p:last-child {
+    font-size: 11px !important;
+  }
+}
+
+/* Meta Ads Page - Metrics Section Responsive */
+@media (max-width: 768px) {
+  .responsive-card h2[style*="font-size: '18px'"] {
+    font-size: 16px !important;
+  }
+
+  .responsive-card h2[style*="font-size: '17px'"] {
+    font-size: 15px !important;
+  }
+
+  .responsive-card button[style*="font-size: '13px'"] {
+    font-size: 12px !important;
+    padding: 6px 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .responsive-card h2[style*="font-size: '18px'"] {
+    font-size: 15px !important;
+    line-height: 1.3 !important;
+  }
+
+  .responsive-card h2[style*="font-size: '17px'"] {
+    font-size: 14px !important;
+  }
+}
+
+/* Meta Ads Page - Upload Section Responsive */
+@media (max-width: 768px) {
+  .responsive-card label[style*="fontSize: '14px'"] {
+    font-size: 13px !important;
+  }
+
+  .responsive-card label[style*="fontSize: '15px'"] {
+    font-size: 14px !important;
+  }
+
+  .responsive-card label[htmlFor][style*="padding: '40px'"] {
+    padding: 30px 20px !important;
+  }
+
+  .responsive-card label[htmlFor][style*="padding"] p {
+    font-size: 14px !important;
+  }
+
+  .responsive-card label[htmlFor][style*="padding"] p:last-child {
+    font-size: 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .responsive-card label[htmlFor][style*="padding: '40px'"] {
+    padding: 24px 16px !important;
+  }
+
+  .responsive-card label[htmlFor][style*="padding"] p {
+    font-size: 13px !important;
+  }
+
+  .responsive-card label[htmlFor][style*="padding"] p:last-child {
+    font-size: 11px !important;
+  }
+
+  .responsive-card label[htmlFor][style*="padding"] p i {
+    font-size: 16px !important;
+  }
+}
+
+/* Meta Ads Page - Action Buttons Responsive */
+@media (max-width: 768px) {
+  .action-buttons-container button {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 12px 20px !important;
+    font-size: 14px !important;
+  }
+
+  .action-buttons-container button i {
+    font-size: 15px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .action-buttons-container button {
+    padding: 10px 16px !important;
+    font-size: 13px !important;
+  }
+
+  .action-buttons-container button i {
+    font-size: 14px !important;
+  }
+
+  .back-to-home-mobile {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 10px 16px !important;
+    font-size: 13px !important;
+  }
+}
+
+/* Meta Ads Page - File List Responsive */
+@media (max-width: 480px) {
+  .responsive-card div[style*="display: 'flex'"][style*="gap: '8px'"] {
+    flex-wrap: wrap !important;
+  }
+
+  .responsive-card div[style*="display: 'flex'"] span[style*="flex: 1"] {
+    font-size: 11px !important;
+    word-break: break-all !important;
+  }
+
+  .responsive-card div[style*="display: 'flex'"] button {
+    padding: 4px 8px !important;
+    font-size: 12px !important;
+  }
+
+  .responsive-card div[style*="display: 'flex'"] button i {
+    font-size: 10px !important;
   }
 }
