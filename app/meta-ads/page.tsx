@@ -21,7 +21,7 @@ export default function MetaAdsPage() {
   const [generationProgress, setGenerationProgress] = useState<string>('')
   const [retentionType, setRetentionType] = useState<'wow' | 'mom'>('wow')
   const [objectiveType, setObjectiveType] = useState<'ctwa' | 'cpas' | 'ctlptowa' | 'ctlptopurchase'>('ctwa')
-  const [showDocumentation, setShowDocumentation] = useState(false)
+  const [showMetrics, setShowMetrics] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
 
   useEffect(() => {
@@ -410,8 +410,7 @@ export default function MetaAdsPage() {
     setError(null)
     setReportName('')
     setGenerationProgress('')
-    setShowDocumentation(false)
-    
+
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -973,7 +972,7 @@ export default function MetaAdsPage() {
         }}>
           <div className="responsive-grid-3" style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
+            gridTemplateColumns: 'repeat(2, 1fr)',
             gap: '16px',
             marginBottom: '16px'
           }}>
@@ -1055,7 +1054,7 @@ export default function MetaAdsPage() {
                 <option value="mom">MoM (Month-on-Month)</option>
               </select>
             </div>
-            <div>
+            <div style={{ gridColumn: 'span 2' }}>
               <label style={{
                 display: 'block',
                 fontSize: '14px',
@@ -1067,7 +1066,7 @@ export default function MetaAdsPage() {
               </label>
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(2, 1fr)',
+                gridTemplateColumns: 'repeat(4, 1fr)',
                 gap: '12px'
               }}>
                 {/* CTWA Card */}
@@ -1438,12 +1437,13 @@ export default function MetaAdsPage() {
           </div>
         </div>
 
-        {/* Documentation Section */}
+        {/* Objective Metrics Section */}
         <div className="responsive-card" style={{
-          backgroundColor: '#ffffff',
+          backgroundColor: '#fffbeb',
           borderRadius: '16px',
           boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
           border: 'none',
+          borderLeft: '4px solid #f59e0b',
           padding: '32px',
           marginBottom: '24px',
           transition: 'transform 0.2s ease, box-shadow 0.2s ease'
@@ -1460,215 +1460,175 @@ export default function MetaAdsPage() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginBottom: '16px',
-            flexWrap: 'wrap',
-            gap: '12px'
+            marginBottom: showMetrics ? '24px' : '0px',
+            transition: 'margin-bottom 0.2s ease'
           }}>
             <h2 style={{
               fontSize: '18px',
               fontWeight: 'bold',
               color: '#111827',
-              marginBottom: '20px'
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
             }}>
-              <i className="bi bi-file-earmark-text" style={{ marginRight: '8px' }}></i>
-              Export Requirements & Documentation
+              <i className="bi bi-info-circle" style={{ color: '#f59e0b', fontSize: '20px' }}></i>
+              Metrics for {objectiveType === 'ctwa' ? 'CTWA' : objectiveType === 'cpas' ? 'CPAS' : objectiveType === 'ctlptowa' ? 'CTLP to WA' : 'CTLP to Purchase'}
             </h2>
             <button
-              onClick={() => setShowDocumentation(!showDocumentation)}
+              onClick={() => setShowMetrics(!showMetrics)}
               style={{
-                padding: '10px 20px',
-                backgroundColor: '#2B46BB',
-                color: '#ffffff',
-                borderRadius: '10px',
+                padding: '8px 16px',
+                backgroundColor: showMetrics ? '#f59e0b' : '#e5e7eb',
+                color: showMetrics ? '#ffffff' : '#111827',
+                borderRadius: '8px',
                 border: 'none',
                 cursor: 'pointer',
-                fontSize: '14px',
+                fontSize: '13px',
                 fontWeight: '600',
                 transition: 'all 0.2s ease',
-                boxShadow: '0 4px 6px -1px rgba(43, 70, 187, 0.2)'
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                whiteSpace: 'nowrap'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#1e35a0'
                 e.currentTarget.style.transform = 'translateY(-1px)'
-                e.currentTarget.style.boxShadow = '0 6px 8px -1px rgba(43, 70, 187, 0.3)'
+                e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#2B46BB'
                 e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(43, 70, 187, 0.2)'
+                e.currentTarget.style.boxShadow = 'none'
               }}
             >
-              {showDocumentation ? 'Hide' : 'Show'} Documentation
+              {showMetrics ? (
+                <>
+                  <i className="bi bi-chevron-up" style={{ fontSize: '14px' }}></i>
+                  Read Less
+                </>
+              ) : (
+                <>
+                  <i className="bi bi-chevron-down" style={{ fontSize: '14px' }}></i>
+                  Read More
+                </>
+              )}
             </button>
           </div>
 
-          {showDocumentation && (
-            <div style={{ marginTop: '16px' }}>
-              <div style={{
-                backgroundColor: '#eff6ff',
-                borderLeft: '4px solid #3b82f6',
-                padding: '16px',
-                borderRadius: '8px',
-                marginBottom: '16px'
-              }}>
+          {showMetrics && (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr',
+              gap: '20px',
+              animation: 'fadeIn 0.3s ease'
+            }}>
+              {/* Main Metrics */}
+              <div>
                 <h3 style={{
+                  fontSize: '16px',
                   fontWeight: '600',
                   color: '#111827',
                   marginBottom: '12px',
-                  fontSize: '16px'
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
                 }}>
-                  Required Exports from Meta Ads Manager:
+                  <i className="bi bi-graph-up" style={{ color: '#f59e0b' }}></i>
+                  Main Metrics
                 </h3>
                 <div style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '24px'
+                  backgroundColor: '#ffffff',
+                  padding: '16px',
+                  borderRadius: '8px',
+                  border: '1px solid #fde68a'
                 }}>
-                  <div>
-                    <h4 style={{
-                      fontWeight: '600',
-                      fontSize: '16px',
-                      color: '#111827',
-                      marginBottom: '12px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
-                    }}>
-                      <i className="bi bi-file-earmark-text" style={{ color: '#3b82f6' }}></i>
-                      Main Export File (CSV Metrics):
-                    </h4>
-                    <div style={{
-                      backgroundColor: '#f9fafb',
-                      padding: '16px',
+                  <ul style={{
+                    fontSize: '13px',
+                    color: '#4b5563',
+                    listStyle: 'none',
+                    padding: 0,
+                    margin: 0,
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+                    gap: '8px'
+                  }}>
+                    {requirements.main.map((metric: string, idx: number) => (
+                      <li key={idx} style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        paddingLeft: '16px',
+                        paddingRight: '8px'
+                      }}>
+                        <span style={{ color: '#f59e0b', marginRight: '8px', fontSize: '12px', marginTop: '2px', flexShrink: 0 }}>✓</span>
+                        <span>{metric}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* Breakdown Metrics */}
+              <div>
+                <h3 style={{
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#111827',
+                  marginBottom: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <i className="bi bi-pie-chart" style={{ color: '#f59e0b' }}></i>
+                  Breakdown Metrics by Dimension
+                </h3>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                  gap: '12px'
+                }}>
+                  {Object.entries(requirements.breakdown).map(([fileName, metrics]: [string, any]) => (
+                    <div key={fileName} style={{
+                      padding: '14px',
+                      backgroundColor: '#ffffff',
                       borderRadius: '8px',
-                      border: '1px solid #e5e7eb'
+                      border: '1px solid #fde68a',
+                      boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
                     }}>
-                      <ul style={{
+                      <div style={{
+                        fontWeight: '600',
+                        color: '#111827',
+                        marginBottom: '10px',
                         fontSize: '13px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}>
+                        <i className="bi bi-file-earmark-spreadsheet" style={{ color: '#f59e0b', fontSize: '14px' }}></i>
+                        {fileName}
+                      </div>
+                      <ul style={{
+                        fontSize: '11px',
                         color: '#4b5563',
                         listStyle: 'none',
                         padding: 0,
                         margin: 0,
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-                        gap: '6px'
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '4px'
                       }}>
-                        {requirements.main.map((metric: string, idx: number) => (
+                        {metrics.map((metric: string, idx: number) => (
                           <li key={idx} style={{
                             display: 'flex',
                             alignItems: 'flex-start',
-                            marginBottom: '4px'
+                            paddingLeft: '16px'
                           }}>
-                            <span style={{ color: '#3b82f6', marginRight: '8px', fontSize: '12px' }}>•</span>
-                            <span>{metric}</span>
+                            <span style={{ color: '#f59e0b', marginRight: '6px', fontSize: '10px', marginTop: '2px', flexShrink: 0 }}>▸</span>
+                            <span style={{ lineHeight: '1.4' }}>{metric}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
-                  </div>
-                  <div>
-                    <h4 style={{
-                      fontWeight: '600',
-                      fontSize: '16px',
-                      color: '#111827',
-                      marginBottom: '12px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
-                    }}>
-                      <i className="bi bi-files" style={{ color: '#3b82f6' }}></i>
-                      Breakdown Export Files (with Required Metrics):
-                    </h4>
-                    <div style={{
-                      fontSize: '14px',
-                      color: '#4b5563',
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-                      gap: '12px'
-                    }}>
-                      {Object.entries(requirements.breakdown).map(([fileName, metrics]: [string, any]) => (
-                        <div key={fileName} style={{
-                          padding: '14px',
-                          backgroundColor: '#ffffff',
-                          borderRadius: '8px',
-                          border: '1px solid #e5e7eb',
-                          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
-                        }}>
-                          <div style={{
-                            fontWeight: '600',
-                            color: '#111827',
-                            marginBottom: '10px',
-                            fontSize: '14px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px'
-                          }}>
-                            <i className="bi bi-file-earmark-spreadsheet" style={{ color: '#3b82f6', fontSize: '16px' }}></i>
-                            {fileName}
-                          </div>
-                          <div style={{
-                            fontSize: '11px',
-                            color: '#6b7280',
-                            marginBottom: '8px',
-                            fontWeight: '500'
-                          }}>
-                            Required Metrics:
-                          </div>
-                          <ul style={{
-                            fontSize: '11px',
-                            color: '#4b5563',
-                            listStyle: 'none',
-                            padding: 0,
-                            margin: 0,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '3px'
-                          }}>
-                            {metrics.map((metric: string, idx: number) => (
-                              <li key={idx} style={{
-                                display: 'flex',
-                                alignItems: 'flex-start',
-                                padding: '2px 0'
-                              }}>
-                                <span style={{ color: '#3b82f6', marginRight: '6px', fontSize: '10px', marginTop: '2px' }}>▸</span>
-                                <span style={{ lineHeight: '1.4' }}>{metric}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  ))}
                 </div>
-              </div>
-
-              <div style={{
-                backgroundColor: '#fef3c7',
-                borderLeft: '4px solid #f59e0b',
-                padding: '16px',
-                borderRadius: '8px'
-              }}>
-                <h3 style={{
-                  fontWeight: '600',
-                  color: '#111827',
-                  marginBottom: '12px',
-                  fontSize: '16px'
-                }}>
-                  <i className="bi bi-lightbulb" style={{ marginRight: '8px' }}></i>
-                  Tips:
-                </h3>
-                <ul style={{
-                  fontSize: '14px',
-                  color: '#374151',
-                  listStyle: 'none',
-                  padding: 0,
-                  margin: 0
-                }}>
-                  <li style={{ marginBottom: '4px' }}>• Export data untuk kedua periode (This Week/This Month dan Last Week/Last Month)</li>
-                  <li style={{ marginBottom: '4px' }}>• Pastikan semua kolom metrik yang diperlukan ada di export</li>
-                  <li style={{ marginBottom: '4px' }}>• File breakdown harus sesuai dengan dimensi yang dipilih (age, gender, region, dll)</li>
-                  <li style={{ marginBottom: '4px' }}>• Format file harus CSV (Comma Separated Values)</li>
-                </ul>
               </div>
             </div>
           )}
