@@ -2026,7 +2026,7 @@ function generateAdCreativeSlide(data: any[], slideNumber: number): string {
     
     const rankBg = '#2563eb'
     const status = linkClicks > 0 && cpc < avgCPC ? '<span class="badge badge-success">Top</span>' : linkClicks > 0 ? '<span class="badge badge-warning">OK</span>' : '<span class="badge badge-danger">Low</span>'
-    const rowClass = index < 3 ? 'highlight' : ''
+    const rowClass = index < 5 ? 'highlight' : ''
 
     return `
       <tr class="${rowClass}">
