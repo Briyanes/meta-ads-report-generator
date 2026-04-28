@@ -2007,14 +2007,14 @@ function generateAdCreativeSlide(data: any[], slideNumber: number): string {
     return name && String(name).trim() !== ''
   }).sort((a, b) => parseNum(b['Link clicks'] || 0) - parseNum(a['Link clicks'] || 0))
 
-  // Limit to top 10 for table display
-  const top10Data = sortedData.slice(0, 10)
+  // Limit to top 5 for table display
+  const top5Data = sortedData.slice(0, 5)
 
   const totalClicks = sortedData.reduce((sum, item) => sum + parseNum(item['Link clicks'] || 0), 0)
   const totalSpent = sortedData.reduce((sum, item) => sum + parseNum(item['Amount spent (IDR)'] || 0), 0)
   const avgCPC = totalClicks > 0 ? totalSpent / totalClicks : 0
 
-  const rows = top10Data.map((item, index) => {
+  const rows = top5Data.map((item, index) => {
     const name = String(item[creativeNameKey] || 'Unknown').slice(0, 45) + (String(item[creativeNameKey] || '').length > 45 ? '...' : '')
     const spent = parseNum(item['Amount spent (IDR)'] || 0)
     const impr = parseNum(item['Impressions'] || 0)
@@ -2049,7 +2049,7 @@ function generateAdCreativeSlide(data: any[], slideNumber: number): string {
 
         <div class="slide-title">
             <h1><i class="bi bi-image-fill"></i> Ad Creative Performance</h1>
-            <p>Top 10 Creatives (${sortedData.length} Total)</p>
+            <p>Top 5 Creatives (${sortedData.length} Total)</p>
         </div>
 
         <div class="full-table">
