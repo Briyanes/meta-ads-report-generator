@@ -2293,7 +2293,7 @@ function generateContentPerformanceSlide(data: any[], slideNumber: number): stri
 
         <div class="info-box" style="margin-top: 20px;">
             <h4><i class="bi bi-lightbulb-fill"></i> Summary</h4>
-            <p>Dari <strong>${sortedData.length} creative</strong> aktif, top 10 menghasilkan <strong>${formatNumber(top10.reduce((sum, item) => sum + parseNum(item['Messaging conversations started'] || item['Results'] || 0), 0))} WA</strong> (${totalWA > 0 ? ((top10.reduce((sum, item) => sum + parseNum(item['Messaging conversations started'] || item['Results'] || 0), 0) / totalWA) * 100).toFixed(1) : 0}% dari total). Rata-rata Cost/WA: <strong>${formatCurrency(avgCostPerWA)}</strong>, Rata-rata konversi OC→WA: <strong>${avgConvRate.toFixed(1)}%</strong>.</p>
+            <p>Dari <strong>${sortedData.length} creative</strong> aktif, top 5 menghasilkan <strong>${formatNumber(top5.reduce((sum, item) => sum + parseNum(item['Messaging conversations started'] || item['Results'] || 0), 0))} WA</strong> (${totalWA > 0 ? ((top5.reduce((sum, item) => sum + parseNum(item['Messaging conversations started'] || item['Results'] || 0), 0) / totalWA) * 100).toFixed(1) : 0}% dari total). Rata-rata Cost/WA: <strong>${formatCurrency(avgCostPerWA)}</strong>, Rata-rata konversi OC→WA: <strong>${avgConvRate.toFixed(1)}%</strong>.</p>
         </div>
 
         <div class="strategy-box" style="margin-top: 16px; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-left: 4px solid #10b981; border-radius: 12px; padding: 20px;">
@@ -2301,7 +2301,7 @@ function generateContentPerformanceSlide(data: any[], slideNumber: number): stri
                 <i class="bi bi-lightbulb-fill" style="font-size: 20px;"></i>
                 Rekomendasi Strategi
             </h4>
-            ${generateStrategicRecommendations(top10, avgCostPerWA, avgConvRate, totalWA)}
+            ${generateStrategicRecommendations(top5, avgCostPerWA, avgConvRate, totalWA)}
         </div>
     </div>`
 
