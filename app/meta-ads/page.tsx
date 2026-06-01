@@ -4,8 +4,107 @@ import { useState, useEffect, useCallback, lazy, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
+import Papa from 'papaparse'
 import { parseCSV } from '@/lib/csvParser'
 import { generatePDFFromHTML, downloadPDF } from '@/lib/pdfGenerator'
+
+// ============================================================
+// CLIENT-SIDE CSV OPTIMIZER
+// Reduces payload size to stay under Vercel's 4.5MB limit.
+// Filters to only needed columns and limits ad-creative rows.
+// ============================================================
+
+// Columns actually used by the analysis engine (lowercase for matching)
+const NEEDED_COLUMNS_LOWER = new Set([
+  // Spend
+  'amount spent (idr)', 'amount spent', 'spend',
+  // Reach & Impressions
+  'reach', 'accounts center accounts reached', 'impressions', 'frequency',
+  // Clicks
+  'link clicks', 'outbound clicks', 'clicks (all)',
+  // Rates
+  'ctr (link click-through rate)', 'ctr (all)',
+  'cpc (cost per link click)', 'cpm (cost per 1,000 impressions)',
+  'cost per 1,000 accounts center accounts reached',
+  // CTWA
+  'messaging conversations started', 'cost per messaging conversation started',
+  // CTLP
+  'checkouts initiated', 'website landing page views', 'landing page views', 'content views',
+  '* oc to lpv', '* lc to lpv', '* lpv to ic',
+  // CPAS / e-commerce
+  'adds to cart with shared items', 'adds to cart',
+  'adds to cart conversion value for shared items only', 'atc value',
+  'purchases with shared items', 'purchases',
+  'purchases conversion value for shared items only', 'purchases conversion value', 'purchase value',
+  'content views with shared items',
+  // Revenue
+  'roas', 'results roas', 'purchase roas for shared items only', 'purchase roas',
+  'aov (idr)', 'aov',
+  // Cost metrics
+  'cost /cv', 'cost /atc', 'cost /purchase', 'cost per purchase', 'cost per result',
+  // Conversion rates
+  '* lc to cv', '* cv to atc', 'atc to purchase',
+  // Breakdown dimensions
+  'age', 'gender', 'region', 'location',
+  'platform', 'publisher platform',
+  'placement', 'publisher placement',
+  'objective', 'campaign objective',
+  // Creative / Ad
+  'ad id', 'ads', 'ad name', 'ad set name', 'campaign name',
+  // Dates
+  'day', 'reporting starts', 'reporting ends', 'result type',
+  // Instagram
+  'instagram profile visits', 'instagram follows',
+  // Results
+  'results',
+])
+
+/**
+ * Filters CSV to only needed columns and limits ad-creative rows to top 500 by spend.
+ * Returns the original File unchanged if no significant reduction is possible.
+ */
+async function optimizeCSVForUpload(file: File): Promise<File> {
+  try {
+    const text = await file.text()
+    const result = Papa.parse<Record<string, string>>(text, {
+      header: true,
+      skipEmptyLines: true,
+    })
+
+    const allHeaders = result.meta.fields || []
+    const keepHeaders = allHeaders.filter(h => NEEDED_COLUMNS_LOWER.has(h.toLowerCase()))
+
+    // If we're not removing at least 10% of columns, skip filtering
+    if (keepHeaders.length >= allHeaders.length * 0.9) {
+      return file
+    }
+
+    // Filter rows to only needed columns
+    let rows: Record<string, string>[] = (result.data as Record<string, string>[]).map(row => {
+      const filtered: Record<string, string> = {}
+      keepHeaders.forEach(h => { filtered[h] = row[h] ?? '' })
+      return filtered
+    })
+
+    // For ad-creative files: limit to top 500 rows by spend (avoids huge catalog uploads)
+    const isAdCreative = /ad.?creative|creative/i.test(file.name)
+    if (isAdCreative && rows.length > 500) {
+      const spendKey = keepHeaders.find(h => /amount spent/i.test(h))
+      if (spendKey) {
+        rows = [...rows].sort((a, b) => {
+          const parseSpend = (v: string) => parseFloat(String(v || '0').replace(/,/g, '')) || 0
+          return parseSpend(b[spendKey]) - parseSpend(a[spendKey])
+        }).slice(0, 500)
+      }
+    }
+
+    const optimizedCsv = Papa.unparse(rows)
+    return new File([optimizedCsv], file.name, { type: 'text/csv' })
+  } catch {
+    // On any error, fall back to original file
+    return file
+  }
+}
 
 // Lazy load ReportPreview component for better performance
 const ReportPreview = lazy(() => import('./components/ReportPreview'))
@@ -269,22 +368,38 @@ export default function MetaAdsPage() {
       // Progress 30%: Files validated
       setAnalyzeProgress(30)
 
+      // Optimize all CSV files (filter columns + limit ad-creative rows) to stay under Vercel's 4.5MB limit
+      const [
+        optimizedMain,
+        optimizedMainLast,
+        ...optimizedBreakdowns
+      ] = await Promise.all([
+        optimizeCSVForUpload(finalMainThisWeek),
+        optimizeCSVForUpload(finalMainLastWeek),
+        ...filesThisWeek.filter(f => f !== finalMainThisWeek).map(optimizeCSVForUpload),
+        ...filesLastWeek.filter(f => f !== finalMainLastWeek).map(optimizeCSVForUpload),
+      ])
+
+      const optimizedBreakdownsThisWeek = optimizedBreakdowns.slice(
+        0,
+        filesThisWeek.filter(f => f !== finalMainThisWeek).length
+      )
+      const optimizedBreakdownsLastWeek = optimizedBreakdowns.slice(
+        filesThisWeek.filter(f => f !== finalMainThisWeek).length
+      )
+
       // Add main CSV files
-      formData.append('fileThisWeek', finalMainThisWeek)
-      formData.append('fileLastWeek', finalMainLastWeek)
+      formData.append('fileThisWeek', optimizedMain)
+      formData.append('fileLastWeek', optimizedMainLast)
 
       // Add breakdown files for this week (all files except main)
-      filesThisWeek.forEach((file, index) => {
-        if (file !== finalMainThisWeek) {
-          formData.append(`breakdownThisWeek_${index}`, file)
-        }
+      optimizedBreakdownsThisWeek.forEach((file, index) => {
+        formData.append(`breakdownThisWeek_${index}`, file)
       })
 
       // Add breakdown files for last week (all files except main)
-      filesLastWeek.forEach((file, index) => {
-        if (file !== finalMainLastWeek) {
-          formData.append(`breakdownLastWeek_${index}`, file)
-        }
+      optimizedBreakdownsLastWeek.forEach((file, index) => {
+        formData.append(`breakdownLastWeek_${index}`, file)
       })
 
       formData.append('retentionType', retentionType)
